@@ -399,7 +399,7 @@ function showAuth(message='',isError=false){
  document.getElementById('signupBtn').onclick=async()=>{
    if(password.value.length<8)return setAuthMsg('Choisis un mot de passe d’au moins 8 caractères.',true);
    setAuthMsg('Création du compte…',false);
-   const {data,error}=await supa.auth.signUp({email:email.value.trim(),password:password.value,options:{data:{full_name:'Alex Kieffer'}}});
+   const {data,error}=await supa.auth.signUp({email:email.value.trim(),password:password.value,options:{emailRedirectTo:'https://kiefferalex2-oss.github.io/ak-prime/',data:{full_name:'Alex Kieffer'}}});
    if(error)return setAuthMsg(error.message,true);
    if(data.session){await enterApp(data.user)}
    else setAuthMsg('Compte créé. Vérifie ton e-mail si Supabase demande une confirmation, puis reconnecte-toi.',false);
