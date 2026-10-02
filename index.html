@@ -140,14 +140,16 @@ async function loadSupabaseData(){
    supa.from('passport_events').select('*').order('event_date',{ascending:false}),
    supa.from('client_workspace').select('*'),
    supa.from('questionnaire_responses').select('*').order('submitted_at',{ascending:false}),
-   supa.from('profiles').select('id,role,full_name,email')
+   supa.from('profiles').select('id,role,full_name,email'),
+   supa.from('onboarding').select('*')
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const [cr,tr,cyr,chr,er,wr,qr,pr]=reqs.map(r=>r.data||[]);
+ const [cr,tr,cyr,chr,er,wr,qr,pr,obr]=reqs.map(r=>r.data||[]);
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
+ const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
  db.clients=cr.map(x=>{
-   const ws=work[x.id]||{}, cy=(cycles[x.id]||[])[0]||{}, q=(questions[x.id]||[])[0]||{};
+   const ws=work[x.id]||{}, cy=(cycles[x.id]||[])[0]||{}, q=(questions[x.id]||[])[0]||{}, ob=onboard[x.id]||{};
    return {
      id:x.id,name:[x.first_name,x.last_name==='-'?'':x.last_name].filter(Boolean).join(' '),email:x.email||'',phone:x.phone||'',
      authUserId:x.auth_user_id||'',accountProfile:x.auth_user_id?pr.find(p=>p.id===x.auth_user_id)||null:null,
@@ -155,7 +157,8 @@ async function loadSupabaseData(){
      initials:initials([x.first_name,x.last_name].filter(Boolean).join(' ')),pole:x.current_pole||'À définir',offer:x.current_offer||'À définir',
      status:DB_STATUS_TO_UI[x.status]||x.status,start:isoDate(x.start_date),end:isoDate(x.engagement_end_date),next:isoDate(x.next_visio_at),
      sport:x.current_sport||'',specialty:x.position_or_specialty||'',level:x.level||'',age:calcAge(x.birth_date),payment:x.payment_status||'—',
-     questionnaire:q.answers||{},deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
+     questionnaire:q.answers||{},questionnaireStatus:q.status||'',deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
+     onboarding:{currentStep:ob.current_step||'questionnaire',questionnaireReceivedAt:ob.questionnaire_received_at||'',visioScheduledAt:ob.visio_scheduled_at||'',visioCompletedAt:ob.visio_completed_at||'',testsRequired:Array.isArray(ob.tests_required)?ob.tests_required:[],testsCompletedAt:ob.tests_completed_at||'',programmingReadyAt:ob.programming_ready_at||'',completedAt:ob.onboarding_completed_at||''},
      decisions:ws.coach_decisions||'',privateNote:ws.private_note||'',
      tests:(tests[x.id]||[]).map(t=>({id:t.id,name:t.test_name,date:isoDate(t.performed_at),value:t.result_value??t.result_text??'',unit:t.unit||'',context:t.context||'',note:t.coach_interpretation||''})),
      cycle:{_id:cy.id||'',title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||'',optitrainer:x.optitrainer_url||''},
@@ -267,18 +270,25 @@ function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Cli
 function dashboard(){
  const acts=activeClients();
  const next=acts.filter(c=>c.next).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,5);
- const ending=acts.filter(c=>c.end).sort((a,b)=>a.end.localeCompare(b.end)).slice(0,5);
- return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Vue rapide de l’activité AK PRIME.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
+ const now=new Date();
+ const ending=acts.filter(c=>c.end&&((new Date(c.end+'T23:59:59')-now)/(86400000))<=14&&new Date(c.end+'T23:59:59')>=now).sort((a,b)=>a.end.localeCompare(b.end));
+ const visioTodo=db.clients.filter(c=>c.onboarding?.currentStep==='visio');
+ const testsTodo=db.clients.filter(c=>c.onboarding?.currentStep==='tests');
+ const programmingTodo=db.clients.filter(c=>c.onboarding?.currentStep==='programming');
+ const questionnaireTodo=db.clients.filter(c=>c.onboarding?.currentStep==='questionnaire');
+ const checkinTodo=acts.filter(c=>!c.checkins?.length || (now-new Date(c.checkins.slice().sort((a,b)=>b.date.localeCompare(a.date))[0].date+'T12:00:00'))>7*86400000);
+ const tasks=[...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
+ return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="kpis">'+
- kpi('Clients actifs',acts.length,'Tous pôles')+kpi('Performance',acts.filter(c=>c.pole==='Performance').length,'clients actifs')+
- kpi('Forme & Santé',acts.filter(c=>c.pole==='Forme & Santé').length,'clients actifs')+kpi('Mental',acts.filter(c=>c.pole==='Mental').length,'clients actifs')+
+ kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
+ kpi('Tests à terminer',testsTodo.length,'avant programmation')+kpi('Programmations à faire',programmingTodo.length,'tests requis validés')+
  '</div><div class="grid2">'+
+ '<div class="card panel"><h3>Actions prioritaires</h3><div class="list">'+(tasks.length?tasks.map(x=>'<div class="item row between"><div><strong>'+esc(x.c.name)+'</strong><div class="muted tiny">'+esc(x.label)+'</div></div><button class="link openClient" data-id="'+x.c.id+'">Ouvrir</button></div>').join(''):'<div class="alert green">Aucune action d’onboarding urgente.</div>')+'</div></div>'+
  '<div class="card panel"><h3>Prochaines visios</h3><div class="list">'+(next.length?next.map(c=>'<div class="item row between"><div><strong>'+esc(c.name)+'</strong><span class="muted tiny">'+esc(c.offer)+' — '+fmtDate(c.next)+'</span></div><button class="link openClient" data-id="'+c.id+'">Ouvrir</button></div>').join(''):'<div class="muted">Aucune visio planifiée.</div>')+'</div></div>'+
- '<div class="card panel"><h3>Engagements à surveiller</h3><div class="list">'+ending.map(c=>'<div class="item row between"><div><strong>'+esc(c.name)+'</strong><span class="muted tiny">Fin : '+fmtDate(c.end)+'</span></div><span class="status amber">'+esc(c.renewal||'À décider')+'</span></div>').join('')+'</div></div>'+
  '</div><div class="grid3" style="margin-top:13px">'+
- '<div class="card panel"><h3>Onboarding</h3><div class="alert blue">Les questionnaires, notes de visio et décisions restent regroupés dans une seule fiche client.</div></div>'+
- '<div class="card panel"><h3>Tests</h3><div class="alert green">'+db.clients.reduce((n,c)=>n+(c.tests?.length||0),0)+' résultats de tests enregistrés dans la démo.</div></div>'+
- '<div class="card panel"><h3>Check-in vendredi</h3><div class="alert">Le futur module automatisera la remontée des check-ins et les alertes de suivi.</div></div></div>';
+ '<div class="card panel"><h3>Suivis à traiter</h3><div class="kpi"><div class="val">'+checkinTodo.length+'</div><div class="sub">client(s) sans check-in récent</div></div></div>'+
+ '<div class="card panel"><h3>Renouvellements J-14</h3><div class="kpi"><div class="val">'+ending.length+'</div><div class="sub">engagement(s) à revoir</div></div></div>'+
+ '<div class="card panel"><h3>Clients actifs</h3><div class="kpi"><div class="val">'+acts.length+'</div><div class="sub">accompagnements en cours</div></div></div></div>';
 }
 function kpi(label,val,sub){return '<div class="card kpi"><div class="lab">'+label+'</div><div class="val">'+val+'</div><div class="sub">'+sub+'</div></div>'}
 
@@ -331,7 +341,19 @@ function progressRow(label,val){return '<div style="margin-bottom:12px"><div cla
 function onboarding(c){
  const qs=Object.entries(c.questionnaire||{});
  const offerBlocks=offerSpecificBlocks(c);
- return '<div class="grid31"><div class="card panel"><h3>Questionnaire initial</h3><p class="muted tiny">Réponses centralisées.</p>'+
+ const ob=c.onboarding||{currentStep:'questionnaire',testsRequired:[]};
+ const stepLabels={questionnaire:'Questionnaire à compléter',visio:'Visio à préparer',tests:'Tests à réaliser',programming:'Prêt pour programmation',active:'Accompagnement actif'};
+ const stepOrder=['questionnaire','visio','tests','programming','active'];
+ const stepIndex=Math.max(0,stepOrder.indexOf(ob.currentStep));
+ const required=ob.testsRequired||[];
+ const reqRows=required.map(name=>{const done=(c.tests||[]).some(t=>String(t.name).trim().toLowerCase()===String(name).trim().toLowerCase());return '<div class="item row between"><div><strong>'+esc(name)+'</strong><div class="tiny '+(done?'account-good':'muted')+'">'+(done?'Résultat enregistré':'En attente')+'</div></div><button class="link removeRequiredTest" data-name="'+esc(name)+'">Retirer</button></div>'}).join('');
+ return '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Workflow onboarding</h3><div class="muted tiny">Étape actuelle : <strong>'+esc(stepLabels[ob.currentStep]||ob.currentStep)+'</strong></div></div><span class="status '+(ob.currentStep==='active'?'green':ob.currentStep==='programming'?'blue':'amber')+'">'+esc(stepLabels[ob.currentStep]||ob.currentStep)+'</span></div>'+
+ '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0">'+stepOrder.map((s,i)=>'<div class="item" style="padding:9px;background:'+(i<=stepIndex?'#eef3ff':'#fbfcfe')+'"><div class="tiny '+(i<=stepIndex?'':'muted')+'">'+(i+1)+'. '+esc(stepLabels[s])+'</div></div>').join('')+'</div>'+
+ (ob.currentStep==='visio'?'<button class="btn primary small" id="completeInitialVisio">Valider la visio initiale</button>':'')+
+ ((ob.visioCompletedAt||ob.currentStep==='tests'||ob.currentStep==='programming'||ob.currentStep==='active')?'<div class="section-title">Tests requis avant programmation</div><div class="list">'+(reqRows||'<div class="muted tiny">Aucun test requis défini. Ajoute les tests sélectionnés après la visio.</div>')+'</div><div class="row" style="margin-top:9px"><input id="requiredTestName" class="input grow" placeholder="Ex. CMJ, Sprint 10 m…"><button class="btn ghost small" id="addRequiredTest">Ajouter</button></div>':'')+
+ (ob.currentStep==='programming'?'<div class="alert green" style="margin-top:12px"><strong>Tous les tests requis sont validés.</strong><div class="tiny" style="margin-top:4px">La programmation peut maintenant être réalisée.</div><button class="btn primary small" id="completeProgramming" style="margin-top:8px">Marquer la programmation réalisée</button></div>':'')+
+ (ob.currentStep==='active'?'<div class="alert green" style="margin-top:12px"><strong>Onboarding terminé.</strong> L’accompagnement est actif.</div>':'')+
+ '</div><div class="grid31"><div class="card panel"><h3>Questionnaire initial</h3><p class="muted tiny">Réponses centralisées.</p>'+
  (qs.length?qs.map(([k,v],i)=>'<div class="accordion '+(i===0?'open':'')+'"><button class="accBtn">'+esc(questionLabel(k))+'<span>⌄</span></button><div class="body">'+esc(Array.isArray(v)?v.join(', '):(v===true?'Oui':v===false?'Non':v))+'<label class="check"><input class="deepCheck" data-key="'+esc(k)+'" type="checkbox" '+(c.deep?.[k]?'checked':'')+'> À approfondir en visio</label></div></div>').join(''):'<div class="muted">Questionnaire non renseigné.</div>')+
  '</div><div><div class="card panel"><h3>Analyse avant visio</h3><div class="item"><strong>Points marqués à approfondir</strong><div class="muted tiny">'+Object.keys(c.deep||{}).filter(k=>c.deep[k]).map(k=>esc(questionLabel(k))).join(' • ')||'Aucun point marqué'+'</div></div>'+
  '<div class="field"><label>Notes / approfondissements de visio</label><textarea class="textarea autoSave" data-field="visioNotes">'+esc(c.visioNotes||'')+'</textarea></div>'+
@@ -446,6 +468,10 @@ function bind(){
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
  const gs=document.getElementById('globalSearch');if(gs)gs.onkeydown=e=>{if(e.key==='Enter'){state.search=e.target.value;state.view='clients';render()}};
+ document.getElementById('completeInitialVisio')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('onboarding').update({visio_completed_at:new Date().toISOString(),current_step:'tests'}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio initiale validée');render()});
+ document.getElementById('addRequiredTest')?.addEventListener('click',async()=>{const cl=currentClient(),inp=document.getElementById('requiredTestName'),name=inp.value.trim();if(!name)return;const list=[...(cl.onboarding?.testsRequired||[])];if(!list.some(x=>x.toLowerCase()===name.toLowerCase()))list.push(name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis ajouté');render()});
+ document.querySelectorAll('.removeRequiredTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const name=b.dataset.name;const list=(cl.onboarding?.testsRequired||[]).filter(x=>x!==name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis retiré');render()});
+ document.getElementById('completeProgramming')?.addEventListener('click',async()=>{const cl=currentClient();const now=new Date().toISOString();const [a,b]=await Promise.all([supa.from('onboarding').update({onboarding_completed_at:now,current_step:'active'}).eq('client_id',cl.id),supa.from('clients').update({status:'active'}).eq('id',cl.id)]);const err=a.error||b.error;if(err)return toast('Erreur : '+err.message);await loadSupabaseData();toast('Accompagnement activé');render()});
  document.querySelectorAll('.deepCheck').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.deep=cl.deep||{};cl.deep[x.dataset.key]=x.checked;try{await saveWorkspace(cl);toast('Point mis à jour')}catch(e){toast('Erreur : '+e.message)}});
  document.querySelectorAll('.autoSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl[x.dataset.field]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
  document.querySelectorAll('.offerSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.offerNotes=cl.offerNotes||{};cl.offerNotes[x.dataset.offerKey]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
