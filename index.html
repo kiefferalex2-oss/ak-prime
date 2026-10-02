@@ -200,6 +200,54 @@ function fmtDate(v){if(!v)return '—';const p=v.split('-');return p.length===3?
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+const QUESTION_LABELS={
+  full_name:'Nom et prénom',
+  birth_date:'Date de naissance',
+  email:'Adresse e-mail',
+  phone:'Téléphone',
+  legal_guardian:'Responsable légal si mineur',
+  sport:'Sport pratiqué',
+  position:'Poste / spécialité',
+  level:'Niveau de pratique',
+  club:'Club / structure actuelle',
+  main_goal:'Objectif principal',
+  goal_detail:'Précisions sur l’objectif',
+  deadline:'Échéance ou date importante',
+  current_week:'Semaine actuelle d’entraînement et de compétition',
+  availability:'Disponibilités habituelles',
+  facilities:'Installations et matériel disponibles',
+  current_pain:'Douleur, gêne ou limitation actuelle',
+  injury_history:'Antécédents de blessures / opérations',
+  health_restrictions:'Restrictions ou recommandations de santé',
+  recent_tests:'Tests physiques récents',
+  club_data:'Données club / GPS / VBT / cardio disponibles',
+  previous_pp:'Expérience en préparation physique structurée',
+  liked_exercises:'Exercices / séances appréciés',
+  disliked_exercises:'Exercices mal tolérés ou peu appréciés',
+  expectations:'Attentes vis-à-vis de l’accompagnement',
+  other_info:'Informations complémentaires',
+  consent:'Consentement et confirmation des informations',
+  training_experience:'Expérience sportive / musculation',
+  current_activity:'Activité physique actuelle',
+  training_place:'Lieu principal d’entraînement',
+  equipment:'Matériel disponible',
+  life_constraints:'Contraintes de vie et d’organisation',
+  context:'Contexte de la préparation mentale',
+  difficult_situations:'Situations rencontrant le plus de difficultés',
+  duration:'Ancienneté des difficultés',
+  impact:'Impact sur la performance / le quotidien',
+  previous_mental_prep:'Expérience antérieure en préparation mentale',
+  health_professional:'Accompagnement actuel par un professionnel de santé',
+  lack_confidence:'Manque de confiance',
+  focus_difficulty:'Difficultés de concentration',
+  stress_emotions:'Gestion du stress et des émotions',
+  motivation_drop:'Baisse de motivation',
+  other_mental_aspects:'Autres aspects mentaux à travailler'
+};
+function questionLabel(key){
+  return QUESTION_LABELS[key]||String(key||'').replaceAll('_',' ').replace(/^./,m=>m.toUpperCase());
+}
+
 function currentClient(){return db.clients.find(c=>c.id===state.clientId)||db.clients[0]}
 function activeClients(){return db.clients.filter(c=>c.status==='Actif')}
 
@@ -284,8 +332,8 @@ function onboarding(c){
  const qs=Object.entries(c.questionnaire||{});
  const offerBlocks=offerSpecificBlocks(c);
  return '<div class="grid31"><div class="card panel"><h3>Questionnaire initial</h3><p class="muted tiny">Réponses centralisées.</p>'+
- (qs.length?qs.map(([k,v],i)=>'<div class="accordion '+(i===0?'open':'')+'"><button class="accBtn">'+esc(k)+'<span>⌄</span></button><div class="body">'+esc(v)+'<label class="check"><input class="deepCheck" data-key="'+esc(k)+'" type="checkbox" '+(c.deep?.[k]?'checked':'')+'> À approfondir en visio</label></div></div>').join(''):'<div class="muted">Questionnaire non renseigné.</div>')+
- '</div><div><div class="card panel"><h3>Analyse avant visio</h3><div class="item"><strong>Points marqués à approfondir</strong><div class="muted tiny">'+Object.keys(c.deep||{}).filter(k=>c.deep[k]).map(esc).join(' • ')||'Aucun point marqué'+'</div></div>'+
+ (qs.length?qs.map(([k,v],i)=>'<div class="accordion '+(i===0?'open':'')+'"><button class="accBtn">'+esc(questionLabel(k))+'<span>⌄</span></button><div class="body">'+esc(Array.isArray(v)?v.join(', '):(v===true?'Oui':v===false?'Non':v))+'<label class="check"><input class="deepCheck" data-key="'+esc(k)+'" type="checkbox" '+(c.deep?.[k]?'checked':'')+'> À approfondir en visio</label></div></div>').join(''):'<div class="muted">Questionnaire non renseigné.</div>')+
+ '</div><div><div class="card panel"><h3>Analyse avant visio</h3><div class="item"><strong>Points marqués à approfondir</strong><div class="muted tiny">'+Object.keys(c.deep||{}).filter(k=>c.deep[k]).map(k=>esc(questionLabel(k))).join(' • ')||'Aucun point marqué'+'</div></div>'+
  '<div class="field"><label>Notes / approfondissements de visio</label><textarea class="textarea autoSave" data-field="visioNotes">'+esc(c.visioNotes||'')+'</textarea></div>'+
  '<div class="field"><label>Décisions prises</label><textarea class="textarea autoSave" data-field="decisions">'+esc(c.decisions||'')+'</textarea></div></div>'+
  '<div class="card panel" style="margin-top:13px"><h3>Informations nouvelles</h3><textarea class="textarea autoSave" data-field="privateNote" placeholder="Informations complémentaires, notes coach privées…">'+esc(c.privateNote||'')+'</textarea></div></div>'+
