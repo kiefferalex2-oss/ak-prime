@@ -66,7 +66,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 </style>
 </head>
 <body>
-<div class="demo-banner">MODE PROTOTYPE — ne pas saisir de vraies données de santé tant que l’authentification et la base sécurisée ne sont pas branchées.</div>
+<div class="demo-banner">BÊTA PRIVÉE — Supabase est connecté. Les dossiers sont persistants ; les droits du futur portail client restent à tester avant données de santé réelles.</div>
 <div id="root"></div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
@@ -110,17 +110,85 @@ adminNote:'',legalGuardian:'',renewal:'3 mois'
 {id:'c4',name:'Sarah Petit',email:'sarah@example.fr',phone:'06 00 00 00 04',initials:'SP',pole:'Performance',offer:'P1',status:'Inactif',start:'2027-01-01',end:'2027-03-31',next:'',age:20,payment:'Terminé',questionnaire:{},deep:{},visioNotes:'',offerNotes:{},decisions:'',privateNote:'',tests:[],cycle:{title:'',start:'',end:'',priorities:'',vigilance:'',optitrainer:''},checkins:[],events:[],adminNote:'',legalGuardian:'',renewal:'Arrêt'}
 ];
 
-let db=loadDB();
-let state={view:'dashboard',clientId:db.clients[0]?.id||null,tab:'overview',search:'',status:'Tous',pole:'Tous'};
+let db={clients:[],settings:{optitrainerBase:'https://app.optitrainer.fr'}};
+let state={view:'dashboard',clientId:null,tab:'overview',search:'',status:'Tous',pole:'Tous'};
 
-function loadDB(){
-  try{const saved=localStorage.getItem(STORAGE_KEY);if(saved)return JSON.parse(saved)}catch(e){}
-  return {clients:JSON.parse(JSON.stringify(DEMO_CLIENTS)),settings:{optitrainerBase:'https://app.optitrainer.fr'}};
+const DB_STATUS_TO_UI={active:'Actif',inactive:'Inactif',paused:'Pause',onboarding:'Onboarding',prospect:'Prospect'};
+const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
+
+function isoDate(v){return v?String(v).slice(0,10):''}
+function calcAge(date){
+ if(!date)return '';
+ const d=new Date(date+'T00:00:00'),n=new Date();let a=n.getFullYear()-d.getFullYear();
+ const m=n.getMonth()-d.getMonth();if(m<0||(m===0&&n.getDate()<d.getDate()))a--;return a;
 }
-function saveDB(msg){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-  if(msg)toast(msg);
+function splitName(name){
+ const p=name.trim().split(/\s+/);return {first_name:p.shift()||'',last_name:p.join(' ')||'-'};
 }
+function groupBy(arr,key){
+ const out={};for(const x of arr||[]){const k=x[key];(out[k]||(out[k]=[])).push(x)}return out;
+}
+async function loadSupabaseData(){
+ const reqs=await Promise.all([
+   supa.from('clients').select('*').order('created_at',{ascending:false}),
+   supa.from('tests').select('*').order('performed_at',{ascending:false}),
+   supa.from('cycles').select('*').order('start_date',{ascending:false}),
+   supa.from('checkins').select('*').order('week_date',{ascending:false}),
+   supa.from('passport_events').select('*').order('event_date',{ascending:false}),
+   supa.from('client_workspace').select('*'),
+   supa.from('questionnaire_responses').select('*').order('submitted_at',{ascending:false})
+ ]);
+ const err=reqs.find(r=>r.error)?.error;if(err)throw err;
+ const [cr,tr,cyr,chr,er,wr,qr]=reqs.map(r=>r.data||[]);
+ const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id');
+ const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
+ db.clients=cr.map(x=>{
+   const ws=work[x.id]||{}, cy=(cycles[x.id]||[])[0]||{}, q=(questions[x.id]||[])[0]||{};
+   return {
+     id:x.id,name:[x.first_name,x.last_name==='-'?'':x.last_name].filter(Boolean).join(' '),email:x.email||'',phone:x.phone||'',
+     initials:initials([x.first_name,x.last_name].filter(Boolean).join(' ')),pole:x.current_pole||'À définir',offer:x.current_offer||'À définir',
+     status:DB_STATUS_TO_UI[x.status]||x.status,start:isoDate(x.start_date),end:isoDate(x.engagement_end_date),next:isoDate(x.next_visio_at),
+     sport:x.current_sport||'',specialty:x.position_or_specialty||'',level:x.level||'',age:calcAge(x.birth_date),payment:x.payment_status||'—',
+     questionnaire:q.answers||{},deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
+     decisions:ws.coach_decisions||'',privateNote:ws.private_note||'',
+     tests:(tests[x.id]||[]).map(t=>({id:t.id,name:t.test_name,date:isoDate(t.performed_at),value:t.result_value??t.result_text??'',unit:t.unit||'',context:t.context||'',note:t.coach_interpretation||''})),
+     cycle:{_id:cy.id||'',title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||'',optitrainer:x.optitrainer_url||''},
+     checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',coach:w.coach_decision||w.coach_feedback||''})),
+     events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
+     adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois'
+   };
+ });
+ if(state.clientId&&!db.clients.some(x=>x.id===state.clientId))state.clientId=null;
+ if(!state.clientId)state.clientId=db.clients[0]?.id||null;
+}
+async function saveWorkspace(client){
+ const row={client_id:client.id,deep_flags:client.deep||{},offer_notes:client.offerNotes||{},visio_summary:client.visioNotes||null,coach_decisions:client.decisions||null,private_note:client.privateNote||null,renewal_choice:client.renewal||'3 mois'};
+ const {error}=await supa.from('client_workspace').upsert(row,{onConflict:'client_id'});if(error)throw error;
+}
+async function persistPath(client,path,value){
+ if(path.startsWith('cycle.')){
+   const k=path.split('.')[1];
+   if(k==='optitrainer'){
+     const {error}=await supa.from('clients').update({optitrainer_url:value||null}).eq('id',client.id);if(error)throw error;return;
+   }
+   const map={title:'title',start:'start_date',end:'end_date',priorities:'priorities',vigilance:'vigilance'};
+   const field=map[k];if(!field)return;
+   if(!client.cycle._id){
+     const row={client_id:client.id,title:client.cycle.title||'Cycle actuel',start_date:client.cycle.start||client.start||new Date().toISOString().slice(0,10),end_date:client.cycle.end||null,priorities:client.cycle.priorities||null,vigilance:client.cycle.vigilance||null,status:'active'};
+     const {data,error}=await supa.from('cycles').insert(row).select().single();if(error)throw error;client.cycle._id=data.id;
+   }else{
+     const {error}=await supa.from('cycles').update({[field]:value||null}).eq('id',client.cycle._id);if(error)throw error;
+   }
+   return;
+ }
+ const map={offer:'current_offer',start:'start_date',end:'engagement_end_date',next:'next_visio_at',status:'status',email:'email',phone:'phone',legalGuardian:'legal_guardian',adminNote:'admin_note',payment:'payment_status'};
+ if(map[path]){
+   let v=value||null;if(path==='status')v=UI_STATUS_TO_DB[value]||value;if(path==='next'&&value)v=value+'T12:00:00Z';
+   const {error}=await supa.from('clients').update({[map[path]]:v}).eq('id',client.id);if(error)throw error;return;
+ }
+ if(path==='renewal'){client.renewal=value;await saveWorkspace(client);}
+}
+function saveDB(msg){if(msg)toast(msg);}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg||'Enregistré';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
 function fmtDate(v){if(!v)return '—';const p=v.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:v}
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
@@ -135,7 +203,7 @@ function shell(inner){
  '<div class="nav">'+
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('globalTests','Tests')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
- '</div><div class="sidebar-note">V2 interactive locale.<br>Les données restent dans ce navigateur tant que la vraie base sécurisée n’est pas connectée.</div></aside>'+
+ '</div><div class="sidebar-note">Supabase connecté.<br>Données clients persistantes et protégées par authentification + RLS.</div></aside>'+
  '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…"><span class="user-email">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="logoutBtn">Déconnexion</button><div class="avatar">AK</div></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
@@ -167,13 +235,13 @@ function clientsPage(){
  });
  return '<div class="page-title"><div><h1>Clients</h1><p>'+db.clients.length+' dossiers dans la V2.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="card"><div class="toolbar"><input id="clientSearch" class="input" placeholder="Rechercher…" value="'+esc(state.search)+'">'+
- '<select id="statusFilter" class="select"><option>Tous</option><option>Actif</option><option>Inactif</option></select>'+
+ '<select id="statusFilter" class="select"><option>Tous</option><option>Actif</option><option>Onboarding</option><option>Pause</option><option>Prospect</option><option>Inactif</option></select>'+
  '<select id="poleFilter" class="select"><option>Tous</option><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div>'+
  '<div style="overflow:auto"><table><thead><tr><th>Client</th><th>Pôle</th><th>Offre</th><th>Statut</th><th>Paiement</th><th>Prochaine visio</th><th></th></tr></thead><tbody>'+
  list.map(c=>'<tr><td><strong>'+esc(c.name)+'</strong><div class="muted tiny">'+esc(c.email||'')+'</div></td><td>'+esc(c.pole)+'</td><td>'+esc(c.offer)+'</td><td>'+status(c.status)+'</td><td>'+esc(c.payment||'—')+'</td><td>'+fmtDate(c.next)+'</td><td><button class="link openClient" data-id="'+c.id+'">Ouvrir</button></td></tr>').join('')+
  '</tbody></table></div></div>';
 }
-function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inactif'?'red':'blue')+'">'+esc(s)+'</span>'}
+function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inactif'?'red':s==='Onboarding'?'amber':'blue')+'">'+esc(s)+'</span>'}
 
 function clientPage(){
  const c=currentClient();if(!c)return clientsPage();
@@ -287,16 +355,16 @@ function calendarPage(){
  return '<div class="page-title"><div><h1>Calendrier</h1><p>V1 : échéances principales. Le vrai système de réservation sera branché plus tard.</p></div></div><div class="card panel"><div class="list">'+list.map(c=>'<div class="item row between"><div><strong>'+fmtDate(c.next)+' — '+esc(c.name)+'</strong><div class="muted tiny">'+esc(c.offer)+' / '+esc(c.pole)+'</div></div><button class="link openClient" data-id="'+c.id+'">Dossier</button></div>').join('')+'</div></div>';
 }
 function backupPage(){
- return '<div class="page-title"><div><h1>Sauvegardes</h1><p>Indispensable tant que la base de données n’est pas branchée.</p></div></div>'+
- '<div class="grid2"><div class="card panel"><h3>Exporter</h3><p class="muted">Télécharge une copie JSON complète de cette V2 locale.</p><button class="btn primary" id="exportData">Exporter les données</button></div>'+
- '<div class="card panel"><h3>Importer</h3><p class="muted">Restaure une sauvegarde précédemment exportée.</p><input type="file" id="importData" accept=".json" class="input"></div></div>'+
- '<div class="card panel" style="margin-top:13px"><h3>Réinitialiser la démo</h3><p class="muted">Supprime les changements locaux et recharge les faux clients de démonstration.</p><button class="btn danger" id="resetDemo">Réinitialiser</button></div>';
+ return '<div class="page-title"><div><h1>Sauvegardes</h1><p>La base principale est maintenant Supabase.</p></div></div>'+
+ '<div class="grid2"><div class="card panel"><h3>Exporter une copie</h3><p class="muted">Télécharge un instantané JSON des dossiers actuellement chargés. Utile comme copie de contrôle.</p><button class="btn primary" id="exportData">Exporter les données</button></div>'+
+ '<div class="card panel"><h3>Base distante</h3><div class="alert green">Les créations, tests, cycles, check-ins et événements sont enregistrés dans Supabase et ne dépendent plus de ce navigateur.</div></div></div>';
 }
 function settingsPage(){
- return '<div class="page-title"><div><h1>Paramètres</h1><p>Réglages simples de la V2.</p></div></div><div class="card panel" style="max-width:700px">'+
+ return '<div class="page-title"><div><h1>Paramètres</h1><p>État technique AK PRIME.</p></div></div><div class="card panel" style="max-width:760px">'+
  '<div class="field"><label>URL Optitrainer par défaut</label><input class="input" id="optiBase" value="'+esc(db.settings?.optitrainerBase||'')+'"></div>'+
- '<button class="btn primary" id="saveSettings">Enregistrer</button>'+
- '<div class="alert" style="margin-top:15px">La prochaine grosse étape technique sera l’authentification + la base sécurisée. Avant cela, garde uniquement des données fictives.</div></div>';
+ '<button class="btn primary" id="saveSettings">Enregistrer pour cette session</button>'+
+ '<div class="alert green" style="margin-top:15px">Authentification Supabase active • base PostgreSQL active • RLS active • compte propriétaire séparé des comptes clients.</div>'+
+ '<div class="alert" style="margin-top:10px">Le portail client et les invitations automatiques ne sont pas encore finalisés : continue à utiliser des données test pour les éléments de santé sensibles jusqu’au test complet des droits client.</div></div>';
 }
 
 function render(){
@@ -317,23 +385,21 @@ function bind(){
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
  const gs=document.getElementById('globalSearch');if(gs)gs.onkeydown=e=>{if(e.key==='Enter'){state.search=e.target.value;state.view='clients';render()}};
- document.querySelectorAll('.deepCheck').forEach(x=>x.onchange=()=>{const c=currentClient();c.deep=c.deep||{};c.deep[x.dataset.key]=x.checked;saveDB('Point mis à jour')});
- document.querySelectorAll('.autoSave').forEach(x=>x.onchange=()=>{currentClient()[x.dataset.field]=x.value;saveDB('Enregistré')});
- document.querySelectorAll('.offerSave').forEach(x=>x.onchange=()=>{const c=currentClient();c.offerNotes=c.offerNotes||{};c.offerNotes[x.dataset.offerKey]=x.value;saveDB('Enregistré')});
- document.querySelectorAll('.pathSave').forEach(x=>x.onchange=()=>{setPath(currentClient(),x.dataset.path,x.value);saveDB('Enregistré')});
+ document.querySelectorAll('.deepCheck').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.deep=cl.deep||{};cl.deep[x.dataset.key]=x.checked;try{await saveWorkspace(cl);toast('Point mis à jour')}catch(e){toast('Erreur : '+e.message)}});
+ document.querySelectorAll('.autoSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl[x.dataset.field]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
+ document.querySelectorAll('.offerSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.offerNotes=cl.offerNotes||{};cl.offerNotes[x.dataset.offerKey]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
+ document.querySelectorAll('.pathSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();setPath(cl,x.dataset.path,x.value);try{await persistPath(cl,x.dataset.path,x.value);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
  document.getElementById('addTest')?.addEventListener('click',openAddTest);
- document.querySelectorAll('.deleteTest').forEach(b=>b.onclick=()=>{const c=currentClient();c.tests=c.tests.filter(t=>t.id!==b.dataset.id);saveDB('Test supprimé');render()});
+ document.querySelectorAll('.deleteTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('tests').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.tests=cl.tests.filter(t=>t.id!==b.dataset.id);toast('Test supprimé');render()});
  document.getElementById('addCheckin')?.addEventListener('click',openCheckin);
- document.querySelectorAll('.deleteCheckin').forEach(b=>b.onclick=()=>{const c=currentClient();c.checkins=c.checkins.filter(x=>x.id!==b.dataset.id);saveDB('Check-in supprimé');render()});
+ document.querySelectorAll('.deleteCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('checkins').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.checkins=cl.checkins.filter(x=>x.id!==b.dataset.id);toast('Check-in supprimé');render()});
  document.getElementById('addEvent')?.addEventListener('click',openEvent);
- document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=()=>{const c=currentClient();c.events=c.events.filter(x=>x.id!==b.dataset.id);saveDB('Événement supprimé');render()});
+ document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
  document.getElementById('printPassport')?.addEventListener('click',()=>window.print());
- document.getElementById('archiveClient')?.addEventListener('click',()=>{currentClient().status='Inactif';saveDB('Client passé en inactif');render()});
+ document.getElementById('archiveClient')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({status:'inactive'}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);cl.status='Inactif';toast('Client passé en inactif');render()});
  document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
  document.getElementById('exportData')?.addEventListener('click',exportData);
- document.getElementById('importData')?.addEventListener('change',importData);
- document.getElementById('resetDemo')?.addEventListener('click',()=>{if(confirm('Réinitialiser toutes les données locales de cette démo ?')){db={clients:JSON.parse(JSON.stringify(DEMO_CLIENTS)),settings:{optitrainerBase:'https://app.optitrainer.fr'}};saveDB('Démo réinitialisée');state.view='dashboard';render()}});
- document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;saveDB('Paramètres enregistrés')});
+ document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;toast('Paramètre enregistré pour cette session')});
  document.getElementById('logoutBtn')?.addEventListener('click',async()=>{await supa.auth.signOut();authUser=null;authProfile=null;showAuth()});
 }
 function setPath(obj,path,val){const parts=path.split('.');let cur=obj;for(let i=0;i<parts.length-1;i++){cur[parts[i]]=cur[parts[i]]||{}}cur[parts.at(-1)]=val}
@@ -348,30 +414,60 @@ function openNewClient(){
  '<div class="grid2"><div class="field"><label>Nom et prénom</label><input id="mName" class="input"></div><div class="field"><label>E-mail</label><input id="mEmail" class="input"></div>'+
  '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div><div class="field"><label>Offre</label><input id="mOffer" class="input" placeholder="P1, P2, P3…"></div>'+
  '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input"></div><div class="field"><label>Date de fin</label><input id="mEnd" type="date" class="input"></div></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Créer</button>');
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Créer dans Supabase</button>');
  document.getElementById('cancelM').onclick=closeModal;
- document.getElementById('saveM').onclick=()=>{const name=document.getElementById('mName').value.trim();if(!name)return toast('Nom requis');const c={id:uid('c'),name,email:document.getElementById('mEmail').value,phone:'',initials:initials(name),pole:document.getElementById('mPole').value,offer:document.getElementById('mOffer').value||'À définir',status:'Actif',start:document.getElementById('mStart').value,end:document.getElementById('mEnd').value,next:'',age:'',payment:'À jour',questionnaire:{},deep:{},visioNotes:'',offerNotes:{},decisions:'',privateNote:'',tests:[],cycle:{title:'',start:'',end:'',priorities:'',vigilance:'',optitrainer:''},checkins:[],events:[],adminNote:'',legalGuardian:'',renewal:'3 mois'};db.clients.push(c);saveDB('Client créé');closeModal();state.clientId=c.id;state.view='client';state.tab='overview';render()};
+ document.getElementById('saveM').onclick=async()=>{
+   const name=document.getElementById('mName').value.trim();if(!name)return toast('Nom requis');
+   const nm=splitName(name),start=document.getElementById('mStart').value,end=document.getElementById('mEnd').value;
+   const row={...nm,email:document.getElementById('mEmail').value.trim()||null,current_pole:document.getElementById('mPole').value,current_offer:document.getElementById('mOffer').value||'À définir',status:'onboarding',start_date:start||null,engagement_end_date:end||null,payment_status:'À jour'};
+   const {data,error}=await supa.from('clients').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
+   await supa.from('client_workspace').insert({client_id:data.id});
+   await supa.from('onboarding').insert({client_id:data.id,current_step:'questionnaire'});
+   const cycleStart=start||new Date().toISOString().slice(0,10);
+   await supa.from('cycles').insert({client_id:data.id,title:'Cycle initial',start_date:cycleStart,status:'planned'});
+   closeModal();await loadSupabaseData();state.clientId=data.id;state.view='client';state.tab='overview';toast('Client créé dans Supabase');render();
+ };
 }
 function openAddTest(){
  modal('Ajouter un résultat de test',
  '<div class="grid2"><div class="field"><label>Test</label><input id="tName" class="input" placeholder="CMJ, Sprint 10 m…"></div><div class="field"><label>Date</label><input id="tDate" type="date" class="input"></div>'+
  '<div class="field"><label>Résultat</label><input id="tValue" class="input" type="number" step="any"></div><div class="field"><label>Unité</label><input id="tUnit" class="input" placeholder="cm, s, kg…"></div>'+
- '<div class="field"><label>Contexte</label><input id="tContext" class="input" placeholder="Initial, retest S6…"></div><div class="field"><label>Note</label><input id="tNote" class="input"></div></div>',
+ '<div class="field"><label>Contexte</label><input id="tContext" class="input" placeholder="Initial, retest S6…"></div><div class="field"><label>Interprétation coach</label><input id="tNote" class="input"></div></div>',
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
- document.getElementById('cancelM').onclick=closeModal;document.getElementById('saveM').onclick=()=>{const n=document.getElementById('tName').value.trim();if(!n)return toast('Nom du test requis');const c=currentClient();c.tests=c.tests||[];c.tests.push({id:uid('t'),name:n,date:document.getElementById('tDate').value,value:document.getElementById('tValue').value,unit:document.getElementById('tUnit').value,context:document.getElementById('tContext').value,note:document.getElementById('tNote').value});saveDB('Test ajouté');closeModal();render()};
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{
+   const n=document.getElementById('tName').value.trim();if(!n)return toast('Nom du test requis');
+   const cl=currentClient(),row={client_id:cl.id,test_name:n,performed_at:(document.getElementById('tDate').value||new Date().toISOString().slice(0,10))+'T12:00:00Z',result_value:document.getElementById('tValue').value||null,unit:document.getElementById('tUnit').value||null,context:document.getElementById('tContext').value||null,coach_interpretation:document.getElementById('tNote').value||null,created_by:authUser.id};
+   const {data,error}=await supa.from('tests').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
+   cl.tests=cl.tests||[];cl.tests.unshift({id:data.id,name:data.test_name,date:isoDate(data.performed_at),value:data.result_value??'',unit:data.unit||'',context:data.context||'',note:data.coach_interpretation||''});
+   closeModal();toast('Test ajouté');render();
+ };
 }
 function openCheckin(){
  modal('Ajouter un check-in',
  '<div class="field"><label>Date / vendredi</label><input id="wDate" type="date" class="input"></div>'+
  ['Ressenti global','Séance(s) non réalisée(s)','Gêne / douleur','Contrainte semaine suivante','Décision / retour coach'].map((l,i)=>'<div class="field"><label>'+l+'</label><textarea id="w'+i+'" class="textarea"></textarea></div>').join(''),
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
- document.getElementById('cancelM').onclick=closeModal;document.getElementById('saveM').onclick=()=>{const c=currentClient();c.checkins=c.checkins||[];c.checkins.push({id:uid('w'),date:document.getElementById('wDate').value,feeling:document.getElementById('w0').value,missed:document.getElementById('w1').value,pain:document.getElementById('w2').value,nextConstraint:document.getElementById('w3').value,coach:document.getElementById('w4').value});saveDB('Check-in ajouté');closeModal();render()};
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{
+   const cl=currentClient(),row={client_id:cl.id,week_date:document.getElementById('wDate').value||new Date().toISOString().slice(0,10),overall_week:document.getElementById('w0').value||null,missed_sessions:document.getElementById('w1').value||null,pain_or_discomfort:document.getElementById('w2').value||null,next_week_constraints:document.getElementById('w3').value||null,coach_decision:document.getElementById('w4').value||null,reviewed_at:new Date().toISOString()};
+   const {data,error}=await supa.from('checkins').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
+   cl.checkins=cl.checkins||[];cl.checkins.push({id:data.id,date:isoDate(data.week_date),feeling:data.overall_week||'',missed:data.missed_sessions||'',pain:data.pain_or_discomfort||'',nextConstraint:data.next_week_constraints||'',coach:data.coach_decision||''});
+   closeModal();toast('Check-in ajouté');render();
+ };
 }
 function openEvent(){
  modal('Ajouter un événement au parcours',
  '<div class="field"><label>Date</label><input id="eDate" type="date" class="input"></div><div class="field"><label>Titre</label><input id="eTitle" class="input" placeholder="Retest, changement de club, retour compétition…"></div><div class="field"><label>Détail</label><textarea id="eDetail" class="textarea"></textarea></div>',
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
- document.getElementById('cancelM').onclick=closeModal;document.getElementById('saveM').onclick=()=>{const title=document.getElementById('eTitle').value.trim();if(!title)return toast('Titre requis');const c=currentClient();c.events=c.events||[];c.events.push({id:uid('e'),date:document.getElementById('eDate').value,title,detail:document.getElementById('eDetail').value});saveDB('Événement ajouté');closeModal();render()};
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{
+   const title=document.getElementById('eTitle').value.trim();if(!title)return toast('Titre requis');
+   const cl=currentClient(),row={client_id:cl.id,event_date:document.getElementById('eDate').value||new Date().toISOString().slice(0,10),title,detail:document.getElementById('eDetail').value||null,client_visible:true};
+   const {data,error}=await supa.from('passport_events').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
+   cl.events=cl.events||[];cl.events.push({id:data.id,date:isoDate(data.event_date),title:data.title,detail:data.detail||''});
+   closeModal();toast('Événement ajouté');render();
+ };
 }
 function exportData(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ak-prime-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href)
@@ -418,7 +514,12 @@ async function enterApp(user){
    document.getElementById('pendingLogout').onclick=async()=>{await supa.auth.signOut();showAuth()};
    return;
  }
- state.view='dashboard';render();
+ try{
+   await loadSupabaseData();
+   state.view='dashboard';render();
+ }catch(e){
+   showAuth('Connexion réussie, mais impossible de charger la base AK PRIME : '+e.message,true);
+ }
 }
 async function initAuth(){
  const {data:{session}}=await supa.auth.getSession();
