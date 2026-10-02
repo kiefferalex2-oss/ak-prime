@@ -56,6 +56,13 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 @media(max-width:780px){.app{grid-template-columns:1fr}.sidebar{display:none}.content{padding:15px 11px 40px}.topbar{padding:0 13px}.top-actions input{display:none}.kpis,.grid2{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr}.test-row{grid-template-columns:1fr 1fr}.test-row.header{display:none}.passport-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.kpis,.grid2{grid-template-columns:1fr}.page-title{align-items:flex-start;flex-direction:column}}
 @media print{.sidebar,.topbar,.demo-banner,.tabs,.btn,.no-print{display:none!important}.app{display:block}.content{padding:0}.card{box-shadow:none}.passport{min-height:100vh}}
+
+.auth-shell{min-height:calc(100vh - 33px);display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#1d3150 0,#0d1827 48%,#08111d 100%)}
+.auth-card{width:min(460px,100%);background:#fff;border-radius:20px;padding:26px;box-shadow:0 30px 100px rgba(0,0,0,.32)}
+.auth-logo{font-size:27px;font-weight:950;letter-spacing:.09em}.auth-logo span{display:block;font-size:10px;color:#76869a;letter-spacing:.23em;margin-top:4px}
+.auth-card h1{margin:24px 0 6px;font-size:24px}.auth-card p{color:var(--muted);font-size:14px;line-height:1.5}.auth-actions{display:flex;gap:8px;margin-top:14px}.auth-actions .btn{flex:1}
+.auth-msg{margin-top:12px;font-size:13px;padding:10px 11px;border-radius:9px;background:#f5f7fb;color:#475467;display:none}.auth-msg.show{display:block}.auth-msg.err{background:var(--red2);color:var(--red)}
+.user-email{font-size:12px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -63,7 +70,14 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 <div id="root"></div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL='https://gptvgldboqarfklorjip.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx';
+const supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let authUser=null;
+let authProfile=null;
+
 const STORAGE_KEY='akprime-backoffice-v2';
 
 const DEMO_CLIENTS=[
@@ -122,7 +136,7 @@ function shell(inner){
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('globalTests','Tests')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note">V2 interactive locale.<br>Les données restent dans ce navigateur tant que la vraie base sécurisée n’est pas connectée.</div></aside>'+
- '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…"><div class="avatar">AK</div></div></div>'+
+ '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…"><span class="user-email">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="logoutBtn">Déconnexion</button><div class="avatar">AK</div></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'">'+label+'</button>'}
@@ -320,6 +334,7 @@ function bind(){
  document.getElementById('importData')?.addEventListener('change',importData);
  document.getElementById('resetDemo')?.addEventListener('click',()=>{if(confirm('Réinitialiser toutes les données locales de cette démo ?')){db={clients:JSON.parse(JSON.stringify(DEMO_CLIENTS)),settings:{optitrainerBase:'https://app.optitrainer.fr'}};saveDB('Démo réinitialisée');state.view='dashboard';render()}});
  document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;saveDB('Paramètres enregistrés')});
+ document.getElementById('logoutBtn')?.addEventListener('click',async()=>{await supa.auth.signOut();authUser=null;authProfile=null;showAuth()});
 }
 function setPath(obj,path,val){const parts=path.split('.');let cur=obj;for(let i=0;i<parts.length-1;i++){cur[parts[i]]=cur[parts[i]]||{}}cur[parts.at(-1)]=val}
 
@@ -364,7 +379,56 @@ function exportData(){
 function importData(e){
  const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const parsed=JSON.parse(r.result);if(!Array.isArray(parsed.clients))throw new Error();db=parsed;saveDB('Sauvegarde restaurée');state.view='dashboard';render()}catch(err){alert('Fichier de sauvegarde invalide.')}};r.readAsText(f)
 }
-render();
+
+function showAuth(message='',isError=false){
+ document.getElementById('root').innerHTML='<div class="auth-shell"><div class="auth-card">'+
+ '<div class="auth-logo">AK PRIME<span>PERFORMANCE SYSTEM</span></div>'+
+ '<h1>Connexion</h1><p>Accès sécurisé au back-office AK PRIME. Pour la première connexion, crée ton compte puis nous l’activerons comme compte propriétaire.</p>'+
+ '<div class="field"><label>E-mail</label><input id="authEmail" class="input" type="email" autocomplete="email" style="width:100%"></div>'+
+ '<div class="field"><label>Mot de passe</label><input id="authPassword" class="input" type="password" autocomplete="current-password" style="width:100%"></div>'+
+ '<div class="auth-actions"><button class="btn primary" id="loginBtn">Se connecter</button><button class="btn ghost" id="signupBtn">Créer le compte</button></div>'+
+ '<div id="authMsg" class="auth-msg '+(isError?'err ':'')+(message?'show':'')+'">'+esc(message)+'</div>'+
+ '</div></div>';
+ const email=document.getElementById('authEmail'), password=document.getElementById('authPassword');
+ document.getElementById('loginBtn').onclick=async()=>{
+   setAuthMsg('Connexion…',false);
+   const {data,error}=await supa.auth.signInWithPassword({email:email.value.trim(),password:password.value});
+   if(error)return setAuthMsg(error.message,true);
+   await enterApp(data.user);
+ };
+ document.getElementById('signupBtn').onclick=async()=>{
+   if(password.value.length<8)return setAuthMsg('Choisis un mot de passe d’au moins 8 caractères.',true);
+   setAuthMsg('Création du compte…',false);
+   const {data,error}=await supa.auth.signUp({email:email.value.trim(),password:password.value,options:{data:{full_name:'Alex Kieffer'}}});
+   if(error)return setAuthMsg(error.message,true);
+   if(data.session){await enterApp(data.user)}
+   else setAuthMsg('Compte créé. Vérifie ton e-mail si Supabase demande une confirmation, puis reconnecte-toi.',false);
+ };
+}
+function setAuthMsg(msg,err){
+ const el=document.getElementById('authMsg');if(!el)return;el.textContent=msg;el.className='auth-msg show'+(err?' err':'');
+}
+async function enterApp(user){
+ authUser=user;
+ const {data:profile,error}=await supa.from('profiles').select('id,role,full_name').eq('id',user.id).maybeSingle();
+ if(error){showAuth('Connexion réussie mais profil inaccessible : '+error.message,true);return}
+ authProfile=profile;
+ if(!profile||!['owner','coach'].includes(profile.role)){
+   document.getElementById('root').innerHTML='<div class="auth-shell"><div class="auth-card"><div class="auth-logo">AK PRIME<span>PERFORMANCE SYSTEM</span></div><h1>Compte créé</h1><p>Ton compte est authentifié, mais il n’est pas encore activé comme compte propriétaire AK PRIME.</p><p><strong>'+esc(user.email||'')+'</strong></p><button class="btn ghost" id="pendingLogout">Déconnexion</button></div></div>';
+   document.getElementById('pendingLogout').onclick=async()=>{await supa.auth.signOut();showAuth()};
+   return;
+ }
+ state.view='dashboard';render();
+}
+async function initAuth(){
+ const {data:{session}}=await supa.auth.getSession();
+ if(session?.user) await enterApp(session.user); else showAuth();
+ supa.auth.onAuthStateChange(async(event,session)=>{
+   if(event==='SIGNED_OUT'){authUser=null;authProfile=null;showAuth()}
+ });
+}
+
+initAuth();
 </script>
 </body>
 </html>
