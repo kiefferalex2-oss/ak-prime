@@ -93,7 +93,12 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .public-method-line{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:14px}.public-method-step{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:11px 7px;text-align:center;font-size:10px;font-weight:850;color:#c6d1dd;background:rgba(255,255,255,.03)}.public-method-step b{display:block;color:#d9b775;font-size:15px;margin-bottom:4px}
 .public-section{padding:76px 18px;background:#f5f7fa;color:#101828}.public-section.dark{background:#0b1624;color:#fff}.public-section-inner{max-width:1180px;margin:0 auto}
 .public-section-head{max-width:760px;margin-bottom:30px}.public-section-head .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a4772e;font-weight:950}.public-section.dark .public-section-head .kicker{color:#d5ad67}.public-section-head h2{font-size:clamp(29px,4vw,44px);letter-spacing:-.03em;margin:8px 0 10px}.public-section-head p{color:#667085;line-height:1.65;margin:0}.public-section.dark .public-section-head p{color:#aebdcd}
-.public-poles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.public-pole{background:#fff;border:1px solid #e1e7ef;border-radius:18px;padding:19px}.public-pole .num{color:#b88739;font-size:11px;font-weight:950;letter-spacing:.1em}.public-pole h3{font-size:22px;margin:7px 0}.public-pole p{color:#667085;font-size:13px;line-height:1.55}
+.public-poles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.public-pole{background:#fff;border:1px solid #e1e7ef;border-radius:18px;padding:19px;display:flex;flex-direction:column}.public-pole .num{color:#b88739;font-size:11px;font-weight:950;letter-spacing:.1em}.public-pole h3{font-size:22px;margin:7px 0}.public-pole p{color:#667085;font-size:13px;line-height:1.55}.public-pole .pole-more{margin-top:auto;padding-top:13px}.public-pole .pole-more button{width:100%}
+.pole-detail-hero{background:linear-gradient(145deg,#0d1827,#183252);color:#fff;border-radius:16px;padding:18px;margin-bottom:14px}.pole-detail-hero .eyebrow{font-size:10px;font-weight:950;letter-spacing:.1em;color:#d8b16d}.pole-detail-hero h2{margin:7px 0 7px;font-size:27px}.pole-detail-hero p{margin:0;color:#bcc9d6;line-height:1.55;font-size:13px}
+.pole-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pole-detail-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fff}.pole-detail-card h4{margin:0 0 7px;font-size:14px}.pole-detail-card p,.pole-detail-card li{font-size:12px;color:#667085;line-height:1.55}.pole-detail-card ul{margin:0;padding-left:18px}
+.pole-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.pole-flow div{border:1px solid var(--line);border-radius:11px;padding:10px;background:#fbfcfe;font-size:11px;color:#667085}.pole-flow b{display:block;color:#b88739;margin-bottom:4px}
+.pole-offer-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}.pole-offer-mini{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fbfcfe;display:flex;flex-direction:column}.pole-offer-mini.featured{border-color:#c6a25e;background:#fffaf2}.pole-offer-mini h4{margin:2px 0 4px}.pole-offer-mini .price{font-size:22px;font-weight:950;margin:5px 0}.pole-offer-mini .price span{font-size:10px;color:#667085}.pole-offer-mini p{font-size:11px;color:#667085;line-height:1.45}.pole-offer-mini button{margin-top:auto}
+@media(max-width:650px){.pole-detail-grid,.pole-offer-compare,.pole-flow{grid-template-columns:1fr}}
 .public-process{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.public-process-card{border:1px solid #e1e7ef;background:#fff;border-radius:15px;padding:17px}.public-process-card b{display:block;font-size:12px;color:#b88739;margin-bottom:8px}.public-process-card strong{display:block;margin-bottom:7px}.public-process-card p{font-size:12px;color:#667085;line-height:1.5;margin:0}
 .public-offer-group{margin-top:34px}.public-offer-group-title{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:13px}.public-offer-group-title h3{margin:0;font-size:25px}.public-offer-group-title p{margin:0;color:#aebdcd;font-size:12px}
 .public-offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.public-offer-card{border:1px solid #26384c;background:linear-gradient(160deg,#101f31,#0d1827);border-radius:18px;padding:20px;display:flex;flex-direction:column;min-height:330px}.public-offer-card.featured{border-color:#b78a46;box-shadow:0 0 0 1px rgba(211,171,98,.16) inset}.public-offer-card .tag{font-size:10px;color:#d5ad67;font-weight:950;letter-spacing:.08em;text-transform:uppercase}.public-offer-card h4{font-size:20px;margin:8px 0 4px}.public-price{font-size:34px;font-weight:950;margin:9px 0}.public-price span{font-size:12px;color:#aebdcd;font-weight:700}.public-offer-card ul{padding-left:18px;margin:8px 0 18px;color:#bac7d4;font-size:13px;line-height:1.65}.public-offer-card .public-primary{margin-top:auto;text-align:center}
@@ -1589,9 +1594,9 @@ function renderPublicSite(){
  '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Un accompagnement <span>structuré</span>, pas un programme générique.</h1><p>Préparation physique, forme & santé et préparation mentale. AK PRIME centralise l’évaluation, la planification, les visios et le suivi pour adapter l’accompagnement à la personne, à ses objectifs et à ses contraintes.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les offres</a><button class="public-secondary" id="heroLoginBtn">J’ai déjà un compte</button></div></div>'+
  '<div class="public-hero-card"><div class="tag" style="color:#d5ad67;font-size:11px;font-weight:950;letter-spacing:.08em">LA MÉTHODE AK PRIME</div><h3 style="font-size:25px;margin:9px 0 6px">Standardiser la méthode, pas le client.</h3><p style="color:#aebdcd;font-size:13px;line-height:1.55">Chaque accompagnement suit un cadre clair tout en restant individualisé.</p><div class="public-method-line"><div class="public-method-step"><b>01</b>Évaluer</div><div class="public-method-step"><b>02</b>Comprendre</div><div class="public-method-step"><b>03</b>Planifier</div><div class="public-method-step"><b>04</b>Accompagner</div><div class="public-method-step"><b>05</b>Adapter</div></div></div></div></section>'+
  '<section class="public-section" id="methode"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">3 pôles</div><h2>Un seul espace, trois types d’accompagnement.</h2><p>Le niveau de suivi et les outils évoluent selon ton objectif. Les informations utiles restent regroupées dans ton espace AK PRIME et ton Passeport.</p></div><div class="public-poles">'+
- '<div class="public-pole"><div class="num">01 — PERFORMANCE</div><h3>Performance</h3><p>Pour les sportifs qui veulent développer leurs qualités physiques, structurer leur préparation et suivre objectivement leur progression.</p></div>'+
- '<div class="public-pole"><div class="num">02 — FORME & SANTÉ</div><h3>Forme & Santé</h3><p>Pour construire une pratique durable, progresser en musculation et améliorer sa condition physique avec un cadre individualisé.</p></div>'+
- '<div class="public-pole"><div class="num">03 — MENTAL</div><h3>Préparation mentale</h3><p>Pour travailler routines, gestion du stress, confiance, recentrage, résilience et préparation aux situations exigeantes.</p></div>'+
+ '<div class="public-pole"><div class="num">01 — PERFORMANCE</div><h3>Performance</h3><p>Pour les sportifs qui veulent développer leurs qualités physiques, structurer leur préparation et suivre objectivement leur progression.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="performance">Découvrir le pôle</button></div></div>'+
+ '<div class="public-pole"><div class="num">02 — FORME & SANTÉ</div><h3>Forme & Santé</h3><p>Pour construire une pratique durable, progresser en musculation et améliorer sa condition physique avec un cadre individualisé.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="forme">Découvrir le pôle</button></div></div>'+
+ '<div class="public-pole"><div class="num">03 — MENTAL</div><h3>Préparation mentale</h3><p>Pour travailler routines, gestion du stress, confiance, recentrage, résilience et préparation aux situations exigeantes.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="mental">Découvrir le pôle</button></div></div>'+
  '</div></div></section>'+
  '<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
  '<div class="public-process-card"><b>01</b><strong>Choisir</strong><p>Tu sélectionnes le pôle et le niveau d’accompagnement adapté.</p></div>'+
@@ -1640,6 +1645,52 @@ function openPublicLogin(message='',isError=false){
  };
  document.getElementById('loginBtn').onclick=login;
  password.onkeydown=e=>{if(e.key==='Enter')login()};
+}
+
+
+function poleOfferMini(pole,name,price,subtitle,featured=false){
+ return '<div class="pole-offer-mini '+(featured?'featured':'')+'"><div class="checkout-step">'+esc(featured?'Le plus complet':'Formule')+'</div><h4>'+esc(name)+'</h4><div class="price">'+esc(price)+' € <span>/ mois</span></div><p>'+esc(subtitle)+'</p><button class="btn '+(featured?'primary':'ghost')+' small poleOfferSelect" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir</button></div>';
+}
+function openPublicPoleDetails(key){
+ const configs={
+  performance:{
+   label:'PÔLE PERFORMANCE',title:'Performance',
+   intro:'Un accompagnement pour les sportifs qui veulent structurer leur préparation physique autour de leurs contraintes, de leur calendrier et de leurs objectifs.',
+   forWho:['Sportif amateur ambitieux ou compétiteur','Sportif souhaitant développer force, vitesse, explosivité ou endurance','Sportif voulant suivre ses progrès avec des tests et des données'],
+   work:['Profilage et tests selon les besoins','Planification des qualités physiques','Gestion de la charge, récupération et adaptation','Réévaluations pour ajuster le cycle'],
+   flow:[['01','Évaluer','Questionnaire, contexte sportif et tests utiles.'],['02','Planifier','Objectifs, priorités et organisation du cycle.'],['03','Suivre','Check-in, échanges et visios selon la formule.'],['04','Réévaluer','Tests et adaptations selon l’évolution.']],
+   note:'La préparation reste individualisée : les tests, volumes et priorités dépendent du sport, du niveau et du contexte.',
+   offers:[['Performance','P1',149,'Suivi structuré avec 1 visio de 30 min par mois.',false],['Performance','P2',199,'Suivi renforcé avec 2 visios de 30 min par mois.',true],['Performance','P3',299,'Accompagnement premium avec jusqu’à 1 visio de 30 min par semaine.',false]]
+  },
+  forme:{
+   label:'PÔLE FORME & SANTÉ',title:'Forme & Santé',
+   intro:'Un coaching à distance pour construire une pratique régulière, progresser en musculation et améliorer sa condition physique avec un cadre adapté au quotidien.',
+   forWho:['Personne souhaitant reprendre ou structurer son entraînement','Pratiquant voulant progresser en musculation','Personne ayant besoin d’un cadre régulier et d’ajustements'],
+   work:['Programme individualisé selon le matériel disponible','Progression en musculation et condition physique','Organisation de la récupération et des jours de repos','Suivi hebdomadaire pour adapter la semaine suivante'],
+   flow:[['01','Comprendre','Objectifs, niveau, contraintes et matériel.'],['02','Construire','Plan d’entraînement cohérent avec ton quotidien.'],['03','Suivre','Bilan hebdomadaire et visios selon la formule.'],['04','Adapter','Charges, exercices et organisation évoluent avec toi.']],
+   note:'AK PRIME reste dans le champ du coaching sportif : pas de diagnostic médical, ni de prise en charge clinique.',
+   offers:[['Forme & Santé','Standard',99,'Programme individualisé + 1 visio de 30 min par mois.',false],['Forme & Santé','Renforcé',149,'Suivi plus rapproché + 2 visios de 30 min par mois.',true]]
+  },
+  mental:{
+   label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
+   intro:'Un accompagnement non clinique pour travailler les habiletés mentales utiles à la performance, à la gestion des situations exigeantes et à la régularité.',
+   forWho:['Particulier confronté à du stress ou à des situations exigeantes','Sportif voulant mieux gérer compétition, erreur ou pression','Personne souhaitant structurer routines, confiance et concentration'],
+   work:['Gestion du stress et des émotions','Respiration, recentrage et routines','Confiance, estime de soi et résilience','Imagerie, mot-clé individuel et exercices de concentration'],
+   flow:[['01','Questionnaire','Comprendre le contexte et les difficultés rencontrées.'],['02','Visio initiale','Clarifier les priorités et les situations à travailler.'],['03','Outils','Mettre en place des techniques concrètes et personnalisées.'],['04','Ajuster','Suivre leur utilisation et les faire évoluer.']],
+   note:'Cet accompagnement ne remplace pas un psychologue, un psychiatre ou un professionnel de santé lorsque la situation relève d’un suivi clinique.',
+   offers:[['Mental','Particulier',199,'Visio initiale de 45 min puis jusqu’à 1 visio de 45 min par semaine.',false],['Mental','Sportif',229,'Même fréquence avec travail contextualisé à la pratique sportive.',true]]
+  }
+ };
+ const x=configs[key];if(!x)return;
+ modal(x.title+' — AK PRIME',
+  '<div class="pole-detail-hero"><div class="eyebrow">'+esc(x.label)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.intro)+'</p></div>'+
+  '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>Pour qui ?</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>Ce qu’on travaille</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
+  '<div class="section-title">Comment se déroule l’accompagnement ?</div><div class="pole-flow">'+x.flow.map(v=>'<div><b>'+esc(v[0])+' — '+esc(v[1])+'</b>'+esc(v[2])+'</div>').join('')+'</div>'+
+  '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
+  '<div class="section-title">Formules disponibles</div><div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
+  '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
+ document.getElementById('closePoleDetail').onclick=closeModal;
+ document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
 }
 
 function publicOfferBenefits(pole,name){
@@ -1717,6 +1768,7 @@ function openPublicOfferCheckout(button){
 function bindPublicSite(){
  document.getElementById('publicLoginBtn')?.addEventListener('click',()=>openPublicLogin());
  document.getElementById('heroLoginBtn')?.addEventListener('click',()=>openPublicLogin());
+ document.querySelectorAll('.publicPoleBtn').forEach(b=>b.onclick=()=>openPublicPoleDetails(b.dataset.pole));
  document.querySelectorAll('.publicOfferBtn').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
 }
 
