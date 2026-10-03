@@ -331,6 +331,49 @@ function addMonthsISO(dateStr,months){
 }
 function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel sans engagement','stop':'Arrêt'})[v]||v||'—'}
 function renewalPaymentLabel(v){return ({monthly:'Paiement mensuel',upfront:'Paiement comptant'})[v]||'—'}
+function offerBaseMonthlyPrice(pole,offer){
+ const p=String(pole||'').toLowerCase(),o=String(offer||'').toLowerCase();
+ if(p.includes('forme')){
+   if(o.includes('renfor'))return 149;
+   if(o.includes('standard'))return 99;
+ }
+ if(p.includes('performance')){
+   if(/\bp3\b/.test(o))return 299;
+   if(/\bp2\b/.test(o))return 199;
+   if(/\bp1\b/.test(o))return 149;
+ }
+ if(p.includes('mental')){
+   if(o.includes('sportif'))return 229;
+   if(o.includes('particulier'))return 199;
+ }
+ return null;
+}
+function euro(v){
+ return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:Number.isInteger(Number(v))?0:2,maximumFractionDigits:2}).format(Number(v)||0);
+}
+function renewalPriceDetails(client,decision,paymentMode){
+ const base=offerBaseMonthlyPrice(client?.current_pole,client?.current_offer);
+ if(!base)return null;
+ if(decision==='3_months'){
+   const monthlyTotal=base*3;
+   const upfrontTotal=Math.round(monthlyTotal*.97*100)/100;
+   return paymentMode==='upfront'
+     ? {headline:euro(upfrontTotal)+' comptant',detail:'au lieu de '+euro(monthlyTotal)+' • remise comptant 3 %',base}
+     : {headline:euro(base)+' / mois',detail:'pendant 3 mois • total '+euro(monthlyTotal),base};
+ }
+ if(decision==='6_months'){
+   const discountedMonthly=Math.round(base*.95*100)/100;
+   const monthlyTotal=Math.round(discountedMonthly*6*100)/100;
+   const upfrontTotal=Math.round(monthlyTotal*.98*100)/100;
+   return paymentMode==='upfront'
+     ? {headline:euro(upfrontTotal)+' comptant',detail:'tarif 6 mois -5 %, puis remise comptant 2 % • au lieu de '+euro(base*6),base}
+     : {headline:euro(discountedMonthly)+' / mois',detail:'pendant 6 mois • total '+euro(monthlyTotal)+' • remise engagement 6 mois 5 %',base};
+ }
+ if(decision==='monthly'){
+   return {headline:'Tarif sans engagement à finaliser',detail:'Le tarif mensuel sans engagement sera fixé avant l’activation du paiement. Ton offre actuelle est à '+euro(base)+' / mois avec engagement.',base};
+ }
+ return null;
+}
 function appointmentStatusLabel(v){return ({scheduled:'Réservée',confirmed:'Confirmée',completed:'Réalisée',cancelled:'Annulée à temps',cancelled_late:'Annulée tardivement',no_show:'Absent'})[v]||v||'—'}
 function appointmentStatusTone(v){return v==='completed'?'green':v==='cancelled'||v==='cancelled_late'||v==='no_show'?'red':v==='scheduled'||v==='confirmed'?'blue':'amber'}
 function hoursUntil(v){return (new Date(v)-new Date())/3600000}
@@ -1184,7 +1227,7 @@ function openClientRenewalChoice(){
  if(!end||d===null||d>14)return alert('Le choix sera disponible 14 jours avant la fin de ton engagement.');
  const existing=currentClientRenewalChoice(s);
  modal('Choisir la suite de mon accompagnement',
- '<div class="alert blue"><strong>Échéance actuelle : '+fmtDate(end)+'</strong><div class="tiny" style="margin-top:4px">Aucune option n’est reconduite automatiquement. Ton choix est enregistré, mais aucun paiement n’est déclenché aujourd’hui.</div></div>'+
+ '<div class="alert blue"><strong>Échéance actuelle : '+fmtDate(end)+'</strong><div class="tiny" style="margin-top:4px">Offre actuelle : '+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+(offerBaseMonthlyPrice(c.current_pole,c.current_offer)?' • '+euro(offerBaseMonthlyPrice(c.current_pole,c.current_offer))+' / mois':'')+'.</div><div class="tiny" style="margin-top:4px">Aucune option n’est reconduite automatiquement. Ton choix est enregistré, mais aucun paiement n’est déclenché aujourd’hui.</div></div>'+
  '<div class="field"><label>Que souhaites-tu faire ?</label><select id="clientRenewDecision" class="select"><option value="3_months">Repartir sur 3 mois</option><option value="6_months">Repartir sur 6 mois</option><option value="monthly">Passer en mensuel sans engagement</option><option value="stop">Arrêter à l’échéance</option></select></div>'+
  '<div id="clientRenewPaymentWrap"><div class="field"><label>Mode de paiement souhaité</label><select id="clientRenewPayment" class="select"><option value="monthly">Paiement mensuel</option><option value="upfront">Paiement comptant</option></select></div><div class="muted tiny" style="margin-top:-4px">Le paiement comptant bénéficiera de la remise prévue par la grille tarifaire au moment de l’activation.</div></div>'+
  '<div id="clientRenewSummary" class="alert" style="margin-top:12px"></div>',
@@ -1193,9 +1236,17 @@ function openClientRenewalChoice(){
  if(existing){decision.value=existing.decision||'3_months';if(existing.payment_mode)payment.value=existing.payment_mode}
  const sync=()=>{
    const v=decision.value;
-   if(v==='stop'){wrap.style.display='none';summary.innerHTML='<strong>Arrêt à l’échéance</strong><div class="tiny" style="margin-top:4px">Ton accompagnement continuera jusqu’au '+fmtDate(end)+', puis s’arrêtera. Aucun nouvel engagement ne sera créé.</div>'}
-   else if(v==='monthly'){wrap.style.display='none';summary.innerHTML='<strong>Mensuel sans engagement</strong><div class="tiny" style="margin-top:4px">Tu demandes à poursuivre au mois. Le tarif final et le premier paiement seront confirmés avant activation.</div>'}
-   else{wrap.style.display='block';summary.innerHTML='<strong>Nouvel engagement '+(v==='3_months'?'3':'6')+' mois</strong><div class="tiny" style="margin-top:4px">'+renewalPaymentLabel(payment.value)+'. Le montant exact sera affiché avant paiement lorsque Stripe sera activé.</div>'}
+   const price=renewalPriceDetails(c,v,payment.value);
+   if(v==='stop'){
+     wrap.style.display='none';
+     summary.innerHTML='<strong>Arrêt à l’échéance</strong><div class="tiny" style="margin-top:4px">Ton accompagnement continuera jusqu’au '+fmtDate(end)+', puis s’arrêtera. Aucun nouvel engagement ne sera créé.</div>';
+   }else if(v==='monthly'){
+     wrap.style.display='none';
+     summary.innerHTML='<strong>Mensuel sans engagement</strong>'+(price?'<div style="font-size:19px;font-weight:900;margin-top:7px">'+esc(price.headline)+'</div><div class="tiny" style="margin-top:4px">'+esc(price.detail)+'</div>':'<div class="tiny" style="margin-top:4px">Le tarif sera confirmé avant activation.</div>');
+   }else{
+     wrap.style.display='block';
+     summary.innerHTML='<strong>Nouvel engagement '+(v==='3_months'?'3':'6')+' mois</strong>'+(price?'<div style="font-size:21px;font-weight:950;margin-top:7px">'+esc(price.headline)+'</div><div class="tiny" style="margin-top:4px">'+esc(price.detail)+'</div>':'<div class="tiny" style="margin-top:4px">'+renewalPaymentLabel(payment.value)+'. Le tarif sera confirmé avant paiement.</div>');
+   }
  };
  decision.onchange=sync;payment.onchange=sync;sync();
  document.getElementById('cancelClientRenewal').onclick=closeModal;
@@ -1203,7 +1254,8 @@ function openClientRenewalChoice(){
    const dec=decision.value;
    const pay=dec==='stop'?null:dec==='monthly'?'monthly':payment.value;
    const label=renewalDecisionLabel(dec)+(pay?' — '+renewalPaymentLabel(pay):'');
-   if(!confirm('Confirmer : '+label+' ?\n\nAucun paiement ne sera effectué maintenant.'))return;
+   const price=renewalPriceDetails(c,dec,pay);
+   if(!confirm('Confirmer : '+label+(price?'\n'+price.headline:'')+' ?\n\nAucun paiement ne sera effectué maintenant.'))return;
    const btn=document.getElementById('saveClientRenewal');btn.disabled=true;btn.textContent='Enregistrement…';
    const {data,error}=await supa.rpc('submit_my_renewal_choice',{p_decision:dec,p_payment_mode:pay});
    if(error){btn.disabled=false;btn.textContent='Confirmer mon choix';return alert(error.message||'Impossible d’enregistrer ton choix.')}
