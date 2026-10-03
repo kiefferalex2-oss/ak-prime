@@ -477,7 +477,7 @@ function calendarPage(){
      const iso=localDateISO(d);
      const label=new Intl.DateTimeFormat('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit'}).format(d);
      const rows=dated.filter(w=>String(w.availability_date).slice(0,10)===iso);
-     const fullBlock=exceptions.some(e=>String(e.exception_date).slice(0,10)===iso&&!e.start_time&&!e.end_time);
+     const fullBlock=exceptions.some(e=>iso>=String(e.exception_date).slice(0,10)&&iso<=String(e.end_date||e.exception_date).slice(0,10)&&!e.start_time&&!e.end_time);
      const recurring=windows.filter(w=>w.weekday===(((d.getDay()+6)%7)+1));
      const detail=rows.length
        ? rows.map(w=>'<div class="item" style="padding:8px"><div class="row between"><strong>'+esc(String(w.start_time).slice(0,5))+'–'+esc(String(w.end_time).slice(0,5))+'</strong><button class="link deleteDateAvailability" data-id="'+w.id+'">×</button></div></div>').join('')
@@ -496,10 +496,10 @@ function calendarPage(){
    return '<div class="card panel" style="min-width:180px"><div class="row between"><h3 style="margin:0">'+label+'</h3><button class="btn ghost small addAvailability" data-day="'+n+'">+</button></div><div class="list" style="margin-top:10px">'+(rows||'<div class="muted tiny">Aucune disponibilité habituelle</div>')+'</div></div>';
  }).join('');
 
- const exRows=exceptions.map(e=>'<div class="item row between"><div><strong>'+fmtDate(e.exception_date)+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée entière')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>').join('');
+ const exRows=exceptions.map(e=>{const end=String(e.end_date||e.exception_date).slice(0,10),range=end!==String(e.exception_date).slice(0,10)?fmtDate(e.exception_date)+' → '+fmtDate(end):fmtDate(e.exception_date);return '<div class="item row between"><div><strong>'+range+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée(s) entière(s)')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>'}).join('');
  const apptRows=upcoming.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><div class="row"><button class="link openClient" data-id="'+a.client_id+'">Dossier</button><button class="link cancelAppointment" data-id="'+a.id+'" data-client-id="'+a.client_id+'">Annuler</button></div></div>').join('');
 
- return '<div class="page-title"><div><h1>Calendrier & disponibilités</h1><p>Planifie tes créneaux jusqu’à 3 semaines à l’avance. Les clients voient les changements en temps réel.</p></div><button class="btn primary" id="addException">Bloquer une date / un créneau</button></div>'+
+ return '<div class="page-title"><div><h1>Calendrier & disponibilités</h1><p>Planifie tes créneaux jusqu’à 3 semaines à l’avance. Les clients voient les changements en temps réel.</p></div><button class="btn primary" id="addException">Bloquer une période / un créneau</button></div>'+
  '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Planning des 3 prochaines semaines</h3><div class="muted tiny">Clique sur + pour définir précisément tes disponibilités d’une date. Dès qu’une date possède un planning précis, il remplace le planning hebdomadaire habituel pour ce jour.</div></div><span class="status green">Temps réel</span></div>'+threeWeeks+'</div>'+
  '<div class="card panel" style="margin-bottom:13px"><div><h3 style="margin-bottom:4px">Planning hebdomadaire habituel</h3><div class="muted tiny">Facultatif : il sert de base pour les jours où tu n’as pas défini de planning précis.</div></div>'+
  '<div style="display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:10px;overflow:auto;margin-top:14px;padding-bottom:4px">'+weekly+'</div></div>'+
@@ -598,11 +598,16 @@ function openAvailabilityModal(day){
  document.getElementById('saveM').onclick=async()=>{const start=document.getElementById('avStart').value,end=document.getElementById('avEnd').value;if(!start||!end||end<=start)return toast('Horaires invalides');const {error}=await supa.from('availability_windows').insert({coach_user_id:authUser.id,weekday:day,start_time:start,end_time:end});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Disponibilité ajoutée');render()};
 }
 function openExceptionModal(){
- modal('Bloquer une date / un créneau',
- '<div class="field"><label>Date</label><input id="exDate" type="date" class="input"></div><div class="grid2"><div class="field"><label>Début (laisser vide pour la journée entière)</label><input id="exStart" type="time" class="input"></div><div class="field"><label>Fin</label><input id="exEnd" type="time" class="input"></div></div><div class="field"><label>Note facultative</label><input id="exNote" class="input" placeholder="Ex. indisponible, déplacement…"></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Bloquer</button>');
+ modal('Bloquer une période / un créneau',
+ '<div class="grid2"><div class="field"><label>Date de début</label><input id="exDate" type="date" class="input"></div><div class="field"><label>Date de fin</label><input id="exEndDate" type="date" class="input"></div></div>'+
+ '<div class="grid2"><div class="field"><label>Heure de début (facultatif)</label><input id="exStart" type="time" class="input"></div><div class="field"><label>Heure de fin (facultatif)</label><input id="exEnd" type="time" class="input"></div></div>'+
+ '<div class="muted tiny">Sans horaires : toute la journée est bloquée pour chaque date de la période. Avec horaires : la même plage horaire est bloquée chaque jour de la période.</div>'+
+ '<div class="field"><label>Note facultative</label><input id="exNote" class="input" placeholder="Ex. congés, déplacement, formation…"></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Bloquer la période</button>');
  document.getElementById('cancelM').onclick=closeModal;
- document.getElementById('saveM').onclick=async()=>{const date=document.getElementById('exDate').value,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim();if(!date)return toast('Date requise');if((start&&!end)||(!start&&end)||(start&&end&&end<=start))return toast('Créneau invalide');const {error}=await supa.from('availability_exceptions').insert({coach_user_id:authUser.id,exception_date:date,start_time:start||null,end_time:end||null,note:note||null});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Indisponibilité ajoutée');render()};
+ const startDate=document.getElementById('exDate'),endDate=document.getElementById('exEndDate');
+ startDate.onchange=()=>{if(!endDate.value||endDate.value<startDate.value)endDate.value=startDate.value};
+ document.getElementById('saveM').onclick=async()=>{const date=startDate.value,last=endDate.value||date,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim();if(!date)return toast('Date de début requise');if(last<date)return toast('La date de fin doit être après le début');if((start&&!end)||(!start&&end)||(start&&end&&end<=start))return toast('Créneau invalide');const {error}=await supa.from('availability_exceptions').insert({coach_user_id:authUser.id,exception_date:date,end_date:last,start_time:start||null,end_time:end||null,note:note||null});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Période indisponible ajoutée');render()};
 }
 
 function openNewClient(){
@@ -677,7 +682,7 @@ async function enterClientPortal(user,profile){
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte est confirmé mais il n’est pas encore relié à ton dossier AK PRIME. Utilise la même adresse e-mail que celle communiquée au coach, puis attends la liaison du compte.');return}
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
@@ -685,11 +690,12 @@ async function enterClientPortal(user,profile){
    supa.from('passport_events').select('*').eq('client_id',client.id).eq('client_visible',true).order('event_date',{ascending:false}),
    supa.from('appointments').select('*').eq('client_id',client.id).order('starts_at',{ascending:true}),
    supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false}),
-   supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate})
+   supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate}),
+   supa.rpc('get_my_booking_policy')
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[]};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null};
  renderClientPortal();
 }
 function showClientPending(message){
@@ -728,12 +734,17 @@ function renderClientPortal(){
 function renderBookingPanel(s){
  const future=(s.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const next=future[0];
- const slots=(s.availableSlots||[]).slice(0,24);
+ const slots=(s.availableSlots||[]).slice(0,60);
+ const policy=s.bookingPolicy||{};
+ const quotaText=policy.quota_period==='week'
+   ? (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par semaine'
+   : (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par mois';
  const grouped={};for(const sl of slots){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
- return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés sont disponibles au moment où tu les vois. Ils se mettent à jour automatiquement si quelqu’un réserve.</div></div><span class="status green">Temps réel</span></div>'+
- (next?'<div class="alert blue" style="margin-top:12px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div></div>':'')+
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés respectent automatiquement la fréquence incluse dans ton offre et les disponibilités du coach.</div></div><span class="status green">Temps réel</span></div>'+
+ '<div class="alert blue" style="margin-top:12px"><strong>Ton offre : '+esc(quotaText)+'</strong><div class="tiny" style="margin-top:4px">Durée d’une visio : '+esc(policy.duration_minutes||30)+' min. Quand ton quota est atteint pour une semaine ou un mois, aucun autre créneau de cette période n’est proposé.</div></div>'+
+ (next?'<div class="alert" style="margin-top:10px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div></div>':'')+
  '<div class="section-title">Créneaux disponibles sur les 3 prochaines semaines</div>'+
- (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible pour le moment. Le coach peut en ajouter depuis son calendrier.</div>')+
+ (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible actuellement. Cela peut aussi signifier que ton quota de visio est déjà utilisé pour les périodes affichées.</div>')+
  '</div>';
 }
 function bindBookingButtons(){
@@ -749,12 +760,14 @@ function bindBookingButtons(){
 async function refreshClientBookingData(){
  if(!clientPortalState?.client)return;
  const today=localDateISO(),end=new Date();end.setDate(end.getDate()+20);
- const [slots,appts]=await Promise.all([
+ const [slots,appts,policy]=await Promise.all([
    supa.rpc('get_my_available_slots',{p_from:today,p_to:localDateISO(end)}),
-   supa.from('appointments').select('*').eq('client_id',clientPortalState.client.id).order('starts_at',{ascending:true})
+   supa.from('appointments').select('*').eq('client_id',clientPortalState.client.id).order('starts_at',{ascending:true}),
+   supa.rpc('get_my_booking_policy')
  ]);
  if(!slots.error)clientPortalState.availableSlots=slots.data||[];
  if(!appts.error)clientPortalState.appointments=appts.data||[];
+ if(!policy.error)clientPortalState.bookingPolicy=(policy.data||[])[0]||clientPortalState.bookingPolicy;
  const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}
 }
 async function subscribeCalendarRealtime(mode){
