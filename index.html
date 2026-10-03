@@ -357,19 +357,33 @@ function onboarding(c){
  '</div><div class="grid31"><div class="card panel"><h3>Questionnaire initial</h3><p class="muted tiny">Réponses centralisées.</p>'+
  (qs.length?qs.map(([k,v],i)=>'<div class="accordion '+(i===0?'open':'')+'"><button class="accBtn">'+esc(questionLabel(k))+'<span>⌄</span></button><div class="body">'+esc(Array.isArray(v)?v.join(', '):(v===true?'Oui':v===false?'Non':v))+'<label class="check"><input class="deepCheck" data-key="'+esc(k)+'" type="checkbox" '+(c.deep?.[k]?'checked':'')+'> À approfondir en visio</label></div></div>').join(''):'<div class="muted">Questionnaire non renseigné.</div>')+
  '</div><div><div class="card panel"><h3>Analyse avant visio</h3><div class="item"><strong>Points marqués à approfondir</strong><div class="muted tiny">'+Object.keys(c.deep||{}).filter(k=>c.deep[k]).map(k=>esc(questionLabel(k))).join(' • ')||'Aucun point marqué'+'</div></div>'+
- '<div class="field"><label>Notes / approfondissements de visio</label><textarea class="textarea autoSave" data-field="visioNotes">'+esc(c.visioNotes||'')+'</textarea></div>'+
- '<div class="field"><label>Décisions prises</label><textarea class="textarea autoSave" data-field="decisions">'+esc(c.decisions||'')+'</textarea></div></div>'+
- '<div class="card panel" style="margin-top:13px"><h3>Informations nouvelles</h3><textarea class="textarea autoSave" data-field="privateNote" placeholder="Informations complémentaires, notes coach privées…">'+esc(c.privateNote||'')+'</textarea></div></div>'+
+ '<div class="field"><label>Notes / approfondissements de visio</label><textarea class="textarea workspaceDraft" data-field="visioNotes">'+esc(c.visioNotes||'')+'</textarea></div>'+
+ '<div class="field"><label>Décisions prises</label><textarea class="textarea workspaceDraft" data-field="decisions">'+esc(c.decisions||'')+'</textarea></div>'+
+ '<button class="btn primary small saveWorkspaceNotes">Enregistrer les notes de visio</button></div>'+
+ '<div class="card panel" style="margin-top:13px"><h3>Informations nouvelles</h3><textarea class="textarea workspaceDraft" data-field="privateNote" placeholder="Informations complémentaires, notes coach privées…">'+esc(c.privateNote||'')+'</textarea><button class="btn primary small saveWorkspaceNotes" style="margin-top:8px">Enregistrer la note</button></div></div>'+
  '<div class="card panel"><h3>Approfondissements liés à l’offre '+esc(c.offer)+'</h3><p class="muted tiny">Ils complètent le questionnaire sans le répéter.</p>'+offerBlocks+'</div></div>';
 }
 function offerSpecificBlocks(c){
  const labels=c.pole==='Performance'?(c.offer==='P3'?['Récupération','Sommeil','Nutrition sportive','Données club','Staff / coordination','Déplacements / compétition','Routines pré/post match']:c.offer==='P2'?['Récupération','Sommeil','Nutrition sportive','Données club','Échauffement / adaptation rapide']:['Contexte sportif','Contraintes essentielles']):c.pole==='Forme & Santé'?(c.offer==='Renforcé'?['Sommeil','Récupération','Nutrition si pertinente','Habitudes de vie']:['Contraintes d’entraînement']):c.offer==='Mental Sportif'?['Situation de compétition','Erreur / pression','Routines','Imagerie sportive','Contexte staff / saison']:['Situations déclenchantes','Confiance','Stress / émotions','Concentration','Motivation'];
- return labels.map(l=>'<div class="field"><label>'+l+'</label><textarea class="textarea offerSave" data-offer-key="'+esc(l)+'">'+esc(c.offerNotes?.[l]||'')+'</textarea></div>').join('');
+ return labels.map(l=>'<div class="field"><label>'+l+'</label><textarea class="textarea offerDraft" data-offer-key="'+esc(l)+'">'+esc(c.offerNotes?.[l]||'')+'</textarea></div>').join('')+
+ '<button class="btn primary small saveOfferNotes">Enregistrer les approfondissements</button>';
 }
 
 function testsTab(c){
  const history=(c.tests||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+ const required=c.onboarding?.testsRequired||[];
+ const requiredRows=required.map(name=>{
+   const found=history.find(t=>String(t.name).trim().toLowerCase()===String(name).trim().toLowerCase());
+   return '<div class="item row between"><div><strong>'+esc(name)+'</strong><div class="tiny '+(found?'account-good':'account-wait')+'">'+(found?'Résultat enregistré : '+esc(found.value)+' '+esc(found.unit||''):'Résultat à saisir')+'</div></div>'+
+   (found?'<span class="status green">Validé</span>':'<button class="btn primary small addRequiredResult" data-test-name="'+esc(name)+'">Ajouter le résultat</button>')+'</div>';
+ }).join('');
+ const doneCount=required.filter(name=>history.some(t=>String(t.name).trim().toLowerCase()===String(name).trim().toLowerCase())).length;
  return '<div class="page-title"><div><h1 style="font-size:22px">Tests & évaluations</h1><p>Historique exhaustif du parcours.</p></div><button class="btn primary" id="addTest">+ Ajouter un résultat</button></div>'+
+ '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Tests requis avant programmation</h3><div class="muted tiny">'+doneCount+' / '+required.length+' test(s) validé(s)</div></div>'+
+ (required.length?'<span class="status '+(doneCount===required.length?'green':'amber')+'">'+(doneCount===required.length?'Tous validés':'À terminer')+'</span>':'<span class="status blue">Aucun test requis</span>')+'</div>'+
+ '<div class="list" style="margin-top:12px">'+(requiredRows||'<div class="muted">Aucun test requis défini. Ajoute-les depuis Onboarding & Visio après la visio initiale.</div>')+'</div>'+
+ (required.length&&doneCount===required.length?'<div class="alert green" style="margin-top:12px"><strong>Prêt pour programmation.</strong> Tous les tests requis ont un résultat enregistré.</div>':'')+
+ '</div>'+
  '<div class="grid2"><div class="card panel"><h3>Historique</h3>'+
  (history.length?'<div class="test-row header"><div>Test</div><div>Date</div><div>Résultat</div><div>Contexte</div><div>Note</div><div></div></div>'+history.map(t=>'<div class="test-row"><div><strong>'+esc(t.name)+'</strong></div><div>'+fmtDate(t.date)+'</div><div>'+esc(t.value)+' '+esc(t.unit||'')+'</div><div>'+esc(t.context||'')+'</div><div class="muted tiny">'+esc(t.note||'')+'</div><div><button class="link deleteTest" data-id="'+t.id+'">Suppr.</button></div></div>').join(''):'<div class="muted">Aucun test enregistré.</div>')+
  '</div><div class="card panel"><h3>Évolution</h3>'+testProgress(c)+'</div></div>';
@@ -391,7 +405,7 @@ function follow(c){
  '<div class="list">'+((c.checkins||[]).length?c.checkins.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(w=>'<div class="item"><div class="row between"><div><strong>Semaine du '+fmtDate(w.date)+'</strong><div class="tiny '+(w.reviewedAt?'account-good':'account-wait')+'">'+(w.reviewedAt?'Traité':'À traiter')+'</div></div><button class="link deleteCheckin" data-id="'+w.id+'">Suppr.</button></div><div class="tiny"><b>Ressenti :</b> '+esc(w.feeling||'—')+'</div><div class="tiny"><b>Séances non réalisées :</b> '+esc(w.missed||'—')+'</div><div class="tiny"><b>Problème exercice/séance :</b> '+esc(w.problem||'—')+'</div><div class="tiny"><b>Gêne / douleur :</b> '+esc(w.pain||'—')+'</div><div class="tiny"><b>Contrainte suivante :</b> '+esc(w.nextConstraint||'—')+'</div><div class="tiny"><b>Autre :</b> '+esc(w.other||'—')+'</div><div class="field" style="margin-top:9px"><label>Retour / décision coach</label><textarea class="textarea coachCheckinFeedback" data-id="'+w.id+'">'+esc(w.coach||'')+'</textarea></div><button class="btn primary small reviewCheckin" data-id="'+w.id+'">'+(w.reviewedAt?'Mettre à jour le retour':'Marquer comme traité')+'</button></div>').join(''):'<div class="muted">Aucun check-in enregistré.</div>')+'</div></div></div>'+
  '<div><div class="card panel"><h3>Principe de suivi</h3><div class="alert blue">Optitrainer conserve les séances et données quotidiennes. AK PRIME conserve les décisions, cycles, événements et synthèses utiles à long terme.</div>'+
  '<div class="alert green">Check-in client le vendredi soir → analyse / ajustements le week-end → semaine suivante prête avant lundi.</div></div>'+
- '<div class="card panel" style="margin-top:13px"><h3>Décisions importantes</h3><textarea class="textarea autoSave" data-field="decisions">'+esc(c.decisions||'')+'</textarea></div></div></div>';
+ '<div class="card panel" style="margin-top:13px"><h3>Décisions importantes</h3><textarea class="textarea workspaceDraft" data-field="decisions">'+esc(c.decisions||'')+'</textarea><button class="btn primary small saveWorkspaceNotes" style="margin-top:8px">Enregistrer les décisions</button></div></div></div>';
 }
 function fieldInput(label,path,value,type){return '<div class="field"><label>'+label+'</label><input class="input pathSave" data-path="'+path+'" type="'+(type||'text')+'" value="'+esc(value||'')+'"></div>'}
 function fieldArea(label,path,value){return '<div class="field"><label>'+label+'</label><textarea class="textarea pathSave" data-path="'+path+'">'+esc(value||'')+'</textarea></div>'}
@@ -420,8 +434,9 @@ function admin(c){
  '<div class="card panel"><h3>Administratif</h3>'+fieldInput('E-mail','email',c.email)+fieldInput('Téléphone','phone',c.phone)+fieldInput('Responsable légal (si mineur)','legalGuardian',c.legalGuardian)+
  '<div class="field"><label>Statut paiement</label><select class="select pathSave" data-path="payment"><option '+(c.payment==='À jour'?'selected':'')+'>À jour</option><option '+(c.payment==='En attente'?'selected':'')+'>En attente</option><option '+(c.payment==='Échec'?'selected':'')+'>Échec</option><option '+(c.payment==='Terminé'?'selected':'')+'>Terminé</option></select></div>'+
  '<div class="section-title">Compte espace client</div>'+clientAccountBlock(c)+
- fieldArea('Notes administratives','adminNote',c.adminNote)+
- '<button class="btn danger small" id="archiveClient">Passer le client en inactif</button></div></div>';
+ '<div class="field"><label>Notes administratives</label><textarea class="textarea adminNoteDraft">'+esc(c.adminNote||'')+'</textarea></div>'+
+ '<button class="btn primary small" id="saveAdminNote">Enregistrer les notes administratives</button>'+
+ '<button class="btn danger small" id="archiveClient" style="margin-left:8px">Passer le client en inactif</button></div></div>';
 }
 
 function clientAccountBlock(c){
@@ -474,10 +489,13 @@ function bind(){
  document.querySelectorAll('.removeRequiredTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const name=b.dataset.name;const list=(cl.onboarding?.testsRequired||[]).filter(x=>x!==name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis retiré');render()});
  document.getElementById('completeProgramming')?.addEventListener('click',async()=>{const cl=currentClient();const now=new Date().toISOString();const [a,b]=await Promise.all([supa.from('onboarding').update({onboarding_completed_at:now,current_step:'active'}).eq('client_id',cl.id),supa.from('clients').update({status:'active'}).eq('id',cl.id)]);const err=a.error||b.error;if(err)return toast('Erreur : '+err.message);await loadSupabaseData();toast('Accompagnement activé');render()});
  document.querySelectorAll('.deepCheck').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.deep=cl.deep||{};cl.deep[x.dataset.key]=x.checked;try{await saveWorkspace(cl);toast('Point mis à jour')}catch(e){toast('Erreur : '+e.message)}});
- document.querySelectorAll('.autoSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl[x.dataset.field]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
- document.querySelectorAll('.offerSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.offerNotes=cl.offerNotes||{};cl.offerNotes[x.dataset.offerKey]=x.value;try{await saveWorkspace(cl);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
- document.querySelectorAll('.pathSave').forEach(x=>x.onchange=async()=>{const cl=currentClient();setPath(cl,x.dataset.path,x.value);try{await persistPath(cl,x.dataset.path,x.value);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}});
- document.getElementById('addTest')?.addEventListener('click',openAddTest);
+ document.querySelectorAll('.workspaceDraft').forEach(x=>x.oninput=()=>{const cl=currentClient();cl[x.dataset.field]=x.value});
+ document.querySelectorAll('.offerDraft').forEach(x=>x.oninput=()=>{const cl=currentClient();cl.offerNotes=cl.offerNotes||{};cl.offerNotes[x.dataset.offerKey]=x.value});
+ document.querySelectorAll('.saveWorkspaceNotes').forEach(b=>b.onclick=async()=>{try{await saveWorkspace(currentClient());toast('Notes enregistrées')}catch(e){toast('Erreur : '+e.message)}});
+ document.querySelectorAll('.saveOfferNotes').forEach(b=>b.onclick=async()=>{try{await saveWorkspace(currentClient());toast('Approfondissements enregistrés')}catch(e){toast('Erreur : '+e.message)}});
+ document.querySelectorAll('.pathSave').forEach(x=>{x.oninput=()=>{setPath(currentClient(),x.dataset.path,x.value)};x.onchange=async()=>{const cl=currentClient();setPath(cl,x.dataset.path,x.value);try{await persistPath(cl,x.dataset.path,x.value);toast('Enregistré')}catch(e){toast('Erreur : '+e.message)}}});
+ document.getElementById('addTest')?.addEventListener('click',()=>openAddTest());
+ document.querySelectorAll('.addRequiredResult').forEach(b=>b.onclick=()=>openAddTest(b.dataset.testName||''));
  document.querySelectorAll('.deleteTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('tests').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.tests=cl.tests.filter(t=>t.id!==b.dataset.id);toast('Test supprimé');render()});
  document.getElementById('addCheckin')?.addEventListener('click',openCheckin);
  document.querySelectorAll('.reviewCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const ta=document.querySelector('.coachCheckinFeedback[data-id="'+b.dataset.id+'"]');const feedback=ta?.value.trim()||'';const {error}=await supa.from('checkins').update({coach_feedback:feedback||null,coach_decision:feedback||null,reviewed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);const w=cl.checkins.find(x=>x.id===b.dataset.id);if(w){w.coach=feedback;w.reviewedAt=new Date().toISOString()}toast('Check-in traité');render()});
@@ -485,6 +503,8 @@ function bind(){
  document.getElementById('addEvent')?.addEventListener('click',openEvent);
  document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
  document.getElementById('printPassport')?.addEventListener('click',()=>window.print());
+ document.querySelector('.adminNoteDraft')?.addEventListener('input',e=>{currentClient().adminNote=e.target.value});
+ document.getElementById('saveAdminNote')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({admin_note:cl.adminNote||null}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);toast('Notes administratives enregistrées')});
  document.getElementById('archiveClient')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({status:'inactive'}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);cl.status='Inactif';toast('Client passé en inactif');render()});
  document.querySelectorAll('.linkClientAccount').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({auth_user_id:b.dataset.userId}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Compte client lié');render()});
  document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
@@ -518,9 +538,9 @@ function openNewClient(){
    closeModal();await loadSupabaseData();state.clientId=data.id;state.view='client';state.tab='overview';toast('Client créé dans Supabase');render();
  };
 }
-function openAddTest(){
+function openAddTest(prefillName=''){
  modal('Ajouter un résultat de test',
- '<div class="grid2"><div class="field"><label>Test</label><input id="tName" class="input" placeholder="CMJ, Sprint 10 m…"></div><div class="field"><label>Date</label><input id="tDate" type="date" class="input"></div>'+
+ '<div class="grid2"><div class="field"><label>Test</label><input id="tName" class="input" placeholder="CMJ, Sprint 10 m…" value="'+esc(prefillName)+'"></div><div class="field"><label>Date</label><input id="tDate" type="date" class="input"></div>'+
  '<div class="field"><label>Résultat</label><input id="tValue" class="input" type="number" step="any"></div><div class="field"><label>Unité</label><input id="tUnit" class="input" placeholder="cm, s, kg…"></div>'+
  '<div class="field"><label>Contexte</label><input id="tContext" class="input" placeholder="Initial, retest S6…"></div><div class="field"><label>Interprétation coach</label><input id="tNote" class="input"></div></div>',
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
