@@ -1,0 +1,12 @@
+-- AK PRIME — Visios V2
+-- Ajoute les statuts et traces nécessaires à la gestion complète des visios :
+-- cancelled_at, completed_at, rescheduled_at, cancellation_reason, updated_at.
+-- Crée appointment_events pour conserver les réservations, déplacements,
+-- annulations, réalisations et absences.
+-- Ajoute les RPC client :
+--   get_my_reschedule_slots(...)
+--   cancel_my_appointment(...)
+--   reschedule_my_appointment(...)
+-- Met à jour get_my_available_slots(...) afin que completed, cancelled_late
+-- et no_show restent comptabilisés dans le quota.
+-- Ajoute la synchronisation automatique de clients.next_visio_at.
