@@ -1,0 +1,14 @@
+-- AK PRIME — quotas de visio selon l'offre
+-- Règles V1 :
+-- Forme Standard : 1/mois
+-- Forme Renforcé : 2/mois
+-- Performance P1 : 1/mois
+-- Performance P2 : 2/mois
+-- Performance P3 : 1/semaine
+-- Mental Particulier : 1/semaine
+-- Mental Sportif : 1/semaine
+-- Offres combinées physique + mental : maximum 4/mois
+--
+-- Les fonctions privées/publiques appliquées au projet Supabase calculent la
+-- politique à partir de current_offer, filtrent les créneaux affichés et
+-- recontrôlent le quota au moment exact de la réservation.
