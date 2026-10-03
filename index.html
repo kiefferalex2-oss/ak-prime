@@ -242,11 +242,12 @@ async function loadSupabaseData(){
    supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at'),
    supa.from('renewals').select('*').order('due_date',{ascending:false}),
    supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
-   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
+   supa.from('renewal_choices').select('*').order('due_date',{ascending:false})
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[];
- const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id');
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[];
+ const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id'),renewalChoices=groupBy(rcr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
  db.clients=cr.map(x=>{
@@ -266,6 +267,7 @@ async function loadSupabaseData(){
      checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',problem:w.exercise_problem||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',other:w.other_info||'',coach:w.coach_feedback||w.coach_decision||'',reviewedAt:w.reviewed_at||''})),
      events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
      renewals:(renewals[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,newEndDate:isoDate(r.new_end_date),cycleReviewDone:!!r.cycle_review_done,retestsRequired:!!r.retests_required,retestsDone:!!r.retests_done,objectivesUpdated:!!r.objectives_updated,notes:r.notes||'',processedAt:r.processed_at||''})),
+     renewalChoices:(renewalChoices[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,paymentMode:r.payment_mode||'',submittedAt:r.submitted_at||'',updatedAt:r.updated_at||''})),
      adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois'
    };
  });
@@ -327,7 +329,8 @@ function addMonthsISO(dateStr,months){
  base.setUTCDate(Math.min(d,last));
  return base.toISOString().slice(0,10);
 }
-function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel','stop':'Arrêt'})[v]||v||'—'}
+function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel sans engagement','stop':'Arrêt'})[v]||v||'—'}
+function renewalPaymentLabel(v){return ({monthly:'Paiement mensuel',upfront:'Paiement comptant'})[v]||'—'}
 function appointmentStatusLabel(v){return ({scheduled:'Réservée',confirmed:'Confirmée',completed:'Réalisée',cancelled:'Annulée à temps',cancelled_late:'Annulée tardivement',no_show:'Absent'})[v]||v||'—'}
 function appointmentStatusTone(v){return v==='completed'?'green':v==='cancelled'||v==='cancelled_late'||v==='no_show'?'red':v==='scheduled'||v==='confirmed'?'blue':'amber'}
 function hoursUntil(v){return (new Date(v)-new Date())/3600000}
@@ -408,7 +411,9 @@ function coachNotifications(){
      if(!w.reviewedAt)out.push({key:'coach:checkin:'+w.id,title:'Nouveau bilan — '+cl.name,detail:'Check-in du '+fmtDate(w.date)+' à traiter.',target:'client',clientId:cl.id,tab:'follow',priority:4});
    }
    if(cl.end&&daysUntil(cl.end)<=14&&!(cl.renewals||[]).some(r=>r.dueDate===cl.end)){
-     out.push({key:'coach:renewal:'+cl.id+':'+cl.end,title:'Renouvellement — '+cl.name,detail:'Fin d’engagement le '+fmtDate(cl.end)+'. Bilan et décision à préparer.',target:'client',clientId:cl.id,tab:'admin',priority:5});
+     const choice=(cl.renewalChoices||[]).find(r=>r.dueDate===cl.end);
+     if(choice)out.push({key:'coach:renewal-choice:'+choice.id,title:'Choix de renouvellement reçu — '+cl.name,detail:renewalDecisionLabel(choice.decision)+(choice.paymentMode?' • '+renewalPaymentLabel(choice.paymentMode):'')+'. Échéance '+fmtDate(cl.end)+'.',target:'client',clientId:cl.id,tab:'admin',priority:5});
+     else out.push({key:'coach:renewal:'+cl.id+':'+cl.end,title:'Renouvellement — '+cl.name,detail:'Fin d’engagement le '+fmtDate(cl.end)+'. Le client doit encore choisir la suite.',target:'client',clientId:cl.id,tab:'admin',priority:5});
    }
    if(cl.status==='Actif'){
      const upcoming=(db.appointments||[]).some(a=>a.client_id===cl.id&&['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>now);
@@ -444,7 +449,12 @@ function clientNotifications(s){
  }
  const end=isoDate(c.engagement_end_date),d=end?daysUntil(end):null;
  if(d!==null&&d<=14){
-   out.push({key:'client:engagement:'+end,title:d<0?'Engagement arrivé à échéance':'Fin d’engagement proche',detail:d<0?'Ton engagement est arrivé à échéance.':d===0?'Ton engagement se termine aujourd’hui.':'Ton engagement se termine dans '+d+' jour(s), le '+fmtDate(end)+'.',target:'passport',priority:4});
+   const choice=(s?.renewalChoices||[]).find(r=>isoDate(r.due_date)===end);
+   if(!choice){
+     out.push({key:'client:renewal-choice:'+end,title:'Choisis la suite de ton accompagnement',detail:d<0?'Ton engagement est arrivé à échéance. Indique maintenant ce que tu souhaites faire.':d===0?'Ton engagement se termine aujourd’hui. Choisis la suite avant tout nouveau paiement.':'Ton engagement se termine dans '+d+' jour(s). Choisis 3 mois, 6 mois, mensuel ou arrêt.',target:'home',priority:5});
+   }else{
+     out.push({key:'client:engagement:'+end,title:'Choix de renouvellement enregistré',detail:renewalDecisionLabel(choice.decision)+(choice.payment_mode?' • '+renewalPaymentLabel(choice.payment_mode):'')+'. Aucun nouveau paiement n’est déclenché pour le moment.',target:'home',priority:2});
+   }
  }
  return out.map(n=>({...n,read:reads.has(n.key)})).sort((a,b)=>(b.priority-a.priority)||Number(a.read)-Number(b.read));
 }
@@ -492,18 +502,20 @@ function openNotificationCenter(mode){
 async function refreshClientNotificationData(){
  if(!clientPortalState?.client)return;
  const id=clientPortalState.client.id;
- const [clientRes,responseRes,checkRes,apptRes,readsRes]=await Promise.all([
+ const [clientRes,responseRes,checkRes,apptRes,readsRes,renewalChoiceRes]=await Promise.all([
    supa.from('clients').select('*').eq('id',id).single(),
    supa.from('questionnaire_responses').select('*').eq('client_id',id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('checkins').select('*').eq('client_id',id).order('week_date',{ascending:false}),
    supa.from('appointments').select('*').eq('client_id',id).order('starts_at',{ascending:true}),
-   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
+   supa.from('renewal_choices').select('*').eq('client_id',id).order('due_date',{ascending:false})
  ]);
  if(!clientRes.error)clientPortalState.client=clientRes.data;
  if(!responseRes.error)clientPortalState.response=responseRes.data;
  if(!checkRes.error)clientPortalState.checkins=checkRes.data||[];
  if(!apptRes.error)clientPortalState.appointments=apptRes.data||[];
  if(!readsRes.error)clientPortalState.notificationReads=readsRes.data||[];
+ if(!renewalChoiceRes.error)clientPortalState.renewalChoices=renewalChoiceRes.data||[];
 }
 async function handleNotificationBell(mode){
  if(mode==='coach'){try{await loadSupabaseData()}catch(e){}}
@@ -538,7 +550,7 @@ function dashboard(){
  const questionnaireTodo=db.clients.filter(c=>c.onboarding?.currentStep==='questionnaire');
  const pendingCheckins=acts.flatMap(c=>(c.checkins||[]).filter(w=>!w.reviewedAt).map(w=>({c,w})));
  const checkinTodo=pendingCheckins.length;
- const tasks=[...ending.map(c=>({c,label:'Renouvellement à traiter — échéance '+fmtDate(c.end),tone:'amber',tab:'admin'})),...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
+ const tasks=[...ending.map(c=>{const choice=(c.renewalChoices||[]).find(r=>r.dueDate===c.end);return {c,label:choice?'Choix client reçu — '+renewalDecisionLabel(choice.decision)+(choice.paymentMode?' / '+renewalPaymentLabel(choice.paymentMode):''):'Renouvellement en attente du choix client — '+fmtDate(c.end),tone:choice?'green':'amber',tab:'admin'}}),...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
  return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="kpis">'+
  kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
@@ -801,19 +813,24 @@ function admin(c){
 function renewalPanel(c){
  const d=daysUntil(c.end),history=(c.renewals||[]).slice().sort((a,b)=>b.dueDate.localeCompare(a.dueDate));
  const processedCurrent=history.find(r=>r.dueDate===c.end);
+ const clientChoice=(c.renewalChoices||[]).find(r=>r.dueDate===c.end);
  let stateHtml='';
  if(!c.end)stateHtml='<div class="muted">Ajoute d’abord une date de fin d’engagement.</div>';
  else if(processedCurrent){
    stateHtml=processedCurrent.decision==='stop'
     ? '<div class="alert"><strong>Arrêt prévu à l’échéance du '+fmtDate(c.end)+'.</strong><div class="tiny" style="margin-top:4px">Le renouvellement a déjà été traité.</div></div>'
     : '<div class="alert green"><strong>Renouvellement traité.</strong><div class="tiny" style="margin-top:4px">'+esc(renewalDecisionLabel(processedCurrent.decision))+' • nouvelle échéance '+fmtDate(processedCurrent.newEndDate)+'</div></div>';
+ }else if(clientChoice){
+   stateHtml='<div class="alert green"><strong>Le client a choisi : '+esc(renewalDecisionLabel(clientChoice.decision))+'</strong><div class="tiny" style="margin-top:4px">'+(clientChoice.paymentMode?esc(renewalPaymentLabel(clientChoice.paymentMode))+' • ':'')+'choix reçu le '+fmtDateTime(clientChoice.submittedAt)+'.</div></div>'+
+   '<div class="muted tiny" style="margin:8px 0 10px">Le choix est enregistré mais n’active encore aucun nouveau paiement. Quand Stripe sera branché, la validation du paiement finalisera automatiquement le renouvellement.</div>'+
+   '<button class="btn primary" id="openRenewal">Finaliser manuellement</button>';
  }else if(d!==null&&d<=14){
-   stateHtml='<div class="alert" style="margin-bottom:10px"><strong>Renouvellement à traiter</strong><div class="tiny" style="margin-top:4px">'+(d<0?'Échéance dépassée de '+Math.abs(d)+' jour(s).':d===0?'Échéance aujourd’hui.':'Échéance dans '+d+' jour(s), le '+fmtDate(c.end)+'.')+'</div></div><button class="btn primary" id="openRenewal">Traiter le renouvellement</button>';
+   stateHtml='<div class="alert" style="margin-bottom:10px"><strong>En attente du choix client</strong><div class="tiny" style="margin-top:4px">'+(d<0?'Échéance dépassée de '+Math.abs(d)+' jour(s).':d===0?'Échéance aujourd’hui.':'Échéance dans '+d+' jour(s), le '+fmtDate(c.end)+'.')+'</div></div><div class="muted tiny">Le client peut choisir directement depuis son espace : 3 mois, 6 mois, mensuel sans engagement ou arrêt.</div><button class="btn ghost small" id="openRenewal" style="margin-top:10px">Traiter manuellement</button>';
  }else{
-   stateHtml='<div class="alert blue"><strong>Prochaine échéance : '+fmtDate(c.end)+'</strong><div class="tiny" style="margin-top:4px">Le dossier passera automatiquement en “Renouvellement à traiter” à J-14.</div></div><button class="btn ghost small" id="openRenewal">Traiter maintenant</button>';
+   stateHtml='<div class="alert blue"><strong>Prochaine échéance : '+fmtDate(c.end)+'</strong><div class="tiny" style="margin-top:4px">Le choix client s’ouvrira automatiquement à J-14.</div></div><button class="btn ghost small" id="openRenewal">Traiter maintenant</button>';
  }
- const hist=history.length?history.map(r=>'<div class="item"><div class="row between"><strong>'+fmtDate(r.dueDate)+'</strong><span class="status '+(r.decision==='stop'?'red':'green')+'">'+esc(renewalDecisionLabel(r.decision))+'</span></div><div class="tiny muted">'+(r.newEndDate?'Nouvelle fin : '+fmtDate(r.newEndDate):'Fin prévue à l’échéance')+'</div><div class="tiny">Bilan cycle : '+(r.cycleReviewDone?'Oui':'Non')+' • Retests : '+(r.retestsRequired?(r.retestsDone?'faits':'à faire'):'non requis')+' • Objectifs : '+(r.objectivesUpdated?'mis à jour':'non mis à jour')+'</div>'+(r.notes?'<div class="tiny" style="margin-top:4px">'+esc(r.notes)+'</div>':'')+'</div>').join(''):'<div class="muted">Aucun renouvellement traité pour le moment.</div>';
- return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Renouvellement d’engagement</h3><div class="muted tiny">Alerte automatique à J-14, bilan de cycle et décision de poursuite.</div></div>'+(c.end&&d!==null&&d<=14&&!processedCurrent?'<span class="status amber">À traiter</span>':'')+'</div><div style="margin-top:12px">'+stateHtml+'</div><div class="section-title">Historique</div><div class="list">'+hist+'</div></div>';
+ const hist=history.length?history.map(r=>'<div class="item"><div class="row between"><strong>'+fmtDate(r.dueDate)+'</strong><span class="status '+(r.decision==='stop'?'red':'green')+'">'+esc(renewalDecisionLabel(r.decision))+'</span></div><div class="tiny muted">'+(r.newEndDate?'Nouvelle fin : '+fmtDate(r.newEndDate):'Fin prévue à l’échéance')+'</div><div class="tiny">Bilan cycle : '+(r.cycleReviewDone?'Oui':'Non')+' • Retests : '+(r.retestsRequired?(r.retestsDone?'faits':'à faire'):'non requis')+' • Objectifs : '+(r.objectivesUpdated?'mis à jour':'non mis à jour')+'</div>'+(r.notes?'<div class="tiny" style="margin-top:4px">'+esc(r.notes)+'</div>':'')+'</div>').join(''):'<div class="muted">Aucun renouvellement finalisé pour le moment.</div>';
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Renouvellement d’engagement</h3><div class="muted tiny">Le client choisit lui-même à J-14. Aucun renouvellement n’est imposé automatiquement.</div></div>'+(c.end&&d!==null&&d<=14&&!processedCurrent?'<span class="status '+(clientChoice?'green':'amber')+'">'+(clientChoice?'Choix reçu':'En attente')+'</span>':'')+'</div><div style="margin-top:12px">'+stateHtml+'</div><div class="section-title">Historique finalisé</div><div class="list">'+hist+'</div></div>';
 }
 
 function clientAccountBlock(c){
@@ -1001,6 +1018,8 @@ function openRenewalModal(cl){
  '<label class="check"><input id="renewObjectives" type="checkbox"> Nouveaux objectifs définis / mis à jour</label>'+
  '<div class="field"><label>Notes de renouvellement</label><textarea id="renewNotes" class="textarea" placeholder="Bilan, éléments discutés avec le client, suite prévue…"></textarea></div>',
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Valider le renouvellement</button>');
+ const clientChoice=(cl.renewalChoices||[]).find(r=>r.dueDate===cl.end);
+ if(clientChoice)document.getElementById('renewDecision').value=clientChoice.decision;
  document.getElementById('cancelM').onclick=closeModal;
  document.getElementById('renewRetestsRequired').onchange=e=>{if(!e.target.checked)document.getElementById('renewRetestsDone').checked=false};
  document.getElementById('saveM').onclick=async()=>{
@@ -1100,7 +1119,7 @@ async function enterClientPortal(user,profile){
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte existe, mais ton accès à l’espace AK PRIME n’est pas encore activé. En production, l’accès sera débloqué après validation du paiement et liaison sécurisée avec ton dossier.');return}
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
@@ -1111,11 +1130,12 @@ async function enterClientPortal(user,profile){
    supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate}),
    supa.rpc('get_my_booking_policy'),
    supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
-   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
+   supa.from('renewal_choices').select('*').eq('client_id',client.id).order('due_date',{ascending:false})
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[]};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[],renewalChoices:renewalChoiceRes.data||[]};
  clientPortalView='home';
  clientVisioWeek=0;
  clientVisioDay='';
@@ -1143,6 +1163,55 @@ function clientNavMarkup(){
  return {top,mobile};
 }
 
+
+function currentClientRenewalChoice(s){
+ const end=isoDate(s?.client?.engagement_end_date);
+ return end?(s?.renewalChoices||[]).find(r=>isoDate(r.due_date)===end)||null:null;
+}
+function renderClientRenewalCard(s){
+ const end=isoDate(s?.client?.engagement_end_date);if(!end)return '';
+ const d=daysUntil(end);if(d===null||d>14)return '';
+ const choice=currentClientRenewalChoice(s);
+ if(choice){
+   const payment=choice.payment_mode?' • '+renewalPaymentLabel(choice.payment_mode):'';
+   return '<div class="client-section-card" style="border-color:#c9d7ef;background:#fbfdff"><div class="row between"><div><div class="muted tiny">MA DÉCISION POUR LA SUITE</div><h3 style="margin:4px 0 5px">'+esc(renewalDecisionLabel(choice.decision))+'</h3><div class="muted tiny">'+esc(payment.replace(/^ • /,''))+(payment?' • ':'')+'échéance actuelle '+fmtDate(end)+'</div></div><span class="status green">Choix enregistré</span></div><div class="alert blue" style="margin-top:12px"><div class="tiny"><strong>Aucun nouveau prélèvement n’est effectué ici.</strong> Le tarif et le paiement seront confirmés avant l’activation du prochain engagement.</div></div><button class="btn ghost small" id="openClientRenewalChoice" style="margin-top:5px">Modifier mon choix</button></div>';
+ }
+ return '<div class="client-section-card" style="border-color:#efcf8e;background:#fffaf0"><div class="row between"><div><div class="muted tiny">FIN D’ENGAGEMENT</div><h3 style="margin:4px 0 5px">Choisis toi-même la suite</h3><div class="muted tiny">'+(d<0?'Échéance dépassée : ':d===0?'Échéance aujourd’hui : ':'Dans '+d+' jour(s) : ')+fmtDate(end)+'</div></div><span class="status amber">Action requise</span></div><p class="tiny" style="line-height:1.55">Rien ne repart automatiquement : tu choisis entre un nouvel engagement de 3 mois, 6 mois, du mensuel sans engagement ou l’arrêt.</p><button class="btn primary" id="openClientRenewalChoice">Choisir la suite</button></div>';
+}
+function openClientRenewalChoice(){
+ const s=clientPortalState,c=s?.client;if(!c)return;
+ const end=isoDate(c.engagement_end_date),d=end?daysUntil(end):null;
+ if(!end||d===null||d>14)return alert('Le choix sera disponible 14 jours avant la fin de ton engagement.');
+ const existing=currentClientRenewalChoice(s);
+ modal('Choisir la suite de mon accompagnement',
+ '<div class="alert blue"><strong>Échéance actuelle : '+fmtDate(end)+'</strong><div class="tiny" style="margin-top:4px">Aucune option n’est reconduite automatiquement. Ton choix est enregistré, mais aucun paiement n’est déclenché aujourd’hui.</div></div>'+
+ '<div class="field"><label>Que souhaites-tu faire ?</label><select id="clientRenewDecision" class="select"><option value="3_months">Repartir sur 3 mois</option><option value="6_months">Repartir sur 6 mois</option><option value="monthly">Passer en mensuel sans engagement</option><option value="stop">Arrêter à l’échéance</option></select></div>'+
+ '<div id="clientRenewPaymentWrap"><div class="field"><label>Mode de paiement souhaité</label><select id="clientRenewPayment" class="select"><option value="monthly">Paiement mensuel</option><option value="upfront">Paiement comptant</option></select></div><div class="muted tiny" style="margin-top:-4px">Le paiement comptant bénéficiera de la remise prévue par la grille tarifaire au moment de l’activation.</div></div>'+
+ '<div id="clientRenewSummary" class="alert" style="margin-top:12px"></div>',
+ '<button class="btn ghost" id="cancelClientRenewal">Annuler</button><button class="btn primary" id="saveClientRenewal">Confirmer mon choix</button>');
+ const decision=document.getElementById('clientRenewDecision'),payment=document.getElementById('clientRenewPayment'),wrap=document.getElementById('clientRenewPaymentWrap'),summary=document.getElementById('clientRenewSummary');
+ if(existing){decision.value=existing.decision||'3_months';if(existing.payment_mode)payment.value=existing.payment_mode}
+ const sync=()=>{
+   const v=decision.value;
+   if(v==='stop'){wrap.style.display='none';summary.innerHTML='<strong>Arrêt à l’échéance</strong><div class="tiny" style="margin-top:4px">Ton accompagnement continuera jusqu’au '+fmtDate(end)+', puis s’arrêtera. Aucun nouvel engagement ne sera créé.</div>'}
+   else if(v==='monthly'){wrap.style.display='none';summary.innerHTML='<strong>Mensuel sans engagement</strong><div class="tiny" style="margin-top:4px">Tu demandes à poursuivre au mois. Le tarif final et le premier paiement seront confirmés avant activation.</div>'}
+   else{wrap.style.display='block';summary.innerHTML='<strong>Nouvel engagement '+(v==='3_months'?'3':'6')+' mois</strong><div class="tiny" style="margin-top:4px">'+renewalPaymentLabel(payment.value)+'. Le montant exact sera affiché avant paiement lorsque Stripe sera activé.</div>'}
+ };
+ decision.onchange=sync;payment.onchange=sync;sync();
+ document.getElementById('cancelClientRenewal').onclick=closeModal;
+ document.getElementById('saveClientRenewal').onclick=async()=>{
+   const dec=decision.value;
+   const pay=dec==='stop'?null:dec==='monthly'?'monthly':payment.value;
+   const label=renewalDecisionLabel(dec)+(pay?' — '+renewalPaymentLabel(pay):'');
+   if(!confirm('Confirmer : '+label+' ?\n\nAucun paiement ne sera effectué maintenant.'))return;
+   const btn=document.getElementById('saveClientRenewal');btn.disabled=true;btn.textContent='Enregistrement…';
+   const {data,error}=await supa.rpc('submit_my_renewal_choice',{p_decision:dec,p_payment_mode:pay});
+   if(error){btn.disabled=false;btn.textContent='Confirmer mon choix';return alert(error.message||'Impossible d’enregistrer ton choix.')}
+   const row=Array.isArray(data)?data[0]:data;
+   s.renewalChoices=[row,...(s.renewalChoices||[]).filter(x=>isoDate(x.due_date)!==end)];
+   closeModal();toast('Choix de renouvellement enregistré');renderClientPortal();
+ };
+}
 function renderClientHome(s){
  const c=s.client,cycle=s.cycle,r=s.response;
  const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
@@ -1153,7 +1222,7 @@ function renderClientHome(s){
  const actionCards=[];
  if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><strong>Questionnaire initial à compléter</strong><div class="muted tiny" style="margin-top:5px">Il permet de préparer ton accompagnement et ta première visio.</div><button class="btn primary small clientGoFollow" style="margin-top:10px">Le compléter</button></div>');
  if(!week)actionCards.push('<div class="client-action-card"><strong>Bilan hebdomadaire</strong><div class="muted tiny" style="margin-top:5px">Ton retour aide à adapter la semaine suivante.</div><button class="btn ghost small clientGoFollow" style="margin-top:10px">Faire mon bilan</button></div>');
- if(d!==null&&d<=14)actionCards.push('<div class="client-action-card urgent"><strong>Fin d’engagement '+(d<0?'dépassée':d===0?'aujourd’hui':'dans '+d+' jour(s)')+'</strong><div class="muted tiny" style="margin-top:5px">Un bilan de cycle et la suite de l’accompagnement seront préparés avec Alex.</div><button class="btn ghost small clientGoPassport" style="margin-top:10px">Voir mon Passeport</button></div>');
+ if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card"><strong>Passeport de fin de cycle</strong><div class="muted tiny" style="margin-top:5px">Ton choix est enregistré. Tu peux aussi consulter ton évolution avant la prochaine étape.</div><button class="btn ghost small clientGoPassport" style="margin-top:10px">Voir mon Passeport</button></div>');
  return '<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><span class="status green">'+esc(c.status==='active'?'Actif':c.status||'')+'</span></div></div>'+
  '<div class="client-summary-grid">'+
  '<div class="client-summary-card"><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?next.duration_minutes+' min':'Réserve depuis l’onglet Visios')+'</div></div>'+
@@ -1161,6 +1230,7 @@ function renderClientHome(s){
  '<div class="client-summary-card"><div class="lab">Bilan hebdo</div><div class="value">'+(week?(week.reviewed_at?'Traité':'Envoyé'):'À faire')+'</div><div class="sub">'+(week?(week.reviewed_at?'Retour coach disponible':'En attente du coach'):'À compléter cette semaine')+'</div></div>'+
  '<div class="client-summary-card"><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
  '</div>'+
+ renderClientRenewalCard(s)+
  (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
  '<div class="client-home-actions">'+
  (c.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
@@ -1213,6 +1283,7 @@ function renderClientPortal(){
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
  document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
+ document.getElementById('openClientRenewalChoice')?.addEventListener('click',openClientRenewalChoice);
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
  document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;clientMobileMenuOpen=false;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
