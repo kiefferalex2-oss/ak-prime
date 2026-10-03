@@ -1218,6 +1218,7 @@ function renderClientHome(s){
  const friday=currentWeekFriday(),week=(s.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
  const qDone=r?.status==='submitted';
  const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
+ const renewalPending=d!==null&&d<=14&&!currentClientRenewalChoice(s);
  const engagementValue=!c.engagement_end_date?'À définir':d<0?'Échue':d===0?'Aujourd’hui':d+' j';
  const actionCards=[];
  if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><strong>Questionnaire initial à compléter</strong><div class="muted tiny" style="margin-top:5px">Il permet de préparer ton accompagnement et ta première visio.</div><button class="btn primary small clientGoFollow" style="margin-top:10px">Le compléter</button></div>');
@@ -1231,7 +1232,7 @@ function renderClientHome(s){
  '<div class="client-summary-card"><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
  '</div>'+
  renderClientRenewalCard(s)+
- (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
+ (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':renewalPending?'':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
  '<div class="client-home-actions">'+
  (c.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
  renderClientWhatsAppButton(s,c)+
