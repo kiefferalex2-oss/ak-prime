@@ -252,6 +252,9 @@ function addMonthsISO(dateStr,months){
  return base.toISOString().slice(0,10);
 }
 function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel','stop':'Arrêt'})[v]||v||'—'}
+function appointmentStatusLabel(v){return ({scheduled:'Réservée',confirmed:'Confirmée',completed:'Réalisée',cancelled:'Annulée à temps',cancelled_late:'Annulée tardivement',no_show:'Absent'})[v]||v||'—'}
+function appointmentStatusTone(v){return v==='completed'?'green':v==='cancelled'||v==='cancelled_late'||v==='no_show'?'red':v==='scheduled'||v==='confirmed'?'blue':'amber'}
+function hoursUntil(v){return (new Date(v)-new Date())/3600000}
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 function normalizeTestName(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
@@ -632,7 +635,10 @@ function globalTests(){
 function calendarPage(){
  const days=[['Lundi',1],['Mardi',2],['Mercredi',3],['Jeudi',4],['Vendredi',5],['Samedi',6],['Dimanche',7]];
  const windows=db.availabilityWindows||[], dated=db.availabilityDateWindows||[], exceptions=db.availabilityExceptions||[];
- const upcoming=(db.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const appointments=db.appointments||[];
+ const upcoming=appointments.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const toProcess=appointments.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at));
+ const visioHistory=appointments.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,20);
 
  const today=new Date();today.setHours(12,0,0,0);
  const planningDays=[];
@@ -663,14 +669,18 @@ function calendarPage(){
  }).join('');
 
  const exRows=exceptions.map(e=>{const end=String(e.end_date||e.exception_date).slice(0,10),range=end!==String(e.exception_date).slice(0,10)?fmtDate(e.exception_date)+' → '+fmtDate(end):fmtDate(e.exception_date);return '<div class="item row between"><div><strong>'+range+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée(s) entière(s)')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>'}).join('');
- const apptRows=upcoming.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><div class="row"><button class="link openClient" data-id="'+a.client_id+'">Dossier</button><button class="link cancelAppointment" data-id="'+a.id+'" data-client-id="'+a.client_id+'">Annuler</button></div></div>').join('');
+ const apptRows=upcoming.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min • <span class="status blue">'+appointmentStatusLabel(a.status)+'</span></div></div><div class="row"><button class="link openClient" data-id="'+a.client_id+'">Dossier</button><button class="link cancelAppointment" data-id="'+a.id+'" data-client-id="'+a.client_id+'">Annuler</button></div></div>').join('');
+ const processRows=toProcess.map(a=>'<div class="item"><div class="row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">À clôturer</div></div><button class="link openClient" data-id="'+a.client_id+'">Dossier</button></div><div class="row" style="margin-top:8px"><button class="btn primary small coachCompleteVisio" data-id="'+a.id+'">Marquer réalisée</button><button class="btn danger small coachNoShowVisio" data-id="'+a.id+'">Absent</button></div></div>').join('');
+ const historyRows=visioHistory.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join('');
 
  return '<div class="page-title"><div><h1>Calendrier & disponibilités</h1><p>Planifie tes créneaux jusqu’à 3 semaines à l’avance. Les clients voient les changements en temps réel.</p></div><button class="btn primary" id="addException">Bloquer une période / un créneau</button></div>'+
  '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Planning des 3 prochaines semaines</h3><div class="muted tiny">Clique sur + pour définir précisément tes disponibilités d’une date. Dès qu’une date possède un planning précis, il remplace le planning hebdomadaire habituel pour ce jour.</div></div><span class="status green">Temps réel</span></div>'+threeWeeks+'</div>'+
  '<div class="card panel" style="margin-bottom:13px"><div><h3 style="margin-bottom:4px">Planning hebdomadaire habituel</h3><div class="muted tiny">Facultatif : il sert de base pour les jours où tu n’as pas défini de planning précis.</div></div>'+
  '<div style="display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:10px;overflow:auto;margin-top:14px;padding-bottom:4px">'+weekly+'</div></div>'+
  '<div class="grid2"><div class="card panel"><h3>Indisponibilités ponctuelles</h3><div class="list">'+(exRows||'<div class="muted">Aucune exception enregistrée.</div>')+'</div></div>'+
- '<div class="card panel"><h3>Rendez-vous à venir</h3><div class="list">'+(apptRows||'<div class="muted">Aucune visio réservée.</div>')+'</div></div></div>';
+ '<div class="card panel"><h3>Rendez-vous à venir</h3><div class="list">'+(apptRows||'<div class="muted">Aucune visio réservée.</div>')+'</div></div></div>'+
+ '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Visios à clôturer</h3><div class="list">'+(processRows||'<div class="muted">Aucune visio passée en attente de statut.</div>')+'</div></div>'+
+ '<div class="card panel"><h3>Historique des visios</h3><div class="list">'+(historyRows||'<div class="muted">Aucun historique pour le moment.</div>')+'</div></div></div>';
 }
 
 function backupPage(){
@@ -711,7 +721,9 @@ function bind(){
  document.querySelectorAll('.deleteAvailability').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_windows').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Disponibilité retirée');render()});
  document.getElementById('addException')?.addEventListener('click',openExceptionModal);
  document.querySelectorAll('.deleteException').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_exceptions').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Indisponibilité retirée');render()});
- document.querySelectorAll('.cancelAppointment').forEach(b=>b.onclick=async()=>{if(!confirm('Annuler cette visio ?'))return;const {error}=await supa.from('appointments').update({status:'cancelled'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);const future=(db.appointments||[]).filter(a=>a.client_id===b.dataset.clientId&&a.id!==b.dataset.id&&a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];await supa.from('clients').update({next_visio_at:future?.starts_at||null}).eq('id',b.dataset.clientId);await loadSupabaseData();toast('Visio annulée');render()});
+ document.querySelectorAll('.cancelAppointment').forEach(b=>b.onclick=async()=>{if(!confirm('Annuler cette visio ? Le créneau sera immédiatement libéré.'))return;const a=(db.appointments||[]).find(x=>x.id===b.dataset.id);const {error}=await supa.from('appointments').update({status:'cancelled',cancelled_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);if(a)await supa.from('appointment_events').insert({appointment_id:a.id,client_id:a.client_id,event_type:'cancelled',old_starts_at:a.starts_at,detail:'Visio annulée par le coach.'});await loadSupabaseData();toast('Visio annulée');render()});
+ document.querySelectorAll('.coachCompleteVisio').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('appointments').update({status:'completed',completed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio marquée réalisée');render()});
+ document.querySelectorAll('.coachNoShowVisio').forEach(b=>b.onclick=async()=>{if(!confirm('Marquer le client absent ? Cette visio restera comptabilisée dans son quota.'))return;const {error}=await supa.from('appointments').update({status:'no_show'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Absence enregistrée');render()});
  const cs=document.getElementById('clientSearch');if(cs)cs.oninput=e=>{state.search=e.target.value;render()};
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
@@ -925,7 +937,7 @@ function renderClientEngagementBanner(c){
 function renderClientPortal(){
  const s=clientPortalState,c=s.client,t=s.template,r=s.response,cycle=s.cycle;
  const questionnaireStatus=!t?'Non disponible':r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon commencé':'À compléter';
- const nextAppt=(s.appointments||[]).find(a=>a.status!=='cancelled'&&new Date(a.starts_at)>=new Date());
+ const nextAppt=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
  const nav='<div class="client-nav"><button id="clientHomeNav" class="'+(clientPortalView==='home'?'on':'')+'">Accueil</button><button id="clientPassportNav" class="'+(clientPortalView==='passport'?'on':'')+'">Passeport</button></div>';
  let main='';
  if(clientPortalView==='passport'){
@@ -974,23 +986,36 @@ function renderClientWhatsAppButton(s,c){
 }
 
 function renderBookingPanel(s){
- const future=(s.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const all=(s.appointments||[]).slice().sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const future=all.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>new Date());
  const next=future[0];
+ const history=all.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)||new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,8);
  const slots=(s.availableSlots||[]).slice(0,60);
  const policy=s.bookingPolicy||{};
  const quotaText=policy.quota_period==='week'
    ? (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par semaine'
    : (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par mois';
  const grouped={};for(const sl of slots){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
- return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés respectent automatiquement la fréquence incluse dans ton offre et les disponibilités du coach.</div></div><span class="status green">Temps réel</span></div>'+
- '<div class="alert blue" style="margin-top:12px"><strong>Ton offre : '+esc(quotaText)+'</strong><div class="tiny" style="margin-top:4px">Durée d’une visio : '+esc(policy.duration_minutes||30)+' min. Quand ton quota est atteint pour une semaine ou un mois, aucun autre créneau de cette période n’est proposé.</div></div>'+
- (next?'<div class="alert" style="margin-top:10px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div>'+
- (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="margin-top:8px;text-decoration:none">📹 Rejoindre la visio sur WhatsApp</a>':'')+
- '</div>':'')+
+ const nextActions=next?(()=>{
+   const h=hoursUntil(next.starts_at),late=h<24;
+   return '<div class="alert '+(late?'':'blue')+'" style="margin-top:10px"><div class="row between"><div><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
+   (late?'<div class="tiny" style="margin-top:8px;color:#8a5b00">À moins de 24 h, la visio ne peut plus être déplacée automatiquement. Une annulation reste comptabilisée dans ton quota.</div>':'<div class="tiny" style="margin-top:8px">Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant le rendez-vous.</div>')+
+   '<div class="row" style="margin-top:9px;flex-wrap:wrap">'+
+   (!late?'<button class="btn ghost small clientRescheduleVisio" data-id="'+next.id+'">Déplacer</button>':'')+
+   '<button class="btn danger small clientCancelVisio" data-id="'+next.id+'" data-late="'+(late?'1':'0')+'">Annuler</button>'+
+   (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="text-decoration:none">📹 Rejoindre sur WhatsApp</a>':'')+
+   '</div></div>';
+ })():'';
+ const hist=history.length?history.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join(''):'<div class="muted">Aucune visio dans l’historique.</div>';
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés respectent automatiquement ton offre et les disponibilités du coach.</div></div><span class="status green">Temps réel</span></div>'+
+ '<div class="alert blue" style="margin-top:12px"><strong>Ton offre : '+esc(quotaText)+'</strong><div class="tiny" style="margin-top:4px">Durée : '+esc(policy.duration_minutes||30)+' min. Les annulations à moins de 24 h et les absences restent comptabilisées.</div></div>'+
+ nextActions+
  '<div class="section-title">Créneaux disponibles sur les 3 prochaines semaines</div>'+
- (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible actuellement. Cela peut aussi signifier que ton quota de visio est déjà utilisé pour les périodes affichées.</div>')+
+ (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible actuellement. Ton quota peut aussi être déjà utilisé pour les périodes affichées.</div>')+
+ '<div class="section-title">Historique de mes visios</div><div class="list">'+hist+'</div>'+
  '</div>';
 }
+
 function bindBookingButtons(){
  document.querySelectorAll('.bookSlot').forEach(b=>b.onclick=async()=>{
    const start=b.dataset.start;
@@ -1000,7 +1025,44 @@ function bindBookingButtons(){
    if(error){alert(error.message||'Ce créneau n’est plus disponible.');await refreshClientBookingData();return}
    await refreshClientBookingData();alert('Visio réservée.');
  });
+ document.querySelectorAll('.clientCancelVisio').forEach(b=>b.onclick=()=>openClientCancelVisio(b.dataset.id,b.dataset.late==='1'));
+ document.querySelectorAll('.clientRescheduleVisio').forEach(b=>b.onclick=()=>openClientRescheduleVisio(b.dataset.id));
 }
+async function openClientCancelVisio(id,isLate){
+ const a=(clientPortalState?.appointments||[]).find(x=>x.id===id);if(!a)return;
+ modal('Annuler la visio',
+   '<div class="alert '+(isLate?'':'blue')+'"><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="tiny" style="margin-top:5px">'+(isLate?'Cette annulation a lieu à moins de 24 h : la visio restera comptabilisée dans ton quota.':'Cette annulation a lieu à plus de 24 h : le créneau sera libéré et la visio ne comptera plus dans ton quota.')+'</div></div>'+
+   '<div class="field"><label>Motif facultatif</label><textarea id="clientCancelReason" class="textarea" placeholder="Tu peux préciser la raison si tu le souhaites."></textarea></div>',
+   '<button class="btn ghost" id="cancelM">Garder la visio</button><button class="btn danger" id="saveM">Confirmer l’annulation</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{
+   const reason=document.getElementById('clientCancelReason').value.trim();
+   const {data,error}=await supa.rpc('cancel_my_appointment',{p_appointment_id:id,p_reason:reason||null});
+   if(error)return alert(error.message);
+   closeModal();await refreshClientBookingData();
+   alert(data==='cancelled_late'?'Visio annulée. Elle reste comptabilisée car l’annulation intervient à moins de 24 h.':'Visio annulée. Ton quota a été libéré.');
+ };
+}
+async function openClientRescheduleVisio(id){
+ const a=(clientPortalState?.appointments||[]).find(x=>x.id===id);if(!a)return;
+ if(hoursUntil(a.starts_at)<24){alert('À moins de 24 h, le déplacement automatique n’est plus disponible. Contacte Alex sur WhatsApp.');return}
+ modal('Déplacer ma visio','<div class="alert blue"><strong>Visio actuelle : '+fmtDateTime(a.starts_at)+'</strong><div class="tiny" style="margin-top:5px">Choisis un nouveau créneau disponible. Ton ancienne place ne sera libérée qu’une fois le nouveau créneau confirmé.</div></div><div id="rescheduleSlots"><div class="muted">Chargement des créneaux…</div></div>','<button class="btn ghost" id="cancelM">Fermer</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ const today=localDateISO(),end=new Date();end.setDate(end.getDate()+20);
+ const {data,error}=await supa.rpc('get_my_reschedule_slots',{p_appointment_id:id,p_from:today,p_to:localDateISO(end)});
+ const box=document.getElementById('rescheduleSlots');if(!box)return;
+ if(error){box.innerHTML='<div class="alert">'+esc(error.message)+'</div>';return}
+ const grouped={};for(const sl of data||[]){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
+ box.innerHTML=(data||[]).length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small rescheduleSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun autre créneau disponible sur les 3 prochaines semaines.</div>';
+ document.querySelectorAll('.rescheduleSlot').forEach(b=>b.onclick=async()=>{
+   const start=b.dataset.start;if(!confirm('Déplacer la visio au '+fmtDateTime(start)+' ?'))return;
+   b.disabled=true;
+   const {error}=await supa.rpc('reschedule_my_appointment',{p_appointment_id:id,p_new_starts_at:start});
+   if(error){alert(error.message);b.disabled=false;return}
+   closeModal();await refreshClientBookingData();alert('Visio déplacée avec succès.');
+ });
+}
+
 async function refreshClientBookingData(){
  if(!clientPortalState?.client)return;
  const today=localDateISO(),end=new Date();end.setDate(end.getDate()+20);
