@@ -147,11 +147,12 @@ async function loadSupabaseData(){
    supa.from('availability_date_windows').select('*').eq('coach_user_id',authUser.id).order('availability_date').order('start_time'),
    supa.from('availability_exceptions').select('*').eq('coach_user_id',authUser.id).order('exception_date'),
    supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at'),
+   supa.from('renewals').select('*').order('due_date',{ascending:false}),
    supa.from('app_settings').select('*').eq('id',1).maybeSingle()
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],appSettings=reqs[13].data||null;
- const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id');
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null;
+ const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
  db.clients=cr.map(x=>{
@@ -170,6 +171,7 @@ async function loadSupabaseData(){
      cycle:{_id:cy.id||'',title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||'',optitrainer:x.optitrainer_url||''},
      checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',problem:w.exercise_problem||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',other:w.other_info||'',coach:w.coach_feedback||w.coach_decision||'',reviewedAt:w.reviewed_at||''})),
      events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
+     renewals:(renewals[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,newEndDate:isoDate(r.new_end_date),cycleReviewDone:!!r.cycle_review_done,retestsRequired:!!r.retests_required,retestsDone:!!r.retests_done,objectivesUpdated:!!r.objectives_updated,notes:r.notes||'',processedAt:r.processed_at||''})),
      adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois'
    };
  });
@@ -216,6 +218,21 @@ function fmtDate(v){if(!v)return '—';const p=String(v).slice(0,10).split('-');
 function localDateISO(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function fmtDateTime(v){if(!v)return '—';return new Intl.DateTimeFormat('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(v))}
 function fmtTime(v){if(!v)return '—';return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(v))}
+function daysUntil(dateStr){
+ if(!dateStr)return null;
+ const a=new Date(localDateISO()+'T12:00:00Z'),b=new Date(String(dateStr).slice(0,10)+'T12:00:00Z');
+ return Math.ceil((b-a)/86400000);
+}
+function addMonthsISO(dateStr,months){
+ if(!dateStr)return '';
+ const [y,m,d]=String(dateStr).slice(0,10).split('-').map(Number);
+ const base=new Date(Date.UTC(y,m-1,1,12));
+ base.setUTCMonth(base.getUTCMonth()+months);
+ const last=new Date(Date.UTC(base.getUTCFullYear(),base.getUTCMonth()+1,0,12)).getUTCDate();
+ base.setUTCDate(Math.min(d,last));
+ return base.toISOString().slice(0,10);
+}
+function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel','stop':'Arrêt'})[v]||v||'—'}
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 function normalizeTestName(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
@@ -298,20 +315,20 @@ function dashboard(){
  const acts=activeClients();
  const next=acts.filter(c=>c.next).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,5);
  const now=new Date();
- const ending=acts.filter(c=>c.end&&((new Date(c.end+'T23:59:59')-now)/(86400000))<=14&&new Date(c.end+'T23:59:59')>=now).sort((a,b)=>a.end.localeCompare(b.end));
+ const ending=acts.filter(c=>c.end&&daysUntil(c.end)<=14&&!(c.renewals||[]).some(r=>r.dueDate===c.end)).sort((a,b)=>a.end.localeCompare(b.end));
  const visioTodo=db.clients.filter(c=>c.onboarding?.currentStep==='visio');
  const testsTodo=db.clients.filter(c=>c.onboarding?.currentStep==='tests');
  const programmingTodo=db.clients.filter(c=>c.onboarding?.currentStep==='programming');
  const questionnaireTodo=db.clients.filter(c=>c.onboarding?.currentStep==='questionnaire');
  const pendingCheckins=acts.flatMap(c=>(c.checkins||[]).filter(w=>!w.reviewedAt).map(w=>({c,w})));
  const checkinTodo=pendingCheckins.length;
- const tasks=[...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
+ const tasks=[...ending.map(c=>({c,label:'Renouvellement à traiter — échéance '+fmtDate(c.end),tone:'amber',tab:'admin'})),...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
  return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="kpis">'+
  kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
  kpi('Tests à terminer',testsTodo.length,'avant programmation')+kpi('Programmations à faire',programmingTodo.length,'tests requis validés')+
  '</div><div class="grid2">'+
- '<div class="card panel"><h3>Actions prioritaires</h3><div class="list">'+(tasks.length?tasks.map(x=>'<div class="item row between"><div><strong>'+esc(x.c.name)+'</strong><div class="muted tiny">'+esc(x.label)+'</div></div><button class="link openClient" data-id="'+x.c.id+'">Ouvrir</button></div>').join(''):'<div class="alert green">Aucune action d’onboarding urgente.</div>')+'</div></div>'+
+ '<div class="card panel"><h3>Actions prioritaires</h3><div class="list">'+(tasks.length?tasks.map(x=>'<div class="item row between"><div><strong>'+esc(x.c.name)+'</strong><div class="muted tiny">'+esc(x.label)+'</div></div><button class="link openClient" data-id="'+x.c.id+'" data-tab-target="'+esc(x.tab||'overview')+'">Ouvrir</button></div>').join(''):'<div class="alert green">Aucune action d’onboarding urgente.</div>')+'</div></div>'+
  '<div class="card panel"><h3>Prochaines visios</h3><div class="list">'+(next.length?next.map(c=>'<div class="item row between"><div><strong>'+esc(c.name)+'</strong><span class="muted tiny">'+esc(c.offer)+' — '+fmtDate(c.next)+'</span></div><button class="link openClient" data-id="'+c.id+'">Ouvrir</button></div>').join(''):'<div class="muted">Aucune visio planifiée.</div>')+'</div></div>'+
  '</div><div class="grid3" style="margin-top:13px">'+
  '<div class="card panel"><h3>Check-ins à traiter</h3><div class="kpi"><div class="val">'+checkinTodo+'</div><div class="sub">bilan(s) client en attente de retour</div></div></div>'+
@@ -458,13 +475,32 @@ function admin(c){
  return '<div class="grid2"><div class="card panel"><h3>Engagement</h3>'+
  fieldInput('Offre','offer',c.offer)+fieldInput('Date de début','start',c.start,'date')+fieldInput('Date de fin','end',c.end,'date')+fieldInput('Prochaine visio','next',c.next,'date')+
  '<div class="field"><label>Statut</label><select class="select pathSave" data-path="status"><option '+(c.status==='Actif'?'selected':'')+'>Actif</option><option '+(c.status==='Inactif'?'selected':'')+'>Inactif</option></select></div>'+
- '<div class="field"><label>Renouvellement prévu</label><select class="select pathSave" data-path="renewal"><option>3 mois</option><option>6 mois</option><option>Mensuel</option><option>Arrêt</option></select></div></div>'+
+ '<div class="muted tiny">Le renouvellement réel se traite dans le bloc dédié ci-dessous.</div></div>'+
  '<div class="card panel"><h3>Administratif</h3>'+fieldInput('E-mail','email',c.email)+fieldInput('Téléphone','phone',c.phone)+fieldInput('Responsable légal (si mineur)','legalGuardian',c.legalGuardian)+
  '<div class="field"><label>Statut paiement</label><select class="select pathSave" data-path="payment"><option '+(c.payment==='À jour'?'selected':'')+'>À jour</option><option '+(c.payment==='En attente'?'selected':'')+'>En attente</option><option '+(c.payment==='Échec'?'selected':'')+'>Échec</option><option '+(c.payment==='Terminé'?'selected':'')+'>Terminé</option></select></div>'+
  '<div class="section-title">Compte espace client</div>'+clientAccountBlock(c)+
  '<div class="field"><label>Notes administratives</label><textarea class="textarea adminNoteDraft">'+esc(c.adminNote||'')+'</textarea></div>'+
  '<button class="btn primary small" id="saveAdminNote">Enregistrer les notes administratives</button>'+
- '<button class="btn danger small" id="archiveClient" style="margin-left:8px">Passer le client en inactif</button></div></div>';
+ '<button class="btn danger small" id="archiveClient" style="margin-left:8px">Passer le client en inactif</button></div></div>'+
+ renewalPanel(c);
+}
+
+function renewalPanel(c){
+ const d=daysUntil(c.end),history=(c.renewals||[]).slice().sort((a,b)=>b.dueDate.localeCompare(a.dueDate));
+ const processedCurrent=history.find(r=>r.dueDate===c.end);
+ let stateHtml='';
+ if(!c.end)stateHtml='<div class="muted">Ajoute d’abord une date de fin d’engagement.</div>';
+ else if(processedCurrent){
+   stateHtml=processedCurrent.decision==='stop'
+    ? '<div class="alert"><strong>Arrêt prévu à l’échéance du '+fmtDate(c.end)+'.</strong><div class="tiny" style="margin-top:4px">Le renouvellement a déjà été traité.</div></div>'
+    : '<div class="alert green"><strong>Renouvellement traité.</strong><div class="tiny" style="margin-top:4px">'+esc(renewalDecisionLabel(processedCurrent.decision))+' • nouvelle échéance '+fmtDate(processedCurrent.newEndDate)+'</div></div>';
+ }else if(d!==null&&d<=14){
+   stateHtml='<div class="alert" style="margin-bottom:10px"><strong>Renouvellement à traiter</strong><div class="tiny" style="margin-top:4px">'+(d<0?'Échéance dépassée de '+Math.abs(d)+' jour(s).':d===0?'Échéance aujourd’hui.':'Échéance dans '+d+' jour(s), le '+fmtDate(c.end)+'.')+'</div></div><button class="btn primary" id="openRenewal">Traiter le renouvellement</button>';
+ }else{
+   stateHtml='<div class="alert blue"><strong>Prochaine échéance : '+fmtDate(c.end)+'</strong><div class="tiny" style="margin-top:4px">Le dossier passera automatiquement en “Renouvellement à traiter” à J-14.</div></div><button class="btn ghost small" id="openRenewal">Traiter maintenant</button>';
+ }
+ const hist=history.length?history.map(r=>'<div class="item"><div class="row between"><strong>'+fmtDate(r.dueDate)+'</strong><span class="status '+(r.decision==='stop'?'red':'green')+'">'+esc(renewalDecisionLabel(r.decision))+'</span></div><div class="tiny muted">'+(r.newEndDate?'Nouvelle fin : '+fmtDate(r.newEndDate):'Fin prévue à l’échéance')+'</div><div class="tiny">Bilan cycle : '+(r.cycleReviewDone?'Oui':'Non')+' • Retests : '+(r.retestsRequired?(r.retestsDone?'faits':'à faire'):'non requis')+' • Objectifs : '+(r.objectivesUpdated?'mis à jour':'non mis à jour')+'</div>'+(r.notes?'<div class="tiny" style="margin-top:4px">'+esc(r.notes)+'</div>':'')+'</div>').join(''):'<div class="muted">Aucun renouvellement traité pour le moment.</div>';
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Renouvellement d’engagement</h3><div class="muted tiny">Alerte automatique à J-14, bilan de cycle et décision de poursuite.</div></div>'+(c.end&&d!==null&&d<=14&&!processedCurrent?'<span class="status amber">À traiter</span>':'')+'</div><div style="margin-top:12px">'+stateHtml+'</div><div class="section-title">Historique</div><div class="list">'+hist+'</div></div>';
 }
 
 function clientAccountBlock(c){
@@ -547,7 +583,7 @@ function render(){
 }
 function bind(){
  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}render()});
- document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab='overview';render()});
+ document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
  document.querySelectorAll('.quickTab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
@@ -584,6 +620,7 @@ function bind(){
  document.getElementById('addEvent')?.addEventListener('click',openEvent);
  document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
  document.getElementById('printPassport')?.addEventListener('click',()=>window.print());
+ document.getElementById('openRenewal')?.addEventListener('click',()=>openRenewalModal(currentClient()));
  document.querySelector('.adminNoteDraft')?.addEventListener('input',e=>{currentClient().adminNote=e.target.value});
  document.getElementById('saveAdminNote')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({admin_note:cl.adminNote||null}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);toast('Notes administratives enregistrées')});
  document.getElementById('archiveClient')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({status:'inactive'}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);cl.status='Inactif';toast('Client passé en inactif');render()});
@@ -628,6 +665,44 @@ function openExceptionModal(){
  const startDate=document.getElementById('exDate'),endDate=document.getElementById('exEndDate');
  startDate.onchange=()=>{if(!endDate.value||endDate.value<startDate.value)endDate.value=startDate.value};
  document.getElementById('saveM').onclick=async()=>{const date=startDate.value,last=endDate.value||date,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim();if(!date)return toast('Date de début requise');if(last<date)return toast('La date de fin doit être après le début');if((start&&!end)||(!start&&end)||(start&&end&&end<=start))return toast('Créneau invalide');const {error}=await supa.from('availability_exceptions').insert({coach_user_id:authUser.id,exception_date:date,end_date:last,start_time:start||null,end_time:end||null,note:note||null});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Période indisponible ajoutée');render()};
+}
+
+function openRenewalModal(cl){
+ if(!cl?.end)return toast('Ajoute une date de fin d’engagement');
+ modal('Renouvellement — '+esc(cl.name),
+ '<div class="alert blue"><strong>Échéance actuelle : '+fmtDate(cl.end)+'</strong><div class="tiny" style="margin-top:4px">Choisis la suite de l’accompagnement et valide les éléments de fin de cycle.</div></div>'+
+ '<div class="field"><label>Décision</label><select id="renewDecision" class="select"><option value="3_months">Renouvellement 3 mois</option><option value="6_months">Renouvellement 6 mois</option><option value="monthly">Passage en mensuel</option><option value="stop">Arrêt à l’échéance</option></select></div>'+
+ '<label class="check"><input id="renewReview" type="checkbox"> Bilan de cycle réalisé</label>'+
+ '<label class="check"><input id="renewRetestsRequired" type="checkbox"> Retests nécessaires</label>'+
+ '<label class="check"><input id="renewRetestsDone" type="checkbox"> Retests réalisés</label>'+
+ '<label class="check"><input id="renewObjectives" type="checkbox"> Nouveaux objectifs définis / mis à jour</label>'+
+ '<div class="field"><label>Notes de renouvellement</label><textarea id="renewNotes" class="textarea" placeholder="Bilan, éléments discutés avec le client, suite prévue…"></textarea></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Valider le renouvellement</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('renewRetestsRequired').onchange=e=>{if(!e.target.checked)document.getElementById('renewRetestsDone').checked=false};
+ document.getElementById('saveM').onclick=async()=>{
+   const decision=document.getElementById('renewDecision').value;
+   const review=document.getElementById('renewReview').checked;
+   const retestsRequired=document.getElementById('renewRetestsRequired').checked;
+   const retestsDone=document.getElementById('renewRetestsDone').checked;
+   const objectives=document.getElementById('renewObjectives').checked;
+   const notes=document.getElementById('renewNotes').value.trim();
+   if(retestsRequired&&!retestsDone&&!confirm('Les retests sont marqués nécessaires mais pas encore réalisés. Valider quand même le renouvellement ?'))return;
+   const months=decision==='3_months'?3:decision==='6_months'?6:decision==='monthly'?1:0;
+   const newEnd=months?addMonthsISO(cl.end,months):null;
+   const row={client_id:cl.id,due_date:cl.end,decision,cycle_review_done:review,retests_required:retestsRequired,retests_done:retestsDone,objectives_updated:objectives,notes:notes||null,previous_end_date:cl.end,new_end_date:newEnd};
+   const {error}=await supa.from('renewals').insert(row);
+   if(error)return toast(error.code==='23505'?'Cette échéance a déjà été traitée.':'Erreur : '+error.message);
+   if(newEnd){
+     const {error:updateErr}=await supa.from('clients').update({engagement_end_date:newEnd,status:'active'}).eq('id',cl.id);
+     if(updateErr)return toast('Renouvellement enregistré, mais erreur de date : '+updateErr.message);
+   }
+   cl.renewal=decision==='3_months'?'3 mois':decision==='6_months'?'6 mois':decision==='monthly'?'Mensuel':'Arrêt';
+   try{await saveWorkspace(cl)}catch(e){}
+   const eventTitle=decision==='stop'?'Fin d’accompagnement prévue':'Renouvellement '+renewalDecisionLabel(decision);
+   await supa.from('passport_events').insert({client_id:cl.id,event_date:localDateISO(),title:eventTitle,detail:decision==='stop'?'Arrêt prévu à l’échéance du '+fmtDate(cl.end)+'.':'Nouvelle échéance : '+fmtDate(newEnd)+'.',client_visible:true});
+   closeModal();await loadSupabaseData();toast(decision==='stop'?'Arrêt enregistré':'Renouvellement enregistré');render();
+ };
 }
 
 function openNewClient(){
