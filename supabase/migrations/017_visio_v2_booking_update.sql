@@ -1,0 +1,4 @@
+-- AK PRIME — mise à jour réservation Visios V2
+-- book_my_appointment(...) utilise désormais la politique de quota V2,
+-- journalise la réservation dans appointment_events et laisse le trigger
+-- synchroniser automatiquement la prochaine visio du client.
