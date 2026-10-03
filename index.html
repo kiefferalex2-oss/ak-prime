@@ -95,6 +95,11 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .questionnaire-done{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #bfe7d4;background:#f5fbf8;border-radius:14px;padding:15px}.questionnaire-done .checkmark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#dff5e9;color:#13764f;font-size:20px;font-weight:950;flex:0 0 auto}
 .questionnaire-answers{display:grid;gap:8px;margin-top:12px}.questionnaire-answer{border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff}.questionnaire-answer strong{display:block;font-size:12px;margin-bottom:4px}.questionnaire-answer div{font-size:13px;line-height:1.45;color:#475467}
 .client-bottom-nav{display:none}
+.notification-bell{position:relative;width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:10px;display:grid;place-items:center;cursor:pointer;font-size:18px;color:#253447;flex:0 0 auto}
+.client-top .notification-bell{background:#122235;border-color:#314458;color:#fff}
+.notification-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:999px;background:#d94747;color:#fff;font-size:10px;font-weight:900;display:grid;place-items:center;padding:0 5px;border:2px solid #fff}
+.client-top .notification-badge{border-color:#0d1827}
+.notification-list{display:flex;flex-direction:column;gap:9px}.notification-row{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfe}.notification-row.unread{background:#f4f7ff;border-color:#c8d5fb}.notification-row .notification-dot{width:8px;height:8px;border-radius:50%;background:#2f66f6;flex:0 0 auto}.notification-row.read .notification-dot{background:#c6ced8}.notification-row h4{margin:0;font-size:14px}.notification-row p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.notification-empty{padding:28px 12px;text-align:center;color:var(--muted)}
 .client-mobile-menu-toggle{display:none}
 .client-mobile-menu{display:none}
 .client-mobile-spacer{display:none}
@@ -110,6 +115,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
  .client-engagement{align-items:flex-start;flex-direction:column}
  .client-bottom-nav{display:none!important}
  .client-mobile-menu-toggle{display:flex;align-items:center;gap:7px;border:1px solid #314458;background:#122235;color:#fff;border-radius:10px;padding:8px 10px;font-weight:850;cursor:pointer}
+ .client-top .notification-bell{width:36px;height:36px}
  .client-mobile-menu-toggle .chev{font-size:11px;color:#d8b16d}
  .client-mobile-menu{display:block;position:absolute;top:calc(100% + 7px);left:12px;right:12px;background:#0d1827;border:1px solid #2b3b4c;border-radius:14px;padding:8px;box-shadow:0 18px 50px rgba(0,0,0,.32)}
  .client-mobile-menu button{width:100%;border:0;background:transparent;color:#c7d2de;text-align:left;padding:12px 13px;border-radius:9px;font-weight:850;cursor:pointer}
@@ -206,10 +212,11 @@ async function loadSupabaseData(){
    supa.from('availability_exceptions').select('*').eq('coach_user_id',authUser.id).order('exception_date'),
    supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at'),
    supa.from('renewals').select('*').order('due_date',{ascending:false}),
-   supa.from('app_settings').select('*').eq('id',1).maybeSingle()
+   supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null;
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[];
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
@@ -222,7 +229,7 @@ async function loadSupabaseData(){
      initials:initials([x.first_name,x.last_name].filter(Boolean).join(' ')),pole:x.current_pole||'À définir',offer:x.current_offer||'À définir',
      status:DB_STATUS_TO_UI[x.status]||x.status,start:isoDate(x.start_date),end:isoDate(x.engagement_end_date),next:isoDate(x.next_visio_at),
      sport:x.current_sport||'',specialty:x.position_or_specialty||'',level:x.level||'',age:calcAge(x.birth_date),payment:x.payment_status||'—',
-     questionnaire:q.answers||{},questionnaireStatus:q.status||'',deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
+     questionnaire:q.answers||{},questionnaireStatus:q.status||'',questionnaireResponseId:q.id||'',questionnaireSubmittedAt:q.submitted_at||'',deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
      onboarding:{currentStep:ob.current_step||'questionnaire',questionnaireReceivedAt:ob.questionnaire_received_at||'',visioScheduledAt:ob.visio_scheduled_at||'',visioCompletedAt:ob.visio_completed_at||'',testsRequired:Array.isArray(ob.tests_required)?ob.tests_required:[],testsCompletedAt:ob.tests_completed_at||'',programmingReadyAt:ob.programming_ready_at||'',completedAt:ob.onboarding_completed_at||'',testsWaived:!!ob.tests_waived,testsWaivedAt:ob.tests_waived_at||''},
      decisions:ws.coach_decisions||'',privateNote:ws.private_note||'',
      tests:(tests[x.id]||[]).map(t=>({id:t.id,name:t.test_name,date:isoDate(t.performed_at),value:t.result_value??t.result_text??'',unit:t.unit||'',context:t.context||'',note:t.coach_interpretation||''})),
@@ -242,6 +249,7 @@ async function loadSupabaseData(){
  db.settings=db.settings||{};
  db.settings.whatsappNumber=appSettings?.whatsapp_number||'';
  db.settings.whatsappMessage=appSettings?.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
+ db.notificationReads=notificationReads;
 }
 async function saveWorkspace(client){
  const row={client_id:client.id,deep_flags:client.deep||{},offer_notes:client.offerNotes||{},visio_summary:client.visioNotes||null,coach_decisions:client.decisions||null,private_note:client.privateNote||null,renewal_choice:client.renewal||'3 mois'};
@@ -359,6 +367,124 @@ function questionLabel(key){
 function currentClient(){return db.clients.find(c=>c.id===state.clientId)||db.clients[0]}
 function activeClients(){return db.clients.filter(c=>c.status==='Actif')}
 
+
+function notificationReadSet(rows){return new Set((rows||[]).map(x=>x.notification_key))}
+function coachNotifications(){
+ const out=[],reads=notificationReadSet(db.notificationReads),now=new Date();
+ for(const cl of db.clients||[]){
+   if(cl.questionnaireStatus==='submitted'&&cl.onboarding?.currentStep==='visio'){
+     out.push({key:'coach:questionnaire:'+(cl.questionnaireResponseId||cl.id),title:'Questionnaire reçu — '+cl.name,detail:'Le questionnaire initial est envoyé. Prépare la visio et les points à approfondir.',target:'client',clientId:cl.id,tab:'onboarding',priority:3});
+   }
+   for(const w of cl.checkins||[]){
+     if(!w.reviewedAt)out.push({key:'coach:checkin:'+w.id,title:'Nouveau bilan — '+cl.name,detail:'Check-in du '+fmtDate(w.date)+' à traiter.',target:'client',clientId:cl.id,tab:'follow',priority:4});
+   }
+   if(cl.end&&daysUntil(cl.end)<=14&&!(cl.renewals||[]).some(r=>r.dueDate===cl.end)){
+     out.push({key:'coach:renewal:'+cl.id+':'+cl.end,title:'Renouvellement — '+cl.name,detail:'Fin d’engagement le '+fmtDate(cl.end)+'. Bilan et décision à préparer.',target:'client',clientId:cl.id,tab:'admin',priority:5});
+   }
+   if(cl.status==='Actif'){
+     const upcoming=(db.appointments||[]).some(a=>a.client_id===cl.id&&['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>now);
+     if(!upcoming){
+       out.push({key:'coach:no-visio:'+cl.id+':'+localDateISO().slice(0,7),title:'Aucune prochaine visio — '+cl.name,detail:'Ce client actif n’a actuellement aucune visio planifiée.',target:'client',clientId:cl.id,tab:'overview',priority:1});
+     }
+   }
+ }
+ for(const a of db.appointments||[]){
+   if(['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)<now){
+     out.push({key:'coach:close-visio:'+a.id,title:'Visio à clôturer — '+a.clientName,detail:fmtDateTime(a.starts_at)+' • marque-la réalisée ou absent.',target:'calendar',priority:5});
+   }
+ }
+ return out.map(n=>({...n,read:reads.has(n.key)})).sort((a,b)=>(b.priority-a.priority)||Number(a.read)-Number(b.read));
+}
+function clientNotifications(s){
+ const out=[],reads=notificationReadSet(s?.notificationReads),c=s?.client||{},now=new Date();
+ if(s?.template&&s?.response?.status!=='submitted'){
+   out.push({key:'client:questionnaire:'+(s.template.template_key||s.template.id||'initial'),title:'Questionnaire initial à compléter',detail:'Complète-le pour préparer ton accompagnement.',target:'suivi',priority:4});
+ }
+ const friday=currentWeekFriday(),checkin=(s?.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
+ if(!checkin)out.push({key:'client:checkin:'+friday,title:'Bilan hebdomadaire à envoyer',detail:'Ton retour permet à Alex d’adapter la semaine suivante.',target:'suivi',priority:3});
+ for(const w of s?.checkins||[]){
+   if(w.reviewed_at&&(w.coach_feedback||w.coach_decision)){
+     out.push({key:'client:feedback:'+w.id,title:'Nouveau retour coach',detail:'Alex a traité ton bilan du '+fmtDate(String(w.week_date).slice(0,10))+'.',target:'suivi',priority:3});
+   }
+ }
+ const next=(s?.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>now);
+ if(next){
+   const h=hoursUntil(next.starts_at);
+   if(h>0&&h<=3)out.push({key:'client:visio3:'+next.id,title:'Visio dans quelques heures',detail:'Rendez-vous à '+fmtDateTime(next.starts_at)+'.',target:'visios',priority:5});
+   else if(h>3&&h<=24)out.push({key:'client:visio24:'+next.id,title:'Visio dans moins de 24 h',detail:'Rendez-vous à '+fmtDateTime(next.starts_at)+'.',target:'visios',priority:4});
+ }
+ const end=isoDate(c.engagement_end_date),d=end?daysUntil(end):null;
+ if(d!==null&&d<=14){
+   out.push({key:'client:engagement:'+end,title:d<0?'Engagement arrivé à échéance':'Fin d’engagement proche',detail:d<0?'Ton engagement est arrivé à échéance.':d===0?'Ton engagement se termine aujourd’hui.':'Ton engagement se termine dans '+d+' jour(s), le '+fmtDate(end)+'.',target:'passport',priority:4});
+ }
+ return out.map(n=>({...n,read:reads.has(n.key)})).sort((a,b)=>(b.priority-a.priority)||Number(a.read)-Number(b.read));
+}
+function notificationBell(mode){
+ const list=mode==='coach'?coachNotifications():clientNotifications(clientPortalState),count=list.filter(n=>!n.read).length;
+ return '<button class="notification-bell notificationBell" data-mode="'+mode+'" title="Notifications">🔔'+(count?'<span class="notification-badge">'+(count>99?'99+':count)+'</span>':'')+'</button>';
+}
+async function markNotificationRead(key,mode){
+ if(!key||!authUser?.id)return;
+ const row={user_id:authUser.id,notification_key:key,read_at:new Date().toISOString()};
+ const {error}=await supa.from('notification_reads').upsert(row,{onConflict:'user_id,notification_key'});
+ if(error){toast('Erreur notification : '+error.message);return}
+ const target=mode==='coach'?db:clientPortalState;target.notificationReads=target.notificationReads||[];
+ const ex=target.notificationReads.find(x=>x.notification_key===key);
+ if(ex)ex.read_at=row.read_at;else target.notificationReads.push({notification_key:key,read_at:row.read_at});
+}
+async function markAllNotificationsRead(mode,list){
+ const unread=(list||[]).filter(n=>!n.read);if(!unread.length)return;
+ const now=new Date().toISOString(),rows=unread.map(n=>({user_id:authUser.id,notification_key:n.key,read_at:now}));
+ const {error}=await supa.from('notification_reads').upsert(rows,{onConflict:'user_id,notification_key'});
+ if(error){toast('Erreur : '+error.message);return}
+ const target=mode==='coach'?db:clientPortalState;target.notificationReads=target.notificationReads||[];
+ for(const r of rows){const ex=target.notificationReads.find(x=>x.notification_key===r.notification_key);if(ex)ex.read_at=now;else target.notificationReads.push({notification_key:r.notification_key,read_at:now})}
+}
+function renderNotificationRows(list,mode){
+ if(!list.length)return '<div class="notification-empty">Aucune notification active. Tout est à jour.</div>';
+ return '<div class="notification-list">'+list.map(n=>'<div class="notification-row '+(n.read?'read':'unread')+'"><div class="row" style="align-items:flex-start"><span class="notification-dot"></span><div class="grow"><h4>'+esc(n.title)+'</h4><p>'+esc(n.detail)+'</p></div><span class="status '+(n.read?'blue':'amber')+'">'+(n.read?'Lu':'Nouveau')+'</span></div><div class="row" style="justify-content:flex-end;margin-top:9px"><button class="btn ghost small notificationOpen" data-key="'+esc(n.key)+'">Ouvrir</button></div></div>').join('')+'</div>';
+}
+function openNotificationCenter(mode){
+ const list=mode==='coach'?coachNotifications():clientNotifications(clientPortalState);
+ modal('Notifications',renderNotificationRows(list,mode),'<button class="btn ghost" id="closeNotif">Fermer</button><button class="btn primary" id="markAllNotif">Tout marquer comme lu</button>');
+ document.getElementById('closeNotif').onclick=closeModal;
+ document.getElementById('markAllNotif').onclick=async()=>{await markAllNotificationsRead(mode,list);closeModal();mode==='coach'?render():renderClientPortal()};
+ document.querySelectorAll('.notificationOpen').forEach(b=>b.onclick=async()=>{
+   const n=list.find(x=>x.key===b.dataset.key);if(!n)return;
+   await markNotificationRead(n.key,mode);closeModal();
+   if(mode==='coach'){
+     if(n.target==='calendar'){state.view='calendar';await loadSupabaseData();render();return}
+     state.clientId=n.clientId||state.clientId;state.view='client';state.tab=n.tab||'overview';render();
+   }else{
+     clientPortalView=n.target||'home';clientMobileMenuOpen=false;renderClientPortal();
+   }
+ });
+}
+async function refreshClientNotificationData(){
+ if(!clientPortalState?.client)return;
+ const id=clientPortalState.client.id;
+ const [clientRes,responseRes,checkRes,apptRes,readsRes]=await Promise.all([
+   supa.from('clients').select('*').eq('id',id).single(),
+   supa.from('questionnaire_responses').select('*').eq('client_id',id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
+   supa.from('checkins').select('*').eq('client_id',id).order('week_date',{ascending:false}),
+   supa.from('appointments').select('*').eq('client_id',id).order('starts_at',{ascending:true}),
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
+ ]);
+ if(!clientRes.error)clientPortalState.client=clientRes.data;
+ if(!responseRes.error)clientPortalState.response=responseRes.data;
+ if(!checkRes.error)clientPortalState.checkins=checkRes.data||[];
+ if(!apptRes.error)clientPortalState.appointments=apptRes.data||[];
+ if(!readsRes.error)clientPortalState.notificationReads=readsRes.data||[];
+}
+async function handleNotificationBell(mode){
+ if(mode==='coach'){try{await loadSupabaseData()}catch(e){}}
+ else {try{await refreshClientNotificationData()}catch(e){}}
+ openNotificationCenter(mode);
+}
+function bindNotificationBells(){
+ document.querySelectorAll('.notificationBell').forEach(b=>b.onclick=()=>handleNotificationBell(b.dataset.mode));
+}
+
 function shell(inner){
  return '<div class="app">'+
  '<aside class="sidebar"><div class="brand"><strong>AK PRIME</strong><span>PERFORMANCE SYSTEM</span></div>'+
@@ -366,7 +492,7 @@ function shell(inner){
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('globalTests','Tests')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note">Supabase connecté.<br>Données clients persistantes et protégées par authentification + RLS.</div></aside>'+
- '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…"><span class="user-email">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="logoutBtn">Déconnexion</button><div class="avatar">AK</div></div></div>'+
+ '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…">'+notificationBell('coach')+'<span class="user-email">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="logoutBtn">Déconnexion</button><div class="avatar">AK</div></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'">'+label+'</button>'}
@@ -747,6 +873,7 @@ function render(){
  bind();
 }
 function bind(){
+ bindNotificationBells();
  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}render()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
@@ -944,7 +1071,7 @@ async function enterClientPortal(user,profile){
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte est confirmé mais il n’est pas encore relié à ton dossier AK PRIME. Utilise la même adresse e-mail que celle communiquée au coach, puis attends la liaison du compte.');return}
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
@@ -954,11 +1081,12 @@ async function enterClientPortal(user,profile){
    supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false}),
    supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate}),
    supa.rpc('get_my_booking_policy'),
-   supa.from('app_settings').select('*').eq('id',1).maybeSingle()
+   supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
+   supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id)
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[]};
  clientPortalView='home';
  clientVisioWeek=0;
  clientVisioDay='';
@@ -1050,7 +1178,7 @@ function renderClientPortal(){
  }else{
    main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row">'+nav.mobile+'<span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row">'+nav.mobile+notificationBell('client')+'<span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
@@ -1063,6 +1191,7 @@ function renderClientPortal(){
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
  bindBookingButtons();
+ bindNotificationBells();
  subscribeCalendarRealtime('client');
 }
 
