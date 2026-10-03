@@ -102,6 +102,17 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .public-faq{display:grid;grid-template-columns:1fr 1fr;gap:10px}.public-faq details{background:#fff;border:1px solid #e1e7ef;border-radius:13px;padding:15px}.public-faq summary{font-weight:850;cursor:pointer}.public-faq p{font-size:13px;color:#667085;line-height:1.55;margin:10px 0 0}
 .public-footer{padding:28px 18px;background:#07101a;color:#8494a6}.public-footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:11px}
 .public-login-note{border:1px solid #d9e0ea;background:#f8fafc;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.45;margin-top:10px}
+.checkout-offer-head{background:linear-gradient(145deg,#0d1827,#183252);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px}
+.checkout-offer-head .tiny{color:#b9c6d5}.checkout-offer-head h3{margin:5px 0 2px;font-size:22px}
+.checkout-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.checkout-choice{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;cursor:pointer}
+.checkout-choice input{margin-right:7px}.checkout-choice:has(input:checked){border-color:#7f9df8;background:#f5f7ff}
+.checkout-price-box{border:1px solid #d8e0eb;background:#f8fafc;border-radius:14px;padding:15px;margin-top:13px}
+.checkout-price-main{font-size:25px;font-weight:950;margin-top:5px}.checkout-price-sub{font-size:12px;color:#667085;margin-top:4px;line-height:1.5}
+.checkout-benefits{margin:10px 0 0;padding-left:19px;color:#475467;font-size:13px;line-height:1.65}
+.checkout-step{font-size:10px;color:#8a6a32;font-weight:950;letter-spacing:.09em;text-transform:uppercase}
+.checkout-recap{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.checkout-recap>div{border:1px solid var(--line);border-radius:11px;padding:11px;background:#fbfcfe}.checkout-recap span{display:block;font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:.06em}.checkout-recap strong{display:block;margin-top:3px;font-size:13px}
+@media(max-width:650px){.checkout-options,.checkout-recap{grid-template-columns:1fr}}
 @media(max-width:900px){.public-hero-inner,.public-access{grid-template-columns:1fr}.public-poles,.public-offers{grid-template-columns:1fr 1fr}.public-process{grid-template-columns:1fr 1fr}.public-method-line{grid-template-columns:1fr 1fr 1fr}.public-hero-card{max-width:650px}}
 @media(max-width:650px){.public-links a{display:none}.public-nav{padding:12px 13px}.public-logo{font-size:19px}.public-hero{padding:54px 14px 52px}.public-hero h1{font-size:43px}.public-hero p{font-size:15px}.public-section{padding:54px 14px}.public-poles,.public-offers,.public-process,.public-faq{grid-template-columns:1fr}.public-method-line{grid-template-columns:1fr}.public-offer-group-title{align-items:flex-start;flex-direction:column}.public-hero-actions .public-primary,.public-hero-actions .public-secondary{width:100%;text-align:center}}
 .auth-shell{min-height:calc(100vh - 33px);display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#1d3150 0,#0d1827 48%,#08111d 100%)}
@@ -1570,7 +1581,7 @@ async function saveClientQuestionnaire(statusValue){
 
 
 function publicOfferCard(pole,name,price,tag,items,featured=false){
- return '<div class="public-offer-card '+(featured?'featured':'')+'"><div class="tag">'+esc(tag||pole)+'</div><h4>'+esc(name)+'</h4><div class="public-price">'+esc(price)+' € <span>/ mois</span></div><ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="public-primary publicOfferBtn" data-offer="'+esc(pole+' — '+name)+'">Choisir cette offre</button></div>';
+ return '<div class="public-offer-card '+(featured?'featured':'')+'"><div class="tag">'+esc(tag||pole)+'</div><h4>'+esc(name)+'</h4><div class="public-price">'+esc(price)+' € <span>/ mois</span></div><ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="public-primary publicOfferBtn" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir cette offre</button></div>';
 }
 function renderPublicSite(){
  return '<div class="public-site">'+
@@ -1630,13 +1641,83 @@ function openPublicLogin(message='',isError=false){
  document.getElementById('loginBtn').onclick=login;
  password.onkeydown=e=>{if(e.key==='Enter')login()};
 }
+
+function publicOfferBenefits(pole,name){
+ const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
+ const map={
+  'forme & santé|standard':['Programme individualisé','Suivi hebdomadaire','1 visio de 30 min / mois','Accès à l’espace AK PRIME'],
+  'forme & santé|renforcé':['Programme individualisé','Suivi hebdomadaire','2 visios de 30 min / mois','Ajustements plus fréquents','Accès à l’espace AK PRIME'],
+  'performance|p1':['Planification individualisée','Tests & suivi des résultats','Suivi hebdomadaire','1 visio de 30 min / mois'],
+  'performance|p2':['Planification individualisée','Tests & suivi des résultats','Suivi hebdomadaire','2 visios de 30 min / mois'],
+  'performance|p3':['Suivi renforcé','Tests & réévaluations','Adaptations fréquentes','Jusqu’à 1 visio de 30 min / semaine'],
+  'mental|particulier':['Questionnaire initial','Visio initiale de 45 min','Jusqu’à 1 visio de 45 min / semaine','Routines, respiration, recentrage et confiance'],
+  'mental|sportif':['Questionnaire initial','Visio initiale de 45 min','Jusqu’à 1 visio de 45 min / semaine','Travail contextualisé à la pratique sportive']
+ };
+ return map[key]||['Accompagnement individualisé','Suivi AK PRIME','Accès à l’espace client'];
+}
+function publicCheckoutPrice(base,duration,paymentMode){
+ base=Number(base)||0;
+ if(duration===3){
+   const monthlyTotal=base*3;
+   if(paymentMode==='upfront'){
+     const total=Math.round(monthlyTotal*.97*100)/100;
+     return {headline:euro(total)+' comptant',detail:'au lieu de '+euro(monthlyTotal)+' • remise comptant 3 %',monthlyEquivalent:Math.round((total/3)*100)/100,total};
+   }
+   return {headline:euro(base)+' / mois',detail:'3 mensualités • total '+euro(monthlyTotal),monthlyEquivalent:base,total:monthlyTotal};
+ }
+ const discountedMonthly=Math.round(base*.95*100)/100;
+ const sixTotal=Math.round(discountedMonthly*6*100)/100;
+ if(paymentMode==='upfront'){
+   const total=Math.round(sixTotal*.98*100)/100;
+   return {headline:euro(total)+' comptant',detail:'remise engagement 6 mois 5 %, puis remise comptant 2 % • au lieu de '+euro(base*6),monthlyEquivalent:Math.round((total/6)*100)/100,total};
+ }
+ return {headline:euro(discountedMonthly)+' / mois',detail:'6 mensualités • total '+euro(sixTotal)+' • remise engagement 6 mois 5 %',monthlyEquivalent:discountedMonthly,total:sixTotal};
+}
+function openPublicOfferCheckout(button){
+ const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
+ const benefits=publicOfferBenefits(pole,name);
+ modal('Choisir mon accompagnement',
+  '<div class="checkout-offer-head"><div class="checkout-step">Étape 1 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Tarif de référence : '+euro(base)+' / mois</div></div>'+
+  '<div><strong>Ce qui est inclus</strong><ul class="checkout-benefits">'+benefits.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+  '<div class="section-title">Durée d’engagement</div><div class="checkout-options">'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="3" checked><strong>3 mois</strong><div class="muted tiny" style="margin-top:4px">Tarif de référence de l’offre</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="6"><strong>6 mois</strong><div class="muted tiny" style="margin-top:4px">5 % de remise sur l’engagement</div></label>'+
+  '</div>'+
+  '<div class="section-title">Mode de paiement</div><div class="checkout-options">'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="monthly" checked><strong>Paiement mensuel</strong><div class="muted tiny" style="margin-top:4px">Prélèvement chaque mois</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="upfront"><strong>Paiement comptant</strong><div class="muted tiny" style="margin-top:4px">Petite remise supplémentaire</div></label>'+
+  '</div>'+
+  '<div id="publicCheckoutPrice" class="checkout-price-box"></div>',
+  '<button class="btn ghost" id="cancelPublicCheckout">Annuler</button><button class="btn primary" id="continuePublicCheckout">Continuer</button>');
+ document.getElementById('cancelPublicCheckout').onclick=closeModal;
+ const durationEls=[...document.querySelectorAll('input[name="checkoutDuration"]')],paymentEls=[...document.querySelectorAll('input[name="checkoutPayment"]')];
+ const renderPrice=()=>{
+   const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly';
+   const p=publicCheckoutPrice(base,duration,paymentMode);
+   document.getElementById('publicCheckoutPrice').innerHTML='<div class="checkout-step">Récapitulatif tarifaire</div><div class="checkout-price-main">'+esc(p.headline)+'</div><div class="checkout-price-sub">'+esc(p.detail)+'</div>';
+ };
+ [...durationEls,...paymentEls].forEach(x=>x.onchange=renderPrice);renderPrice();
+ document.getElementById('continuePublicCheckout').onclick=()=>{
+   const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly',p=publicCheckoutPrice(base,duration,paymentMode);
+   modal('Récapitulatif avant paiement',
+    '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix avant de continuer.</div></div>'+
+    '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
+    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Aucun paiement n’est effectué actuellement. Quand Stripe sera branché, ce bouton ouvrira le paiement sécurisé. Après validation, le compte AK PRIME sera créé et activé automatiquement avec l’adresse e-mail utilisée lors du paiement.</div></div>',
+    '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Continuer vers le paiement</button>');
+   document.getElementById('backPublicCheckout').onclick=()=>openPublicOfferCheckout(button);
+   document.getElementById('futureStripeCheckout').onclick=()=>{
+     modal('Paiement bientôt disponible',
+      '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt.</strong><div class="tiny" style="margin-top:5px">Stripe sera connecté à cette dernière étape quand le reste du site sera finalisé.</div></div><div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
+      '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
+     document.getElementById('closeCheckoutInfo').onclick=closeModal;
+   };
+ };
+}
+
 function bindPublicSite(){
  document.getElementById('publicLoginBtn')?.addEventListener('click',()=>openPublicLogin());
  document.getElementById('heroLoginBtn')?.addEventListener('click',()=>openPublicLogin());
- document.querySelectorAll('.publicOfferBtn').forEach(b=>b.onclick=()=>{
-   modal('Paiement bientôt disponible','<p>La page de présentation de <strong>'+esc(b.dataset.offer)+'</strong> est prête.</p><p class="muted tiny">Le paiement sera activé avec Stripe à la fin du développement. À ce moment-là, le paiement déclenchera automatiquement la création et l’activation du compte client.</p>','<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
-   document.getElementById('closeCheckoutInfo').onclick=closeModal;
- });
+ document.querySelectorAll('.publicOfferBtn').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
 }
 
 function showAuth(message='',isError=false){
