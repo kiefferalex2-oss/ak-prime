@@ -146,10 +146,11 @@ async function loadSupabaseData(){
    supa.from('availability_windows').select('*').eq('coach_user_id',authUser.id).order('weekday').order('start_time'),
    supa.from('availability_date_windows').select('*').eq('coach_user_id',authUser.id).order('availability_date').order('start_time'),
    supa.from('availability_exceptions').select('*').eq('coach_user_id',authUser.id).order('exception_date'),
-   supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at')
+   supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at'),
+   supa.from('app_settings').select('*').eq('id',1).maybeSingle()
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const [cr,tr,cyr,chr,er,wr,qr,pr,obr,awr,adwr,aer,apr]=reqs.map(r=>r.data||[]);
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],appSettings=reqs[13].data||null;
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
@@ -178,6 +179,9 @@ async function loadSupabaseData(){
  db.availabilityDateWindows=adwr;
  db.availabilityExceptions=aer;
  db.appointments=apr.map(a=>({...a,clientName:db.clients.find(c=>c.id===a.client_id)?.name||'Client'}));
+ db.settings=db.settings||{};
+ db.settings.whatsappNumber=appSettings?.whatsapp_number||'';
+ db.settings.whatsappMessage=appSettings?.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
 }
 async function saveWorkspace(client){
  const row={client_id:client.id,deep_flags:client.deep||{},offer_notes:client.offerNotes||{},visio_summary:client.visioNotes||null,coach_decisions:client.decisions||null,private_note:client.privateNote||null,renewal_choice:client.renewal||'3 mois'};
@@ -215,6 +219,16 @@ function fmtTime(v){if(!v)return '—';return new Intl.DateTimeFormat('fr-FR',{h
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 function normalizeTestName(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function normalizeWhatsAppNumber(v){
+ let n=String(v||'').replace(/\D/g,'');
+ if(n.startsWith('00'))n=n.slice(2);
+ if(n.startsWith('0'))n='33'+n.slice(1);
+ return n;
+}
+function whatsappUrl(number,message){
+ const n=normalizeWhatsAppNumber(number);if(!n)return '';
+ return 'https://wa.me/'+n+'?text='+encodeURIComponent(message||'');
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 const QUESTION_LABELS={
   full_name:'Nom et prénom',
@@ -513,11 +527,16 @@ function backupPage(){
  '<div class="card panel"><h3>Base distante</h3><div class="alert green">Les créations, tests, cycles, check-ins et événements sont enregistrés dans Supabase et ne dépendent plus de ce navigateur.</div></div></div>';
 }
 function settingsPage(){
- return '<div class="page-title"><div><h1>Paramètres</h1><p>État technique AK PRIME.</p></div></div><div class="card panel" style="max-width:760px">'+
+ return '<div class="page-title"><div><h1>Paramètres</h1><p>Configuration générale AK PRIME.</p></div></div><div class="card panel" style="max-width:760px">'+
+ '<h3>WhatsApp professionnel</h3><p class="muted tiny">Ce numéro sera utilisé dans l’espace client pour les échanges rapides et les visios.</p>'+
+ '<div class="field"><label>Numéro WhatsApp</label><input class="input" id="waNumber" value="'+esc(db.settings?.whatsappNumber||'')+'" placeholder="+33 6 12 34 56 78"></div>'+
+ '<div class="field"><label>Message prérempli</label><textarea class="textarea" id="waMessage">'+esc(db.settings?.whatsappMessage||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.')+'</textarea></div>'+
+ '<button class="btn primary" id="saveWhatsAppSettings">Enregistrer WhatsApp</button>'+
+ '<div class="section-title">Autres paramètres</div>'+
  '<div class="field"><label>URL Optitrainer par défaut</label><input class="input" id="optiBase" value="'+esc(db.settings?.optitrainerBase||'')+'"></div>'+
- '<button class="btn primary" id="saveSettings">Enregistrer pour cette session</button>'+
+ '<button class="btn ghost" id="saveSettings">Enregistrer Optitrainer pour cette session</button>'+
  '<div class="alert green" style="margin-top:15px">Authentification Supabase active • base PostgreSQL active • RLS active • compte propriétaire séparé des comptes clients.</div>'+
- '<div class="alert" style="margin-top:10px">Le portail client et les invitations automatiques ne sont pas encore finalisés : continue à utiliser des données test pour les éléments de santé sensibles jusqu’au test complet des droits client.</div></div>';
+ '<div class="alert" style="margin-top:10px">Le portail client reste en phase de test pour les données sensibles : continue à vérifier les droits avant utilisation réelle à grande échelle.</div></div>';
 }
 
 function render(){
@@ -571,6 +590,7 @@ function bind(){
  document.querySelectorAll('.linkClientAccount').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({auth_user_id:b.dataset.userId}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Compte client lié');render()});
  document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
  document.getElementById('exportData')?.addEventListener('click',exportData);
+ document.getElementById('saveWhatsAppSettings')?.addEventListener('click',async()=>{const raw=document.getElementById('waNumber').value.trim(),msg=document.getElementById('waMessage').value.trim()||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';const normalized=normalizeWhatsAppNumber(raw);if(raw&&!/^\d{10,15}$/.test(normalized))return toast('Numéro WhatsApp invalide');const {error}=await supa.from('app_settings').upsert({id:1,whatsapp_number:raw||null,whatsapp_default_message:msg,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)return toast('Erreur : '+error.message);db.settings.whatsappNumber=raw;db.settings.whatsappMessage=msg;toast('WhatsApp enregistré')});
  document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;toast('Paramètre enregistré pour cette session')});
  document.getElementById('logoutBtn')?.addEventListener('click',async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;showAuth()});
 }
@@ -682,7 +702,7 @@ async function enterClientPortal(user,profile){
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte est confirmé mais il n’est pas encore relié à ton dossier AK PRIME. Utilise la même adresse e-mail que celle communiquée au coach, puis attends la liaison du compte.');return}
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
@@ -691,11 +711,12 @@ async function enterClientPortal(user,profile){
    supa.from('appointments').select('*').eq('client_id',client.id).order('starts_at',{ascending:true}),
    supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false}),
    supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate}),
-   supa.rpc('get_my_booking_policy')
+   supa.rpc('get_my_booking_policy'),
+   supa.from('app_settings').select('*').eq('id',1).maybeSingle()
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null};
  renderClientPortal();
 }
 function showClientPending(message){
@@ -715,6 +736,7 @@ function renderClientPortal(){
  '<div id="clientBookingPanel">'+renderBookingPanel(s)+'</div>'+
  '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Mon accompagnement</h3>'+
  '<div class="item"><strong>Pôle</strong>'+esc(c.current_pole||'—')+'</div><div class="item"><strong>Offre</strong>'+esc(c.current_offer||'—')+'</div>'+
+ renderClientWhatsAppButton(s,c)+
  (c.optitrainer_url?'<button class="btn primary" id="clientOpti" style="margin-top:10px">Ouvrir mon entraînement Optitrainer</button>':'<div class="muted tiny" style="margin-top:10px">Le lien Optitrainer sera ajouté par le coach.</div>')+
  '</div><div class="card panel"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,5).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div></div>'+
  '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Mon questionnaire initial</h3><div class="muted tiny">'+esc(t?.description||'')+'</div></div>'+status(r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon':'À compléter')+'</div>'+
@@ -731,6 +753,15 @@ function renderClientPortal(){
  bindBookingButtons();
  subscribeCalendarRealtime('client');
 }
+function renderClientWhatsAppButton(s,c){
+ const cfg=s.appSettings||{},num=cfg.whatsapp_number||'';
+ if(!normalizeWhatsAppNumber(num))return '<div class="muted tiny" style="margin-top:10px">Le contact WhatsApp sera bientôt disponible.</div>';
+ const first=(c.first_name||'').trim();
+ const base=cfg.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
+ const msg=base+(first?'\n\n'+first:'');
+ return '<a class="btn primary" href="'+esc(whatsappUrl(num,msg))+'" target="_blank" rel="noopener" style="margin-top:10px;text-decoration:none">💬 Contacter Alex sur WhatsApp</a>';
+}
+
 function renderBookingPanel(s){
  const future=(s.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const next=future[0];
@@ -742,7 +773,9 @@ function renderBookingPanel(s){
  const grouped={};for(const sl of slots){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
  return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés respectent automatiquement la fréquence incluse dans ton offre et les disponibilités du coach.</div></div><span class="status green">Temps réel</span></div>'+
  '<div class="alert blue" style="margin-top:12px"><strong>Ton offre : '+esc(quotaText)+'</strong><div class="tiny" style="margin-top:4px">Durée d’une visio : '+esc(policy.duration_minutes||30)+' min. Quand ton quota est atteint pour une semaine ou un mois, aucun autre créneau de cette période n’est proposé.</div></div>'+
- (next?'<div class="alert" style="margin-top:10px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div></div>':'')+
+ (next?'<div class="alert" style="margin-top:10px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div>'+
+ (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="margin-top:8px;text-decoration:none">📹 Rejoindre la visio sur WhatsApp</a>':'')+
+ '</div>':'')+
  '<div class="section-title">Créneaux disponibles sur les 3 prochaines semaines</div>'+
  (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible actuellement. Cela peut aussi signifier que ton quota de visio est déjà utilisé pour les périodes affichées.</div>')+
  '</div>';
