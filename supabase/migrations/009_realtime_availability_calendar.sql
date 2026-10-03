@@ -1,0 +1,11 @@
+-- AK PRIME — calendrier de disponibilités et réservation temps réel
+-- Cette migration ajoute :
+-- - plages de disponibilités hebdomadaires du coach
+-- - indisponibilités ponctuelles
+-- - coach_user_id sur les rendez-vous
+-- - RPC client get_my_available_slots / book_my_appointment
+-- - verrouillage transactionnel anti-double réservation
+-- - table calendar_version publiée dans Supabase Realtime
+--
+-- La version effectivement appliquée au projet Supabase est identique à celle
+-- utilisée pour la V2 en production au moment de ce commit.
