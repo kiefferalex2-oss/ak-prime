@@ -52,10 +52,28 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .backup{display:flex;gap:8px;flex-wrap:wrap}
 .toast{position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:11px 14px;border-radius:10px;box-shadow:var(--shadow);z-index:110;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}
 .demo-banner{background:#fff4d8;color:#895d00;border-bottom:1px solid #efd38f;padding:8px 16px;text-align:center;font-size:12px;font-weight:750}
+
+/* Passeport AK PRIME premium */
+.premium-passport{background:radial-gradient(circle at 78% 0,#1d1b18 0,#0b121a 31%,#071018 76%);color:#edf2f7;border:1px solid #29333d;border-radius:20px;padding:20px;box-shadow:0 26px 70px rgba(0,0,0,.24);overflow:hidden}
+.pp-topline{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}.pp-eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#d7ad67;font-weight:900}.pp-title{font-size:30px;margin:4px 0 0;font-weight:950;letter-spacing:-.03em}.pp-motto{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#b98b4c;text-align:right;line-height:1.6}
+.pp-card{background:linear-gradient(145deg,rgba(18,28,38,.96),rgba(9,17,24,.96));border:1px solid #2a3540;border-radius:15px;padding:15px;min-width:0}.pp-card h3{font-size:14px;margin:0 0 11px;color:#f5f7fa}.pp-muted{color:#93a2b2}.pp-tiny{font-size:11px}.pp-gold{color:#e3b86d}.pp-green{color:#5dd29e}.pp-amber{color:#f0bb67}.pp-red{color:#ef8585}
+.pp-profile{display:grid;grid-template-columns:1.4fr .8fr .8fr .8fr;gap:10px;margin-bottom:10px}.pp-person{display:flex;gap:13px;align-items:center}.pp-avatar{width:70px;height:70px;border-radius:14px;border:1px solid #8b6a38;background:linear-gradient(145deg,#32404d,#121a22);display:grid;place-items:center;font-size:24px;font-weight:950;color:#e5bc79;flex:0 0 auto}.pp-name{font-size:22px;font-weight:950}.pp-tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pp-tag{font-size:10px;padding:5px 7px;border-radius:999px;border:1px solid #38434d;background:#121d27;color:#bcc8d3}
+.pp-stat{border-left:1px solid #2d3742;padding-left:14px}.pp-stat span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8191a1}.pp-stat strong{display:block;margin-top:7px;font-size:14px}.pp-engagement{border-color:#8b6a38;background:linear-gradient(145deg,rgba(61,46,25,.46),rgba(19,20,20,.95))}
+.pp-grid3{display:grid;grid-template-columns:1.25fr 1.1fr .95fr;gap:10px;margin-top:10px}.pp-grid2{display:grid;grid-template-columns:1.25fr .75fr;gap:10px;margin-top:10px}.pp-grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.pp-chart{width:100%;height:auto;display:block;min-height:190px}.pp-chart text{font-family:Inter,ui-sans-serif,system-ui,sans-serif}.pp-chart-grid{stroke:#283440;stroke-width:1}.pp-chart-axis{fill:#758595;font-size:9px}.pp-chart-value{fill:#f0bf73;font-size:9px;font-weight:800}
+.pp-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pp-kpi{background:#111c25;border:1px solid #283440;border-radius:10px;padding:10px}.pp-kpi span{display:block;font-size:9px;color:#8191a1;text-transform:uppercase;letter-spacing:.05em}.pp-kpi strong{display:block;font-size:16px;margin-top:4px}.pp-kpi small{font-size:10px;color:#8394a4}
+.pp-progress{height:8px;background:#28313a;border-radius:99px;overflow:hidden;margin-top:12px}.pp-progress i{display:block;height:100%;background:linear-gradient(90deg,#bc8740,#efc476);border-radius:99px}.pp-cycle-title{font-size:17px;font-weight:900;margin-bottom:6px}
+.pp-list{display:flex;flex-direction:column;gap:8px}.pp-list-row{padding:9px 10px;border:1px solid #27333d;border-radius:10px;background:#0e1821}.pp-list-row strong{font-size:12px}.pp-list-row .pp-muted{font-size:10px;margin-top:3px}
+.pp-timeline{display:flex;align-items:flex-start;gap:0;overflow:auto;padding:10px 2px 4px}.pp-node{min-width:135px;position:relative;padding:19px 9px 0}.pp-node:before{content:"";position:absolute;top:5px;left:0;right:0;height:2px;background:#3a4651}.pp-node:first-child:before{left:50%}.pp-node:last-child:before{right:50%}.pp-node:after{content:"";position:absolute;width:10px;height:10px;border-radius:50%;top:1px;left:calc(50% - 5px);background:#e5b96f;box-shadow:0 0 0 4px rgba(229,185,111,.08)}.pp-node strong{display:block;font-size:11px;text-align:center}.pp-node span{display:block;font-size:9px;text-align:center;color:#778899;margin-top:4px}
+.pp-pill{display:inline-flex;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}.pp-pill.good{background:#143529;color:#6fe0ad}.pp-pill.warn{background:#3a2c18;color:#f1be6b}.pp-pill.neutral{background:#172432;color:#9db0c3}
+.pp-empty{display:grid;place-items:center;min-height:170px;color:#778899;font-size:12px;text-align:center;padding:20px}.pp-actions{display:flex;gap:8px;justify-content:flex-end;margin:0 0 10px}.pp-actions .btn.ghost{background:#111b24;border-color:#34414c;color:#eef3f7}
+.client-nav{display:flex;gap:6px;align-items:center}.client-nav button{border:1px solid #2d3b49;background:#101e2d;color:#afbecc;border-radius:9px;padding:8px 11px;font-weight:800;cursor:pointer}.client-nav button.on{background:#d5aa63;border-color:#d5aa63;color:#0b1218}.client-engagement{margin-top:13px;border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line)}.client-engagement.warn{background:#fff9ed;border-color:#efd39c}.client-engagement.end{background:#fff1f1;border-color:#efb4b4}.premium-client-main{max-width:1450px}
+@media(max-width:1100px){.pp-profile{grid-template-columns:1.3fr 1fr}.pp-grid3{grid-template-columns:1fr 1fr}.pp-grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:780px){.pp-profile,.pp-grid3,.pp-grid2,.pp-grid4{grid-template-columns:1fr}.pp-stat{border-left:0;border-top:1px solid #2d3742;padding-left:0;padding-top:10px}.pp-topline{flex-direction:column}.pp-motto{text-align:left}.pp-kpi-row{grid-template-columns:1fr}.client-top{flex-wrap:wrap}.client-nav{order:3;width:100%}}
 @media(max-width:1100px){.app{grid-template-columns:80px 1fr}.sidebar{padding:18px 8px}.brand strong{font-size:14px;text-align:center}.brand span,.sidebar-note{display:none}.nav button{font-size:0;text-align:center}.nav button:before{content:"•";font-size:20px}.grid31,.grid3{grid-template-columns:1fr}.client-head{grid-template-columns:1fr}}
 @media(max-width:780px){.app{grid-template-columns:1fr}.sidebar{display:none}.content{padding:15px 11px 40px}.topbar{padding:0 13px}.top-actions input{display:none}.kpis,.grid2{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr}.test-row{grid-template-columns:1fr 1fr}.test-row.header{display:none}.passport-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.kpis,.grid2{grid-template-columns:1fr}.page-title{align-items:flex-start;flex-direction:column}}
-@media print{.sidebar,.topbar,.demo-banner,.tabs,.btn,.no-print{display:none!important}.app{display:block}.content{padding:0}.card{box-shadow:none}.passport{min-height:100vh}}
+@media print{.sidebar,.topbar,.demo-banner,.tabs,.btn,.no-print,.client-top{display:none!important}.app{display:block}.content,.client-main{padding:0!important;max-width:none!important}.card{box-shadow:none}.passport{min-height:100vh}.premium-passport{border:0;border-radius:0;box-shadow:none;min-height:100vh;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 
 .auth-shell{min-height:calc(100vh - 33px);display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#1d3150 0,#0d1827 48%,#08111d 100%)}
 .auth-card{width:min(460px,100%);background:#fff;border-radius:20px;padding:26px;box-shadow:0 30px 100px rgba(0,0,0,.32)}
@@ -118,6 +136,7 @@ let state={view:'dashboard',clientId:null,tab:'overview',search:'',status:'Tous'
 
 const DB_STATUS_TO_UI={active:'Actif',inactive:'Inactif',paused:'Pause',onboarding:'Onboarding',prospect:'Prospect'};
 let clientPortalState=null;
+let clientPortalView='home';
 const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
 
 function isoDate(v){return v?String(v).slice(0,10):''}
@@ -455,15 +474,112 @@ function follow(c){
 function fieldInput(label,path,value,type){return '<div class="field"><label>'+label+'</label><input class="input pathSave" data-path="'+path+'" type="'+(type||'text')+'" value="'+esc(value||'')+'"></div>'}
 function fieldArea(label,path,value){return '<div class="field"><label>'+label+'</label><textarea class="textarea pathSave" data-path="'+path+'">'+esc(value||'')+'</textarea></div>'}
 
+
+function passportTestRows(rawTests){
+ return (rawTests||[]).map(t=>({
+   name:t.name??t.test_name??'Test',
+   date:isoDate(t.date??t.performed_at),
+   value:t.value??t.result_value??t.result_text??'',
+   unit:t.unit||'',
+   context:t.context||'',
+   note:t.note??t.coach_interpretation??''
+ }));
+}
+function passportEventRows(rawEvents){
+ return (rawEvents||[]).map(e=>({date:isoDate(e.date??e.event_date),title:e.title||'Événement',detail:e.detail||''}));
+}
+function passportAppointmentRows(raw){
+ return (raw||[]).filter(a=>a.status!=='cancelled').slice().sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+}
+function passportModelFromCoach(c){
+ const appts=(db.appointments||[]).filter(a=>a.client_id===c.id);
+ return {name:c.name,initials:c.initials||initials(c.name),pole:c.pole,offer:c.offer,sport:c.sport||'',specialty:c.specialty||'',level:c.level||'',start:c.start,end:c.end,status:c.status,
+   cycle:{title:c.cycle?.title||'',start:c.cycle?.start||'',end:c.cycle?.end||'',priorities:c.cycle?.priorities||'',vigilance:c.cycle?.vigilance||''},
+   tests:passportTestRows(c.tests),events:passportEventRows(c.events),checkins:c.checkins||[],appointments:passportAppointmentRows(appts)};
+}
+function passportModelFromClient(s){
+ const c=s.client||{},cy=s.cycle||{};
+ const name=[c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ');
+ return {name,initials:initials(name),pole:c.current_pole||'',offer:c.current_offer||'',sport:c.current_sport||'',specialty:c.position_or_specialty||'',level:c.level||'',start:isoDate(c.start_date),end:isoDate(c.engagement_end_date),status:c.status||'',
+   cycle:{title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||''},
+   tests:passportTestRows(s.tests),events:passportEventRows(s.events),checkins:s.checkins||[],appointments:passportAppointmentRows(s.appointments)};
+}
+function passportTestGroups(tests){
+ const groups={};
+ for(const t of tests||[]){
+   const n=Number(t.value);
+   if(!Number.isFinite(n)||!t.name)continue;
+   const key=normalizeTestName(t.name);
+   if(!groups[key])groups[key]={name:t.name,unit:t.unit||'',rows:[]};
+   groups[key].rows.push({...t,num:n});
+ }
+ Object.values(groups).forEach(g=>g.rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))));
+ return Object.values(groups).sort((a,b)=>b.rows.length-a.rows.length);
+}
+function passportLineChart(group){
+ if(!group||!group.rows?.length)return '<div class="pp-empty">Ajoute des résultats numériques pour afficher une courbe d’évolution.</div>';
+ const rows=group.rows,vals=rows.map(r=>r.num),min=Math.min(...vals),max=Math.max(...vals),range=(max-min)||1;
+ const W=680,H=215,L=42,R=18,T=22,B=30,innerW=W-L-R,innerH=H-T-B;
+ const pts=rows.map((r,i)=>({x:L+(rows.length===1?innerW/2:i*innerW/(rows.length-1)),y:T+(max-r.num)/range*innerH,r}));
+ const line=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+ const area=L+','+(T+innerH)+' '+line+' '+(L+innerW)+','+(T+innerH);
+ const grid=[0,.25,.5,.75,1].map(f=>{const y=T+innerH*f;return '<line class="pp-chart-grid" x1="'+L+'" y1="'+y+'" x2="'+(L+innerW)+'" y2="'+y+'"/>';}).join('');
+ const labels=pts.map((p,i)=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#e7b96d"/><text class="pp-chart-value" x="'+p.x+'" y="'+(p.y-9)+'" text-anchor="middle">'+esc(String(p.r.value))+'</text>'+(i===0||i===pts.length-1?'<text class="pp-chart-axis" x="'+p.x+'" y="'+(H-8)+'" text-anchor="middle">'+esc(fmtDate(p.r.date))+'</text>':'')+'</g>').join('');
+ return '<svg class="pp-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Évolution '+esc(group.name)+'">'+grid+'<polygon points="'+area+'" fill="#d6a85c" opacity=".10"/><polyline points="'+line+'" fill="none" stroke="#e7b96d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+labels+'</svg>';
+}
+function passportBars(groups){
+ const usable=(groups||[]).filter(g=>g.rows.length).slice(0,4);
+ if(!usable.length)return '<div class="pp-empty">Les comparaisons apparaîtront ici dès que des tests seront renseignés.</div>';
+ const W=520,H=210,base=166,barW=22,gap=105;
+ let body='';
+ usable.forEach((g,i)=>{
+   const first=g.rows[0],last=g.rows[g.rows.length-1],mx=Math.max(Math.abs(first.num),Math.abs(last.num),1);
+   const h1=Math.max(8,Math.abs(first.num)/mx*105),h2=Math.max(8,Math.abs(last.num)/mx*105),x=55+i*gap;
+   const short=g.name.length>15?g.name.slice(0,14)+'…':g.name;
+   body+='<rect x="'+x+'" y="'+(base-h1)+'" width="'+barW+'" height="'+h1+'" rx="4" fill="#596774"/><rect x="'+(x+28)+'" y="'+(base-h2)+'" width="'+barW+'" height="'+h2+'" rx="4" fill="#e7b96d"/>'+
+   '<text class="pp-chart-value" x="'+(x+39)+'" y="'+(base-h2-6)+'" text-anchor="middle">'+esc(String(last.value))+'</text><text class="pp-chart-axis" x="'+(x+25)+'" y="187" text-anchor="middle">'+esc(short)+'</text>';
+ });
+ return '<svg class="pp-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Comparaison des tests"><line class="pp-chart-grid" x1="25" y1="'+base+'" x2="500" y2="'+base+'"/>'+body+'<text class="pp-chart-axis" x="30" y="204">gris : premier • or : dernier</text></svg>';
+}
+function cycleProgressPct(cycle){
+ if(!cycle?.start||!cycle?.end)return 0;
+ const s=new Date(cycle.start+'T12:00:00Z'),e=new Date(cycle.end+'T12:00:00Z'),n=new Date();
+ if(!(e>s))return 0;
+ return Math.max(0,Math.min(100,Math.round((n-s)/(e-s)*100)));
+}
+function renderPremiumPassport(m){
+ const groups=passportTestGroups(m.tests),main=groups.find(g=>g.rows.length>=2)||groups[0];
+ const keyGroups=groups.slice(0,3);
+ const future=m.appointments.filter(a=>new Date(a.starts_at)>=new Date()),past=m.appointments.filter(a=>new Date(a.starts_at)<new Date());
+ const next=future[0]||null,last=past.length?past[past.length-1]:null;
+ const left=m.end?daysUntil(m.end):null;
+ const engagementTone=left===null?'neutral':left<0?'warn':left<=14?'warn':'good';
+ const engagementText=left===null?'À définir':left<0?'Échéance dépassée':left===0?'Échéance aujourd’hui':left+' jour(s) restant(s)';
+ const cp=cycleProgressPct(m.cycle);
+ const events=(m.events||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-6);
+ const recentTests=groups.slice(0,4).map(g=>{const last=g.rows[g.rows.length-1];return '<div class="pp-kpi"><span>'+esc(g.name)+'</span><strong>'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</strong><small>'+fmtDate(last.date)+'</small></div>'}).join('');
+ const priorities=(m.cycle?.priorities||'À définir').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
+ const vigilance=(m.cycle?.vigilance||'Aucun point de vigilance signalé').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
+ return '<div class="premium-passport">'+
+ '<div class="pp-topline"><div><div class="pp-eyebrow">Passeport AK PRIME</div><div class="pp-title">Progression & parcours</div></div><div class="pp-motto">Discipline • progression • liberté<br>Plus qu’un coaching, un parcours</div></div>'+
+ '<div class="pp-profile"><div class="pp-card pp-person"><div class="pp-avatar">'+esc(m.initials||'AK')+'</div><div><div class="pp-name">'+esc(m.name||'Client AK PRIME')+'</div><div class="pp-muted pp-tiny">'+esc([m.sport,m.specialty,m.level].filter(Boolean).join(' • ')||'Accompagnement AK PRIME')+'</div><div class="pp-tagrow"><span class="pp-tag">'+esc(m.pole||'—')+'</span><span class="pp-tag">'+esc(m.offer||'—')+'</span></div></div></div>'+
+ '<div class="pp-card pp-stat"><span>Pôle actuel</span><strong>'+esc(m.pole||'—')+'</strong><span style="margin-top:13px">Offre</span><strong>'+esc(m.offer||'—')+'</strong></div>'+
+ '<div class="pp-card pp-stat"><span>Objectif / priorités</span><strong>'+esc(m.cycle?.priorities||'À définir')+'</strong></div>'+
+ '<div class="pp-card pp-engagement"><div class="row between"><strong>Engagement</strong><span class="pp-pill '+engagementTone+'">'+esc(engagementText)+'</span></div><div class="pp-muted pp-tiny" style="margin-top:12px">Début : '+fmtDate(m.start)+'</div><div style="font-weight:900;margin-top:5px">Fin : '+fmtDate(m.end)+'</div>'+(left!==null&&left<=14?'<div class="pp-amber pp-tiny" style="margin-top:7px">Bilan / renouvellement à préparer</div>':'')+'</div></div>'+
+ '<div class="pp-grid3"><div class="pp-card"><div class="row between"><h3>Évolution — '+esc(main?.name||'Tests clés')+'</h3><span class="pp-pill neutral">'+esc(main?.unit||'données réelles')+'</span></div>'+passportLineChart(main)+'</div>'+
+ '<div class="pp-card"><h3>Tests & performances clés</h3>'+passportBars(groups)+'</div>'+
+ '<div class="pp-card"><h3>Derniers repères</h3><div class="pp-kpi-row" style="grid-template-columns:1fr">'+(recentTests||'<div class="pp-empty">Aucun test renseigné.</div>')+'</div></div></div>'+
+ '<div class="pp-grid2"><div class="pp-card"><h3>Parcours & jalons clés</h3><div class="pp-timeline">'+(events.length?events.map(e=>'<div class="pp-node"><strong>'+esc(e.title)+'</strong><span>'+fmtDate(e.date)+'</span></div>').join(''):'<div class="pp-empty" style="min-height:90px;width:100%">Les jalons du parcours apparaîtront ici.</div>')+'</div></div>'+
+ '<div class="pp-card"><div class="row between"><h3>Cycle actuel</h3><span class="pp-pill neutral">'+cp+'%</span></div><div class="pp-cycle-title">'+esc(m.cycle?.title||'Cycle à définir')+'</div><div class="pp-muted pp-tiny">'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</div><div class="pp-progress"><i style="width:'+cp+'%"></i></div><div class="pp-tagrow" style="margin-top:13px">'+priorities.map(x=>'<span class="pp-tag">'+esc(x)+'</span>').join('')+'</div></div></div>'+
+ '<div class="pp-grid4"><div class="pp-card"><h3>Priorités actuelles</h3><div class="pp-list">'+(priorities.length?priorities.map(x=>'<div class="pp-list-row"><strong>◎ '+esc(x)+'</strong></div>').join(''):'<div class="pp-muted pp-tiny">À définir avec le coach.</div>')+'</div></div>'+
+ '<div class="pp-card"><h3>Points de vigilance</h3><div class="pp-list">'+vigilance.map(x=>'<div class="pp-list-row"><strong>△ '+esc(x)+'</strong></div>').join('')+'</div></div>'+
+ '<div class="pp-card"><h3>Dernière visio</h3>'+(last?'<div class="pp-cycle-title">'+fmtDateTime(last.starts_at)+'</div><div class="pp-muted pp-tiny">'+esc(last.appointment_type||'Visio')+' • '+esc(last.duration_minutes||'')+' min</div>':'<div class="pp-muted pp-tiny">Aucune visio passée enregistrée.</div>')+'</div>'+
+ '<div class="pp-card"><h3>Prochaine visio</h3>'+(next?'<div class="pp-cycle-title pp-gold">'+fmtDateTime(next.starts_at)+'</div><div class="pp-muted pp-tiny">'+esc(next.appointment_type||'Visio')+' • '+esc(next.duration_minutes||'')+' min</div>':'<div class="pp-muted pp-tiny">Aucune visio planifiée.</div>')+'</div></div>'+
+ '</div>';
+}
 function passport(c){
- const tests=c.tests||[]; const latest={}; tests.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>latest[t.name]=t);
- const highlights=Object.values(latest).slice(0,4);
- return '<div class="page-title no-print"><div><h1 style="font-size:22px">Passeport AK PRIME</h1><p>Vue client synthétique du parcours.</p></div><button class="btn primary" id="printPassport">Imprimer / PDF</button></div>'+
- '<div class="card passport"><div class="row between"><div><div class="muted tiny">PASSEPORT AK PRIME</div><h2 style="margin:4px 0">'+esc(c.name)+'</h2><div class="muted">'+esc(c.pole)+' — '+esc(c.offer)+(c.sport?' — '+esc(c.sport):'')+'</div></div><div class="status blue">Mis à jour aujourd’hui</div></div>'+
- '<div class="section-title" style="color:#c4d0dd">Priorités actuelles</div><div class="mini">'+esc(c.cycle?.priorities||'À définir')+'</div>'+
- '<div class="section-title" style="color:#c4d0dd">Profil actuel</div><div class="passport-grid"><div class="mini"><span>Cycle</span><strong>'+esc(c.cycle?.title||'—')+'</strong></div><div class="mini"><span>Vigilance</span><strong>'+esc(c.cycle?.vigilance||'Aucune')+'</strong></div>'+
- highlights.map(t=>'<div class="mini"><span>'+esc(t.name)+'</span><strong>'+esc(t.value)+' '+esc(t.unit||'')+'</strong><div class="muted tiny">'+fmtDate(t.date)+'</div></div>').join('')+'</div>'+
- '<div class="section-title" style="color:#c4d0dd">Parcours AK PRIME</div><div class="timeline">'+((c.events||[]).length?c.events.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>'<div class="event"><div class="date" style="color:#b9c6d5">'+fmtDate(e.date)+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Aucun événement enregistré.</div>')+'</div></div>';
+ return '<div class="page-title no-print"><div><h1 style="font-size:22px">Passeport AK PRIME</h1><p>Vue premium du parcours client, basée uniquement sur les données du dossier.</p></div><button class="btn primary" id="printPassport">Imprimer / PDF</button></div>'+
+ renderPremiumPassport(passportModelFromCoach(c));
 }
 
 function history(c){
@@ -792,35 +908,54 @@ async function enterClientPortal(user,profile){
  const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
  clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null};
+ clientPortalView='home';
  renderClientPortal();
 }
 function showClientPending(message){
  document.getElementById('root').innerHTML='<div class="auth-shell"><div class="auth-card"><div class="auth-logo">AK PRIME<span>ESPACE CLIENT</span></div><h1>Compte client</h1><p>'+esc(message)+'</p><button class="btn ghost" id="pendingLogout">Déconnexion</button></div></div>';
  document.getElementById('pendingLogout').onclick=async()=>{await supa.auth.signOut();showAuth()};
 }
+function renderClientEngagementBanner(c){
+ const end=isoDate(c.engagement_end_date);if(!end)return '';
+ const d=daysUntil(end),tone=d<0?'end':d<=14?'warn':'';
+ const msg=d<0?'Ton engagement est arrivé à échéance.':d===0?'Ton engagement arrive à échéance aujourd’hui.':d<=14?'Ton engagement arrive à échéance dans '+d+' jour(s).':'Fin d’engagement : '+fmtDate(end);
+ const sub=d<=14?'Alex préparera avec toi le bilan de cycle et la suite de l’accompagnement.':'Tu retrouveras cette échéance dans ton Passeport AK PRIME.';
+ return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
+}
 function renderClientPortal(){
  const s=clientPortalState,c=s.client,t=s.template,r=s.response,cycle=s.cycle;
  const questionnaireStatus=!t?'Non disponible':r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon commencé':'À compléter';
- const nextAppt=(s.appointments||[]).find(a=>new Date(a.starts_at)>=new Date());
- document.getElementById('root').innerHTML='<div class="client-portal">'+
- '<div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div><div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+
- '<div class="client-main"><div class="client-hero"><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div>'+
- '<div class="client-grid">'+portalMini('Questionnaire initial',questionnaireStatus,r?.status==='submitted'?'Merci, tes réponses sont disponibles pour le coach.':'À remplir avant la visio.')+
- portalMini('Prochaine visio',nextAppt?fmtDateTime(nextAppt.starts_at):c.next_visio_at?fmtDateTime(c.next_visio_at):'À planifier','')+
- portalMini('Cycle actuel',cycle?.title||'À venir',cycle?.priorities||'')+'</div>'+
- '<div id="clientBookingPanel">'+renderBookingPanel(s)+'</div>'+
- '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Mon accompagnement</h3>'+
- '<div class="item"><strong>Pôle</strong>'+esc(c.current_pole||'—')+'</div><div class="item"><strong>Offre</strong>'+esc(c.current_offer||'—')+'</div>'+
- renderClientWhatsAppButton(s,c)+
- (c.optitrainer_url?'<button class="btn primary" id="clientOpti" style="margin-top:10px">Ouvrir mon entraînement Optitrainer</button>':'<div class="muted tiny" style="margin-top:10px">Le lien Optitrainer sera ajouté par le coach.</div>')+
- '</div><div class="card panel"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,5).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div></div>'+
- '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Mon questionnaire initial</h3><div class="muted tiny">'+esc(t?.description||'')+'</div></div>'+status(r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon':'À compléter')+'</div>'+
- (t?renderClientQuestionnaire(t,r?.answers||{}):'<div class="muted" style="margin-top:12px">Aucun questionnaire actif pour ce pôle.</div>')+
- '</div>'+
- renderClientWeeklyCheckin(s)+
- '<div class="card panel" style="margin-top:13px"><h3>Mon parcours AK PRIME</h3><div class="timeline">'+((s.events||[]).length?s.events.map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton historique apparaîtra ici au fil de l’accompagnement.</div>')+'</div></div>'+
- '</div></div>';
- document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;showAuth()};
+ const nextAppt=(s.appointments||[]).find(a=>a.status!=='cancelled'&&new Date(a.starts_at)>=new Date());
+ const nav='<div class="client-nav"><button id="clientHomeNav" class="'+(clientPortalView==='home'?'on':'')+'">Accueil</button><button id="clientPassportNav" class="'+(clientPortalView==='passport'?'on':'')+'">Passeport</button></div>';
+ let main='';
+ if(clientPortalView==='passport'){
+   main='<div class="client-main premium-client-main"><div class="pp-actions no-print"><button class="btn ghost small" id="clientPrintPassport">Imprimer / PDF</button></div>'+renderPremiumPassport(passportModelFromClient(s))+'</div>';
+ }else{
+   main='<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><button class="btn ghost small" id="heroPassportBtn">Mon Passeport</button></div></div>'+
+   '<div class="client-grid">'+portalMini('Questionnaire initial',questionnaireStatus,r?.status==='submitted'?'Merci, tes réponses sont disponibles pour le coach.':'À remplir avant la visio.')+
+   portalMini('Prochaine visio',nextAppt?fmtDateTime(nextAppt.starts_at):c.next_visio_at?fmtDateTime(c.next_visio_at):'À planifier','')+
+   portalMini('Cycle actuel',cycle?.title||'À venir',cycle?.priorities||'')+'</div>'+
+   renderClientEngagementBanner(c)+
+   '<div id="clientBookingPanel">'+renderBookingPanel(s)+'</div>'+
+   '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Mon accompagnement</h3>'+
+   '<div class="item"><strong>Pôle</strong>'+esc(c.current_pole||'—')+'</div><div class="item"><strong>Offre</strong>'+esc(c.current_offer||'—')+'</div>'+
+   renderClientWhatsAppButton(s,c)+
+   (c.optitrainer_url?'<button class="btn primary" id="clientOpti" style="margin-top:10px">Ouvrir mon entraînement Optitrainer</button>':'<div class="muted tiny" style="margin-top:10px">Le lien Optitrainer sera ajouté par le coach.</div>')+
+   '</div><div class="card panel"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,5).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div></div>'+
+   '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Mon questionnaire initial</h3><div class="muted tiny">'+esc(t?.description||'')+'</div></div>'+status(r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon':'À compléter')+'</div>'+
+   (t?renderClientQuestionnaire(t,r?.answers||{}):'<div class="muted" style="margin-top:12px">Aucun questionnaire actif pour ce pôle.</div>')+
+   '</div>'+
+   renderClientWeeklyCheckin(s)+
+   '<div class="card panel" style="margin-top:13px"><h3>Mon parcours AK PRIME</h3><div class="timeline">'+((s.events||[]).length?s.events.map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton historique apparaîtra ici au fil de l’accompagnement.</div>')+'</div></div>'+
+   '</div>';
+ }
+ document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav+'<div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.getElementById('clientHomeNav')?.addEventListener('click',()=>{clientPortalView='home';renderClientPortal()});
+ document.getElementById('clientPassportNav')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
+ document.getElementById('heroPassportBtn')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
+ document.getElementById('engagementPassportBtn')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
+ document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
+ document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
@@ -828,6 +963,7 @@ function renderClientPortal(){
  bindBookingButtons();
  subscribeCalendarRealtime('client');
 }
+
 function renderClientWhatsAppButton(s,c){
  const cfg=s.appSettings||{},num=cfg.whatsapp_number||'';
  if(!normalizeWhatsAppNumber(num))return '<div class="muted tiny" style="margin-top:10px">Le contact WhatsApp sera bientôt disponible.</div>';
