@@ -82,7 +82,34 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .auth-msg{margin-top:12px;font-size:13px;padding:10px 11px;border-radius:9px;background:#f5f7fb;color:#475467;display:none}.auth-msg.show{display:block}.auth-msg.err{background:var(--red2);color:var(--red)}
 .user-email{font-size:12px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .client-portal{min-height:calc(100vh - 33px);background:#f3f6fa}.client-top{background:#0d1827;color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}.client-brand{font-weight:950;letter-spacing:.09em}.client-brand small{display:block;font-size:9px;letter-spacing:.2em;color:#9fb0c3;margin-top:3px}.client-main{max-width:1050px;margin:0 auto;padding:24px 18px 50px}.client-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.client-hero{background:linear-gradient(145deg,#0d1827,#183252);color:#fff;padding:22px;border-radius:18px;margin-bottom:14px}.client-hero h1{margin:0 0 6px}.client-hero p{margin:0;color:#c3d0dd}.qform{display:flex;flex-direction:column;gap:14px}.qblock{border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px}.qblock label.qtitle{display:block;font-weight:800;margin-bottom:7px}.req{color:var(--red)}.qhelp{font-size:12px;color:var(--muted);margin-top:5px}.choices{display:flex;flex-direction:column;gap:7px}.choice{display:flex;gap:8px;align-items:flex-start}.scale-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}.scale-wrap .select{min-width:90px}.portal-actions{position:sticky;bottom:0;background:rgba(243,246,250,.95);backdrop-filter:blur(8px);padding:12px 0;display:flex;gap:8px;justify-content:flex-end}.portal-note{font-size:12px;color:var(--muted);line-height:1.5}.account-good{color:var(--green);font-weight:800}.account-wait{color:var(--amber);font-weight:800}
-@media(max-width:760px){.client-grid{grid-template-columns:1fr}.client-top{align-items:flex-start}.scale-wrap{grid-template-columns:1fr}.portal-actions{justify-content:stretch}.portal-actions .btn{flex:1}}
+
+.client-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.client-page-head h2{margin:0;font-size:23px}.client-page-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.client-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.client-home-actions .btn,.client-home-actions a{text-align:center;text-decoration:none}
+.client-action-card{border:1px solid var(--line);background:#fff;border-radius:15px;padding:15px;box-shadow:var(--shadow)}.client-action-card.urgent{border-color:#efcf8e;background:#fffaf0}.client-action-card.good{border-color:#bfe7d4;background:#f7fcf9}
+.client-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.client-summary-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:105px}.client-summary-card .lab{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}.client-summary-card .value{font-size:17px;font-weight:900;margin-top:8px;line-height:1.25}.client-summary-card .sub{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.client-week-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:4px;margin:13px 0 10px}.client-week-tabs button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font-weight:850;cursor:pointer}.client-week-tabs button.on{background:#0d1827;color:#fff;border-color:#0d1827}
+.client-day-strip{display:flex;gap:8px;overflow:auto;padding:2px 0 10px}.client-day-btn{min-width:82px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer}.client-day-btn.on{border-color:#2f66f6;background:#edf2ff;color:#214fcb}.client-day-btn strong{display:block;font-size:13px}.client-day-btn span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.client-time-grid{display:grid;grid-template-columns:repeat(5,minmax(78px,1fr));gap:8px;margin-top:8px}.client-time-grid .btn{width:100%}
+.client-section-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-top:13px}
+.client-section-card h3{margin:0 0 10px}.client-collapsed{border:1px solid var(--line);border-radius:13px;background:#fbfcfe;padding:14px}.client-collapsed summary{cursor:pointer;font-weight:850;list-style:none}.client-collapsed summary::-webkit-details-marker{display:none}
+.questionnaire-done{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #bfe7d4;background:#f5fbf8;border-radius:14px;padding:15px}.questionnaire-done .checkmark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#dff5e9;color:#13764f;font-size:20px;font-weight:950;flex:0 0 auto}
+.questionnaire-answers{display:grid;gap:8px;margin-top:12px}.questionnaire-answer{border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff}.questionnaire-answer strong{display:block;font-size:12px;margin-bottom:4px}.questionnaire-answer div{font-size:13px;line-height:1.45;color:#475467}
+.client-bottom-nav{display:none}
+.client-mobile-spacer{display:none}
+@media(max-width:760px){
+ .client-grid,.client-summary-grid{grid-template-columns:1fr}
+ .client-top{align-items:center;padding:13px 14px}.client-top .client-nav{display:none}.client-top .tiny{display:none}
+ .client-main{padding:16px 12px 92px}.scale-wrap{grid-template-columns:1fr}.portal-actions{justify-content:stretch}.portal-actions .btn{flex:1}
+ .client-hero{padding:17px;border-radius:15px}.client-hero h1{font-size:23px}
+ .client-home-actions{grid-template-columns:1fr}
+ .client-time-grid{grid-template-columns:repeat(3,1fr)}
+ .client-page-head h2{font-size:21px}
+ .client-engagement{align-items:flex-start;flex-direction:column}
+ .client-bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:0;right:0;bottom:0;z-index:70;background:rgba(9,20,33,.97);backdrop-filter:blur(10px);border-top:1px solid #26384b;padding:7px 6px max(7px,env(safe-area-inset-bottom))}
+ .client-bottom-nav button{border:0;background:transparent;color:#8fa1b8;padding:6px 3px;font-size:10px;font-weight:800;cursor:pointer}.client-bottom-nav button span{display:block;font-size:19px;line-height:1.1;margin-bottom:3px}.client-bottom-nav button.on{color:#efc477}
+ .client-mobile-spacer{display:block;height:10px}
+}
+
 </style>
 </head>
 <body>
@@ -137,6 +164,9 @@ let state={view:'dashboard',clientId:null,tab:'overview',search:'',status:'Tous'
 const DB_STATUS_TO_UI={active:'Actif',inactive:'Inactif',paused:'Pause',onboarding:'Onboarding',prospect:'Prospect'};
 let clientPortalState=null;
 let clientPortalView='home';
+let clientVisioWeek=0;
+let clientVisioDay='';
+let clientQuestionnaireExpanded=false;
 const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
 
 function isoDate(v){return v?String(v).slice(0,10):''}
@@ -921,6 +951,9 @@ async function enterClientPortal(user,profile){
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
  clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null};
  clientPortalView='home';
+ clientVisioWeek=0;
+ clientVisioDay='';
+ clientQuestionnaireExpanded=false;
  renderClientPortal();
 }
 function showClientPending(message){
@@ -934,40 +967,83 @@ function renderClientEngagementBanner(c){
  const sub=d<=14?'Alex préparera avec toi le bilan de cycle et la suite de l’accompagnement.':'Tu retrouveras cette échéance dans ton Passeport AK PRIME.';
  return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
 }
+function clientNavMarkup(){
+ const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['suivi','✓','Suivi'],['passport','◇','Passeport']];
+ const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'">'+label+'</button>').join('')+'</div>';
+ const bottom='<div class="client-bottom-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
+ return {top,bottom};
+}
+function renderClientHome(s){
+ const c=s.client,cycle=s.cycle,r=s.response;
+ const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
+ const friday=currentWeekFriday(),week=(s.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
+ const qDone=r?.status==='submitted';
+ const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
+ const engagementValue=!c.engagement_end_date?'À définir':d<0?'Échue':d===0?'Aujourd’hui':d+' j';
+ const actionCards=[];
+ if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><strong>Questionnaire initial à compléter</strong><div class="muted tiny" style="margin-top:5px">Il permet de préparer ton accompagnement et ta première visio.</div><button class="btn primary small clientGoFollow" style="margin-top:10px">Le compléter</button></div>');
+ if(!week)actionCards.push('<div class="client-action-card"><strong>Bilan hebdomadaire</strong><div class="muted tiny" style="margin-top:5px">Ton retour aide à adapter la semaine suivante.</div><button class="btn ghost small clientGoFollow" style="margin-top:10px">Faire mon bilan</button></div>');
+ if(d!==null&&d<=14)actionCards.push('<div class="client-action-card urgent"><strong>Fin d’engagement '+(d<0?'dépassée':d===0?'aujourd’hui':'dans '+d+' jour(s)')+'</strong><div class="muted tiny" style="margin-top:5px">Un bilan de cycle et la suite de l’accompagnement seront préparés avec Alex.</div><button class="btn ghost small clientGoPassport" style="margin-top:10px">Voir mon Passeport</button></div>');
+ return '<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><span class="status green">'+esc(c.status==='active'?'Actif':c.status||'')+'</span></div></div>'+
+ '<div class="client-summary-grid">'+
+ '<div class="client-summary-card"><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?next.duration_minutes+' min':'Réserve depuis l’onglet Visios')+'</div></div>'+
+ '<div class="client-summary-card"><div class="lab">Cycle actuel</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir')+'</div></div>'+
+ '<div class="client-summary-card"><div class="lab">Bilan hebdo</div><div class="value">'+(week?(week.reviewed_at?'Traité':'Envoyé'):'À faire')+'</div><div class="sub">'+(week?(week.reviewed_at?'Retour coach disponible':'En attente du coach'):'À compléter cette semaine')+'</div></div>'+
+ '<div class="client-summary-card"><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
+ '</div>'+
+ (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
+ '<div class="client-home-actions">'+
+ (c.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
+ renderClientWhatsAppButton(s,c)+
+ '</div>'+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Mon parcours</h3><div class="muted tiny">Les derniers jalons importants.</div></div><button class="link clientGoPassport">Voir le Passeport</button></div><div class="timeline" style="margin-top:12px">'+((s.events||[]).length?s.events.slice(0,4).map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton parcours apparaîtra ici.</div>')+'</div></div>'+
+ '</div>';
+}
+function renderClientVisios(s){
+ return '<div class="client-main"><div class="client-page-head"><div><h2>Mes visios</h2><p>Réserve, déplace ou annule tes rendez-vous avec Alex.</p></div><span class="status green">Temps réel</span></div><div id="clientBookingPanel">'+renderBookingPanel(s)+'</div></div>';
+}
+function renderQuestionnaireAnswers(template,answers){
+ if(!template)return '<div class="muted">Questionnaire indisponible.</div>';
+ return '<div class="questionnaire-answers">'+template.questions.map(q=>{let v=answers?.[q.key];if(Array.isArray(v))v=v.join(', ');else if(v===true)v='Oui';else if(v===false)v='Non';return '<div class="questionnaire-answer"><strong>'+esc(q.label)+'</strong><div>'+esc(v||'—')+'</div></div>'}).join('')+'</div>';
+}
+function renderClientQuestionnaireSection(s){
+ const t=s.template,r=s.response;
+ if(!t)return '<div class="client-section-card"><h3>Questionnaire initial</h3><div class="muted">Aucun questionnaire actif pour ton pôle.</div></div>';
+ if(r?.status==='submitted'){
+   const sent=r.submitted_at?fmtDateTime(r.submitted_at):'Envoyé';
+   return '<div class="client-section-card"><div class="questionnaire-done"><div class="row"><div class="checkmark">✓</div><div><strong>Questionnaire initial complété</strong><div class="muted tiny" style="margin-top:4px">Envoyé : '+esc(sent)+'</div></div></div><button class="btn ghost small" id="toggleQuestionnaireAnswers">'+(clientQuestionnaireExpanded?'Masquer':'Voir mes réponses')+'</button></div>'+(clientQuestionnaireExpanded?renderQuestionnaireAnswers(t,r.answers||{}):'')+'</div>';
+ }
+ return '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Questionnaire initial</h3><div class="muted tiny">'+esc(t.description||'À compléter pour préparer ton accompagnement.')+'</div></div><span class="status '+(r?.status==='draft'?'amber':'blue')+'">'+(r?.status==='draft'?'Brouillon':'À compléter')+'</span></div>'+renderClientQuestionnaire(t,r?.answers||{})+'</div>';
+}
+function renderClientSuivi(s){
+ const c=s.client;
+ return '<div class="client-main"><div class="client-page-head"><div><h2>Mon suivi</h2><p>Questionnaire, bilan hebdomadaire et retours du coach.</p></div></div>'+
+ renderClientWeeklyCheckin(s)+
+ renderClientQuestionnaireSection(s)+
+ '<div class="client-section-card"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,6).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div>'+
+ '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(c.optitrainer_url?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
+ '</div>';
+}
 function renderClientPortal(){
- const s=clientPortalState,c=s.client,t=s.template,r=s.response,cycle=s.cycle;
- const questionnaireStatus=!t?'Non disponible':r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon commencé':'À compléter';
- const nextAppt=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
- const nav='<div class="client-nav"><button id="clientHomeNav" class="'+(clientPortalView==='home'?'on':'')+'">Accueil</button><button id="clientPassportNav" class="'+(clientPortalView==='passport'?'on':'')+'">Passeport</button></div>';
+ const s=clientPortalState,c=s.client;
+ const nav=clientNavMarkup();
  let main='';
  if(clientPortalView==='passport'){
    main='<div class="client-main premium-client-main"><div class="pp-actions no-print"><button class="btn ghost small" id="clientPrintPassport">Imprimer / PDF</button></div>'+renderPremiumPassport(passportModelFromClient(s))+'</div>';
+ }else if(clientPortalView==='visios'){
+   main=renderClientVisios(s);
+ }else if(clientPortalView==='suivi'){
+   main=renderClientSuivi(s);
  }else{
-   main='<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><button class="btn ghost small" id="heroPassportBtn">Mon Passeport</button></div></div>'+
-   '<div class="client-grid">'+portalMini('Questionnaire initial',questionnaireStatus,r?.status==='submitted'?'Merci, tes réponses sont disponibles pour le coach.':'À remplir avant la visio.')+
-   portalMini('Prochaine visio',nextAppt?fmtDateTime(nextAppt.starts_at):c.next_visio_at?fmtDateTime(c.next_visio_at):'À planifier','')+
-   portalMini('Cycle actuel',cycle?.title||'À venir',cycle?.priorities||'')+'</div>'+
-   renderClientEngagementBanner(c)+
-   '<div id="clientBookingPanel">'+renderBookingPanel(s)+'</div>'+
-   '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Mon accompagnement</h3>'+
-   '<div class="item"><strong>Pôle</strong>'+esc(c.current_pole||'—')+'</div><div class="item"><strong>Offre</strong>'+esc(c.current_offer||'—')+'</div>'+
-   renderClientWhatsAppButton(s,c)+
-   (c.optitrainer_url?'<button class="btn primary" id="clientOpti" style="margin-top:10px">Ouvrir mon entraînement Optitrainer</button>':'<div class="muted tiny" style="margin-top:10px">Le lien Optitrainer sera ajouté par le coach.</div>')+
-   '</div><div class="card panel"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,5).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div></div>'+
-   '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Mon questionnaire initial</h3><div class="muted tiny">'+esc(t?.description||'')+'</div></div>'+status(r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon':'À compléter')+'</div>'+
-   (t?renderClientQuestionnaire(t,r?.answers||{}):'<div class="muted" style="margin-top:12px">Aucun questionnaire actif pour ce pôle.</div>')+
-   '</div>'+
-   renderClientWeeklyCheckin(s)+
-   '<div class="card panel" style="margin-top:13px"><h3>Mon parcours AK PRIME</h3><div class="timeline">'+((s.events||[]).length?s.events.map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton historique apparaîtra ici au fil de l’accompagnement.</div>')+'</div></div>'+
-   '</div>';
+   main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav+'<div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
- document.getElementById('clientHomeNav')?.addEventListener('click',()=>{clientPortalView='home';renderClientPortal()});
- document.getElementById('clientPassportNav')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
- document.getElementById('heroPassportBtn')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
- document.getElementById('engagementPassportBtn')?.addEventListener('click',()=>{clientPortalView='passport';renderClientPortal()});
+ document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+nav.bottom+'</div>';
+ document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
+ document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
+ document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
+ document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
- document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';showAuth()};
+ document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
@@ -989,34 +1065,56 @@ function renderBookingPanel(s){
  const all=(s.appointments||[]).slice().sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const future=all.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>new Date());
  const next=future[0];
- const history=all.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)||new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,8);
- const slots=(s.availableSlots||[]).slice(0,60);
+ const history=all.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)||new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,10);
+ const slots=(s.availableSlots||[]).slice();
  const policy=s.bookingPolicy||{};
  const quotaText=policy.quota_period==='week'
    ? (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par semaine'
    : (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par mois';
- const grouped={};for(const sl of slots){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
+ const today=new Date();today.setHours(0,0,0,0);
+ const weeks=[[],[],[]];
+ for(const sl of slots){
+   const d=new Date(sl.starts_at),local=new Date(d.toLocaleString('en-US',{timeZone:'Europe/Paris'}));local.setHours(0,0,0,0);
+   const idx=Math.max(0,Math.min(2,Math.floor((local-today)/604800000)));
+   weeks[idx].push(sl);
+ }
+ if(clientVisioWeek<0||clientVisioWeek>2)clientVisioWeek=0;
+ const weekSlots=weeks[clientVisioWeek]||[];
+ const byDate={};
+ for(const sl of weekSlots){const key=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(byDate[key]||(byDate[key]=[])).push(sl)}
+ const dates=Object.keys(byDate).sort();
+ if(!dates.includes(clientVisioDay))clientVisioDay=dates[0]||'';
+ const selected=clientVisioDay?byDate[clientVisioDay]||[]:[];
  const nextActions=next?(()=>{
    const h=hoursUntil(next.starts_at),late=h<24;
-   return '<div class="alert '+(late?'':'blue')+'" style="margin-top:10px"><div class="row between"><div><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
-   (late?'<div class="tiny" style="margin-top:8px;color:#8a5b00">À moins de 24 h, la visio ne peut plus être déplacée automatiquement. Une annulation reste comptabilisée dans ton quota.</div>':'<div class="tiny" style="margin-top:8px">Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant le rendez-vous.</div>')+
-   '<div class="row" style="margin-top:9px;flex-wrap:wrap">'+
+   return '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">'+fmtDateTime(next.starts_at)+'</strong><div class="muted tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
+   (late?'<div class="alert" style="margin-top:10px"><div class="tiny">À moins de 24 h, le déplacement automatique est fermé. Une annulation reste comptabilisée dans ton quota.</div></div>':'<div class="muted tiny" style="margin-top:9px">Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant.</div>')+
+   '<div class="row" style="margin-top:10px;flex-wrap:wrap">'+
    (!late?'<button class="btn ghost small clientRescheduleVisio" data-id="'+next.id+'">Déplacer</button>':'')+
    '<button class="btn danger small clientCancelVisio" data-id="'+next.id+'" data-late="'+(late?'1':'0')+'">Annuler</button>'+
-   (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="text-decoration:none">📹 Rejoindre sur WhatsApp</a>':'')+
+   (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="text-decoration:none">📹 WhatsApp</a>':'')+
    '</div></div>';
- })():'';
+ })():'<div class="client-section-card" style="margin-top:0"><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Aucune visio réservée</strong><div class="muted tiny" style="margin-top:5px">Choisis un créneau ci-dessous.</div></div>';
+ const weekButtons=[0,1,2].map(i=>'<button class="clientWeekBtn '+(clientVisioWeek===i?'on':'')+'" data-week="'+i+'">Semaine '+(i+1)+' <span class="tiny" style="opacity:.7">('+weeks[i].length+')</span></button>').join('');
+ const dayButtons=dates.map(date=>{
+   const d=new Date(date+'T12:00:00');
+   const wd=new Intl.DateTimeFormat('fr-FR',{weekday:'short'}).format(d);
+   const dm=new Intl.DateTimeFormat('fr-FR',{day:'2-digit',month:'2-digit'}).format(d);
+   return '<button class="client-day-btn clientDayBtn '+(clientVisioDay===date?'on':'')+'" data-date="'+date+'"><strong>'+esc(wd)+'</strong><span>'+esc(dm)+' • '+byDate[date].length+'</span></button>';
+ }).join('');
+ const timeButtons=selected.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('');
  const hist=history.length?history.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join(''):'<div class="muted">Aucune visio dans l’historique.</div>';
- return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés respectent automatiquement ton offre et les disponibilités du coach.</div></div><span class="status green">Temps réel</span></div>'+
- '<div class="alert blue" style="margin-top:12px"><strong>Ton offre : '+esc(quotaText)+'</strong><div class="tiny" style="margin-top:4px">Durée : '+esc(policy.duration_minutes||30)+' min. Les annulations à moins de 24 h et les absences restent comptabilisées.</div></div>'+
- nextActions+
- '<div class="section-title">Créneaux disponibles sur les 3 prochaines semaines</div>'+
- (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible actuellement. Ton quota peut aussi être déjà utilisé pour les périodes affichées.</div>')+
- '<div class="section-title">Historique de mes visios</div><div class="list">'+hist+'</div>'+
- '</div>';
+ return nextActions+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Réserver une visio</h3><div class="muted tiny">'+esc(quotaText)+' • '+esc(policy.duration_minutes||30)+' min</div></div><span class="status blue">3 semaines</span></div>'+
+ '<div class="client-week-tabs">'+weekButtons+'</div>'+
+ (weekSlots.length?'<div class="client-day-strip">'+dayButtons+'</div><div class="section-title" style="margin-top:6px">Horaires disponibles</div><div class="client-time-grid">'+timeButtons+'</div>':'<div class="muted" style="padding:16px 0">Aucun créneau disponible sur cette semaine.</div>')+
+ '<div class="muted tiny" style="margin-top:13px">Une annulation à moins de 24 h ou une absence reste comptabilisée dans ton quota.</div></div>'+
+ '<details class="client-collapsed" style="margin-top:13px"><summary>Historique de mes visios <span class="muted tiny">('+history.length+')</span></summary><div class="list" style="margin-top:12px">'+hist+'</div></details>';
 }
 
 function bindBookingButtons(){
+ document.querySelectorAll('.clientWeekBtn').forEach(b=>b.onclick=()=>{clientVisioWeek=Number(b.dataset.week)||0;clientVisioDay='';const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}});
+ document.querySelectorAll('.clientDayBtn').forEach(b=>b.onclick=()=>{clientVisioDay=b.dataset.date||'';const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}});
  document.querySelectorAll('.bookSlot').forEach(b=>b.onclick=async()=>{
    const start=b.dataset.start;
    if(!confirm('Réserver la visio du '+fmtDateTime(start)+' ?'))return;
@@ -1028,6 +1126,7 @@ function bindBookingButtons(){
  document.querySelectorAll('.clientCancelVisio').forEach(b=>b.onclick=()=>openClientCancelVisio(b.dataset.id,b.dataset.late==='1'));
  document.querySelectorAll('.clientRescheduleVisio').forEach(b=>b.onclick=()=>openClientRescheduleVisio(b.dataset.id));
 }
+
 async function openClientCancelVisio(id,isLate){
  const a=(clientPortalState?.appointments||[]).find(x=>x.id===id);if(!a)return;
  modal('Annuler la visio',
@@ -1074,8 +1173,13 @@ async function refreshClientBookingData(){
  if(!slots.error)clientPortalState.availableSlots=slots.data||[];
  if(!appts.error)clientPortalState.appointments=appts.data||[];
  if(!policy.error)clientPortalState.bookingPolicy=(policy.data||[])[0]||clientPortalState.bookingPolicy;
- const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}
+ if(clientPortalView==='visios'){
+   const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}
+ }else if(clientPortalView==='home'||clientPortalView==='passport'){
+   renderClientPortal();
+ }
 }
+
 async function subscribeCalendarRealtime(mode){
  if(calendarChannel)await supa.removeChannel(calendarChannel);
  calendarChannel=supa.channel('akprime-calendar-'+mode+'-'+Math.random().toString(36).slice(2,7))
