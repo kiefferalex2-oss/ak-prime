@@ -79,6 +79,7 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx';
 const supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let authUser=null;
 let authProfile=null;
+let calendarChannel=null;
 
 const STORAGE_KEY='akprime-backoffice-v2';
 
@@ -141,10 +142,13 @@ async function loadSupabaseData(){
    supa.from('client_workspace').select('*'),
    supa.from('questionnaire_responses').select('*').order('submitted_at',{ascending:false}),
    supa.from('profiles').select('id,role,full_name,email'),
-   supa.from('onboarding').select('*')
+   supa.from('onboarding').select('*'),
+   supa.from('availability_windows').select('*').eq('coach_user_id',authUser.id).order('weekday').order('start_time'),
+   supa.from('availability_exceptions').select('*').eq('coach_user_id',authUser.id).order('exception_date'),
+   supa.from('appointments').select('*').eq('coach_user_id',authUser.id).order('starts_at')
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const [cr,tr,cyr,chr,er,wr,qr,pr,obr]=reqs.map(r=>r.data||[]);
+ const [cr,tr,cyr,chr,er,wr,qr,pr,obr,awr,aer,apr]=reqs.map(r=>r.data||[]);
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
@@ -169,6 +173,9 @@ async function loadSupabaseData(){
  });
  if(state.clientId&&!db.clients.some(x=>x.id===state.clientId))state.clientId=null;
  if(!state.clientId)state.clientId=db.clients[0]?.id||null;
+ db.availabilityWindows=awr;
+ db.availabilityExceptions=aer;
+ db.appointments=apr.map(a=>({...a,clientName:db.clients.find(c=>c.id===a.client_id)?.name||'Client'}));
 }
 async function saveWorkspace(client){
  const row={client_id:client.id,deep_flags:client.deep||{},offer_notes:client.offerNotes||{},visio_summary:client.visioNotes||null,coach_decisions:client.decisions||null,private_note:client.privateNote||null,renewal_choice:client.renewal||'3 mois'};
@@ -199,7 +206,10 @@ async function persistPath(client,path,value){
 }
 function saveDB(msg){if(msg)toast(msg);}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg||'Enregistré';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
-function fmtDate(v){if(!v)return '—';const p=v.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:v}
+function fmtDate(v){if(!v)return '—';const p=String(v).slice(0,10).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:v}
+function localDateISO(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
+function fmtDateTime(v){if(!v)return '—';return new Intl.DateTimeFormat('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(v))}
+function fmtTime(v){if(!v)return '—';return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(v))}
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -450,8 +460,20 @@ function globalTests(){
  return '<div class="page-title"><div><h1>Tests</h1><p>Vue transversale de tous les résultats enregistrés.</p></div></div><div class="card" style="overflow:auto"><table><thead><tr><th>Client</th><th>Test</th><th>Date</th><th>Résultat</th><th>Contexte</th></tr></thead><tbody>'+all.map(t=>'<tr><td>'+esc(t.client)+'</td><td>'+esc(t.name)+'</td><td>'+fmtDate(t.date)+'</td><td>'+esc(t.value)+' '+esc(t.unit||'')+'</td><td>'+esc(t.context||'')+'</td></tr>').join('')+'</tbody></table></div>';
 }
 function calendarPage(){
- const list=activeClients().filter(c=>c.next).sort((a,b)=>a.next.localeCompare(b.next));
- return '<div class="page-title"><div><h1>Calendrier</h1><p>V1 : échéances principales. Le vrai système de réservation sera branché plus tard.</p></div></div><div class="card panel"><div class="list">'+list.map(c=>'<div class="item row between"><div><strong>'+fmtDate(c.next)+' — '+esc(c.name)+'</strong><div class="muted tiny">'+esc(c.offer)+' / '+esc(c.pole)+'</div></div><button class="link openClient" data-id="'+c.id+'">Dossier</button></div>').join('')+'</div></div>';
+ const days=[['Lundi',1],['Mardi',2],['Mercredi',3],['Jeudi',4],['Vendredi',5],['Samedi',6],['Dimanche',7]];
+ const windows=db.availabilityWindows||[], exceptions=db.availabilityExceptions||[];
+ const upcoming=(db.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const weekly=days.map(([label,n])=>{
+   const rows=windows.filter(w=>w.weekday===n).map(w=>'<div class="item" style="padding:9px"><div class="row between"><div><strong>'+esc(String(w.start_time).slice(0,5))+'–'+esc(String(w.end_time).slice(0,5))+'</strong><div class="tiny muted">Disponible chaque '+label.toLowerCase()+'</div></div><button class="link deleteAvailability" data-id="'+w.id+'">Retirer</button></div></div>').join('');
+   return '<div class="card panel" style="min-width:180px"><div class="row between"><h3 style="margin:0">'+label+'</h3><button class="btn ghost small addAvailability" data-day="'+n+'">+</button></div><div class="list" style="margin-top:10px">'+(rows||'<div class="muted tiny">Aucune disponibilité</div>')+'</div></div>';
+ }).join('');
+ const exRows=exceptions.map(e=>'<div class="item row between"><div><strong>'+fmtDate(e.exception_date)+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée entière')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>').join('');
+ const apptRows=upcoming.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><div class="row"><button class="link openClient" data-id="'+a.client_id+'">Dossier</button><button class="link cancelAppointment" data-id="'+a.id+'" data-client-id="'+a.client_id+'">Annuler</button></div></div>').join('');
+ return '<div class="page-title"><div><h1>Calendrier & disponibilités</h1><p>Tu définis ici les créneaux que les clients peuvent réserver.</p></div><button class="btn primary" id="addException">Bloquer une date / un créneau</button></div>'+
+ '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Disponibilités hebdomadaires</h3><div class="muted tiny">Les créneaux sont proposés automatiquement aux clients selon la durée de leur visio.</div></div><span class="status green">Synchronisé en temps réel</span></div>'+
+ '<div style="display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:10px;overflow:auto;margin-top:14px;padding-bottom:4px">'+weekly+'</div></div>'+
+ '<div class="grid2"><div class="card panel"><h3>Indisponibilités ponctuelles</h3><div class="list">'+(exRows||'<div class="muted">Aucune exception enregistrée.</div>')+'</div></div>'+
+ '<div class="card panel"><h3>Rendez-vous à venir</h3><div class="list">'+(apptRows||'<div class="muted">Aucune visio réservée.</div>')+'</div></div></div>';
 }
 function backupPage(){
  return '<div class="page-title"><div><h1>Sauvegardes</h1><p>La base principale est maintenant Supabase.</p></div></div>'+
@@ -473,13 +495,18 @@ function render(){
  bind();
 }
 function bind(){
- document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{state.view=b.dataset.nav;render()});
+ document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}render()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab='overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
  document.querySelectorAll('.quickTab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
  document.querySelectorAll('.accBtn').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'));
  document.getElementById('newClient')?.addEventListener('click',openNewClient);
+ document.querySelectorAll('.addAvailability').forEach(b=>b.onclick=()=>openAvailabilityModal(Number(b.dataset.day)));
+ document.querySelectorAll('.deleteAvailability').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_windows').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Disponibilité retirée');render()});
+ document.getElementById('addException')?.addEventListener('click',openExceptionModal);
+ document.querySelectorAll('.deleteException').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_exceptions').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Indisponibilité retirée');render()});
+ document.querySelectorAll('.cancelAppointment').forEach(b=>b.onclick=async()=>{if(!confirm('Annuler cette visio ?'))return;const {error}=await supa.from('appointments').update({status:'cancelled'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);const future=(db.appointments||[]).filter(a=>a.client_id===b.dataset.clientId&&a.id!==b.dataset.id&&a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];await supa.from('clients').update({next_visio_at:future?.starts_at||null}).eq('id',b.dataset.clientId);await loadSupabaseData();toast('Visio annulée');render()});
  const cs=document.getElementById('clientSearch');if(cs)cs.oninput=e=>{state.search=e.target.value;render()};
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
@@ -510,7 +537,7 @@ function bind(){
  document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
  document.getElementById('exportData')?.addEventListener('click',exportData);
  document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;toast('Paramètre enregistré pour cette session')});
- document.getElementById('logoutBtn')?.addEventListener('click',async()=>{await supa.auth.signOut();authUser=null;authProfile=null;showAuth()});
+ document.getElementById('logoutBtn')?.addEventListener('click',async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;showAuth()});
 }
 function setPath(obj,path,val){const parts=path.split('.');let cur=obj;for(let i=0;i<parts.length-1;i++){cur[parts[i]]=cur[parts[i]]||{}}cur[parts.at(-1)]=val}
 
@@ -519,6 +546,22 @@ function modal(title,body,foot){
  document.getElementById('closeModal').onclick=closeModal;document.getElementById('modalWrap').onclick=e=>{if(e.target.id==='modalWrap')closeModal()};
 }
 function closeModal(){document.getElementById('modalRoot').innerHTML=''}
+function openAvailabilityModal(day){
+ const names={1:'Lundi',2:'Mardi',3:'Mercredi',4:'Jeudi',5:'Vendredi',6:'Samedi',7:'Dimanche'};
+ modal('Ajouter une disponibilité — '+names[day],
+ '<div class="grid2"><div class="field"><label>Début</label><input id="avStart" type="time" class="input" value="18:00"></div><div class="field"><label>Fin</label><input id="avEnd" type="time" class="input" value="20:00"></div></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{const start=document.getElementById('avStart').value,end=document.getElementById('avEnd').value;if(!start||!end||end<=start)return toast('Horaires invalides');const {error}=await supa.from('availability_windows').insert({coach_user_id:authUser.id,weekday:day,start_time:start,end_time:end});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Disponibilité ajoutée');render()};
+}
+function openExceptionModal(){
+ modal('Bloquer une date / un créneau',
+ '<div class="field"><label>Date</label><input id="exDate" type="date" class="input"></div><div class="grid2"><div class="field"><label>Début (laisser vide pour la journée entière)</label><input id="exStart" type="time" class="input"></div><div class="field"><label>Fin</label><input id="exEnd" type="time" class="input"></div></div><div class="field"><label>Note facultative</label><input id="exNote" class="input" placeholder="Ex. indisponible, déplacement…"></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Bloquer</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{const date=document.getElementById('exDate').value,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim();if(!date)return toast('Date requise');if((start&&!end)||(!start&&end)||(start&&end&&end<=start))return toast('Créneau invalide');const {error}=await supa.from('availability_exceptions').insert({coach_user_id:authUser.id,exception_date:date,start_time:start||null,end_time:end||null,note:note||null});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Indisponibilité ajoutée');render()};
+}
+
 function openNewClient(){
  modal('Nouveau client',
  '<div class="grid2"><div class="field"><label>Nom et prénom</label><input id="mName" class="input"></div><div class="field"><label>E-mail</label><input id="mEmail" class="input"></div>'+
@@ -591,18 +634,20 @@ async function enterClientPortal(user,profile){
  const {data:client,error}=await supa.from('clients').select('*').eq('auth_user_id',user.id).maybeSingle();
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte est confirmé mais il n’est pas encore relié à ton dossier AK PRIME. Utilise la même adresse e-mail que celle communiquée au coach, puis attends la liaison du compte.');return}
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes]=await Promise.all([
+ const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+30); const endDate=localDateISO(end);
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
    supa.from('cycles').select('*').eq('client_id',client.id).order('start_date',{ascending:false}).limit(1).maybeSingle(),
    supa.from('passport_events').select('*').eq('client_id',client.id).eq('client_visible',true).order('event_date',{ascending:false}),
    supa.from('appointments').select('*').eq('client_id',client.id).order('starts_at',{ascending:true}),
-   supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false})
+   supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false}),
+   supa.rpc('get_my_available_slots',{p_from:today,p_to:endDate})
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[]};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[]};
  renderClientPortal();
 }
 function showClientPending(message){
@@ -617,8 +662,9 @@ function renderClientPortal(){
  '<div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div><div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+
  '<div class="client-main"><div class="client-hero"><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div>'+
  '<div class="client-grid">'+portalMini('Questionnaire initial',questionnaireStatus,r?.status==='submitted'?'Merci, tes réponses sont disponibles pour le coach.':'À remplir avant la visio.')+
- portalMini('Prochaine visio',nextAppt?fmtDate(String(nextAppt.starts_at).slice(0,10)):c.next_visio_at?fmtDate(String(c.next_visio_at).slice(0,10)):'À planifier','')+
+ portalMini('Prochaine visio',nextAppt?fmtDateTime(nextAppt.starts_at):c.next_visio_at?fmtDateTime(c.next_visio_at):'À planifier','')+
  portalMini('Cycle actuel',cycle?.title||'À venir',cycle?.priorities||'')+'</div>'+
+ '<div id="clientBookingPanel">'+renderBookingPanel(s)+'</div>'+
  '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Mon accompagnement</h3>'+
  '<div class="item"><strong>Pôle</strong>'+esc(c.current_pole||'—')+'</div><div class="item"><strong>Offre</strong>'+esc(c.current_offer||'—')+'</div>'+
  (c.optitrainer_url?'<button class="btn primary" id="clientOpti" style="margin-top:10px">Ouvrir mon entraînement Optitrainer</button>':'<div class="muted tiny" style="margin-top:10px">Le lien Optitrainer sera ajouté par le coach.</div>')+
@@ -629,12 +675,57 @@ function renderClientPortal(){
  renderClientWeeklyCheckin(s)+
  '<div class="card panel" style="margin-top:13px"><h3>Mon parcours AK PRIME</h3><div class="timeline">'+((s.events||[]).length?s.events.map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton historique apparaîtra ici au fil de l’accompagnement.</div>')+'</div></div>'+
  '</div></div>';
- document.getElementById('clientLogout').onclick=async()=>{await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;showAuth()};
+ document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
+ bindBookingButtons();
+ subscribeCalendarRealtime('client');
 }
+function renderBookingPanel(s){
+ const future=(s.appointments||[]).filter(a=>a.status!=='cancelled'&&new Date(a.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const next=future[0];
+ const slots=(s.availableSlots||[]).slice(0,24);
+ const grouped={};for(const sl of slots){const d=new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'2-digit',month:'long',timeZone:'Europe/Paris'}).format(new Date(sl.starts_at));(grouped[d]||(grouped[d]=[])).push(sl)}
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Réserver une visio</h3><div class="muted tiny">Les créneaux affichés sont disponibles au moment où tu les vois. Ils se mettent à jour automatiquement si quelqu’un réserve.</div></div><span class="status green">Temps réel</span></div>'+
+ (next?'<div class="alert blue" style="margin-top:12px"><strong>Prochaine visio : '+fmtDateTime(next.starts_at)+'</strong><div class="tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(next.status==='scheduled'?'Réservée':next.status)+'</div></div>':'')+
+ '<div class="section-title">Créneaux disponibles sur les 30 prochains jours</div>'+
+ (slots.length?Object.entries(grouped).map(([day,list])=>'<div class="item" style="margin-bottom:8px"><strong style="text-transform:capitalize">'+esc(day)+'</strong><div class="row" style="flex-wrap:wrap;margin-top:8px">'+list.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('')+'</div></div>').join(''):'<div class="muted">Aucun créneau disponible pour le moment. Le coach peut en ajouter depuis son calendrier.</div>')+
+ '</div>';
+}
+function bindBookingButtons(){
+ document.querySelectorAll('.bookSlot').forEach(b=>b.onclick=async()=>{
+   const start=b.dataset.start;
+   if(!confirm('Réserver la visio du '+fmtDateTime(start)+' ?'))return;
+   b.disabled=true;
+   const {error}=await supa.rpc('book_my_appointment',{p_starts_at:start});
+   if(error){alert(error.message||'Ce créneau n’est plus disponible.');await refreshClientBookingData();return}
+   await refreshClientBookingData();alert('Visio réservée.');
+ });
+}
+async function refreshClientBookingData(){
+ if(!clientPortalState?.client)return;
+ const today=localDateISO(),end=new Date();end.setDate(end.getDate()+30);
+ const [slots,appts]=await Promise.all([
+   supa.rpc('get_my_available_slots',{p_from:today,p_to:localDateISO(end)}),
+   supa.from('appointments').select('*').eq('client_id',clientPortalState.client.id).order('starts_at',{ascending:true})
+ ]);
+ if(!slots.error)clientPortalState.availableSlots=slots.data||[];
+ if(!appts.error)clientPortalState.appointments=appts.data||[];
+ const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}
+}
+async function subscribeCalendarRealtime(mode){
+ if(calendarChannel)await supa.removeChannel(calendarChannel);
+ calendarChannel=supa.channel('akprime-calendar-'+mode+'-'+Math.random().toString(36).slice(2,7))
+   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'calendar_version'},async()=>{
+     if(mode==='client')await refreshClientBookingData();
+     else {
+       try{await loadSupabaseData();if(state.view==='calendar'||state.view==='dashboard')render()}catch(e){}
+     }
+   }).subscribe();
+}
+
 function currentWeekFriday(){
  const d=new Date(); const day=d.getDay(); const diff=(5-day+7)%7; d.setDate(d.getDate()+diff);
  return d.toISOString().slice(0,10);
@@ -763,6 +854,7 @@ async function enterApp(user){
  try{
    await loadSupabaseData();
    state.view='dashboard';render();
+   subscribeCalendarRealtime('coach');
  }catch(e){
    showAuth('Connexion réussie, mais impossible de charger la base AK PRIME : '+e.message,true);
  }
@@ -771,7 +863,7 @@ async function initAuth(){
  const {data:{session}}=await supa.auth.getSession();
  if(session?.user) await enterApp(session.user); else showAuth();
  supa.auth.onAuthStateChange(async(event,session)=>{
-   if(event==='SIGNED_OUT'){authUser=null;authProfile=null;showAuth()}
+   if(event==='SIGNED_OUT'){if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}authUser=null;authProfile=null;clientPortalState=null;showAuth()}
  });
 }
 
