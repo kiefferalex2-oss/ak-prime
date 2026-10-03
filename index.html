@@ -162,7 +162,7 @@ async function loadSupabaseData(){
      decisions:ws.coach_decisions||'',privateNote:ws.private_note||'',
      tests:(tests[x.id]||[]).map(t=>({id:t.id,name:t.test_name,date:isoDate(t.performed_at),value:t.result_value??t.result_text??'',unit:t.unit||'',context:t.context||'',note:t.coach_interpretation||''})),
      cycle:{_id:cy.id||'',title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||'',optitrainer:x.optitrainer_url||''},
-     checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',coach:w.coach_decision||w.coach_feedback||''})),
+     checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',problem:w.exercise_problem||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',other:w.other_info||'',coach:w.coach_feedback||w.coach_decision||'',reviewedAt:w.reviewed_at||''})),
      events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
      adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois'
    };
@@ -276,8 +276,9 @@ function dashboard(){
  const testsTodo=db.clients.filter(c=>c.onboarding?.currentStep==='tests');
  const programmingTodo=db.clients.filter(c=>c.onboarding?.currentStep==='programming');
  const questionnaireTodo=db.clients.filter(c=>c.onboarding?.currentStep==='questionnaire');
- const checkinTodo=acts.filter(c=>!c.checkins?.length || (now-new Date(c.checkins.slice().sort((a,b)=>b.date.localeCompare(a.date))[0].date+'T12:00:00'))>7*86400000);
- const tasks=[...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
+ const pendingCheckins=acts.flatMap(c=>(c.checkins||[]).filter(w=>!w.reviewedAt).map(w=>({c,w})));
+ const checkinTodo=pendingCheckins.length;
+ const tasks=[...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
  return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="kpis">'+
  kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
@@ -286,7 +287,7 @@ function dashboard(){
  '<div class="card panel"><h3>Actions prioritaires</h3><div class="list">'+(tasks.length?tasks.map(x=>'<div class="item row between"><div><strong>'+esc(x.c.name)+'</strong><div class="muted tiny">'+esc(x.label)+'</div></div><button class="link openClient" data-id="'+x.c.id+'">Ouvrir</button></div>').join(''):'<div class="alert green">Aucune action d’onboarding urgente.</div>')+'</div></div>'+
  '<div class="card panel"><h3>Prochaines visios</h3><div class="list">'+(next.length?next.map(c=>'<div class="item row between"><div><strong>'+esc(c.name)+'</strong><span class="muted tiny">'+esc(c.offer)+' — '+fmtDate(c.next)+'</span></div><button class="link openClient" data-id="'+c.id+'">Ouvrir</button></div>').join(''):'<div class="muted">Aucune visio planifiée.</div>')+'</div></div>'+
  '</div><div class="grid3" style="margin-top:13px">'+
- '<div class="card panel"><h3>Suivis à traiter</h3><div class="kpi"><div class="val">'+checkinTodo.length+'</div><div class="sub">client(s) sans check-in récent</div></div></div>'+
+ '<div class="card panel"><h3>Check-ins à traiter</h3><div class="kpi"><div class="val">'+checkinTodo+'</div><div class="sub">bilan(s) client en attente de retour</div></div></div>'+
  '<div class="card panel"><h3>Renouvellements J-14</h3><div class="kpi"><div class="val">'+ending.length+'</div><div class="sub">engagement(s) à revoir</div></div></div>'+
  '<div class="card panel"><h3>Clients actifs</h3><div class="kpi"><div class="val">'+acts.length+'</div><div class="sub">accompagnements en cours</div></div></div></div>';
 }
@@ -387,7 +388,7 @@ function follow(c){
  fieldArea('Priorités','cycle.priorities',cy.priorities)+fieldArea('Points de vigilance','cycle.vigilance',cy.vigilance)+fieldInput('Lien Optitrainer','cycle.optitrainer',cy.optitrainer)+
  '<button class="btn primary small" id="openOpti">Ouvrir Optitrainer</button></div>'+
  '<div class="card panel" style="margin-top:13px"><div class="row between"><h3>Historique check-ins</h3><button class="btn ghost small" id="addCheckin">+ Check-in</button></div>'+
- '<div class="list">'+((c.checkins||[]).length?c.checkins.slice().reverse().map(w=>'<div class="item"><div class="row between"><strong>Semaine du '+fmtDate(w.date)+'</strong><button class="link deleteCheckin" data-id="'+w.id+'">Suppr.</button></div><div class="tiny"><b>Ressenti :</b> '+esc(w.feeling||'')+'</div><div class="tiny"><b>Gêne :</b> '+esc(w.pain||'')+'</div><div class="tiny"><b>Contrainte suivante :</b> '+esc(w.nextConstraint||'')+'</div><div class="tiny" style="margin-top:5px"><b>Décision coach :</b> '+esc(w.coach||'')+'</div></div>').join(''):'<div class="muted">Aucun check-in enregistré.</div>')+'</div></div></div>'+
+ '<div class="list">'+((c.checkins||[]).length?c.checkins.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(w=>'<div class="item"><div class="row between"><div><strong>Semaine du '+fmtDate(w.date)+'</strong><div class="tiny '+(w.reviewedAt?'account-good':'account-wait')+'">'+(w.reviewedAt?'Traité':'À traiter')+'</div></div><button class="link deleteCheckin" data-id="'+w.id+'">Suppr.</button></div><div class="tiny"><b>Ressenti :</b> '+esc(w.feeling||'—')+'</div><div class="tiny"><b>Séances non réalisées :</b> '+esc(w.missed||'—')+'</div><div class="tiny"><b>Problème exercice/séance :</b> '+esc(w.problem||'—')+'</div><div class="tiny"><b>Gêne / douleur :</b> '+esc(w.pain||'—')+'</div><div class="tiny"><b>Contrainte suivante :</b> '+esc(w.nextConstraint||'—')+'</div><div class="tiny"><b>Autre :</b> '+esc(w.other||'—')+'</div><div class="field" style="margin-top:9px"><label>Retour / décision coach</label><textarea class="textarea coachCheckinFeedback" data-id="'+w.id+'">'+esc(w.coach||'')+'</textarea></div><button class="btn primary small reviewCheckin" data-id="'+w.id+'">'+(w.reviewedAt?'Mettre à jour le retour':'Marquer comme traité')+'</button></div>').join(''):'<div class="muted">Aucun check-in enregistré.</div>')+'</div></div></div>'+
  '<div><div class="card panel"><h3>Principe de suivi</h3><div class="alert blue">Optitrainer conserve les séances et données quotidiennes. AK PRIME conserve les décisions, cycles, événements et synthèses utiles à long terme.</div>'+
  '<div class="alert green">Check-in client le vendredi soir → analyse / ajustements le week-end → semaine suivante prête avant lundi.</div></div>'+
  '<div class="card panel" style="margin-top:13px"><h3>Décisions importantes</h3><textarea class="textarea autoSave" data-field="decisions">'+esc(c.decisions||'')+'</textarea></div></div></div>';
@@ -479,6 +480,7 @@ function bind(){
  document.getElementById('addTest')?.addEventListener('click',openAddTest);
  document.querySelectorAll('.deleteTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('tests').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.tests=cl.tests.filter(t=>t.id!==b.dataset.id);toast('Test supprimé');render()});
  document.getElementById('addCheckin')?.addEventListener('click',openCheckin);
+ document.querySelectorAll('.reviewCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const ta=document.querySelector('.coachCheckinFeedback[data-id="'+b.dataset.id+'"]');const feedback=ta?.value.trim()||'';const {error}=await supa.from('checkins').update({coach_feedback:feedback||null,coach_decision:feedback||null,reviewed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);const w=cl.checkins.find(x=>x.id===b.dataset.id);if(w){w.coach=feedback;w.reviewedAt=new Date().toISOString()}toast('Check-in traité');render()});
  document.querySelectorAll('.deleteCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('checkins').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.checkins=cl.checkins.filter(x=>x.id!==b.dataset.id);toast('Check-in supprimé');render()});
  document.getElementById('addEvent')?.addEventListener('click',openEvent);
  document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
@@ -569,17 +571,18 @@ async function enterClientPortal(user,profile){
  const {data:client,error}=await supa.from('clients').select('*').eq('auth_user_id',user.id).maybeSingle();
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte est confirmé mais il n’est pas encore relié à ton dossier AK PRIME. Utilise la même adresse e-mail que celle communiquée au coach, puis attends la liaison du compte.');return}
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
    supa.from('cycles').select('*').eq('client_id',client.id).order('start_date',{ascending:false}).limit(1).maybeSingle(),
    supa.from('passport_events').select('*').eq('client_id',client.id).eq('client_visible',true).order('event_date',{ascending:false}),
-   supa.from('appointments').select('*').eq('client_id',client.id).order('starts_at',{ascending:true})
+   supa.from('appointments').select('*').eq('client_id',client.id).order('starts_at',{ascending:true}),
+   supa.from('checkins').select('*').eq('client_id',client.id).order('week_date',{ascending:false})
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[]};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[]};
  renderClientPortal();
 }
 function showClientPending(message){
@@ -603,13 +606,48 @@ function renderClientPortal(){
  '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Mon questionnaire initial</h3><div class="muted tiny">'+esc(t?.description||'')+'</div></div>'+status(r?.status==='submitted'?'Envoyé':r?.status==='draft'?'Brouillon':'À compléter')+'</div>'+
  (t?renderClientQuestionnaire(t,r?.answers||{}):'<div class="muted" style="margin-top:12px">Aucun questionnaire actif pour ce pôle.</div>')+
  '</div>'+
+ renderClientWeeklyCheckin(s)+
  '<div class="card panel" style="margin-top:13px"><h3>Mon parcours AK PRIME</h3><div class="timeline">'+((s.events||[]).length?s.events.map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton historique apparaîtra ici au fil de l’accompagnement.</div>')+'</div></div>'+
  '</div></div>';
  document.getElementById('clientLogout').onclick=async()=>{await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
+ document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
 }
+function currentWeekFriday(){
+ const d=new Date(); const day=d.getDay(); const diff=(5-day+7)%7; d.setDate(d.getDate()+diff);
+ return d.toISOString().slice(0,10);
+}
+function renderClientWeeklyCheckin(s){
+ const friday=currentWeekFriday();
+ const existing=(s.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
+ if(existing){
+   return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Bilan hebdomadaire</h3><div class="muted tiny">Semaine du '+fmtDate(friday)+'</div></div><span class="status '+(existing.reviewed_at?'green':'blue')+'">'+(existing.reviewed_at?'Traité par le coach':'Envoyé')+'</span></div>'+
+   '<div class="item" style="margin-top:12px"><strong>Ton retour</strong><div class="tiny"><b>Semaine :</b> '+esc(existing.overall_week||'—')+'</div><div class="tiny"><b>Séances non réalisées :</b> '+esc(existing.missed_sessions||'—')+'</div><div class="tiny"><b>Problème exercice/séance :</b> '+esc(existing.exercise_problem||'—')+'</div><div class="tiny"><b>Gêne / douleur :</b> '+esc(existing.pain_or_discomfort||'—')+'</div><div class="tiny"><b>Contrainte semaine suivante :</b> '+esc(existing.next_week_constraints||'—')+'</div></div>'+
+   (existing.coach_feedback||existing.coach_decision?'<div class="alert green" style="margin-top:10px"><strong>Retour coach</strong><div class="tiny" style="margin-top:5px">'+esc(existing.coach_feedback||existing.coach_decision)+'</div></div>':'')+
+   '</div>';
+ }
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Bilan hebdomadaire</h3><div class="muted tiny">Semaine du '+fmtDate(friday)+'</div></div><span class="status amber">À remplir</span></div>'+
+ '<p class="muted tiny">Ce bilan complète les données Optitrainer sans les répéter. Il sert à adapter la semaine suivante.</p>'+
+ '<div class="grid2"><div class="field"><label>Comment s’est passée ta semaine ?</label><textarea id="ciOverall" class="textarea"></textarea></div>'+
+ '<div class="field"><label>As-tu réalisé toutes les séances prévues ? Si non, pourquoi ?</label><textarea id="ciMissed" class="textarea"></textarea></div>'+
+ '<div class="field"><label>Un exercice ou une séance t’a-t-il posé problème ?</label><textarea id="ciProblem" class="textarea"></textarea></div>'+
+ '<div class="field"><label>Douleur, gêne inhabituelle ou évolution à signaler ?</label><textarea id="ciPain" class="textarea"></textarea></div>'+
+ '<div class="field"><label>As-tu une contrainte particulière la semaine prochaine ?</label><textarea id="ciConstraint" class="textarea"></textarea></div>'+
+ '<div class="field"><label>Autre chose à signaler ou à adapter ?</label><textarea id="ciOther" class="textarea"></textarea></div></div>'+
+ '<div class="row between"><span class="portal-note">Le coach analysera ton bilan avec tes données d’entraînement.</span><button class="btn primary" id="submitWeeklyCheckin">Envoyer mon bilan</button></div></div>';
+}
+async function submitClientWeeklyCheckin(){
+ const s=clientPortalState;if(!s?.client)return;
+ const friday=currentWeekFriday();
+ const row={client_id:s.client.id,week_date:friday,overall_week:document.getElementById('ciOverall')?.value.trim()||null,missed_sessions:document.getElementById('ciMissed')?.value.trim()||null,exercise_problem:document.getElementById('ciProblem')?.value.trim()||null,pain_or_discomfort:document.getElementById('ciPain')?.value.trim()||null,next_week_constraints:document.getElementById('ciConstraint')?.value.trim()||null,other_info:document.getElementById('ciOther')?.value.trim()||null};
+ if(!row.overall_week&&!row.missed_sessions&&!row.exercise_problem&&!row.pain_or_discomfort&&!row.next_week_constraints&&!row.other_info){alert('Ajoute au moins une information avant d’envoyer le bilan.');return}
+ const {data,error}=await supa.from('checkins').insert(row).select().single();
+ if(error){alert(error.code==='23505'?'Ton bilan de cette semaine a déjà été envoyé.':'Impossible d’enregistrer le bilan : '+error.message);return}
+ s.checkins=[data,...(s.checkins||[])];alert('Bilan envoyé au coach.');renderClientPortal();
+}
+
 function portalMini(title,value,sub){
  return '<div class="card panel"><div class="muted tiny">'+esc(title)+'</div><div style="font-size:19px;font-weight:900;margin-top:4px">'+esc(value||'—')+'</div>'+(sub?'<div class="muted tiny" style="margin-top:5px">'+esc(sub)+'</div>':'')+'</div>';
 }
