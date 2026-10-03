@@ -95,19 +95,27 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .questionnaire-done{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #bfe7d4;background:#f5fbf8;border-radius:14px;padding:15px}.questionnaire-done .checkmark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#dff5e9;color:#13764f;font-size:20px;font-weight:950;flex:0 0 auto}
 .questionnaire-answers{display:grid;gap:8px;margin-top:12px}.questionnaire-answer{border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff}.questionnaire-answer strong{display:block;font-size:12px;margin-bottom:4px}.questionnaire-answer div{font-size:13px;line-height:1.45;color:#475467}
 .client-bottom-nav{display:none}
+.client-mobile-menu-toggle{display:none}
+.client-mobile-menu{display:none}
 .client-mobile-spacer{display:none}
 @media(max-width:760px){
  .client-grid,.client-summary-grid{grid-template-columns:1fr}
- .client-top{align-items:center;padding:13px 14px}.client-top .client-nav{display:none}.client-top .tiny{display:none}
- .client-main{padding:16px 12px 92px}.scale-wrap{grid-template-columns:1fr}.portal-actions{justify-content:stretch}.portal-actions .btn{flex:1}
+ .client-top{align-items:center;padding:12px 13px;position:sticky;top:0;z-index:80;box-shadow:0 8px 24px rgba(5,12,20,.16)}
+ .client-top .client-nav{display:none}.client-top .tiny{display:none}
+ .client-main{padding:16px 12px 34px}.scale-wrap{grid-template-columns:1fr}.portal-actions{justify-content:stretch}.portal-actions .btn{flex:1}
  .client-hero{padding:17px;border-radius:15px}.client-hero h1{font-size:23px}
  .client-home-actions{grid-template-columns:1fr}
  .client-time-grid{grid-template-columns:repeat(3,1fr)}
  .client-page-head h2{font-size:21px}
  .client-engagement{align-items:flex-start;flex-direction:column}
- .client-bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:0;right:0;bottom:0;z-index:70;background:rgba(9,20,33,.97);backdrop-filter:blur(10px);border-top:1px solid #26384b;padding:7px 6px max(7px,env(safe-area-inset-bottom))}
- .client-bottom-nav button{border:0;background:transparent;color:#8fa1b8;padding:6px 3px;font-size:10px;font-weight:800;cursor:pointer}.client-bottom-nav button span{display:block;font-size:19px;line-height:1.1;margin-bottom:3px}.client-bottom-nav button.on{color:#efc477}
- .client-mobile-spacer{display:block;height:10px}
+ .client-bottom-nav{display:none!important}
+ .client-mobile-menu-toggle{display:flex;align-items:center;gap:7px;border:1px solid #314458;background:#122235;color:#fff;border-radius:10px;padding:8px 10px;font-weight:850;cursor:pointer}
+ .client-mobile-menu-toggle .chev{font-size:11px;color:#d8b16d}
+ .client-mobile-menu{display:block;position:absolute;top:calc(100% + 7px);left:12px;right:12px;background:#0d1827;border:1px solid #2b3b4c;border-radius:14px;padding:8px;box-shadow:0 18px 50px rgba(0,0,0,.32)}
+ .client-mobile-menu button{width:100%;border:0;background:transparent;color:#c7d2de;text-align:left;padding:12px 13px;border-radius:9px;font-weight:850;cursor:pointer}
+ .client-mobile-menu button+button{margin-top:3px}
+ .client-mobile-menu button.on{background:#d5aa63;color:#0b1218}
+ .client-mobile-menu button span{display:inline-block;width:26px;text-align:center;margin-right:7px}
 }
 
 </style>
@@ -167,6 +175,7 @@ let clientPortalView='home';
 let clientVisioWeek=0;
 let clientVisioDay='';
 let clientQuestionnaireExpanded=false;
+let clientMobileMenuOpen=false;
 const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
 
 function isoDate(v){return v?String(v).slice(0,10):''}
@@ -954,6 +963,7 @@ async function enterClientPortal(user,profile){
  clientVisioWeek=0;
  clientVisioDay='';
  clientQuestionnaireExpanded=false;
+ clientMobileMenuOpen=false;
  renderClientPortal();
 }
 function showClientPending(message){
@@ -969,10 +979,13 @@ function renderClientEngagementBanner(c){
 }
 function clientNavMarkup(){
  const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['suivi','✓','Suivi'],['passport','◇','Passeport']];
+ const current=items.find(x=>x[0]===clientPortalView)||items[0];
  const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'">'+label+'</button>').join('')+'</div>';
- const bottom='<div class="client-bottom-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
- return {top,bottom};
+ const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
+ (clientMobileMenuOpen?'<div class="client-mobile-menu">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>':'');
+ return {top,mobile};
 }
+
 function renderClientHome(s){
  const c=s.client,cycle=s.cycle,r=s.response;
  const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
@@ -1037,13 +1050,14 @@ function renderClientPortal(){
  }else{
    main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row"><span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+nav.bottom+'</div>';
- document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
+ document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row">'+nav.mobile+'<span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
+ document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
  document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
- document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;showAuth()};
+ document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;clientMobileMenuOpen=false;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
