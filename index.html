@@ -122,6 +122,13 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .perf-compare-wrap{overflow:auto;border:1px solid #e1e7ef;border-radius:14px}.perf-compare{min-width:760px;width:100%;border-collapse:collapse}.perf-compare th,.perf-compare td{padding:10px 11px;font-size:11px;border-bottom:1px solid #edf0f4;vertical-align:top}.perf-compare th{background:#f6f8fb;color:#526173;text-transform:none;letter-spacing:0;font-size:11px}.perf-compare th:first-child,.perf-compare td:first-child{font-weight:850;color:#344054;width:150px}.perf-compare .current{background:#fff7e8}.perf-compare .current strong{color:#986b25}.perf-current-pill{display:inline-flex;padding:3px 7px;border-radius:999px;background:#ead3a4;color:#714d15;font-size:8px;font-weight:950;margin-left:5px}
 .perf-full-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.perf-full-list{border:1px solid #e1e7ef;border-radius:14px;padding:14px;background:#fff}.perf-full-list h4{margin:0 0 8px;font-size:13px}.perf-full-list ul{margin:0;padding-left:17px;color:#596778;font-size:11px;line-height:1.55}.perf-full-list li+li{margin-top:4px}
 .perf-note{font-size:10px;color:#7b8796;line-height:1.5}
+.ak-system{border:1px solid #243b55;background:linear-gradient(145deg,#0c1927,#122945);border-radius:18px;padding:18px;color:#fff;overflow:hidden;position:relative}
+.ak-system:after{content:"SYSTEM";position:absolute;right:-12px;bottom:-25px;font-size:78px;font-weight:950;letter-spacing:.05em;color:rgba(255,255,255,.025)}
+.ak-system-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;position:relative;z-index:1;margin-bottom:14px}.ak-system-head .eyebrow{font-size:9px;color:#ddb96f;font-weight:950;letter-spacing:.12em}.ak-system-head h3{font-size:19px;margin:4px 0 5px}.ak-system-head p{margin:0;color:#aebdcd;font-size:11px;line-height:1.5;max-width:700px}.ak-system-badge{border:1px solid rgba(221,185,111,.32);background:rgba(221,185,111,.09);color:#edca86;padding:7px 9px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}
+.ak-system-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}.ak-system-col{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);border-radius:14px;padding:14px}.ak-system-col h4{margin:0 0 9px;font-size:12px;color:#fff}.ak-system-list{display:grid;grid-template-columns:1fr 1fr;gap:7px}.ak-system-item{border:1px solid rgba(255,255,255,.07);background:rgba(5,15,26,.34);border-radius:10px;padding:9px}.ak-system-item b{display:block;font-size:10px;color:#e7c37f;margin-bottom:3px}.ak-system-item span{display:block;font-size:10px;color:#b8c5d2;line-height:1.4}
+.ak-system-result{position:relative;z-index:1;margin-top:10px;border:1px solid rgba(102,159,255,.18);background:rgba(68,117,207,.08);border-radius:12px;padding:11px 12px;color:#cbd7e4;font-size:11px;line-height:1.5}.ak-system-result strong{color:#fff}
+@media(max-width:760px){.ak-system-cols{grid-template-columns:1fr}.ak-system-head{display:block}.ak-system-badge{display:inline-block;margin-top:9px}}
+@media(max-width:520px){.ak-system-list{grid-template-columns:1fr}}
 @media(max-width:760px){.perf-hero-top,.perf-example{grid-template-columns:1fr;display:grid}.perf-hero-price{text-align:left}.perf-kpis,.perf-week,.perf-full-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.perf-kpis,.perf-week,.perf-full-grid{grid-template-columns:1fr}.perf-hero h2{font-size:28px}}
 @media(max-width:650px){.public-offer-actions,.offer-detail-grid{grid-template-columns:1fr}}.public-offer-foundation{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;border:1px solid #26384c;background:#0b1725;border-radius:16px;padding:15px 16px;margin:0 0 14px}.public-offer-foundation h4{margin:0 0 7px;font-size:14px;color:#fff}.public-offer-foundation p{margin:0;color:#aebdcd;font-size:11px;line-height:1.55}.public-offer-foundation ul{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px;margin:0;padding-left:18px;color:#c4cfdb;font-size:11px;line-height:1.45}.public-offer-ladder{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.public-offer-ladder span{border:1px solid #2b4055;background:#102033;color:#b9c6d5;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:800}.public-offer-ladder span strong{color:#e2bd77}
@@ -1983,6 +1990,28 @@ function performanceOfferLanding(name,price){
    '<div class="perf-kpis">'+d.kpis.map(k=>'<div class="perf-kpi"><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>').join('')+'</div>'+
   '</section>'+
   '<section class="perf-section"><div class="perf-section-head"><div><h3>Concrètement, comment se passe le suivi ?</h3><p>Une lecture rapide d’une semaine-type.</p></div></div><div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div></section>'+
+  '<section class="ak-system">'+
+   '<div class="ak-system-head"><div><div class="eyebrow">AK PRIME SYSTEM</div><h3>Toute la logistique de ton suivi, au même endroit.</h3><p>Le programme n’est qu’une partie de l’accompagnement. Ton dossier, tes données, tes rendez-vous et les décisions importantes restent structurés dans AK PRIME pour éviter les informations dispersées.</p></div><div class="ak-system-badge">INCLUS DANS LE SUIVI</div></div>'+
+   '<div class="ak-system-cols">'+
+    '<div class="ak-system-col"><h4>Ton espace client</h4><div class="ak-system-list">'+
+     '<div class="ak-system-item"><b>Questionnaire & onboarding</b><span>Objectifs, contraintes et informations utiles centralisés dès le départ.</span></div>'+
+     '<div class="ak-system-item"><b>Suivi hebdomadaire</b><span>Check-in, retours et état d’avancement sans refaire le point à zéro.</span></div>'+
+     '<div class="ak-system-item"><b>Visios en autonomie</b><span>Réservation, déplacement et annulation depuis les créneaux disponibles.</span></div>'+
+     '<div class="ak-system-item"><b>Passeport AK PRIME</b><span>Tests, progrès, cycle, jalons et échéances regroupés dans ton parcours.</span></div>'+
+     '<div class="ak-system-item"><b>Notifications utiles</b><span>Actions à faire, rendez-vous et échéances importantes remontent dans ton espace.</span></div>'+
+     '<div class="ak-system-item"><b>Optitrainer & contact</b><span>Accès à ton entraînement et aux outils utilisés dans le suivi.</span></div>'+
+    '</div></div>'+
+    '<div class="ak-system-col"><h4>Le back-office qui pilote ton accompagnement</h4><div class="ak-system-list">'+
+     '<div class="ak-system-item"><b>Dossier centralisé</b><span>Profil, offre, engagement, questionnaire et historique réunis au même endroit.</span></div>'+
+     '<div class="ak-system-item"><b>Tests & retests</b><span>Résultats enregistrés et comparables dans le temps pour guider les décisions.</span></div>'+
+     '<div class="ak-system-item"><b>Cycles & priorités</b><span>Objectifs, vigilance et étapes du cycle visibles pendant tout le suivi.</span></div>'+
+     '<div class="ak-system-item"><b>Calendrier & visios</b><span>Disponibilités, rendez-vous et historique reliés directement au dossier.</span></div>'+
+     '<div class="ak-system-item"><b>Historique des décisions</b><span>Adaptations et événements importants conservés dans ton parcours.</span></div>'+
+     '<div class="ak-system-item"><b>Renouvellement cadré</b><span>Échéance, choix de suite et bilan de cycle suivis sans repartir de zéro.</span></div>'+
+    '</div></div>'+
+   '</div>'+
+   '<div class="ak-system-result"><strong>Ce que ça change :</strong> moins d’informations perdues, moins d’allers-retours administratifs et un historique exploitable pour prendre les décisions suivantes.</div>'+
+  '</section>'+
   '<section class="perf-example"><div class="perf-example-tag"><b>Exemple</b><strong>Dans une vraie semaine</strong></div><div class="perf-example-copy">'+esc(d.example)+'</div></section>'+
   '<section class="perf-section"><div class="perf-section-head"><div><h3>Pourquoi choisir '+esc(tier)+' ?</h3><p>'+esc(d.difference)+'</p></div></div>'+
    '<div class="perf-full-grid"><div class="perf-full-list"><h4>Inclus dans cette formule</h4><ul>'+publicOfferBenefits('Performance',tier).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
