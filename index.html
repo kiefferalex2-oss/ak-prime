@@ -379,6 +379,38 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .passport-test-categories{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.passport-test-categories span{border:1px solid #dfe5ec;background:#f7f9fb;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:850;color:#667586}
 .passport-test-history{border-top:1px solid #e7ebf0;margin-top:14px;padding-top:13px}.passport-test-table{display:flex;flex-direction:column;gap:6px;margin-top:10px}.passport-test-row{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;gap:12px;align-items:center;border:1px solid #e6ebf0;background:#fff;border-radius:11px;padding:10px 11px}.passport-test-row strong{display:block;font-size:11px}.passport-test-row span{display:block;color:#778596;font-size:9px;margin-top:3px}.passport-test-row>b{font-size:12px;color:#26364a}
 @media(max-width:650px){.passport-test-row{grid-template-columns:1fr auto}.passport-test-row .link{grid-column:1/-1;text-align:left;padding:0}}
+
+/* Passeport AK PRIME V2 — dashboard progression */
+.pp-v2{padding:22px;background:
+ radial-gradient(circle at 82% -8%,rgba(211,171,98,.12),transparent 27%),
+ radial-gradient(circle at 5% 38%,rgba(48,94,135,.11),transparent 24%),
+ linear-gradient(160deg,#08121b,#0b1721 56%,#09131c)}
+.pp-v2-head{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;align-items:stretch;margin-bottom:12px}
+.pp-v2-identity{display:flex;align-items:center;gap:14px;padding:4px 2px}.pp-v2-identity .pp-avatar{width:62px;height:62px}
+.pp-v2-head-message{border:1px solid #2b3742;background:rgba(255,255,255,.025);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;justify-content:center}
+.pp-v2-head-message span{font-size:9px;color:#8293a4;text-transform:uppercase;letter-spacing:.1em}.pp-v2-head-message strong{font-size:14px;margin-top:6px;line-height:1.35}
+.pp-command-grid{display:grid;grid-template-columns:1.55fr .8fr .8fr;gap:10px;margin-bottom:10px}
+.pp-command-card{border:1px solid #2b3742;background:linear-gradient(145deg,#111d27,#0b151e);border-radius:16px;padding:16px;min-height:170px}
+.pp-command-label{font-size:9px;letter-spacing:.12em;color:#8192a3;font-weight:900;margin-bottom:12px}
+.pp-cycle-command{border-color:#5a482e;background:linear-gradient(145deg,rgba(54,42,24,.58),rgba(13,21,29,.98))}
+.pp-cycle-command-inner{display:grid;grid-template-columns:116px 1fr;gap:16px;align-items:center}
+.pp-ring{--p:0;width:108px;height:108px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#d9af67 calc(var(--p)*1%),#26313b 0);position:relative}
+.pp-ring:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#101820;border:1px solid #2b3540}.pp-ring>div{position:relative;z-index:1;text-align:center}.pp-ring strong{display:block;font-size:26px;color:#f3d69d;letter-spacing:-.04em}.pp-ring span{display:block;font-size:9px;color:#8fa0b0;margin-top:2px}
+.pp-cycle-command-copy h3{font-size:20px;margin:0 0 4px}.pp-cycle-command-copy p{font-size:10px;color:#8c9bab;margin:0}.pp-cycle-track{height:7px;background:#27313a;border-radius:99px;overflow:hidden;margin:16px 0 8px}.pp-cycle-track i{display:block;height:100%;background:linear-gradient(90deg,#b88742,#e2b96e);border-radius:99px}.pp-cycle-meta{display:flex;justify-content:space-between;gap:8px;color:#93a2b0;font-size:9px}
+.pp-next-command .pp-next-date{font-size:24px;font-weight:950;color:#efc67f;letter-spacing:-.03em}.pp-next-command h3{font-size:15px;margin:6px 0 4px}.pp-next-command p{font-size:10px;color:#8393a2;line-height:1.45;margin:0}.pp-next-mini{border-top:1px solid #2a3540;margin-top:14px;padding-top:10px}.pp-next-mini span{display:block;font-size:8px;color:#718295;text-transform:uppercase}.pp-next-mini strong{display:block;font-size:10px;margin-top:4px}
+.pp-main-metric{position:relative;overflow:hidden}.pp-main-metric:after{content:"";position:absolute;width:105px;height:105px;border-radius:50%;right:-35px;bottom:-45px;background:rgba(211,171,98,.05)}.pp-main-metric-name{font-size:13px;font-weight:850;color:#dce5ee}.pp-main-metric-value{font-size:34px;font-weight:950;letter-spacing:-.04em;margin-top:13px}.pp-main-metric-value span{font-size:12px;color:#8e9dad;font-weight:800}.pp-main-metric-change{font-size:10px;margin-top:6px;color:#91a1b1}.pp-main-metric.up .pp-main-metric-change{color:#63d6a4}.pp-main-metric.down .pp-main-metric-change{color:#ee9a8f}
+.pp-v2-section{border:1px solid #293641;background:linear-gradient(145deg,rgba(17,29,39,.96),rgba(9,17,24,.96));border-radius:16px;padding:16px;margin-top:10px}
+.pp-v2-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}.pp-v2-section-head h3{font-size:16px;margin:3px 0 0}.pp-v2-two{display:grid;grid-template-columns:1.25fr .75fr;gap:10px}.pp-v2-three{display:grid;grid-template-columns:1fr 1fr .8fr;gap:10px}
+.pp-progress-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pp-progress-card{border:1px solid #2b3742;background:#0d1821;border-radius:13px;padding:12px}.pp-progress-card.up{border-color:#23513f;background:linear-gradient(145deg,rgba(23,62,48,.32),#0d1821)}.pp-progress-card.down{border-color:#5a3634;background:linear-gradient(145deg,rgba(91,47,44,.22),#0d1821)}
+.pp-progress-card-top{display:flex;justify-content:space-between;gap:8px;align-items:start}.pp-progress-card-top span{font-size:10px;color:#a8b6c4;font-weight:800}.pp-progress-card-top b{font-size:10px;white-space:nowrap}.pp-progress-card.up .pp-progress-card-top b{color:#64d8a5}.pp-progress-card.down .pp-progress-card-top b{color:#ef9a8f}.pp-progress-card.neutral .pp-progress-card-top b{color:#d6b16d}
+.pp-progress-values{margin-top:13px}.pp-progress-values strong{display:block;font-size:20px;letter-spacing:-.03em}.pp-progress-values small{display:block;color:#718293;font-size:9px;margin-top:3px}.pp-progress-card-foot{margin-top:10px;padding-top:8px;border-top:1px solid #26313a;font-size:8px;color:#748493}
+.pp-empty-soft{min-height:95px;background:#0d1720;border:1px dashed #2b3742;border-radius:12px}
+.pp-test-overview{display:flex;flex-direction:column;gap:7px}.pp-test-overview-row{display:grid;grid-template-columns:minmax(110px,1fr) auto auto;gap:9px;align-items:center;padding:9px 10px;background:#0d1821;border:1px solid #28343e;border-radius:10px}.pp-test-overview-row strong{display:block;font-size:10px}.pp-test-overview-row span{display:block;color:#718293;font-size:8px;margin-top:3px}.pp-test-latest{font-size:11px;font-weight:900}.pp-delta{font-size:9px;font-weight:900;border-radius:999px;padding:4px 6px;background:#172431;color:#9db0c3}.pp-delta.up{background:#143529;color:#6fe0ad}.pp-delta.down{background:#3a2220;color:#ef9d92}
+.pp-roadmap{overflow:hidden}.pp-roadmap-line{display:flex;gap:0;overflow:auto;padding:12px 6px 8px}.pp-roadmap-node{position:relative;min-width:155px;padding:23px 10px 0}.pp-roadmap-node:before{content:"";position:absolute;top:7px;left:0;right:0;height:2px;background:#34414c}.pp-roadmap-node:first-child:before{left:50%}.pp-roadmap-node:last-child:before{right:50%}.pp-roadmap-node:after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;top:2px;left:calc(50% - 6px);background:#586a7c;border:2px solid #0c1720;box-shadow:0 0 0 3px rgba(88,106,124,.13)}.pp-roadmap-node.done:after{background:#5dd29e;box-shadow:0 0 0 3px rgba(93,210,158,.10)}.pp-roadmap-node.future:after{background:#e5b96f;box-shadow:0 0 0 3px rgba(229,185,111,.10)}.pp-roadmap-node span,.pp-roadmap-node strong,.pp-roadmap-node small{display:block;text-align:center}.pp-roadmap-node span{font-size:8px;color:#8191a1;text-transform:uppercase}.pp-roadmap-node strong{font-size:10px;margin-top:4px}.pp-roadmap-node small{font-size:8px;color:#6f8191;margin-top:3px;line-height:1.35}
+.pp-focus-list{display:flex;flex-direction:column;gap:7px}.pp-focus-list>div{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;padding:9px;background:#0e1922;border:1px solid #29353f;border-radius:10px}.pp-focus-list b{font-size:9px;color:#e0b76b}.pp-focus-list span{font-size:10px}.pp-focus-list.warn b{color:#ed9f83}
+.pp-visit-grid{display:grid;grid-template-columns:1fr;gap:8px}.pp-visit-grid>div{padding:10px;background:#0e1922;border:1px solid #29353f;border-radius:10px}.pp-visit-grid span{display:block;font-size:8px;color:#718293;text-transform:uppercase}.pp-visit-grid strong{display:block;font-size:10px;margin-top:5px;line-height:1.35}
+@media(max-width:1100px){.pp-command-grid{grid-template-columns:1fr 1fr}.pp-cycle-command{grid-column:1/-1}.pp-progress-cards{grid-template-columns:1fr 1fr}.pp-v2-three{grid-template-columns:1fr 1fr}.pp-v2-three>section:last-child{grid-column:1/-1}}
+@media(max-width:780px){.pp-v2-head,.pp-v2-two,.pp-v2-three,.pp-command-grid{grid-template-columns:1fr}.pp-cycle-command{grid-column:auto}.pp-progress-cards{grid-template-columns:1fr}.pp-cycle-command-inner{grid-template-columns:90px 1fr}.pp-ring{width:84px;height:84px}.pp-ring strong{font-size:21px}.pp-cycle-meta{flex-direction:column}.pp-v2-three>section:last-child{grid-column:auto}}
 </style>
 </head>
 <body>
@@ -969,21 +1001,21 @@ function fieldArea(label,path,value){return '<div class="field"><label>'+label+'
 
 
 const TEST_LIBRARY=[
- {name:'CMJ',category:'Explosivité',unit:'cm',hint:'Hauteur de saut vertical.'},
- {name:'SJ',category:'Explosivité',unit:'cm',hint:'Squat Jump.'},
- {name:'Sprint 10 m',category:'Vitesse',unit:'s',hint:'Temps sur 10 mètres.'},
- {name:'Sprint 20 m',category:'Vitesse',unit:'s',hint:'Temps sur 20 mètres.'},
- {name:'Sprint 30 m',category:'Vitesse',unit:'s',hint:'Temps sur 30 mètres.'},
- {name:'Illinois',category:'Changement de direction',unit:'s',hint:'Temps total du test Illinois.'},
- {name:'505',category:'Changement de direction',unit:'s',hint:'Temps du test 505.'},
- {name:'30-15 IFT — VIFT',category:'Endurance',unit:'km/h',hint:'Vitesse finale atteinte au 30-15 IFT.'},
- {name:'VMA',category:'Endurance',unit:'km/h',hint:'Vitesse maximale aérobie.'},
- {name:'VMI',category:'Endurance',unit:'km/h',hint:'Vitesse maximale intermittente.'},
- {name:'1RM estimée',category:'Force',unit:'kg',hint:'Charge maximale estimée.'},
- {name:'3RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 3 répétitions.'},
- {name:'4RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 4 répétitions.'},
- {name:'5RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 5 répétitions.'},
- {name:'6RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 6 répétitions.'}
+ {name:'CMJ',category:'Explosivité',unit:'cm',better:'higher',hint:'Hauteur de saut vertical.'},
+ {name:'SJ',category:'Explosivité',unit:'cm',better:'higher',hint:'Squat Jump.'},
+ {name:'Sprint 10 m',category:'Vitesse',unit:'s',better:'lower',hint:'Temps sur 10 mètres.'},
+ {name:'Sprint 20 m',category:'Vitesse',unit:'s',better:'lower',hint:'Temps sur 20 mètres.'},
+ {name:'Sprint 30 m',category:'Vitesse',unit:'s',better:'lower',hint:'Temps sur 30 mètres.'},
+ {name:'Illinois',category:'Changement de direction',unit:'s',better:'lower',hint:'Temps total du test Illinois.'},
+ {name:'505',category:'Changement de direction',unit:'s',better:'lower',hint:'Temps du test 505.'},
+ {name:'30-15 IFT — VIFT',category:'Endurance',unit:'km/h',better:'higher',hint:'Vitesse finale atteinte au 30-15 IFT.'},
+ {name:'VMA',category:'Endurance',unit:'km/h',better:'higher',hint:'Vitesse maximale aérobie.'},
+ {name:'VMI',category:'Endurance',unit:'km/h',better:'higher',hint:'Vitesse maximale intermittente.'},
+ {name:'1RM estimée',category:'Force',unit:'kg',better:'higher',hint:'Charge maximale estimée.'},
+ {name:'3RM',category:'Force',unit:'kg',better:'higher',hint:'Charge réalisée sur 3 répétitions.'},
+ {name:'4RM',category:'Force',unit:'kg',better:'higher',hint:'Charge réalisée sur 4 répétitions.'},
+ {name:'5RM',category:'Force',unit:'kg',better:'higher',hint:'Charge réalisée sur 5 répétitions.'},
+ {name:'6RM',category:'Force',unit:'kg',better:'higher',hint:'Charge réalisée sur 6 répétitions.'}
 ];
 function testLibraryItem(name){return TEST_LIBRARY.find(x=>normalizeTestName(x.name)===normalizeTestName(name||''))||null}
 function testLibraryOptions(prefill=''){
@@ -1077,36 +1109,131 @@ function cycleProgressPct(cycle){
  if(!(e>s))return 0;
  return Math.max(0,Math.min(100,Math.round((n-s)/(e-s)*100)));
 }
+function passportMetricDelta(group){
+ if(!group?.rows?.length)return null;
+ const first=group.rows[0],last=group.rows[group.rows.length-1];
+ const initial=Number(first.num),current=Number(last.num);
+ if(!Number.isFinite(initial)||!Number.isFinite(current))return null;
+ const lib=testLibraryItem(group.name);
+ const raw=current-initial;
+ const pct=initial!==0?raw/Math.abs(initial)*100:null;
+ const direction=lib?.better||'neutral';
+ let improved=null;
+ if(group.rows.length>=2&&Math.abs(raw)>1e-9){
+   improved=direction==='higher'?raw>0:direction==='lower'?raw<0:null;
+ }
+ return {first,last,initial,current,raw,pct,direction,improved,count:group.rows.length};
+}
+function passportSigned(v,digits=1){
+ if(v===null||v===undefined||!Number.isFinite(Number(v)))return '—';
+ const n=Number(v);
+ return (n>0?'+':'')+n.toFixed(digits).replace('.',',');
+}
+function passportCycleStats(cycle){
+ if(!cycle?.start||!cycle?.end)return {pct:0,weekNow:null,weeks:null,remaining:null};
+ const start=new Date(cycle.start+'T12:00:00Z'),end=new Date(cycle.end+'T12:00:00Z'),now=new Date();
+ if(!(end>start))return {pct:0,weekNow:null,weeks:null,remaining:null};
+ const totalDays=Math.max(1,Math.ceil((end-start)/86400000));
+ const weeks=Math.max(1,Math.ceil(totalDays/7));
+ const elapsedDays=Math.max(0,Math.ceil((now-start)/86400000));
+ const weekNow=Math.max(1,Math.min(weeks,Math.ceil((elapsedDays+1)/7)));
+ const remaining=Math.ceil((end-now)/86400000);
+ return {pct:cycleProgressPct(cycle),weekNow,weeks,remaining};
+}
+function passportImportantDates(m,events,next){
+ const today=localDateISO();
+ const rows=[];
+ for(const e of events||[]) if(e.date) rows.push({date:e.date,label:e.title||'Jalon',kind:'event'});
+ if(next?.starts_at) rows.push({date:isoDate(next.starts_at),label:'Prochaine visio',kind:'visio'});
+ if(m.cycle?.end) rows.push({date:m.cycle.end,label:'Fin du cycle',kind:'cycle'});
+ if(m.end) rows.push({date:m.end,label:'Fin d’engagement',kind:'engagement'});
+ rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ const future=rows.filter(x=>x.date>=today);
+ return {all:rows,next:future[0]||null};
+}
+function passportProgressCards(groups){
+ const metrics=(groups||[]).map(g=>({g,d:passportMetricDelta(g)})).filter(x=>x.d&&x.d.count>=2);
+ metrics.sort((a,b)=>{
+   const ai=a.d.improved===true?2:a.d.improved===null?1:0;
+   const bi=b.d.improved===true?2:b.d.improved===null?1:0;
+   if(ai!==bi)return bi-ai;
+   return Math.abs(b.d.pct||0)-Math.abs(a.d.pct||0);
+ });
+ const chosen=metrics.slice(0,4);
+ if(!chosen.length)return '<div class="pp-empty pp-empty-soft">Ajoute au moins deux résultats sur un même test pour faire apparaître les progressions ici.</div>';
+ return '<div class="pp-progress-cards">'+chosen.map(({g,d})=>{
+   const tone=d.improved===true?'up':d.improved===false?'down':'neutral';
+   const arrow=d.improved===true?'↗':d.improved===false?'↘':'→';
+   const delta=d.pct===null?'Évolution':passportSigned(d.pct)+' %';
+   return '<div class="pp-progress-card '+tone+'"><div class="pp-progress-card-top"><span>'+esc(g.name)+'</span><b>'+arrow+' '+esc(delta)+'</b></div><div class="pp-progress-values"><strong>'+esc(String(d.current))+' '+esc(d.last.unit||g.unit||'')+'</strong><small>Départ : '+esc(String(d.initial))+' '+esc(d.first.unit||g.unit||'')+'</small></div><div class="pp-progress-card-foot">'+esc(d.improved===true?'Progression':d.improved===false?'À surveiller':'Évolution mesurée')+' • '+d.count+' mesures</div></div>';
+ }).join('')+'</div>';
+}
+function passportTestOverview(groups){
+ if(!(groups||[]).length)return '<div class="pp-empty pp-empty-soft">Aucun résultat de test enregistré.</div>';
+ return '<div class="pp-test-overview">'+groups.slice(0,6).map(g=>{
+   const d=passportMetricDelta(g),last=g.rows[g.rows.length-1],tone=d?.improved===true?'up':d?.improved===false?'down':'neutral';
+   const change=d&&d.count>=2&&d.pct!==null?passportSigned(d.pct)+' %':'Référence';
+   return '<div class="pp-test-overview-row"><div><strong>'+esc(g.name)+'</strong><span>'+fmtDate(last.date)+' • '+g.rows.length+' mesure'+(g.rows.length>1?'s':'')+'</span></div><div class="pp-test-latest">'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</div><div class="pp-delta '+tone+'">'+esc(change)+'</div></div>';
+ }).join('')+'</div>';
+}
 function renderPremiumPassport(m){
  const groups=passportTestGroups(m.tests),main=groups.find(g=>g.rows.length>=2)||groups[0];
- const keyGroups=groups.slice(0,3);
- const future=m.appointments.filter(a=>new Date(a.starts_at)>=new Date()),past=m.appointments.filter(a=>new Date(a.starts_at)<new Date());
+ const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()),past=(m.appointments||[]).filter(a=>new Date(a.starts_at)<new Date());
  const next=future[0]||null,last=past.length?past[past.length-1]:null;
  const left=m.end?daysUntil(m.end):null;
  const engagementTone=left===null?'neutral':left<0?'warn':left<=14?'warn':'good';
- const engagementText=left===null?'À définir':left<0?'Échéance dépassée':left===0?'Échéance aujourd’hui':left+' jour(s) restant(s)';
- const cp=cycleProgressPct(m.cycle);
- const events=(m.events||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-6);
- const recentTests=groups.slice(0,4).map(g=>{const last=g.rows[g.rows.length-1];return '<div class="pp-kpi"><span>'+esc(g.name)+'</span><strong>'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</strong><small>'+fmtDate(last.date)+'</small></div>'}).join('');
- const priorities=(m.cycle?.priorities||'À définir').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
- const vigilance=(m.cycle?.vigilance||'Aucun point de vigilance signalé').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
- return '<div class="premium-passport">'+
- '<div class="pp-topline"><div><div class="pp-eyebrow">Passeport AK PRIME</div><div class="pp-title">Progression & parcours</div></div><div class="pp-motto">Discipline • progression • liberté<br>Plus qu’un coaching, un parcours</div></div>'+
- '<div class="pp-profile"><div class="pp-card pp-person"><div class="pp-avatar">'+esc(m.initials||'AK')+'</div><div><div class="pp-name">'+esc(m.name||'Client AK PRIME')+'</div><div class="pp-muted pp-tiny">'+esc([m.sport,m.specialty,m.level].filter(Boolean).join(' • ')||'Accompagnement AK PRIME')+'</div><div class="pp-tagrow"><span class="pp-tag">'+esc(m.pole||'—')+'</span><span class="pp-tag">'+esc(m.offer||'—')+'</span></div></div></div>'+
- '<div class="pp-card pp-stat"><span>Pôle actuel</span><strong>'+esc(m.pole||'—')+'</strong><span style="margin-top:13px">Offre</span><strong>'+esc(m.offer||'—')+'</strong></div>'+
- '<div class="pp-card pp-stat"><span>Objectif / priorités</span><strong>'+esc(m.cycle?.priorities||'À définir')+'</strong></div>'+
- '<div class="pp-card pp-engagement"><div class="row between"><strong>Engagement</strong><span class="pp-pill '+engagementTone+'">'+esc(engagementText)+'</span></div><div class="pp-muted pp-tiny" style="margin-top:12px">Début : '+fmtDate(m.start)+'</div><div style="font-weight:900;margin-top:5px">Fin : '+fmtDate(m.end)+'</div>'+(left!==null&&left<=14?'<div class="pp-amber pp-tiny" style="margin-top:7px">Bilan / renouvellement à préparer</div>':'')+'</div></div>'+
- '<div class="pp-grid3"><div class="pp-card"><div class="row between"><h3>Évolution — '+esc(main?.name||'Tests clés')+'</h3><span class="pp-pill neutral">'+esc(main?.unit||'données réelles')+'</span></div>'+passportLineChart(main)+'</div>'+
- '<div class="pp-card"><h3>Tests & performances clés</h3>'+passportBars(groups)+'</div>'+
- '<div class="pp-card"><h3>Derniers repères</h3><div class="pp-kpi-row" style="grid-template-columns:1fr">'+(recentTests||'<div class="pp-empty">Aucun test renseigné.</div>')+'</div></div></div>'+
- '<div class="pp-grid2"><div class="pp-card"><h3>Parcours & jalons clés</h3><div class="pp-timeline">'+(events.length?events.map(e=>'<div class="pp-node"><strong>'+esc(e.title)+'</strong><span>'+fmtDate(e.date)+'</span></div>').join(''):'<div class="pp-empty" style="min-height:90px;width:100%">Les jalons du parcours apparaîtront ici.</div>')+'</div></div>'+
- '<div class="pp-card"><div class="row between"><h3>Cycle actuel</h3><span class="pp-pill neutral">'+cp+'%</span></div><div class="pp-cycle-title">'+esc(m.cycle?.title||'Cycle à définir')+'</div><div class="pp-muted pp-tiny">'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</div><div class="pp-progress"><i style="width:'+cp+'%"></i></div><div class="pp-tagrow" style="margin-top:13px">'+priorities.map(x=>'<span class="pp-tag">'+esc(x)+'</span>').join('')+'</div></div></div>'+
- '<div class="pp-grid4"><div class="pp-card"><h3>Priorités actuelles</h3><div class="pp-list">'+(priorities.length?priorities.map(x=>'<div class="pp-list-row"><strong>◎ '+esc(x)+'</strong></div>').join(''):'<div class="pp-muted pp-tiny">À définir avec le coach.</div>')+'</div></div>'+
- '<div class="pp-card"><h3>Points de vigilance</h3><div class="pp-list">'+vigilance.map(x=>'<div class="pp-list-row"><strong>△ '+esc(x)+'</strong></div>').join('')+'</div></div>'+
- '<div class="pp-card"><h3>Dernière visio</h3>'+(last?'<div class="pp-cycle-title">'+fmtDateTime(last.starts_at)+'</div><div class="pp-muted pp-tiny">'+esc(last.appointment_type||'Visio')+' • '+esc(last.duration_minutes||'')+' min</div>':'<div class="pp-muted pp-tiny">Aucune visio passée enregistrée.</div>')+'</div>'+
- '<div class="pp-card"><h3>Prochaine visio</h3>'+(next?'<div class="pp-cycle-title pp-gold">'+fmtDateTime(next.starts_at)+'</div><div class="pp-muted pp-tiny">'+esc(next.appointment_type||'Visio')+' • '+esc(next.duration_minutes||'')+' min</div>':'<div class="pp-muted pp-tiny">Aucune visio planifiée.</div>')+'</div></div>'+
+ const engagementText=left===null?'À définir':left<0?'Échéance dépassée':left===0?'Échéance aujourd’hui':left+' j';
+ const cs=passportCycleStats(m.cycle);
+ const events=(m.events||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-8);
+ const dates=passportImportantDates(m,events,next);
+ const priorities=(m.cycle?.priorities||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
+ const vigilance=(m.cycle?.vigilance||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+ const nextDate=dates.next;
+ const mainDelta=passportMetricDelta(main);
+ const mainTone=mainDelta?.improved===true?'up':mainDelta?.improved===false?'down':'neutral';
+ const mainChange=mainDelta&&mainDelta.count>=2&&mainDelta.pct!==null?passportSigned(mainDelta.pct)+' %':'—';
+ return '<div class="premium-passport pp-v2">'+
+  '<div class="pp-v2-head">'+
+   '<div class="pp-v2-identity"><div class="pp-avatar">'+esc(m.initials||'AK')+'</div><div><div class="pp-eyebrow">Passeport AK PRIME</div><div class="pp-name">'+esc(m.name||'Client AK PRIME')+'</div><div class="pp-muted pp-tiny">'+esc([m.sport,m.specialty,m.level].filter(Boolean).join(' • ')||'Accompagnement AK PRIME')+'</div><div class="pp-tagrow"><span class="pp-tag">'+esc(m.pole||'—')+'</span><span class="pp-tag">'+esc(m.offer||'—')+'</span><span class="pp-pill '+engagementTone+'">'+esc(engagementText)+'</span></div></div></div>'+
+   '<div class="pp-v2-head-message"><span>Objectif actuel</span><strong>'+esc(m.cycle?.priorities||'À définir avec le coach')+'</strong></div>'+
+  '</div>'+
+  '<div class="pp-command-grid">'+
+   '<div class="pp-command-card pp-cycle-command"><div class="pp-command-label">AVANCEMENT DU CYCLE</div><div class="pp-cycle-command-inner">'+
+    '<div class="pp-ring" style="--p:'+cs.pct+'"><div><strong>'+cs.pct+'%</strong><span>'+((cs.weekNow&&cs.weeks)?'S'+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div>'+
+    '<div class="pp-cycle-command-copy"><h3>'+esc(m.cycle?.title||'Cycle à définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p>'+
+     '<div class="pp-cycle-track"><i style="width:'+cs.pct+'%"></i></div>'+
+     '<div class="pp-cycle-meta"><span>'+(cs.remaining===null?'Dates à définir':cs.remaining>0?cs.remaining+' jours restants':cs.remaining===0?'Fin du cycle aujourd’hui':'Cycle terminé')+'</span><span>'+esc(priorities[0]||'Priorité à définir')+'</span></div>'+
+    '</div></div></div>'+
+   '<div class="pp-command-card pp-next-command"><div class="pp-command-label">PROCHAINE DATE IMPORTANTE</div>'+
+    (nextDate?'<div class="pp-next-date">'+fmtDate(nextDate.date)+'</div><h3>'+esc(nextDate.label)+'</h3><p>'+esc(nextDate.kind==='visio'?'Prochain rendez-vous planifié':nextDate.kind==='cycle'?'Échéance du cycle actuel':nextDate.kind==='engagement'?'Échéance de l’accompagnement':'Jalon du parcours')+'</p>':'<div class="pp-next-date">—</div><h3>Aucune échéance</h3><p>Les prochaines dates importantes apparaîtront ici.</p>')+
+    (next?'<div class="pp-next-mini"><span>Prochaine visio</span><strong>'+fmtDateTime(next.starts_at)+'</strong></div>':'')+
+   '</div>'+
+   '<div class="pp-command-card pp-main-metric '+mainTone+'"><div class="pp-command-label">REPÈRE PERFORMANCE</div>'+
+    (main?'<div class="pp-main-metric-name">'+esc(main.name)+'</div><div class="pp-main-metric-value">'+esc(main.rows[main.rows.length-1].value)+' <span>'+esc(main.rows[main.rows.length-1].unit||main.unit||'')+'</span></div><div class="pp-main-metric-change">'+esc(mainChange)+' depuis la première mesure</div>':'<div class="pp-main-metric-name">Aucun test</div><div class="pp-main-metric-value">—</div><div class="pp-main-metric-change">Ajoute des résultats au Passeport</div>')+
+   '</div>'+
+  '</div>'+
+  '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PROGRESSION</span><h3>Ce qui a bougé depuis le départ</h3></div><div class="pp-muted pp-tiny">Les couleurs tiennent compte du sens de performance du test.</div></div>'+
+   passportProgressCards(groups)+
+  '</section>'+
+  '<div class="pp-v2-two">'+
+   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">ÉVOLUTION</span><h3>'+esc(main?'Courbe — '+main.name:'Courbe principale')+'</h3></div><span class="pp-pill neutral">'+esc(main?.unit||'données')+'</span></div>'+passportLineChart(main)+'</section>'+
+   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">TESTS</span><h3>Dernières valeurs</h3></div></div>'+passportTestOverview(groups)+'</section>'+
+  '</div>'+
+  '<section class="pp-v2-section pp-roadmap"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PARCOURS</span><h3>Dates & jalons importants</h3></div></div>'+
+   '<div class="pp-roadmap-line">'+
+    (events.length?events.map(e=>'<div class="pp-roadmap-node '+(String(e.date)<=localDateISO()?'done':'future')+'"><span>'+fmtDate(e.date)+'</span><strong>'+esc(e.title)+'</strong><small>'+esc(e.detail||'')+'</small></div>').join(''):'<div class="pp-empty pp-empty-soft">Ajoute des événements importants pour construire la chronologie du parcours.</div>')+
+    (m.cycle?.end?'<div class="pp-roadmap-node future"><span>'+fmtDate(m.cycle.end)+'</span><strong>Fin du cycle</strong><small>Bilan / retest à préparer</small></div>':'')+
+    (m.end?'<div class="pp-roadmap-node future"><span>'+fmtDate(m.end)+'</span><strong>Fin d’engagement</strong><small>Renouvellement ou bilan final</small></div>':'')+
+   '</div>'+
+  '</section>'+
+  '<div class="pp-v2-three">'+
+   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PRIORITÉS</span><h3>Focus actuel</h3></div></div><div class="pp-focus-list">'+(priorities.length?priorities.map((x,i)=>'<div><b>0'+(i+1)+'</b><span>'+esc(x)+'</span></div>').join(''):'<div class="pp-empty pp-empty-soft">Priorités à définir.</div>')+'</div></section>'+
+   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">VIGILANCE</span><h3>À surveiller</h3></div></div><div class="pp-focus-list warn">'+(vigilance.length?vigilance.map((x,i)=>'<div><b>△</b><span>'+esc(x)+'</span></div>').join(''):'<div class="pp-empty pp-empty-soft">Aucun point de vigilance signalé.</div>')+'</div></section>'+
+   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">RENDEZ-VOUS</span><h3>Repères visio</h3></div></div><div class="pp-visit-grid"><div><span>Dernière</span><strong>'+(last?fmtDateTime(last.starts_at):'—')+'</strong></div><div><span>Prochaine</span><strong class="pp-gold">'+(next?fmtDateTime(next.starts_at):'—')+'</strong></div></div></section>'+
+  '</div>'+
  '</div>';
 }
+
 function passport(c){
  return '<div class="page-title no-print"><div><h1 style="font-size:22px">Passeport AK PRIME</h1><p>Tests, retests, progression et jalons du parcours sont centralisés ici.</p></div><button class="btn primary" id="printPassport">Imprimer / PDF</button></div>'+
  passportCoachTestManager(c)+
