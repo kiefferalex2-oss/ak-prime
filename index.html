@@ -453,6 +453,34 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:1000px){.health-book-nav{grid-template-columns:repeat(3,1fr)}.health-now-grid{grid-template-columns:1fr 1fr}.health-cycle-focus{grid-column:1/-1;grid-row:auto}.health-test-summary{grid-template-columns:1fr 1fr}.health-identity-grid{grid-template-columns:1fr 1fr}.health-notes-grid{grid-template-columns:1fr}}
 @media(max-width:650px){.health-book-header{align-items:flex-start}.health-book-owner{display:none}.health-book-body{padding:15px}.health-cover{grid-template-columns:1fr;padding:24px}.health-cover-seal{width:90px;height:90px}.health-cover-seal span{font-size:30px}.health-cover-copy h1{font-size:31px}.health-book-nav{grid-template-columns:1fr 1fr}.health-now-grid,.health-focus-columns,.health-cycle-info-grid,.health-cycle-footer,.health-identity-grid,.health-test-summary,.health-test-kpis{grid-template-columns:1fr}.health-cycle-focus{grid-template-columns:90px 1fr}.health-cycle-ring{width:82px;height:82px}.health-cycle-ring strong{font-size:21px}.health-page-heading{align-items:flex-start;flex-direction:column}.health-page-heading h2{font-size:25px}.health-measure-head,.health-measure-row{grid-template-columns:85px 90px 1fr}.health-measure-head span:last-child,.health-measure-row span:last-child{display:none}.health-timeline:before{left:92px}.health-timeline-row{grid-template-columns:72px 40px 1fr}.health-timeline-date{padding-right:8px;font-size:10px}}
 @media print{.health-book-nav{display:none!important}.health-book-body{min-height:0;background:#fff}.health-passport-book{box-shadow:none;border:0}.passport-manager-grid{display:none!important}}
+
+/* =========================================================
+   AK PRIME PASSEPORT — ATHLETE PROFILE x PERFORMANCE LAB
+   ========================================================= */
+.akp-passport{overflow:hidden;border:1px solid #dfe5eb;border-radius:16px;background:#f4f7fa;box-shadow:0 14px 38px rgba(15,31,48,.10);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#152536}
+.akp-athlete-head{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(410px,.9fr);gap:26px;align-items:center;padding:26px 28px;background:linear-gradient(122deg,#0d1c2b 0%,#142a40 62%,#172f48 100%);color:#fff;position:relative;overflow:hidden}
+.akp-athlete-head:after{content:"";position:absolute;width:330px;height:330px;border-radius:50%;right:-135px;top:-170px;border:1px solid rgba(214,174,104,.15);box-shadow:0 0 0 38px rgba(214,174,104,.035),0 0 0 76px rgba(214,174,104,.025);pointer-events:none}
+.akp-athlete-profile{display:flex;align-items:center;gap:18px;position:relative;z-index:1}.akp-monogram{width:84px;height:84px;flex:0 0 84px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#d7b26c,#a97d3b);color:#102236;font-size:24px;font-weight:950;letter-spacing:-.04em;box-shadow:0 9px 24px rgba(0,0,0,.22)}
+.akp-overline,.akp-label{font-size:8px;line-height:1.2;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:#a87d3e}.akp-athlete-copy .akp-overline{color:#d9b773}.akp-athlete-copy h1{margin:4px 0 5px;font-size:30px;line-height:1;font-weight:950;letter-spacing:-.035em}.akp-athlete-meta{display:flex;gap:0;flex-wrap:wrap;color:#afbdca;font-size:10px;font-weight:650}.akp-athlete-meta span+span:before{content:"•";margin:0 8px;color:#667b8f}.akp-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.akp-badges>span{padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);font-size:8px;font-weight:800;color:#dce5ed}.akp-badges .status{background:rgba(83,159,123,.13);border-color:rgba(106,189,150,.22);color:#a9dcc3}
+.akp-live-state{display:grid;grid-template-columns:1.2fr .72fr 1fr;gap:8px;position:relative;z-index:1}.akp-live-state>div{min-width:0;border-left:2px solid rgba(214,174,104,.52);background:rgba(255,255,255,.045);padding:11px 12px;border-radius:0 8px 8px 0}.akp-live-state span{display:block;color:#879aab;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.akp-live-state strong{display:block;color:#fff;font-size:12px;line-height:1.25;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.akp-live-state small{display:block;color:#95a7b8;font-size:7px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.akp-tabs{display:flex;gap:0;background:#fff;border-bottom:1px solid #dfe5eb;padding:0 20px;overflow:auto}.akp-tabs button{position:relative;border:0;background:transparent;padding:14px 15px 12px;color:#74808c;font-size:9px;font-weight:900;white-space:nowrap;cursor:pointer}.akp-tabs button:after{content:"";position:absolute;left:15px;right:15px;bottom:-1px;height:3px;background:transparent;border-radius:5px 5px 0 0}.akp-tabs button.on{color:#10263a}.akp-tabs button.on:after{background:#c79b54}.akp-tabs button:hover{color:#10263a}
+.akp-body{padding:22px;background:#f4f7fa;min-height:610px}.akp-page{max-width:1220px;margin:0 auto}.akp-page-title{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}.akp-page-title>div:first-child>span{display:block;color:#a47b3e;font-size:8px;font-weight:950;letter-spacing:.13em}.akp-page-title h2{font-size:25px;letter-spacing:-.025em;line-height:1.05;color:#142638;margin:4px 0 0;font-weight:950}.akp-page-title p{font-size:9px;color:#7a8794;margin:5px 0 0}.akp-date-chip,.akp-mini-status{font-size:8px;color:#61707d;font-weight:850;background:#fff;border:1px solid #dce3e9;padding:7px 9px;border-radius:999px}
+.akp-big-stat{text-align:right}.akp-big-stat strong{display:block;font-size:29px;line-height:1;color:#173047;font-weight:950}.akp-big-stat span{display:block;margin-top:4px;color:#8a96a2;font-size:7px;text-transform:uppercase;font-weight:900}
+.akp-overview-main{display:grid;grid-template-columns:1.08fr .92fr;gap:11px}.akp-cycle-hero,.akp-key-progress,.akp-panel,.akp-performance-board,.akp-test-focus{background:#fff;border:1px solid #dce3e9;border-radius:12px;box-shadow:0 3px 10px rgba(23,43,61,.025)}.akp-cycle-hero{padding:18px}.akp-cycle-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.akp-cycle-top h3{font-size:19px;margin:4px 0 3px;color:#14293c}.akp-cycle-top p{margin:0;color:#86919a;font-size:8px}.akp-cycle-score{text-align:right}.akp-cycle-score strong{display:block;font-size:30px;line-height:1;color:#b98a45;font-weight:950}.akp-cycle-score span{font-size:8px;color:#7d8a96;font-weight:850}.akp-progress-track{height:9px;background:#e8edf1;border-radius:99px;overflow:hidden;margin-top:20px}.akp-progress-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#a77a39,#d1ad6c)}.akp-cycle-bottom{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:9px;color:#7c8995;font-size:8px}.passportInlineNav{border:0;background:transparent;color:#8c632b;font-size:8px;font-weight:950;cursor:pointer;padding:0}
+.akp-key-progress{padding:17px}.akp-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.akp-section-head h3{font-size:15px;margin:3px 0 0;color:#1a2d3f}.akp-progress-three{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px}.akp-progress-three button{border:1px solid #e0e6eb;background:#f8fafb;border-radius:9px;padding:10px;text-align:left;cursor:pointer;min-width:0}.akp-progress-three button span{display:block;font-size:7px;font-weight:850;color:#77848f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.akp-progress-three button strong{display:block;margin-top:6px;font-size:15px;color:#172d41;white-space:nowrap}.akp-progress-three button b{display:inline-block;margin-top:7px;font-size:8px;padding:3px 6px;border-radius:5px;background:#e9edf0;color:#687580}.akp-progress-three button.up b{background:#e6f2ec;color:#34735a}.akp-progress-three button.down b{background:#f8e8e3;color:#aa513e}
+.akp-empty-inline{margin-top:13px;padding:14px;background:#f8fafb;border:1px dashed #dce3e9;border-radius:9px;color:#82909b;font-size:9px}.akp-snapshot-grid{display:grid;grid-template-columns:.8fr .8fr 1.2fr 1.2fr;gap:9px;margin-top:10px}.akp-snapshot{background:#fff;border:1px solid #dce3e9;border-radius:10px;padding:13px}.akp-snapshot span{display:block;font-size:7px;font-weight:900;text-transform:uppercase;color:#82909c}.akp-snapshot strong{display:block;color:#193047;font-size:12px;line-height:1.35;margin-top:6px}.akp-snapshot small{display:block;color:#89949d;font-size:7px;margin-top:4px}.akp-snapshot.focus{border-left:4px solid #b98a45}.akp-snapshot.alert{border-left:4px solid #bd654e}
+.akp-cycle-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);gap:11px}.akp-panel{padding:16px}.akp-week-track{display:flex;align-items:center;margin:22px 0 25px;overflow-x:auto;padding:4px 3px 8px}.akp-week{position:relative;display:flex;flex-direction:column;align-items:center;min-width:68px;flex:1}.akp-week:after{content:"";position:absolute;height:3px;left:50%;right:-50%;top:17px;background:#dfe5ea;z-index:0}.akp-week:last-child:after{display:none}.akp-week-dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#e9edf1;color:#687784;font-size:9px;font-weight:950;border:4px solid #fff;box-shadow:0 0 0 1px #dce3e9;position:relative;z-index:1}.akp-week>span{font-size:7px;color:#7e8a95;font-weight:850;margin-top:7px}.akp-week.done .akp-week-dot{background:#40775f;color:#fff;box-shadow:0 0 0 1px #40775f}.akp-week.done:after{background:#7da995}.akp-week.current .akp-week-dot{width:42px;height:42px;margin:-3px 0;background:#c5964f;color:#12283a;box-shadow:0 0 0 4px #f4e9d6}.akp-week.current>span{color:#9b6e31}.akp-week.finish .akp-week-dot{background:#183149;color:#fff;box-shadow:0 0 0 1px #183149}
+.akp-cycle-milestones{border-top:1px solid #e6ebef;padding-top:13px}.akp-cycle-milestones>div{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #edf1f3;font-size:9px}.akp-cycle-milestones b{color:#9b7137}.akp-cycle-milestones span{color:#394c5d;font-weight:700}.akp-cycle-milestones p{font-size:9px;color:#84909a}.akp-cycle-side{display:flex;flex-direction:column;gap:10px}.akp-priority-list,.akp-vigilance-list{display:flex;flex-direction:column;gap:7px;margin-top:11px}.akp-priority-list>div,.akp-vigilance-list>div{display:grid;grid-template-columns:27px 1fr;gap:8px;align-items:center;background:#f7f9fa;border:1px solid #e7ebee;border-radius:7px;padding:8px}.akp-priority-list b{font-size:8px;color:#a87b3b}.akp-vigilance-list i{font-style:normal;width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:#f4ded7;color:#a84f3c;font-weight:950}.akp-priority-list span,.akp-vigilance-list span{font-size:9px;font-weight:700}.akp-panel.warning{border-top:3px solid #bd654e}.akp-panel.next{background:#152d43;color:#fff;border-color:#152d43}.akp-panel.next .akp-label{color:#d3ac69}.akp-panel.next strong{display:block;font-size:13px;margin-top:10px}.akp-panel.next p{font-size:9px;color:#a9b7c4;margin:4px 0 0}
+.akp-performance-board{padding:15px;margin-bottom:10px}.akp-legend{display:flex;align-items:center;gap:5px;color:#7f8c96;font-size:7px}.akp-legend i{width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:5px}.akp-legend i.up{background:#4d8a6e}.akp-legend i.flat{background:#8694a0}.akp-legend i.down{background:#c0644d}.akp-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:12px}.akp-metric{position:relative;min-width:0;border:1px solid #e0e6eb;border-top:3px solid #8996a1;background:#f9fafb;border-radius:8px;padding:10px;text-align:left;cursor:pointer}.akp-metric.up{border-top-color:#4f876d}.akp-metric.down{border-top-color:#be634d}.akp-metric.selected{background:#fff;border-color:#bd934f;box-shadow:0 0 0 2px rgba(189,147,79,.11)}.akp-metric>div{display:flex;justify-content:space-between;gap:5px}.akp-metric span{font-size:8px;font-weight:900;color:#485866;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.akp-metric small{font-size:7px;color:#929ca4;white-space:nowrap}.akp-metric strong{display:block;color:#162c40;font-size:17px;margin-top:8px}.akp-metric strong em,.akp-test-kpis em{font-style:normal;font-size:.55em;color:#7b8995}.akp-metric b{display:inline-block;font-size:8px;margin-top:7px;color:#707d88}.akp-metric.up b{color:#36755b}.akp-metric.down b{color:#aa503e}
+.akp-test-focus{overflow:hidden}.akp-test-focus:before{content:"";display:block;height:4px;background:#8996a1}.akp-test-focus.up:before{background:#4f876d}.akp-test-focus.down:before{background:#be634d}.akp-test-focus-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-end;padding:15px 16px 11px}.akp-test-focus-head h3{font-size:20px;margin:3px 0 0;color:#152c40}.akp-test-focus-head p{font-size:8px;color:#85919a;margin:3px 0 0}.akp-test-delta{text-align:right}.akp-test-delta span{display:block;font-size:7px;color:#84909b;text-transform:uppercase;font-weight:900}.akp-test-delta strong{display:block;font-size:22px;color:#697782;margin-top:3px}.akp-test-focus.up .akp-test-delta strong{color:#39785e}.akp-test-focus.down .akp-test-delta strong{color:#af543f}
+.akp-test-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e5eaee;border-top:1px solid #e5eaee;border-bottom:1px solid #e5eaee}.akp-test-kpis>div{background:#f8fafb;padding:11px 15px}.akp-test-kpis span{display:block;font-size:7px;color:#83909b;text-transform:uppercase;font-weight:900}.akp-test-kpis strong{display:block;font-size:17px;color:#172d42;margin-top:5px}.akp-test-kpis small{display:block;font-size:7px;color:#929da6;margin-top:3px}.akp-chart{padding:13px 16px;background:#13293e}.akp-chart .pp-chart-grid{stroke:#2a4155}.akp-chart .pp-chart-axis{fill:#8298aa}.akp-chart .pp-chart-value{fill:#efc87f}.akp-history{margin:0 16px 16px;border:1px solid #e1e6ea;border-radius:8px;overflow:hidden}.akp-history-head,.akp-history-row{display:grid;grid-template-columns:95px 110px 1fr 1.3fr;gap:8px;padding:8px 10px;align-items:center}.akp-history-head{background:#edf1f4;color:#6e7c87;font-size:7px;font-weight:900;text-transform:uppercase}.akp-history-row{border-top:1px solid #edf1f3;font-size:8px}.akp-history-row strong{color:#193047}
+.akp-sport-timeline{position:relative;max-width:950px}.akp-sport-timeline:before{content:"";position:absolute;left:156px;top:0;bottom:0;width:2px;background:#dbe2e8}.akp-timeline-item{display:grid;grid-template-columns:135px 44px 1fr;min-height:89px}.akp-timeline-date{text-align:right;padding:15px 14px 0 0}.akp-timeline-date strong{display:block;font-size:10px;color:#40515f}.akp-timeline-date span{display:block;font-size:7px;color:#919ca5;margin-top:3px}.akp-timeline-marker{width:30px;height:30px;border-radius:8px;margin:10px 7px;display:grid;place-items:center;background:#6f7e8b;color:#fff;font-size:10px;font-weight:950;position:relative;z-index:1;box-shadow:0 0 0 5px #f4f7fa}.akp-timeline-item.test .akp-timeline-marker{background:#b48442}.akp-timeline-item.competition .akp-timeline-marker{background:#294f71}.akp-timeline-item.medical .akp-timeline-marker{background:#b65646}.akp-timeline-item.visio .akp-timeline-marker{background:#557d98}.akp-timeline-item.cycle .akp-timeline-marker{background:#4d8169}.akp-timeline-item.contract .akp-timeline-marker{background:#715c87}.akp-timeline-item.future .akp-timeline-marker{opacity:.55}.akp-timeline-card{align-self:start;background:#fff;border:1px solid #dce3e9;border-radius:9px;padding:11px 13px;margin:5px 0}.akp-type,.akp-auto{display:inline-block;font-size:6.5px;font-weight:950;letter-spacing:.07em;text-transform:uppercase;background:#e9edf0;color:#60707d;border-radius:4px;padding:3px 5px}.akp-type.test{background:#f4ead8;color:#92692e}.akp-type.competition{background:#e4edf4;color:#315b7e}.akp-type.medical{background:#f4e2de;color:#a04b3d}.akp-type.visio{background:#e4edf2;color:#47718c}.akp-type.cycle{background:#e2eee8;color:#3f725b}.akp-type.contract{background:#ece6f0;color:#69517a}.akp-auto{margin-left:4px;background:#f1f3f5;color:#98a1a8}.akp-timeline-card h3{font-size:11px;color:#1d3042;margin:6px 0 0}.akp-timeline-card p{font-size:8px;color:#7f8a93;margin:4px 0 0}
+.akp-follow-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:11px}.akp-follow-side{display:flex;flex-direction:column;gap:10px}.akp-checkin{display:grid;grid-template-columns:80px 1fr;gap:11px;padding:12px 0;border-bottom:1px solid #e9edf0}.akp-checkin:last-child{border-bottom:0}.akp-checkin-date{font-size:9px;font-weight:900;color:#9a7138}.akp-checkin-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}.akp-checkin-tags span{font-size:6.5px;font-weight:900;padding:3px 5px;border-radius:4px;background:#e8edf1;color:#677785}.akp-checkin-tags span.warn{background:#f5e2dd;color:#a74e3d}.akp-checkin strong{font-size:10px;color:#1b3043}.akp-checkin p{font-size:8px;color:#7d8992;line-height:1.5;margin:4px 0 0}.akp-period-review{border-top:3px solid #b98a45}.akp-review-row{padding:10px 0;border-bottom:1px solid #e9edf0}.akp-review-row:last-child{border-bottom:0}.akp-review-row span{display:block;font-size:7px;color:#89949d;text-transform:uppercase;font-weight:900}.akp-review-row strong{display:block;font-size:10px;color:#1d3042;margin-top:4px}.akp-review-row.warn strong{color:#a84d3c}.akp-coach-note,.akp-muted-note{font-size:9px;line-height:1.6;color:#40515e;margin:10px 0 0}.akp-muted-note{color:#89939b}.akp-empty-big{padding:45px 20px;text-align:center;background:#fff;border:1px dashed #d8e0e6;border-radius:10px;color:#84919b;font-size:10px}
+.passport-manager-grid{margin-bottom:13px}.passport-test-manager,.passport-event-manager{border-radius:12px!important;box-shadow:none!important}
+@media(max-width:1050px){.akp-athlete-head{grid-template-columns:1fr}.akp-live-state{grid-template-columns:repeat(3,1fr)}.akp-overview-main,.akp-cycle-layout,.akp-follow-layout{grid-template-columns:1fr}.akp-snapshot-grid{grid-template-columns:1fr 1fr}.akp-metric-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.akp-athlete-head{padding:20px}.akp-athlete-profile{align-items:flex-start}.akp-monogram{width:64px;height:64px;flex-basis:64px}.akp-athlete-copy h1{font-size:23px}.akp-live-state{grid-template-columns:1fr}.akp-tabs{padding:0 7px}.akp-tabs button{padding:12px 10px}.akp-body{padding:14px}.akp-page-title{align-items:flex-start;flex-direction:column}.akp-overview-main,.akp-snapshot-grid,.akp-progress-three,.akp-metric-grid,.akp-test-kpis{grid-template-columns:1fr 1fr}.akp-legend{display:none}.akp-history-head,.akp-history-row{grid-template-columns:78px 86px 1fr}.akp-history-head span:last-child,.akp-history-row span:last-child{display:none}.akp-sport-timeline:before{left:102px}.akp-timeline-item{grid-template-columns:82px 40px 1fr}.akp-timeline-date{padding-right:8px}.akp-checkin{grid-template-columns:1fr}.akp-cycle-top{align-items:flex-start}}
+@media(max-width:480px){.akp-athlete-profile{display:grid;grid-template-columns:54px 1fr;gap:12px}.akp-monogram{width:54px;height:54px}.akp-overview-main,.akp-snapshot-grid,.akp-progress-three,.akp-metric-grid,.akp-test-kpis{grid-template-columns:1fr}.akp-live-state{margin-top:2px}.akp-test-focus-head{align-items:flex-start;flex-direction:column}.akp-test-delta{text-align:left}.akp-sport-timeline:before{left:18px}.akp-timeline-item{grid-template-columns:40px 1fr}.akp-timeline-date{grid-column:2;text-align:left;padding:5px 0 2px}.akp-timeline-marker{grid-column:1;grid-row:1/3}.akp-timeline-card{grid-column:2}.akp-cycle-bottom{align-items:flex-start;flex-direction:column}}
+@media print{.akp-tabs{display:none!important}.akp-body{background:#fff;padding:10px}.akp-passport{box-shadow:none;border:0}.akp-athlete-head{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -530,7 +558,7 @@ let clientVisioWeek=0;
 let clientVisioDay='';
 let clientQuestionnaireExpanded=false;
 let clientMobileMenuOpen=false;
-let passportBookPage='identity';
+let passportBookPage='overview';
 let passportSelectedTestKey='';
 let passportActiveModel=null;
 const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
@@ -1261,125 +1289,183 @@ function passportStatusLabel(status){
  if(v==='inactive'||v==='inactif')return 'Suivi terminé';
  return status||'Suivi AK PRIME';
 }
+
+function sportPerformancePct(delta){
+ if(!delta||delta.pct===null||delta.pct===undefined)return null;
+ return delta.direction==='lower'?-delta.pct:delta.pct;
+}
+function passportNextAppointment(m){
+ return (m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0]||null;
+}
+function passportNextRetest(m){
+ const today=localDateISO();
+ const explicit=(m.events||[]).filter(e=>e.date>=today&&/retest|re-test|test|évaluation|evaluation/i.test((e.title||'')+' '+(e.detail||''))).sort((a,b)=>a.date.localeCompare(b.date))[0];
+ if(explicit)return explicit;
+ if(m.cycle?.end&&m.cycle.end>=today)return {date:m.cycle.end,title:'Retest / bilan de cycle',detail:''};
+ return null;
+}
+function passportNextDeadline(m){
+ const next=passportNextAppointment(m),ret=passportNextRetest(m);
+ const candidates=[];
+ if(next?.starts_at)candidates.push({date:isoDate(next.starts_at),label:'Visio',detail:fmtTime(next.starts_at)});
+ if(ret?.date)candidates.push({date:ret.date,label:ret.title||'Retest',detail:ret.detail||''});
+ if(m.end&&m.end>=localDateISO())candidates.push({date:m.end,label:'Fin d’engagement',detail:''});
+ return candidates.sort((a,b)=>a.date.localeCompare(b.date))[0]||null;
+}
+function passportTopProgress(groups,limit=3){
+ return (groups||[]).map(g=>({g,d:passportMetricDelta(g)}))
+  .filter(x=>x.d&&x.d.count>=2)
+  .sort((a,b)=>{
+    const ap=sportPerformancePct(a.d),bp=sportPerformancePct(b.d);
+    const ai=a.d.improved===true?2:a.d.improved===null?1:0;
+    const bi=b.d.improved===true?2:b.d.improved===null?1:0;
+    if(ai!==bi)return bi-ai;
+    return Math.abs(bp||0)-Math.abs(ap||0);
+  }).slice(0,limit);
+}
 function passportBookNav(){
- const items=[['identity','Identité'],['situation','Situation'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['notes','Observations']];
- return '<nav class="health-book-nav">'+items.map(([k,l],i)=>'<button class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'"><span>0'+(i+1)+'</span>'+l+'</button>').join('')+'</nav>';
+ const items=[['overview','Vue d’ensemble'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
+ return '<nav class="akp-tabs">'+items.map(([k,l])=>'<button class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'">'+l+'</button>').join('')+'</nav>';
 }
-function passportIdentityPage(m){
- const since=m.start?fmtDate(m.start):'À définir';
- const end=m.end?fmtDate(m.end):'À définir';
- const profile=[m.sport,m.specialty,m.level].filter(Boolean);
- return '<div class="health-page identity-page">'+
-  '<div class="health-cover">'+
-   '<div class="health-cover-seal"><span>AK</span><small>PRIME</small></div>'+
-   '<div class="health-cover-copy"><div class="health-kicker">CARNET INDIVIDUEL DE SUIVI SPORTIF</div><h1>'+esc(m.name||'Client AK PRIME')+'</h1><p>'+esc(profile.join(' • ')||'Profil sportif à compléter')+'</p><div class="health-cover-tags"><span>'+esc(m.pole||'—')+'</span><span>'+esc(m.offer||'—')+'</span><span>'+esc(passportStatusLabel(m.status))+'</span></div></div>'+
+function passportHeader(m){
+ const cs=passportCycleStats(m.cycle),next=passportNextDeadline(m);
+ return '<header class="akp-athlete-head">'+
+  '<div class="akp-athlete-profile">'+
+   '<div class="akp-monogram">'+esc(m.initials||'AK')+'</div>'+
+   '<div class="akp-athlete-copy"><div class="akp-overline">PASSEPORT ATHLÈTE • AK PRIME</div><h1>'+esc(m.name||'Client AK PRIME')+'</h1><div class="akp-athlete-meta">'+
+    ([m.sport,m.specialty,m.level].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('')||'<span>Profil sportif à compléter</span>')+
+   '</div><div class="akp-badges"><span>'+esc(m.pole||'—')+'</span><span>'+esc(m.offer||'—')+'</span><span class="status">'+esc(passportStatusLabel(m.status))+'</span></div></div>'+
   '</div>'+
-  '<div class="health-identity-grid">'+
-   '<div class="health-id-card"><span>Discipline</span><strong>'+esc(m.sport||'À renseigner')+'</strong></div>'+
-   '<div class="health-id-card"><span>Poste / spécialité</span><strong>'+esc(m.specialty||'À renseigner')+'</strong></div>'+
-   '<div class="health-id-card"><span>Niveau</span><strong>'+esc(m.level||'À renseigner')+'</strong></div>'+
-   '<div class="health-id-card"><span>Suivi depuis</span><strong>'+since+'</strong></div>'+
-   '<div class="health-id-card"><span>Échéance actuelle</span><strong>'+end+'</strong></div>'+
-   '<div class="health-id-card"><span>Référent</span><strong>AK PRIME</strong></div>'+
+  '<div class="akp-live-state">'+
+   '<div><span>Cycle actuel</span><strong>'+esc(m.cycle?.title||'À définir')+'</strong><small>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</small></div>'+
+   '<div><span>Semaine</span><strong>'+(cs.weekNow&&cs.weeks?'S'+cs.weekNow+' / '+cs.weeks:'—')+'</strong><small>'+cs.pct+' % du cycle</small></div>'+
+   '<div><span>Prochaine échéance</span><strong>'+(next?fmtDate(next.date):'—')+'</strong><small>'+esc(next?.label||'Aucune date planifiée')+'</small></div>'+
   '</div>'+
-  '<div class="health-identity-objective"><span>OBJECTIF / PRIORITÉS ACTUELLES</span><strong>'+esc(m.cycle?.priorities||'À définir avec le coach')+'</strong></div>'+
- '</div>';
+ '</header>';
 }
-function passportSituationPage(m){
- const cs=passportCycleStats(m.cycle);
- const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
- const next=future[0]||null;
- const dates=passportImportantDates(m,m.events||[],next);
- const groups=passportTestGroups(m.tests),metrics=groups.map(g=>({g,d:passportMetricDelta(g)})).filter(x=>x.d&&x.d.count>=2);
- const improved=metrics.filter(x=>x.d.improved===true).length;
- const latestTest=groups.map(g=>g.rows[g.rows.length-1]).filter(Boolean).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
- return '<div class="health-page">'+
-  '<div class="health-page-heading"><div><span class="health-kicker">SITUATION ACTUELLE</span><h2>Où j’en suis aujourd’hui</h2></div><div class="health-page-date">'+fmtDate(localDateISO())+'</div></div>'+
-  '<div class="health-now-grid">'+
-   '<div class="health-cycle-focus"><div class="health-cycle-ring" style="--p:'+cs.pct+'"><div><strong>'+cs.pct+'%</strong><span>'+(cs.weekNow&&cs.weeks?'Semaine '+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div><div><span>Cycle en cours</span><h3>'+esc(m.cycle?.title||'À définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p><div class="health-long-progress"><i style="width:'+cs.pct+'%"></i></div></div></div>'+
-   '<div class="health-now-card"><span>Prochaine date importante</span><strong>'+(dates.next?fmtDate(dates.next.date):'—')+'</strong><small>'+esc(dates.next?.label||'Aucune échéance planifiée')+'</small></div>'+
-   '<div class="health-now-card"><span>Prochaine visio</span><strong>'+(next?fmtDate(next.starts_at):'—')+'</strong><small>'+(next?fmtTime(next.starts_at):'À planifier')+'</small></div>'+
-   '<div class="health-now-card"><span>Progressions mesurées</span><strong>'+improved+' / '+metrics.length+'</strong><small>tests avec au moins 2 mesures</small></div>'+
-   '<div class="health-now-card"><span>Dernière mesure</span><strong>'+esc(latestTest?.name||'—')+'</strong><small>'+(latestTest?fmtDate(latestTest.date):'Aucun test')+'</small></div>'+
+function passportOverviewPage(m){
+ const groups=passportTestGroups(m.tests),top=passportTopProgress(groups,3),cs=passportCycleStats(m.cycle);
+ const nextVisio=passportNextAppointment(m),nextRetest=passportNextRetest(m);
+ const focus=(m.cycle?.priorities||'À définir avec le coach').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'À définir avec le coach';
+ const vigilance=(m.cycle?.vigilance||'Aucun point de vigilance signalé').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'Aucun point de vigilance signalé';
+ return '<div class="akp-page">'+
+  '<div class="akp-page-title"><div><span>VUE D’ENSEMBLE</span><h2>État actuel</h2><p>Les informations essentielles du suivi, sans bruit.</p></div><div class="akp-date-chip">'+fmtDate(localDateISO())+'</div></div>'+
+  '<div class="akp-overview-main">'+
+   '<section class="akp-cycle-hero"><div class="akp-cycle-top"><div><span class="akp-label">CYCLE ACTUEL</span><h3>'+esc(m.cycle?.title||'À définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="akp-cycle-score"><strong>'+cs.pct+'%</strong><span>'+(cs.weekNow&&cs.weeks?'S'+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div><div class="akp-progress-track"><i style="width:'+cs.pct+'%"></i></div><div class="akp-cycle-bottom"><span>'+(cs.remaining===null?'Dates à définir':cs.remaining>0?cs.remaining+' jours restants':cs.remaining===0?'Fin aujourd’hui':'Cycle terminé')+'</span><button class="passportInlineNav" data-passport-page="cycle">Voir le cycle →</button></div></section>'+
+   '<section class="akp-key-progress"><div class="akp-section-head"><div><span class="akp-label">PROGRESSION</span><h3>3 repères clés</h3></div><button class="passportInlineNav" data-passport-page="progress">Tout voir →</button></div>'+
+    (top.length?'<div class="akp-progress-three">'+top.map(({g,d})=>{const last=g.rows[g.rows.length-1],p=sportPerformancePct(d),tone=d.improved===true?'up':d.improved===false?'down':'flat';return '<button class="passportMetricJump '+tone+'" data-test-key="'+esc(normalizeTestName(g.name))+'"><span>'+esc(g.name)+'</span><strong>'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</strong><b>'+(p===null?'Référence':passportSigned(p)+' %')+'</b></button>'}).join('')+'</div>':'<div class="akp-empty-inline">Les progrès clés apparaîtront après les premiers retests.</div>')+
+   '</section>'+
   '</div>'+
-  '<div class="health-focus-columns"><div><span>Focus actuel</span><strong>'+esc((m.cycle?.priorities||'À définir').split(/[;\n]+/)[0])+'</strong></div><div><span>Point de vigilance</span><strong>'+esc((m.cycle?.vigilance||'Aucun signalé').split(/[;\n]+/)[0])+'</strong></div></div>'+
+  '<div class="akp-snapshot-grid">'+
+   '<div class="akp-snapshot"><span>Prochain retest</span><strong>'+(nextRetest?fmtDate(nextRetest.date):'—')+'</strong><small>'+esc(nextRetest?.title||'À planifier')+'</small></div>'+
+   '<div class="akp-snapshot"><span>Prochaine visio</span><strong>'+(nextVisio?fmtDate(nextVisio.starts_at):'—')+'</strong><small>'+(nextVisio?fmtTime(nextVisio.starts_at):'À planifier')+'</small></div>'+
+   '<div class="akp-snapshot focus"><span>Focus actuel</span><strong>'+esc(focus)+'</strong></div>'+
+   '<div class="akp-snapshot alert"><span>Vigilance</span><strong>'+esc(vigilance)+'</strong></div>'+
+  '</div>'+
  '</div>';
 }
 function passportCyclePage(m){
- const cs=passportCycleStats(m.cycle),weeks=cs.weeks||6,current=cs.weekNow||1;
+ const cs=passportCycleStats(m.cycle),weeks=Math.min(cs.weeks||6,12),current=cs.weekNow||1;
  const priorities=(m.cycle?.priorities||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
  const vigilance=(m.cycle?.vigilance||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
- const weekNodes=Array.from({length:Math.min(weeks,12)},(_,i)=>i+1).map(w=>'<div class="health-week-node '+(w<current?'done':w===current?'current':'')+'"><b>S'+w+'</b><span>'+(w<current?'✓':w===current?'Maintenant':'')+'</span></div>').join('');
- return '<div class="health-page">'+
-  '<div class="health-page-heading"><div><span class="health-kicker">CYCLE EN COURS</span><h2>'+esc(m.cycle?.title||'Cycle à définir')+'</h2><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="health-cycle-percent"><strong>'+cs.pct+'%</strong><span>avancement</span></div></div>'+
-  '<div class="health-cycle-line">'+weekNodes+'<div class="health-week-node retest"><b>FIN</b><span>Bilan / retest</span></div></div>'+
-  '<div class="health-cycle-info-grid">'+
-   '<section><span class="health-section-label">Priorités du cycle</span><div class="health-number-list">'+(priorities.length?priorities.map((x,i)=>'<div><b>'+String(i+1).padStart(2,'0')+'</b><span>'+esc(x)+'</span></div>').join(''):'<p>Aucune priorité définie.</p>')+'</div></section>'+
-   '<section><span class="health-section-label">Points de vigilance</span><div class="health-number-list warn">'+(vigilance.length?vigilance.map(x=>'<div><b>!</b><span>'+esc(x)+'</span></div>').join(''):'<p>Aucun point de vigilance signalé.</p>')+'</div></section>'+
+ const cycleEvents=(m.events||[]).filter(e=>!m.cycle?.start||!m.cycle?.end||(e.date>=m.cycle.start&&e.date<=m.cycle.end)).sort((a,b)=>a.date.localeCompare(b.date));
+ const retest=passportNextRetest(m);
+ return '<div class="akp-page">'+
+  '<div class="akp-page-title"><div><span>CYCLE</span><h2>'+esc(m.cycle?.title||'Cycle actuel')+'</h2><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="akp-big-stat"><strong>'+cs.pct+'%</strong><span>avancement</span></div></div>'+
+  '<div class="akp-cycle-layout">'+
+   '<section class="akp-panel akp-cycle-timeline"><div class="akp-section-head"><div><span class="akp-label">PLANIFICATION</span><h3>'+(cs.weekNow&&cs.weeks?'Semaine '+cs.weekNow+' sur '+cs.weeks:'Frise du cycle')+'</h3></div><span class="akp-mini-status">'+(cs.remaining!==null&&cs.remaining>0?cs.remaining+' j restants':cs.remaining===0?'Dernier jour':cs.remaining!==null?'Terminé':'À dater')+'</span></div>'+
+    '<div class="akp-week-track">'+Array.from({length:weeks},(_,i)=>i+1).map(w=>'<div class="akp-week '+(w<current?'done':w===current?'current':'future')+'"><div class="akp-week-dot">'+(w<current?'✓':w)+'</div><span>S'+w+'</span></div>').join('')+'<div class="akp-week finish"><div class="akp-week-dot">R</div><span>Retest</span></div></div>'+
+    '<div class="akp-cycle-milestones"><span class="akp-label">JALONS DU CYCLE</span>'+(cycleEvents.length?cycleEvents.slice(0,6).map(e=>'<div><b>'+fmtDate(e.date)+'</b><span>'+esc(e.title)+'</span></div>').join(''):'<p>Aucun jalon spécifique enregistré sur ce cycle.</p>')+'</div>'+
+   '</section>'+
+   '<aside class="akp-cycle-side">'+
+    '<section class="akp-panel"><span class="akp-label">OBJECTIFS & PRIORITÉS</span><div class="akp-priority-list">'+(priorities.length?priorities.map((x,i)=>'<div><b>0'+(i+1)+'</b><span>'+esc(x)+'</span></div>').join(''):'<p>À définir avec le coach.</p>')+'</div></section>'+
+    '<section class="akp-panel warning"><span class="akp-label">POINTS DE VIGILANCE</span><div class="akp-vigilance-list">'+(vigilance.length?vigilance.map(x=>'<div><i>!</i><span>'+esc(x)+'</span></div>').join(''):'<p>Aucun point signalé.</p>')+'</div></section>'+
+    '<section class="akp-panel next"><span class="akp-label">PROCHAINE ÉTAPE</span><strong>'+(retest?esc(retest.title||'Retest'):'À planifier')+'</strong><p>'+(retest?fmtDate(retest.date):'Aucune date enregistrée')+'</p></section>'+
+   '</aside>'+
   '</div>'+
-  '<div class="health-cycle-footer"><div><span>Durée estimée</span><strong>'+(cs.weeks?cs.weeks+' semaines':'À définir')+'</strong></div><div><span>Semaine actuelle</span><strong>'+(cs.weekNow?'S'+cs.weekNow:'—')+'</strong></div><div><span>Temps restant</span><strong>'+(cs.remaining===null?'—':cs.remaining>0?cs.remaining+' jours':cs.remaining===0?'Aujourd’hui':'Terminé')+'</strong></div></div>'+
  '</div>';
 }
 function passportProgressPage(m){
  const groups=passportTestGroups(m.tests),selected=passportSelectedGroup(groups);
- if(!groups.length)return '<div class="health-page"><div class="health-page-heading"><div><span class="health-kicker">PROGRESSION</span><h2>Mes repères de performance</h2></div></div><div class="health-empty">Aucun test enregistré pour le moment.</div></div>';
- const delta=passportMetricDelta(selected),best=passportGroupBest(selected),last=selected.rows[selected.rows.length-1],first=selected.rows[0];
- const tone=delta?.improved===true?'good':delta?.improved===false?'watch':'neutral';
- const deltaText=delta&&delta.count>=2&&delta.pct!==null?passportSigned(delta.pct)+' %':'Référence';
- return '<div class="health-page">'+
-  '<div class="health-page-heading"><div><span class="health-kicker">PROGRESSION</span><h2>Mes repères de performance</h2><p>Choisis un test pour afficher son évolution complète.</p></div></div>'+
-  '<div class="health-test-summary">'+groups.map(g=>{const d=passportMetricDelta(g),l=g.rows[g.rows.length-1],t=d?.improved===true?'good':d?.improved===false?'watch':'neutral';const ch=d&&d.count>=2&&d.pct!==null?passportSigned(d.pct)+' %':'Référence';return '<button class="passportMetricBtn '+(normalizeTestName(g.name)===passportSelectedTestKey?'on':'')+' '+t+'" data-test-key="'+esc(normalizeTestName(g.name))+'"><span>'+esc(g.name)+'</span><strong>'+esc(l.value)+' '+esc(l.unit||g.unit||'')+'</strong><small>'+esc(ch)+'</small></button>'}).join('')+'</div>'+
-  '<div class="health-test-detail">'+
-   '<div class="health-test-detail-head"><div><span class="health-section-label">TEST SÉLECTIONNÉ</span><h3>'+esc(selected.name)+'</h3></div><span class="health-change-pill '+tone+'">'+esc(deltaText)+'</span></div>'+
-   '<div class="health-test-kpis"><div><span>Initial</span><strong>'+esc(first.value)+' '+esc(first.unit||selected.unit||'')+'</strong><small>'+fmtDate(first.date)+'</small></div><div><span>Dernier</span><strong>'+esc(last.value)+' '+esc(last.unit||selected.unit||'')+'</strong><small>'+fmtDate(last.date)+'</small></div><div><span>Meilleur</span><strong>'+esc(best?.value??'—')+' '+esc(best?.unit||selected.unit||'')+'</strong><small>'+(best?fmtDate(best.date):'—')+'</small></div><div><span>Mesures</span><strong>'+selected.rows.length+'</strong><small>dans le carnet</small></div></div>'+
-   '<div class="health-chart-shell">'+passportLineChart(selected)+'</div>'+
-   '<div class="health-measure-history"><div class="health-measure-head"><span>Date</span><span>Valeur</span><span>Contexte</span><span>Observation</span></div>'+selected.rows.slice().reverse().map(r=>'<div class="health-measure-row"><span>'+fmtDate(r.date)+'</span><strong>'+esc(r.value)+' '+esc(r.unit||selected.unit||'')+'</strong><span>'+esc(r.context||'—')+'</span><span>'+esc(r.note||'—')+'</span></div>').join('')+'</div>'+
-  '</div>'+
+ if(!groups.length)return '<div class="akp-page"><div class="akp-page-title"><div><span>PROGRESSION</span><h2>Repères de performance</h2><p>Tous les tests et retests seront centralisés ici.</p></div></div><div class="akp-empty-big">Aucun résultat de test enregistré.</div></div>';
+ const d=passportMetricDelta(selected),perf=sportPerformancePct(d),best=passportGroupBest(selected),last=selected.rows[selected.rows.length-1],first=selected.rows[0],tone=d?.improved===true?'up':d?.improved===false?'down':'flat';
+ return '<div class="akp-page">'+
+  '<div class="akp-page-title"><div><span>PROGRESSION</span><h2>Vue globale & détail</h2><p>Tous les repères sont visibles. Clique sur un test pour ouvrir son évolution.</p></div><div class="akp-big-stat"><strong>'+groups.length+'</strong><span>repères suivis</span></div></div>'+
+  '<section class="akp-performance-board"><div class="akp-section-head"><div><span class="akp-label">VUE COMPARATIVE</span><h3>Tous les tests</h3></div><span class="akp-legend"><i class="up"></i> progression <i class="flat"></i> stable / référence <i class="down"></i> vigilance</span></div>'+
+   '<div class="akp-metric-grid">'+groups.map(g=>{const md=passportMetricDelta(g),mp=sportPerformancePct(md),l=g.rows[g.rows.length-1],t=md?.improved===true?'up':md?.improved===false?'down':'flat';return '<button class="passportMetricBtn akp-metric '+(normalizeTestName(g.name)===passportSelectedTestKey?'selected ':'')+t+'" data-test-key="'+esc(normalizeTestName(g.name))+'"><div><span>'+esc(g.name)+'</span><small>'+g.rows.length+' mesure'+(g.rows.length>1?'s':'')+'</small></div><strong>'+esc(l.value)+' <em>'+esc(l.unit||g.unit||'')+'</em></strong><b>'+(md&&md.count>=2&&mp!==null?passportSigned(mp)+' %':'Référence')+'</b></button>'}).join('')+'</div>'+
+  '</section>'+
+  '<section class="akp-test-focus '+tone+'">'+
+   '<div class="akp-test-focus-head"><div><span class="akp-label">DÉTAIL DU TEST</span><h3>'+esc(selected.name)+'</h3><p>Évolution individuelle depuis la première mesure.</p></div><div class="akp-test-delta"><span>Évolution performance</span><strong>'+(d&&d.count>=2&&perf!==null?passportSigned(perf)+' %':'Référence')+'</strong></div></div>'+
+   '<div class="akp-test-kpis"><div><span>Initial</span><strong>'+esc(first.value)+' <em>'+esc(first.unit||selected.unit||'')+'</em></strong><small>'+fmtDate(first.date)+'</small></div><div><span>Actuel</span><strong>'+esc(last.value)+' <em>'+esc(last.unit||selected.unit||'')+'</em></strong><small>'+fmtDate(last.date)+'</small></div><div><span>Meilleur</span><strong>'+esc(best?.value??'—')+' <em>'+esc(best?.unit||selected.unit||'')+'</em></strong><small>'+(best?fmtDate(best.date):'—')+'</small></div><div><span>Mesures</span><strong>'+selected.rows.length+'</strong><small>enregistrées</small></div></div>'+
+   '<div class="akp-chart">'+passportLineChart(selected)+'</div>'+
+   '<div class="akp-history"><div class="akp-history-head"><span>Date</span><span>Résultat</span><span>Contexte</span><span>Observation coach</span></div>'+selected.rows.slice().reverse().map(r=>'<div class="akp-history-row"><span>'+fmtDate(r.date)+'</span><strong>'+esc(r.value)+' '+esc(r.unit||selected.unit||'')+'</strong><span>'+esc(r.context||'—')+'</span><span>'+esc(r.note||'—')+'</span></div>').join('')+'</div>'+
+  '</section>'+
  '</div>';
+}
+function passportEventType(title,detail=''){
+ const s=((title||'')+' '+(detail||'')).toLowerCase();
+ if(/bless|douleur|reprise|réath|reath/.test(s))return {key:'medical',label:'Blessure / reprise',icon:'+'};
+ if(/compét|compet|match|tournoi|championnat/.test(s))return {key:'competition',label:'Compétition',icon:'★'};
+ if(/retest|re-test|test|évaluation|evaluation/.test(s))return {key:'test',label:'Test / retest',icon:'↗'};
+ if(/visio|rendez-vous|rdv/.test(s))return {key:'visio',label:'Visio',icon:'◷'};
+ if(/cycle/.test(s))return {key:'cycle',label:'Cycle',icon:'↻'};
+ if(/engagement|renouvel/.test(s))return {key:'contract',label:'Engagement',icon:'✓'};
+ return {key:'milestone',label:'Jalon',icon:'•'};
 }
 function passportTimelinePage(m){
- const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
- const rows=[...(m.events||[]).map(e=>({date:e.date,title:e.title,detail:e.detail||'',type:'Jalon'}))];
- if(m.start)rows.push({date:m.start,title:'Début du suivi AK PRIME',detail:'Ouverture du carnet sportif.',type:'Suivi'});
- if(m.cycle?.start)rows.push({date:m.cycle.start,title:'Début du cycle',detail:m.cycle.title||'',type:'Cycle'});
- if(m.cycle?.end)rows.push({date:m.cycle.end,title:'Fin du cycle / bilan',detail:'Retest et bilan de cycle.',type:'Cycle'});
- if(future[0])rows.push({date:isoDate(future[0].starts_at),title:'Prochaine visio',detail:fmtTime(future[0].starts_at),type:'Visio'});
- if(m.end)rows.push({date:m.end,title:'Échéance d’engagement',detail:'Bilan / suite de l’accompagnement.',type:'Suivi'});
- rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
- return '<div class="health-page">'+
-  '<div class="health-page-heading"><div><span class="health-kicker">CHRONOLOGIE</span><h2>Mon parcours sportif</h2><p>Les étapes qui structurent réellement le suivi.</p></div></div>'+
-  '<div class="health-timeline">'+(rows.length?rows.map(x=>'<div class="health-timeline-row '+(x.date<=localDateISO()?'past':'future')+'"><div class="health-timeline-date">'+fmtDate(x.date)+'</div><div class="health-timeline-dot"></div><div><span>'+esc(x.type)+'</span><strong>'+esc(x.title)+'</strong><p>'+esc(x.detail||'')+'</p></div></div>').join(''):'<div class="health-empty">Aucun jalon enregistré.</div>')+'</div>'+
+ const rows=(m.events||[]).map(e=>({date:e.date,title:e.title,detail:e.detail||'',auto:false}));
+ const next=passportNextAppointment(m);
+ if(m.start)rows.push({date:m.start,title:'Début du suivi AK PRIME',detail:'Ouverture de l’accompagnement.',auto:true});
+ if(m.cycle?.start)rows.push({date:m.cycle.start,title:'Début du cycle — '+(m.cycle.title||'cycle actuel'),detail:'',auto:true});
+ if(m.cycle?.end)rows.push({date:m.cycle.end,title:'Fin du cycle / retest',detail:'Bilan du cycle en cours.',auto:true});
+ if(next?.starts_at)rows.push({date:isoDate(next.starts_at),title:'Prochaine visio',detail:fmtTime(next.starts_at),auto:true});
+ if(m.end)rows.push({date:m.end,title:'Fin d’engagement',detail:'Échéance actuelle de l’accompagnement.',auto:true});
+ const seen=new Set(),unique=rows.filter(x=>{const k=x.date+'|'+x.title.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.date.localeCompare(b.date));
+ return '<div class="akp-page">'+
+  '<div class="akp-page-title"><div><span>CHRONOLOGIE</span><h2>Parcours sportif</h2><p>Tests, compétitions, visios, reprises et changements de cycle dans une seule ligne de temps.</p></div></div>'+
+  '<div class="akp-sport-timeline">'+(unique.length?unique.map(x=>{const t=passportEventType(x.title,x.detail),past=x.date<=localDateISO();return '<div class="akp-timeline-item '+t.key+' '+(past?'past':'future')+'"><div class="akp-timeline-date"><strong>'+fmtDate(x.date)+'</strong><span>'+esc(t.label)+'</span></div><div class="akp-timeline-marker">'+t.icon+'</div><div class="akp-timeline-card"><div><span class="akp-type '+t.key+'">'+esc(t.label)+'</span>'+(x.auto?'<span class="akp-auto">AUTO</span>':'')+'</div><h3>'+esc(x.title)+'</h3>'+(x.detail?'<p>'+esc(x.detail)+'</p>':'')+'</div></div>'}).join(''):'<div class="akp-empty-big">Aucun jalon enregistré.</div>')+'</div>'+
  '</div>';
 }
-function passportNotesPage(m){
- const checks=(m.checkins||[]).slice().sort((a,b)=>String(b.date??b.week_date).localeCompare(String(a.date??a.week_date))).slice(0,6);
- const coachNotes=[m.observations?.decisions,m.observations?.visio].filter(Boolean);
- return '<div class="health-page">'+
-  '<div class="health-page-heading"><div><span class="health-kicker">OBSERVATIONS</span><h2>Ce qu’on retient du suivi</h2><p>Les éléments qualitatifs qui donnent du sens aux chiffres.</p></div></div>'+
-  '<div class="health-notes-grid">'+
-   '<section><span class="health-section-label">Synthèse coach</span>'+(coachNotes.length?coachNotes.map(x=>'<div class="health-note-paper">'+esc(x)+'</div>').join(''):'<div class="health-note-paper muted-note">Les décisions et synthèses importantes apparaîtront ici.</div>')+'</section>'+
-   '<section><span class="health-section-label">Derniers bilans qualitatifs</span><div class="health-checkin-list">'+(checks.length?checks.map(w=>{const date=isoDate(w.date??w.week_date),coach=w.coach??w.coach_feedback??w.coach_decision??'',pain=w.pain??w.pain_or_discomfort??'',constraint=w.nextConstraint??w.next_week_constraints??'';return '<div><div class="health-checkin-date">'+fmtDate(date)+'</div><strong>'+esc(coach||'Bilan enregistré')+'</strong>'+((pain||constraint)?'<p>'+esc([pain&&'Gêne : '+pain,constraint&&'Contrainte : '+constraint].filter(Boolean).join(' • '))+'</p>':'')+'</div>'}).join(''):'<div class="health-note-paper muted-note">Aucun bilan qualitatif enregistré.</div>')+'</div></section>'+
+function passportFollowupPage(m){
+ const checks=(m.checkins||[]).slice().sort((a,b)=>String(b.date??b.week_date).localeCompare(String(a.date??a.week_date)));
+ const groups=passportTestGroups(m.tests),metrics=groups.map(g=>({g,d:passportMetricDelta(g)})).filter(x=>x.d&&x.d.count>=2);
+ const improved=metrics.filter(x=>x.d.improved===true).length;
+ const latest=checks[0]||null,cs=passportCycleStats(m.cycle),retest=passportNextRetest(m);
+ const coachDecision=m.observations?.decisions||'',visio=m.observations?.visio||'';
+ const focus=(m.cycle?.priorities||'À définir').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'À définir';
+ const vigilance=(m.cycle?.vigilance||'Aucun point signalé').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'Aucun point signalé';
+ return '<div class="akp-page">'+
+  '<div class="akp-page-title"><div><span>SUIVI</span><h2>Lecture qualitative & bilan de période</h2><p>Ce que les chiffres seuls ne racontent pas.</p></div></div>'+
+  '<div class="akp-follow-layout">'+
+   '<section class="akp-panel akp-follow-feed"><div class="akp-section-head"><div><span class="akp-label">DERNIERS BILANS</span><h3>Retours qualitatifs</h3></div><span class="akp-mini-status">'+checks.length+' bilan'+(checks.length>1?'s':'')+'</span></div>'+
+    (checks.length?checks.slice(0,6).map(w=>{const date=isoDate(w.date??w.week_date),feeling=w.feeling??w.overall_week??'',pain=w.pain??w.pain_or_discomfort??'',problem=w.problem??w.exercise_problem??'',constraint=w.nextConstraint??w.next_week_constraints??'',coach=w.coach??w.coach_feedback??w.coach_decision??'';return '<article class="akp-checkin"><div class="akp-checkin-date">'+fmtDate(date)+'</div><div><div class="akp-checkin-tags">'+(pain?'<span class="warn">Gêne / douleur</span>':'')+(problem?'<span>Exercice</span>':'')+(constraint?'<span>Contrainte</span>':'')+'</div><strong>'+esc(coach||feeling||'Bilan enregistré')+'</strong>'+([pain&&'Douleur/gêne : '+pain,problem&&'Exercice : '+problem,constraint&&'À venir : '+constraint].filter(Boolean).length?'<p>'+esc([pain&&'Douleur/gêne : '+pain,problem&&'Exercice : '+problem,constraint&&'À venir : '+constraint].filter(Boolean).join(' • '))+'</p>':'')+'</div></article>'}).join(''):'<div class="akp-empty-inline">Aucun bilan qualitatif enregistré.</div>')+
+   '</section>'+
+   '<aside class="akp-follow-side">'+
+    '<section class="akp-panel akp-period-review"><span class="akp-label">BILAN DE PÉRIODE</span><div class="akp-review-row"><span>Avancement cycle</span><strong>'+cs.pct+' %</strong></div><div class="akp-review-row"><span>Repères en progression</span><strong>'+improved+' / '+metrics.length+'</strong></div><div class="akp-review-row"><span>Focus à poursuivre</span><strong>'+esc(focus)+'</strong></div><div class="akp-review-row warn"><span>À surveiller</span><strong>'+esc(vigilance)+'</strong></div><div class="akp-review-row"><span>Prochaine étape</span><strong>'+(retest?fmtDate(retest.date)+' — '+esc(retest.title||'Retest'):'À planifier')+'</strong></div></section>'+
+    '<section class="akp-panel"><span class="akp-label">DÉCISIONS / ADAPTATIONS</span>'+(coachDecision?'<p class="akp-coach-note">'+esc(coachDecision)+'</p>':visio?'<p class="akp-coach-note">'+esc(visio)+'</p>':'<p class="akp-muted-note">Les décisions importantes du suivi apparaîtront ici lorsqu’elles sont renseignées.</p>')+'</section>'+
+   '</aside>'+
   '</div>'+
  '</div>';
 }
 function renderPassportBookPage(m){
- if(passportBookPage==='situation')return passportSituationPage(m);
  if(passportBookPage==='cycle')return passportCyclePage(m);
  if(passportBookPage==='progress')return passportProgressPage(m);
  if(passportBookPage==='timeline')return passportTimelinePage(m);
- if(passportBookPage==='notes')return passportNotesPage(m);
- return passportIdentityPage(m);
+ if(passportBookPage==='followup')return passportFollowupPage(m);
+ return passportOverviewPage(m);
 }
 function bindPassportBook(){
- const root=document.querySelector('.health-passport-book');if(!root||!passportActiveModel)return;
+ const root=document.querySelector('.akp-passport');if(!root||!passportActiveModel)return;
  const body=root.querySelector('#passportBookBody');if(!body)return;
  const rerender=()=>{
    body.innerHTML=renderPassportBookPage(passportActiveModel);
    root.querySelectorAll('.passportBookTab').forEach(b=>b.classList.toggle('on',b.dataset.passportPage===passportBookPage));
    bindPassportBook();
  };
- root.querySelectorAll('.passportBookTab').forEach(b=>b.onclick=()=>{passportBookPage=b.dataset.passportPage||'identity';rerender()});
+ root.querySelectorAll('.passportBookTab').forEach(b=>b.onclick=()=>{passportBookPage=b.dataset.passportPage||'overview';rerender()});
+ root.querySelectorAll('.passportInlineNav').forEach(b=>b.onclick=()=>{passportBookPage=b.dataset.passportPage||'overview';rerender()});
  root.querySelectorAll('.passportMetricBtn').forEach(b=>b.onclick=()=>{passportSelectedTestKey=b.dataset.testKey||'';passportBookPage='progress';rerender()});
+ root.querySelectorAll('.passportMetricJump').forEach(b=>b.onclick=()=>{passportSelectedTestKey=b.dataset.testKey||'';passportBookPage='progress';rerender()});
 }
 function renderPremiumPassport(m){
  passportActiveModel=m;
@@ -1387,11 +1473,8 @@ function renderPremiumPassport(m){
  if(groups.length&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
    passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
  }
- return '<div class="health-passport-book">'+
-  '<header class="health-book-header"><div><span>AK PRIME</span><strong>Carnet sportif individuel</strong></div><div class="health-book-owner"><b>'+esc(m.name||'Client AK PRIME')+'</b><small>'+esc([m.sport,m.specialty].filter(Boolean).join(' • ')||m.pole||'Suivi sportif')+'</small></div></header>'+
-  passportBookNav()+
-  '<main id="passportBookBody" class="health-book-body">'+renderPassportBookPage(m)+'</main>'+
- '</div>';
+ if(!['overview','cycle','progress','timeline','followup'].includes(passportBookPage))passportBookPage='overview';
+ return '<div class="akp-passport">'+passportHeader(m)+passportBookNav()+'<main id="passportBookBody" class="akp-body">'+renderPassportBookPage(m)+'</main></div>';
 }
 
 function passport(c){
