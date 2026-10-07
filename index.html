@@ -374,6 +374,11 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .true-client-demo .client-time-grid .btn,.true-client-demo .client-week-tabs button,.true-client-demo .client-day-btn{pointer-events:none}
 .true-client-demo .premium-passport{margin:0}
 @media(max-width:760px){.true-client-demo .client-top{align-items:flex-start}.true-client-demo .client-user-mini{display:none}.true-client-demo .client-nav{width:100%}}
+
+.passport-test-manager{border-color:#d7e0e9;background:linear-gradient(180deg,#fff,#fbfcfd)}
+.passport-test-categories{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.passport-test-categories span{border:1px solid #dfe5ec;background:#f7f9fb;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:850;color:#667586}
+.passport-test-history{border-top:1px solid #e7ebf0;margin-top:14px;padding-top:13px}.passport-test-table{display:flex;flex-direction:column;gap:6px;margin-top:10px}.passport-test-row{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;gap:12px;align-items:center;border:1px solid #e6ebf0;background:#fff;border-radius:11px;padding:10px 11px}.passport-test-row strong{display:block;font-size:11px}.passport-test-row span{display:block;color:#778596;font-size:9px;margin-top:3px}.passport-test-row>b{font-size:12px;color:#26364a}
+@media(max-width:650px){.passport-test-row{grid-template-columns:1fr auto}.passport-test-row .link{grid-column:1/-1;text-align:left;padding:0}}
 </style>
 </head>
 <body>
@@ -832,17 +837,17 @@ function shell(inner){
  return '<div class="app">'+
  '<aside class="sidebar"><div class="brand"><div class="brand-mark">AK</div><div><strong>AK PRIME</strong><span>COACH CONSOLE</span></div></div>'+
  '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
- navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('globalTests','Tests')+navBtn('calendar','Calendrier')+
+ navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
  '<main><div class="topbar"><div class="topbar-title"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){
- const icons={dashboard:'⌂',clients:'◎',globalTests:'◇',calendar:'◷',backup:'⇩',settings:'⚙'};
+ const icons={dashboard:'⌂',clients:'◎',calendar:'◷',backup:'⇩',settings:'⚙'};
  return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'"><span class="nav-ico">'+esc(icons[v]||'•')+'</span><span class="nav-label">'+esc(label)+'</span></button>';
 }
-function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',globalTests:'Tests',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
+function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
 
 function dashboard(){
  const acts=activeClients();
@@ -887,7 +892,7 @@ function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inact
 
 function clientPage(){
  const c=currentClient();if(!c)return clientsPage();
- const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding & Visio'],['tests','Tests'],['follow','Suivi'],['passport','Passeport'],['history','Historique'],['admin','Administratif']];
+ const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding & Visio'],['follow','Suivi'],['passport','Passeport'],['history','Historique'],['admin','Administratif']];
  return '<button class="btn ghost small no-print" id="backClients" style="margin-bottom:10px">← Clients</button>'+
  '<div class="card client-head"><div class="person"><div class="photo">'+esc(c.initials||initials(c.name))+'</div><div><div class="row"><h2>'+esc(c.name)+'</h2>'+status(c.status)+'</div><div class="meta"><span>'+esc(c.pole)+'</span><span>• '+esc(c.offer)+'</span>'+(c.sport?'<span>• '+esc(c.sport)+'</span>':'')+(c.specialty?'<span>• '+esc(c.specialty)+'</span>':'')+(c.level?'<span>• '+esc(c.level)+'</span>':'')+'</div></div></div>'+
  '<div class="metrics"><div class="metric"><span>Début</span><strong>'+fmtDate(c.start)+'</strong></div><div class="metric"><span>Fin engagement</span><strong>'+fmtDate(c.end)+'</strong></div><div class="metric"><span>Prochaine visio</span><strong>'+fmtDate(c.next)+'</strong></div></div></div>'+
@@ -895,7 +900,6 @@ function clientPage(){
 }
 function clientTab(c){
  if(state.tab==='onboarding')return onboarding(c);
- if(state.tab==='tests')return testsTab(c);
  if(state.tab==='follow')return follow(c);
  if(state.tab==='passport')return passport(c);
  if(state.tab==='history')return history(c);
@@ -911,7 +915,7 @@ function overview(c){
  '</div></div><div class="grid3" style="margin-top:13px">'+
  '<div class="card panel"><h3>Tests</h3><div class="kpi"><div class="val">'+testCount+'</div><div class="sub">résultats enregistrés</div></div></div>'+
  '<div class="card panel"><h3>Check-ins</h3><div class="kpi"><div class="val">'+checkCount+'</div><div class="sub">bilans hebdomadaires</div></div></div>'+
- '<div class="card panel"><h3>Actions rapides</h3><button class="btn ghost small quickTab" data-tab="tests">Ajouter un test</button> <button class="btn ghost small quickTab" data-tab="follow">Ajouter un check-in</button></div></div>';
+ '<div class="card panel"><h3>Actions rapides</h3><button class="btn ghost small quickTab" data-tab="passport">Ajouter un test au Passeport</button> <button class="btn ghost small quickTab" data-tab="follow">Ajouter un check-in</button></div></div>';
 }
 function fieldStatic(label,value){return '<div class="item"><strong>'+label+'</strong><div>'+esc(value)+'</div></div>'}
 function progressRow(label,val){return '<div style="margin-bottom:12px"><div class="row between"><span class="tiny"><strong>'+label+'</strong></span><span class="tiny muted">'+val+'%</span></div><div class="progress"><i style="width:'+val+'%"></i></div></div>'}
@@ -929,7 +933,7 @@ function onboarding(c){
  '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0">'+stepOrder.map((s,i)=>'<div class="item" style="padding:9px;background:'+(i<=stepIndex?'#eef3ff':'#fbfcfe')+'"><div class="tiny '+(i<=stepIndex?'':'muted')+'">'+(i+1)+'. '+esc(stepLabels[s])+'</div></div>').join('')+'</div>'+
  (ob.currentStep==='visio'?'<button class="btn primary small" id="completeInitialVisio">Valider la visio initiale</button>':'')+
  ((ob.visioCompletedAt||ob.currentStep==='tests'||ob.currentStep==='programming'||ob.currentStep==='active')?'<div class="section-title">Tests requis avant programmation</div><div class="list">'+(reqRows||'<div class="muted tiny">Aucun test requis défini. Ajoute les tests sélectionnés après la visio, ou passe directement à la programmation si aucun test n’est nécessaire.</div>')+'</div><div class="row" style="margin-top:9px"><input id="requiredTestName" class="input grow" placeholder="Ex. CMJ, Sprint 10 m…"><button class="btn ghost small" id="addRequiredTest">Ajouter</button></div>'+
- (ob.currentStep==='tests'?'<div class="alert blue" style="margin-top:12px"><strong>Décision coach</strong><div class="tiny" style="margin-top:4px">'+(required.length?'Tu peux attendre les résultats, ou décider que les tests restants ne sont finalement pas nécessaires.':'Si aucun test n’est nécessaire pour ce client, passe directement à la programmation.')+'</div><button class="btn primary small" id="forceProgrammingReady" style="margin-top:8px">'+(required.length?'Passer quand même en prêt pour programmation':'Aucun test requis — passer en prêt pour programmation')+'</button></div>':''):'')+
+ (ob.currentStep==='tests'?'<div class="alert blue" style="margin-top:12px"><strong>Résultats à saisir dans le Passeport</strong><div class="tiny" style="margin-top:4px">'+(required.length?'Les tests requis restent suivis ici, mais tous les résultats sont ajoutés depuis le Passeport.':'Si aucun test n’est nécessaire pour ce client, passe directement à la programmation.')+'</div><div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn ghost small quickTab" data-tab="passport">Ouvrir le Passeport</button><button class="btn primary small" id="forceProgrammingReady">'+(required.length?'Passer quand même en prêt pour programmation':'Aucun test requis — passer en prêt pour programmation')+'</button></div></div>':''):'')+
  (ob.currentStep==='programming'?'<div class="alert green" style="margin-top:12px"><strong>'+(ob.testsWaived?'Prêt pour programmation — validation manuelle du coach.':'Tous les tests requis sont validés.')+'</strong><div class="tiny" style="margin-top:4px">La programmation peut maintenant être réalisée.</div><button class="btn primary small" id="completeProgramming" style="margin-top:8px">Marquer la programmation réalisée</button></div>':'')+
  (ob.currentStep==='active'?'<div class="alert green" style="margin-top:12px"><strong>Onboarding terminé.</strong> L’accompagnement est actif.</div>':'')+
  '</div><div class="grid31"><div class="card panel"><h3>Questionnaire initial</h3><p class="muted tiny">Réponses centralisées.</p>'+
@@ -947,31 +951,6 @@ function offerSpecificBlocks(c){
  '<button class="btn primary small saveOfferNotes">Enregistrer les approfondissements</button>';
 }
 
-function testsTab(c){
- const history=(c.tests||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
- const required=c.onboarding?.testsRequired||[];
- const requiredRows=required.map(name=>{
-   const found=history.find(t=>normalizeTestName(t.name)===normalizeTestName(name));
-   return '<div class="item row between"><div><strong>'+esc(name)+'</strong><div class="tiny '+(found?'account-good':'account-wait')+'">'+(found?'Résultat enregistré : '+esc(found.value)+' '+esc(found.unit||''):'Résultat à saisir')+'</div></div>'+
-   (found?'<span class="status green">Validé</span>':'<button class="btn primary small addRequiredResult" data-test-name="'+esc(name)+'">Ajouter le résultat</button>')+'</div>';
- }).join('');
- const doneCount=required.filter(name=>history.some(t=>normalizeTestName(t.name)===normalizeTestName(name))).length;
- return '<div class="page-title"><div><h1 style="font-size:22px">Tests & évaluations</h1><p>Historique exhaustif du parcours.</p></div><button class="btn primary" id="addTest">+ Ajouter un résultat</button></div>'+
- '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Tests requis avant programmation</h3><div class="muted tiny">'+doneCount+' / '+required.length+' test(s) validé(s)</div></div>'+
- (required.length?'<span class="status '+(doneCount===required.length?'green':'amber')+'">'+(doneCount===required.length?'Tous validés':'À terminer')+'</span>':'<span class="status blue">Aucun test requis</span>')+'</div>'+
- '<div class="list" style="margin-top:12px">'+(requiredRows||'<div class="muted">Aucun test requis défini. Ajoute-les depuis Onboarding & Visio après la visio initiale.</div>')+'</div>'+
- (required.length&&doneCount===required.length?'<div class="alert green" style="margin-top:12px"><strong>Prêt pour programmation.</strong> Tous les tests requis ont un résultat enregistré.</div>':'')+
- '</div>'+
- '<div class="grid2"><div class="card panel"><h3>Historique</h3>'+
- (history.length?'<div class="test-row header"><div>Test</div><div>Date</div><div>Résultat</div><div>Contexte</div><div>Note</div><div></div></div>'+history.map(t=>'<div class="test-row"><div><strong>'+esc(t.name)+'</strong></div><div>'+fmtDate(t.date)+'</div><div>'+esc(t.value)+' '+esc(t.unit||'')+'</div><div>'+esc(t.context||'')+'</div><div class="muted tiny">'+esc(t.note||'')+'</div><div><button class="link deleteTest" data-id="'+t.id+'">Suppr.</button></div></div>').join(''):'<div class="muted">Aucun test enregistré.</div>')+
- '</div><div class="card panel"><h3>Évolution</h3>'+testProgress(c)+'</div></div>';
-}
-function testProgress(c){
- const groups={};(c.tests||[]).forEach(t=>{(groups[t.name]||(groups[t.name]=[])).push(t)});
- const multi=Object.entries(groups).filter(([k,v])=>v.length>=2);
- if(!multi.length)return '<div class="muted">Ajoute au moins deux résultats d’un même test pour visualiser une évolution.</div>';
- return multi.map(([name,arr])=>{arr.sort((a,b)=>a.date.localeCompare(b.date));const vals=arr.map(x=>Number(x.value));const max=Math.max(...vals),min=Math.min(...vals);return '<div class="item"><strong>'+esc(name)+'</strong><div class="spark">'+arr.map(x=>'<i title="'+esc(x.value)+'" style="height:'+(15+((Number(x.value)-min)/(max-min||1))*27)+'px"></i>').join('')+'</div><div class="muted tiny">'+fmtDate(arr[0].date)+' : '+arr[0].value+' '+esc(arr[0].unit||'')+' → '+fmtDate(arr[arr.length-1].date)+' : '+arr[arr.length-1].value+' '+esc(arr[arr.length-1].unit||'')+'</div></div>'}).join('');
-}
 
 function follow(c){
  const cy=c.cycle||{};
@@ -988,6 +967,43 @@ function follow(c){
 function fieldInput(label,path,value,type){return '<div class="field"><label>'+label+'</label><input class="input pathSave" data-path="'+path+'" type="'+(type||'text')+'" value="'+esc(value||'')+'"></div>'}
 function fieldArea(label,path,value){return '<div class="field"><label>'+label+'</label><textarea class="textarea pathSave" data-path="'+path+'">'+esc(value||'')+'</textarea></div>'}
 
+
+const TEST_LIBRARY=[
+ {name:'CMJ',category:'Explosivité',unit:'cm',hint:'Hauteur de saut vertical.'},
+ {name:'SJ',category:'Explosivité',unit:'cm',hint:'Squat Jump.'},
+ {name:'Sprint 10 m',category:'Vitesse',unit:'s',hint:'Temps sur 10 mètres.'},
+ {name:'Sprint 20 m',category:'Vitesse',unit:'s',hint:'Temps sur 20 mètres.'},
+ {name:'Sprint 30 m',category:'Vitesse',unit:'s',hint:'Temps sur 30 mètres.'},
+ {name:'Illinois',category:'Changement de direction',unit:'s',hint:'Temps total du test Illinois.'},
+ {name:'505',category:'Changement de direction',unit:'s',hint:'Temps du test 505.'},
+ {name:'30-15 IFT — VIFT',category:'Endurance',unit:'km/h',hint:'Vitesse finale atteinte au 30-15 IFT.'},
+ {name:'VMA',category:'Endurance',unit:'km/h',hint:'Vitesse maximale aérobie.'},
+ {name:'VMI',category:'Endurance',unit:'km/h',hint:'Vitesse maximale intermittente.'},
+ {name:'1RM estimée',category:'Force',unit:'kg',hint:'Charge maximale estimée.'},
+ {name:'3RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 3 répétitions.'},
+ {name:'4RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 4 répétitions.'},
+ {name:'5RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 5 répétitions.'},
+ {name:'6RM',category:'Force',unit:'kg',hint:'Charge réalisée sur 6 répétitions.'}
+];
+function testLibraryItem(name){return TEST_LIBRARY.find(x=>normalizeTestName(x.name)===normalizeTestName(name||''))||null}
+function testLibraryOptions(prefill=''){
+ const groups={};for(const t of TEST_LIBRARY)(groups[t.category]||(groups[t.category]=[])).push(t);
+ let html='<option value="">Choisir un test…</option>';
+ for(const [cat,items] of Object.entries(groups))html+='<optgroup label="'+esc(cat)+'">'+items.map(t=>'<option value="'+esc(t.name)+'" '+(normalizeTestName(prefill)===normalizeTestName(t.name)?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</optgroup>';
+ html+='<option value="__custom__" '+(prefill&&!testLibraryItem(prefill)?'selected':'')+'>Autre test…</option>';
+ return html;
+}
+function passportCoachTestManager(c){
+ const history=(c.tests||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const cats=[...new Set(TEST_LIBRARY.map(x=>x.category))];
+ return '<div class="card panel passport-test-manager no-print">'+
+  '<div class="row between" style="align-items:flex-start"><div><div class="section-title" style="margin-top:0">Bibliothèque de tests</div><h3 style="margin:3px 0 5px">Ajouter un résultat au Passeport</h3><div class="muted tiny">Sélectionne un test, saisis la date et la valeur. Le résultat alimente immédiatement les graphiques du Passeport coach et client.</div></div><button class="btn primary" id="addTest">+ Ajouter un résultat</button></div>'+
+  '<div class="passport-test-categories">'+cats.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+  '<div class="passport-test-history"><div class="row between"><h3 style="margin:0">Derniers résultats</h3><span class="status blue">'+history.length+' résultat'+(history.length>1?'s':'')+'</span></div>'+
+   (history.length?'<div class="passport-test-table">'+history.slice(0,10).map(t=>'<div class="passport-test-row"><div><strong>'+esc(t.name)+'</strong><span>'+fmtDate(t.date)+(t.context?' • '+esc(t.context):'')+'</span></div><b>'+esc(t.value)+' '+esc(t.unit||'')+'</b><button class="link deleteTest" data-id="'+t.id+'">Supprimer</button></div>').join('')+'</div>':'<div class="muted tiny" style="margin-top:10px">Aucun résultat enregistré pour le moment.</div>')+
+  '</div>'+
+ '</div>';
+}
 
 function passportTestRows(rawTests){
  return (rawTests||[]).map(t=>({
@@ -1092,8 +1108,9 @@ function renderPremiumPassport(m){
  '</div>';
 }
 function passport(c){
- return '<div class="page-title no-print"><div><h1 style="font-size:22px">Passeport AK PRIME</h1><p>Vue premium du parcours client, basée uniquement sur les données du dossier.</p></div><button class="btn primary" id="printPassport">Imprimer / PDF</button></div>'+
- renderPremiumPassport(passportModelFromCoach(c));
+ return '<div class="page-title no-print"><div><h1 style="font-size:22px">Passeport AK PRIME</h1><p>Tests, retests, progression et jalons du parcours sont centralisés ici.</p></div><button class="btn primary" id="printPassport">Imprimer / PDF</button></div>'+
+ passportCoachTestManager(c)+
+ '<div style="margin-top:13px">'+renderPremiumPassport(passportModelFromCoach(c))+'</div>';
 }
 
 function history(c){
@@ -1219,7 +1236,7 @@ function settingsPage(){
 
 function render(){
  const root=document.getElementById('root');
- const pages={dashboard,clients:clientsPage,client:clientPage,globalTests,calendar:calendarPage,backup:backupPage,settings:settingsPage};
+ const pages={dashboard,clients:clientsPage,client:clientPage,calendar:calendarPage,backup:backupPage,settings:settingsPage};
  root.innerHTML=shell((pages[state.view]||dashboard)());
  bind();
 }
@@ -1372,19 +1389,48 @@ function openNewClient(){
  };
 }
 function openAddTest(prefillName=''){
- modal('Ajouter un résultat de test',
- '<div class="grid2"><div class="field"><label>Test</label><input id="tName" class="input" placeholder="CMJ, Sprint 10 m…" value="'+esc(prefillName)+'"></div><div class="field"><label>Date</label><input id="tDate" type="date" class="input"></div>'+
- '<div class="field"><label>Résultat</label><input id="tValue" class="input" type="number" step="any"></div><div class="field"><label>Unité</label><input id="tUnit" class="input" placeholder="cm, s, kg…"></div>'+
- '<div class="field"><label>Contexte</label><input id="tContext" class="input" placeholder="Initial, retest S6…"></div><div class="field"><label>Interprétation coach</label><input id="tNote" class="input"></div></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
+ const initial=testLibraryItem(prefillName);
+ modal('Ajouter un résultat au Passeport',
+ '<div class="grid2"><div class="field"><label>Test</label><select id="tLibrary" class="select" style="width:100%">'+testLibraryOptions(prefillName)+'</select></div><div class="field"><label>Date</label><input id="tDate" type="date" class="input" value="'+localDateISO()+'"></div>'+
+ '<div class="field" id="tCustomWrap" style="'+(prefillName&&!initial?'':'display:none')+'"><label>Nom du test</label><input id="tCustomName" class="input" value="'+esc(prefillName&&!initial?prefillName:'')+'" placeholder="Nom du test"></div>'+
+ '<div class="field"><label>Valeur</label><input id="tValue" class="input" type="number" step="any" placeholder="Ex. 42.5"></div>'+
+ '<div class="field"><label>Unité</label><input id="tUnit" class="input" value="'+esc(initial?.unit||'')+'" placeholder="cm, s, kg, km/h…"></div>'+
+ '<div class="field"><label>Contexte <span class="muted">(facultatif)</span></label><input id="tContext" class="input" placeholder="Initial, retest S6, retour blessure…"></div>'+
+ '<div class="field"><label>Interprétation coach <span class="muted">(facultatif)</span></label><textarea id="tNote" class="textarea" style="min-height:75px"></textarea></div></div>'+
+ '<div id="tHint" class="alert blue" style="margin-top:8px">'+esc(initial?.hint||'Choisis un test dans la bibliothèque. L’unité se remplit automatiquement et reste modifiable.')+'</div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter au Passeport</button>');
  document.getElementById('cancelM').onclick=closeModal;
+ const sel=document.getElementById('tLibrary'),custom=document.getElementById('tCustomWrap'),unit=document.getElementById('tUnit'),hint=document.getElementById('tHint');
+ const sync=()=>{
+   const item=testLibraryItem(sel.value),isCustom=sel.value==='__custom__';
+   custom.style.display=isCustom?'block':'none';
+   if(item){unit.value=item.unit||'';hint.textContent=item.hint||''}
+   else if(isCustom){hint.textContent='Test personnalisé : indique son nom et son unité.'}
+   else {unit.value='';hint.textContent='Choisis un test dans la bibliothèque.'}
+ };
+ sel.onchange=sync;
  document.getElementById('saveM').onclick=async()=>{
-   const n=document.getElementById('tName').value.trim();if(!n)return toast('Nom du test requis');
-   const cl=currentClient(),row={client_id:cl.id,test_name:n,performed_at:(document.getElementById('tDate').value||new Date().toISOString().slice(0,10))+'T12:00:00Z',result_value:document.getElementById('tValue').value||null,unit:document.getElementById('tUnit').value||null,context:document.getElementById('tContext').value||null,coach_interpretation:document.getElementById('tNote').value||null,created_by:authUser.id};
-   const {data,error}=await supa.from('tests').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
-   closeModal();await loadSupabaseData();toast('Test ajouté');render();
+   const selected=sel.value;
+   const n=selected==='__custom__'?document.getElementById('tCustomName').value.trim():selected.trim();
+   const value=document.getElementById('tValue').value;
+   if(!n)return toast('Sélectionne ou renseigne un test');
+   if(value==='')return toast('Valeur du test requise');
+   const cl=currentClient(),row={
+     client_id:cl.id,
+     test_name:n,
+     performed_at:(document.getElementById('tDate').value||localDateISO())+'T12:00:00Z',
+     result_value:value,
+     unit:document.getElementById('tUnit').value.trim()||null,
+     context:document.getElementById('tContext').value.trim()||null,
+     coach_interpretation:document.getElementById('tNote').value.trim()||null,
+     include_in_passport:true,
+     created_by:authUser.id
+   };
+   const {error}=await supa.from('tests').insert(row);if(error)return toast('Erreur : '+error.message);
+   closeModal();await loadSupabaseData();toast('Résultat ajouté au Passeport');state.tab='passport';render();
  };
 }
+
 function openCheckin(){
  modal('Ajouter un check-in',
  '<div class="field"><label>Date / vendredi</label><input id="wDate" type="date" class="input"></div>'+
@@ -1572,10 +1618,10 @@ function renderClientQuestionnaireSection(s){
 }
 function renderClientSuivi(s){
  const c=s.client;
- return '<div class="client-main"><div class="client-page-head"><div><h2>Mon suivi</h2><p>Questionnaire, bilan hebdomadaire et retours du coach.</p></div></div>'+
+ return '<div class="client-main"><div class="client-page-head"><div><h2>Mon suivi</h2><p>Questionnaire, bilan qualitatif et retours du coach.</p></div></div>'+
  renderClientWeeklyCheckin(s)+
  renderClientQuestionnaireSection(s)+
- '<div class="client-section-card"><h3>Mes derniers tests</h3>'+((s.tests||[]).length?s.tests.slice(0,6).map(x=>'<div class="item row between"><div><strong>'+esc(x.test_name)+'</strong><div class="muted tiny">'+fmtDate(String(x.performed_at).slice(0,10))+'</div></div><b>'+esc(x.result_value??x.result_text??'')+' '+esc(x.unit||'')+'</b></div>').join(''):'<div class="muted">Aucun test affiché pour le moment.</div>')+'</div>'+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Tests & progression</h3><div class="muted tiny">Tes résultats, retests et courbes sont regroupés dans ton Passeport AK PRIME.</div></div><button class="btn ghost small clientGoPassport">Voir mon Passeport</button></div></div>'+
  '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(c.optitrainer_url?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
  '</div>';
 }
@@ -2141,14 +2187,15 @@ function performanceDemoVisios(tier){
 }
 function performanceDemoSuivi(tier){
  const c=performanceDemoConfig(tier);
- return '<div class="client-page-head"><div><h2>Mon suivi</h2><p>Dossier, retours qualitatifs, tests et lien vers l’entraînement.</p></div></div>'+
+ return '<div class="client-page-head"><div><h2>Mon suivi</h2><p>Dossier, retours qualitatifs et lien vers l’entraînement.</p></div></div>'+
  '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><h3 style="margin-bottom:4px">Bilan qualitatif</h3><div class="muted tiny">Complète Optitrainer sans recopier les données déjà suivies là-bas.</div></div><span class="status amber">À remplir</span></div>'+
   '<div class="questionnaire-answers" style="margin-top:12px"><div class="questionnaire-answer"><strong>Un exercice ou une séance t’a posé problème ?</strong><div>RAS cette semaine.</div></div><div class="questionnaire-answer"><strong>Douleur ou gêne inhabituelle ?</strong><div>Légère gêne adducteur après la séance de mardi.</div></div><div class="questionnaire-answer"><strong>Contrainte semaine prochaine ?</strong><div>Déplacement professionnel jeudi.</div></div></div>'+
  '</div>'+
- '<div class="client-section-card"><h3>Mes derniers tests</h3><div class="item row between"><div><strong>CMJ filmé</strong><div class="muted tiny">03 octobre</div></div><b>+4 %</b></div><div class="item row between"><div><strong>Force estimée 3–6RM</strong><div class="muted tiny">03 octobre</div></div><b>Référence initiale</b></div><div class="item row between"><div><strong>Retest</strong><div class="muted tiny">Semaine 6</div></div><span class="status blue">À venir</span></div></div>'+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Tests & progression</h3><div class="muted tiny">Résultats, retests et courbes sont regroupés dans le Passeport.</div></div><span class="status blue">Passeport</span></div></div>'+
  '<div class="client-section-card"><h3>Contact & entraînement</h3><div class="client-home-actions"><button class="btn primary" style="pointer-events:none">Ouvrir Optitrainer</button><button class="btn ghost" style="pointer-events:none">Contacter le coach</button></div><div class="muted tiny" style="margin-top:10px">Les données d’entraînement restent dans Optitrainer ; AK PRIME centralise le dossier, les échanges et les décisions importantes.</div></div>'+
  (c.tier==='P3'?'<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Suivi P3 complémentaire</h3><div class="muted tiny">Éléments suivis en plus du programme Optitrainer.</div></div><span class="status green">P3</span></div><div class="grid2"><div class="item"><strong>Sommeil</strong><div class="muted tiny">Durée, qualité perçue et régularité.</div></div><div class="item"><strong>Budget macros</strong><div class="muted tiny">Repères calorique et macronutriments.</div></div><div class="item"><strong>Réactivité</strong><div class="muted tiny">Ajustement sous 48 h si nécessaire.</div></div><div class="item"><strong>Récupération</strong><div class="muted tiny">Séance dédiée ajoutée si utile.</div></div></div></div>':'');
 }
+
 function performanceDemoPassport(tier){
  const c=performanceDemoConfig(tier);
  return '<div class="pp-actions"><span class="status blue">Aperçu</span></div>'+
