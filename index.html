@@ -196,6 +196,24 @@ const supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let authUser=null;
 let authProfile=null;
 let calendarChannel=null;
+let publicOfferCatalog={};
+
+async function loadPublicOfferCatalog(){
+ const {data,error}=await supa.from('offer_catalog')
+   .select('code,pole,offer_name,base_monthly_cents,display_order')
+   .eq('active',true)
+   .order('display_order');
+ if(error){
+   console.warn('AK PRIME offer_catalog indisponible, utilisation des tarifs de secours locaux.',error);
+   return false;
+ }
+ publicOfferCatalog=Object.fromEntries((data||[]).map(x=>[x.code,x]));
+ return true;
+}
+function publicCatalogPrice(pole,offer,fallback){
+ const row=publicOfferCatalog[publicOfferCode(pole,offer)];
+ return row?Number(row.base_monthly_cents)/100:Number(fallback)||0;
+}
 
 const STORAGE_KEY='akprime-backoffice-v2';
 
@@ -360,6 +378,8 @@ function addMonthsISO(dateStr,months){
 function renewalDecisionLabel(v){return ({'3_months':'3 mois','6_months':'6 mois','monthly':'Mensuel sans engagement','stop':'Arrêt'})[v]||v||'—'}
 function renewalPaymentLabel(v){return ({monthly:'Paiement mensuel',upfront:'Paiement comptant'})[v]||'—'}
 function offerBaseMonthlyPrice(pole,offer){
+ const catalogPrice=publicCatalogPrice(pole,offer,0);
+ if(catalogPrice)return catalogPrice;
  const p=String(pole||'').toLowerCase(),o=String(offer||'').toLowerCase();
  if(p.includes('forme')){
    if(o.includes('renfor'))return 149;
@@ -1615,6 +1635,7 @@ async function saveClientQuestionnaire(statusValue){
 
 
 function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',featured=false){
+ price=publicCatalogPrice(pole,name,price);
  return '<div class="public-offer-card '+(featured?'featured':'')+'">'+
   '<div class="tag">'+esc(tag||pole)+'</div>'+
   '<h4>'+esc(name)+'</h4>'+
@@ -1777,6 +1798,7 @@ function openPublicLogin(message='',isError=false){
 
 
 function poleOfferMini(pole,name,price,subtitle,featured=false){
+ price=publicCatalogPrice(pole,name,price);
  return '<div class="pole-offer-mini '+(featured?'featured':'')+'"><div class="checkout-step">'+esc(featured?'Le plus complet':'Formule')+'</div><h4>'+esc(name)+'</h4><div class="price">'+esc(price)+' € <span>/ mois</span></div><p>'+esc(subtitle)+'</p><button class="btn '+(featured?'primary':'ghost')+' small poleOfferSelect" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir</button></div>';
 }
 function openPublicPoleDetails(key){
@@ -2002,6 +2024,7 @@ async function enterApp(user){
  }
 }
 async function initAuth(){
+ await loadPublicOfferCatalog();
  const {data:{session}}=await supa.auth.getSession();
  if(session?.user) await enterApp(session.user); else showAuth();
  supa.auth.onAuthStateChange(async(event,session)=>{
