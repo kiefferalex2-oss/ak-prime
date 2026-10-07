@@ -417,6 +417,42 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .client-passport-preview{background:linear-gradient(180deg,#fff,#fbfcfd)}.client-passport-preview-grid{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:8px;margin-top:13px}.client-passport-preview-grid>div{border:1px solid #e5eaf0;background:#fff;border-radius:11px;padding:11px}.client-passport-preview-grid span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#8491a1}.client-passport-preview-grid strong{display:block;font-size:12px;margin-top:5px;color:#223247}.client-passport-preview-grid small{display:block;font-size:8px;color:#7b8796;margin-top:5px;line-height:1.35}
 @media(max-width:980px){.coach-overview-stats{grid-template-columns:1fr 1fr}.passport-manager-grid{grid-template-columns:1fr}.client-passport-preview-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.coach-overview-stats{grid-template-columns:1fr}.passport-event-row{grid-template-columns:1fr auto}.passport-event-date{grid-column:1/-1}}
+
+/* =========================================================
+   PASSEPORT AK PRIME — CARNET SPORTIF
+   ========================================================= */
+.health-passport-book{background:#f4f0e8;color:#172231;border:1px solid #d8d1c5;border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(17,31,46,.10);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+.health-book-header{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:16px 20px;background:#13253a;color:#fff;border-bottom:4px solid #cba45d}
+.health-book-header>div:first-child span{display:block;color:#dcb66f;font-size:9px;letter-spacing:.18em;font-weight:950}.health-book-header>div:first-child strong{display:block;font-size:17px;margin-top:3px;letter-spacing:-.015em}
+.health-book-owner{text-align:right}.health-book-owner b{display:block;font-size:11px}.health-book-owner small{display:block;color:#9eafc0;font-size:8px;margin-top:3px}
+.health-book-nav{display:grid;grid-template-columns:repeat(6,1fr);background:#fff;border-bottom:1px solid #ddd7cc}
+.health-book-nav button{border:0;border-right:1px solid #ebe6dc;background:#fff;padding:11px 8px;color:#6e7882;font-size:9px;font-weight:850;cursor:pointer;text-align:left}.health-book-nav button:last-child{border-right:0}.health-book-nav button span{display:block;font-size:7px;color:#b28c4e;letter-spacing:.08em;margin-bottom:3px}.health-book-nav button.on{background:#f5efe3;color:#172231;box-shadow:inset 0 -3px 0 #c79d54}.health-book-nav button:hover{background:#faf7f1}
+.health-book-body{padding:24px;background:
+ linear-gradient(rgba(19,37,58,.025) 1px,transparent 1px),
+ #faf8f3;background-size:100% 31px;min-height:650px}
+.health-page{max-width:1180px;margin:0 auto}.health-kicker,.health-section-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#9a7338;font-weight:950}
+.health-page-heading{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;border-bottom:2px solid #20364d;padding-bottom:13px;margin-bottom:19px}.health-page-heading h2{font-family:Georgia,'Times New Roman',serif;font-size:31px;line-height:1.05;margin:5px 0 0;color:#17283a;font-weight:700}.health-page-heading p{font-size:10px;color:#7a8289;margin:5px 0 0}.health-page-date{font-family:Georgia,serif;font-size:15px;color:#8c6b39}
+.health-cover{min-height:270px;background:#14283d;border-radius:14px;color:#fff;display:grid;grid-template-columns:150px 1fr;gap:28px;align-items:center;padding:34px 38px;position:relative;overflow:hidden}.health-cover:after{content:"";position:absolute;right:-80px;top:-90px;width:280px;height:280px;border:1px solid rgba(203,164,93,.18);border-radius:50%;box-shadow:0 0 0 32px rgba(203,164,93,.035),0 0 0 64px rgba(203,164,93,.025)}
+.health-cover-seal{width:132px;height:132px;border-radius:50%;border:2px solid #cda75f;display:grid;place-items:center;align-content:center;background:#102132;box-shadow:inset 0 0 0 7px #14283d,inset 0 0 0 8px rgba(205,167,95,.38)}.health-cover-seal span{font-family:Georgia,serif;color:#e0bd7c;font-size:43px;font-weight:700;line-height:.9}.health-cover-seal small{color:#9faeba;font-size:9px;letter-spacing:.24em;margin-top:7px}
+.health-cover-copy{position:relative;z-index:1}.health-cover-copy .health-kicker{color:#d7b36f}.health-cover-copy h1{font-family:Georgia,'Times New Roman',serif;font-size:42px;margin:8px 0 5px;letter-spacing:-.025em}.health-cover-copy p{margin:0;color:#b5c1cd;font-size:12px}.health-cover-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:20px}.health-cover-tags span{border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 9px;font-size:9px;color:#e4e8ec;background:rgba(255,255,255,.045)}
+.health-identity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px}.health-id-card{background:#fff;border:1px solid #dfd9cf;border-radius:10px;padding:13px 14px;min-height:75px}.health-id-card span{display:block;color:#8c8173;font-size:8px;text-transform:uppercase;letter-spacing:.08em}.health-id-card strong{display:block;font-family:Georgia,serif;color:#1b2c3e;font-size:15px;margin-top:7px}
+.health-identity-objective{margin-top:13px;background:#fffdf8;border-left:4px solid #c79d54;border-top:1px solid #e4ddd2;border-right:1px solid #e4ddd2;border-bottom:1px solid #e4ddd2;padding:15px 17px}.health-identity-objective span{display:block;font-size:8px;color:#92703b;font-weight:900;letter-spacing:.1em}.health-identity-objective strong{display:block;font-family:Georgia,serif;font-size:18px;line-height:1.4;color:#1b2c3e;margin-top:6px}
+.health-now-grid{display:grid;grid-template-columns:1.6fr repeat(2,.8fr);gap:10px}.health-cycle-focus{grid-row:span 2;background:#fff;border:1px solid #dcd6cc;border-radius:12px;padding:17px;display:grid;grid-template-columns:125px 1fr;gap:18px;align-items:center}.health-cycle-ring{--p:0;width:116px;height:116px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#c79d54 calc(var(--p)*1%),#e7e2d8 0);position:relative}.health-cycle-ring:after{content:"";position:absolute;inset:9px;background:#fff;border-radius:50%}.health-cycle-ring>div{position:relative;z-index:1;text-align:center}.health-cycle-ring strong{display:block;font-family:Georgia,serif;font-size:27px;color:#20354a}.health-cycle-ring span{font-size:8px;color:#7b7f80}.health-cycle-focus>div:last-child>span{font-size:8px;color:#92703b;text-transform:uppercase;font-weight:900}.health-cycle-focus h3{font-family:Georgia,serif;font-size:21px;margin:5px 0 4px}.health-cycle-focus p{font-size:9px;color:#7a8187}.health-long-progress{height:7px;background:#e9e4db;border-radius:99px;overflow:hidden;margin-top:14px}.health-long-progress i{display:block;height:100%;background:#c79d54}
+.health-now-card{background:#fff;border:1px solid #dfd9cf;border-radius:12px;padding:14px}.health-now-card span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:#8c8173}.health-now-card strong{display:block;font-family:Georgia,serif;font-size:19px;color:#1d3044;margin-top:8px}.health-now-card small{display:block;font-size:8px;color:#777f86;margin-top:5px;line-height:1.35}
+.health-focus-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}.health-focus-columns>div{background:#fff;border:1px solid #dfd9cf;border-radius:10px;padding:14px}.health-focus-columns span{font-size:8px;color:#92703b;text-transform:uppercase;font-weight:900}.health-focus-columns strong{display:block;font-size:12px;margin-top:5px}
+.health-cycle-percent{text-align:right}.health-cycle-percent strong{display:block;font-family:Georgia,serif;font-size:34px;color:#b38847}.health-cycle-percent span{font-size:8px;color:#777f86;text-transform:uppercase}.health-cycle-line{display:flex;align-items:stretch;gap:6px;overflow:auto;padding:13px 0 18px}.health-week-node{min-width:74px;border-top:4px solid #d9d3ca;background:#fff;border-left:1px solid #e1dcd3;border-right:1px solid #e1dcd3;border-bottom:1px solid #e1dcd3;border-radius:5px 5px 9px 9px;padding:11px 9px}.health-week-node b{display:block;font-family:Georgia,serif;font-size:16px;color:#6f777e}.health-week-node span{display:block;font-size:7px;color:#9a9a94;margin-top:5px}.health-week-node.done{border-top-color:#56816f;background:#f7fbf8}.health-week-node.done b{color:#386a56}.health-week-node.current{border-top-color:#c79d54;background:#fff9ec;box-shadow:0 5px 17px rgba(168,125,58,.10)}.health-week-node.current b{color:#9c7134}.health-week-node.retest{border-top-color:#20364d;background:#f5f7f9}.health-week-node.retest b{color:#20364d}
+.health-cycle-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.health-cycle-info-grid section{background:#fff;border:1px solid #dfd9cf;border-radius:11px;padding:15px}.health-number-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}.health-number-list>div{display:grid;grid-template-columns:31px 1fr;gap:9px;align-items:center;border-bottom:1px solid #ede8df;padding:7px 0}.health-number-list>div:last-child{border-bottom:0}.health-number-list b{font-family:Georgia,serif;color:#b18849}.health-number-list span{font-size:10px}.health-number-list.warn b{color:#af624c}.health-cycle-footer{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:11px}.health-cycle-footer>div{background:#20364d;color:#fff;border-radius:9px;padding:12px}.health-cycle-footer span{display:block;font-size:7px;color:#9eb0c0;text-transform:uppercase}.health-cycle-footer strong{display:block;font-family:Georgia,serif;font-size:16px;margin-top:5px}
+.health-test-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.health-test-summary button{border:1px solid #ddd7cc;background:#fff;border-radius:10px;padding:11px;text-align:left;cursor:pointer}.health-test-summary button span{display:block;font-size:8px;color:#7c827f;font-weight:850}.health-test-summary button strong{display:block;font-family:Georgia,serif;font-size:17px;color:#22364a;margin-top:6px}.health-test-summary button small{display:inline-block;margin-top:7px;font-size:8px;border-radius:99px;padding:3px 6px;background:#ece8e1;color:#6f767a}.health-test-summary button.good small{background:#e6f2ec;color:#3c765e}.health-test-summary button.watch small{background:#f7e8e3;color:#a15442}.health-test-summary button.on{border-color:#b98b48;box-shadow:0 0 0 2px rgba(185,139,72,.11);background:#fffaf0}
+.health-test-detail{background:#fff;border:1px solid #dcd6cc;border-radius:12px;padding:17px}.health-test-detail-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-bottom:1px solid #e6e0d7;padding-bottom:11px}.health-test-detail-head h3{font-family:Georgia,serif;font-size:23px;margin:4px 0 0}.health-change-pill{font-size:10px;font-weight:900;padding:6px 9px;border-radius:999px;background:#ece8e1;color:#6f767a}.health-change-pill.good{background:#e6f2ec;color:#3c765e}.health-change-pill.watch{background:#f7e8e3;color:#a15442}
+.health-test-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:13px 0}.health-test-kpis>div{background:#f9f7f2;border:1px solid #e6e0d6;border-radius:9px;padding:10px}.health-test-kpis span{display:block;font-size:7px;color:#8b8277;text-transform:uppercase}.health-test-kpis strong{display:block;font-family:Georgia,serif;font-size:17px;margin-top:5px}.health-test-kpis small{font-size:8px;color:#888}
+.health-chart-shell{background:#182b3f;border-radius:10px;padding:11px}.health-chart-shell .pp-chart-grid{stroke:#30465a}.health-chart-shell .pp-chart-axis{fill:#91a5b8}.health-chart-shell .pp-chart-value{fill:#e4bd76}
+.health-measure-history{margin-top:12px;border:1px solid #e2dcd2;border-radius:9px;overflow:hidden}.health-measure-head,.health-measure-row{display:grid;grid-template-columns:100px 110px 1fr 1.4fr;gap:8px;padding:9px 10px;align-items:center}.health-measure-head{background:#20364d;color:#fff;font-size:8px;text-transform:uppercase;letter-spacing:.06em}.health-measure-row{border-top:1px solid #ece7de;font-size:9px}.health-measure-row strong{color:#1f3348}
+.health-timeline{position:relative;margin-top:10px}.health-timeline:before{content:"";position:absolute;left:125px;top:0;bottom:0;width:2px;background:#d6d0c6}.health-timeline-row{display:grid;grid-template-columns:105px 40px 1fr;gap:0;min-height:78px}.health-timeline-date{text-align:right;padding:15px 15px 0 0;font-family:Georgia,serif;color:#83643a;font-size:12px}.health-timeline-dot{position:relative}.health-timeline-dot:before{content:"";position:absolute;left:14px;top:17px;width:11px;height:11px;border-radius:50%;background:#c79d54;border:3px solid #faf8f3;box-shadow:0 0 0 1px #c79d54}.health-timeline-row.past .health-timeline-dot:before{background:#4f7968;box-shadow:0 0 0 1px #4f7968}.health-timeline-row>div:last-child{background:#fff;border:1px solid #dfd9cf;border-radius:9px;padding:11px 13px;margin:5px 0}.health-timeline-row>div:last-child span{font-size:7px;color:#92703b;text-transform:uppercase}.health-timeline-row>div:last-child strong{display:block;font-size:11px;margin-top:3px}.health-timeline-row>div:last-child p{font-size:9px;color:#747c82;margin:4px 0 0}
+.health-notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.health-notes-grid section{background:#fff;border:1px solid #ddd7cd;border-radius:11px;padding:15px}.health-note-paper{margin-top:10px;padding:13px 14px;background:repeating-linear-gradient(#fffdf8,#fffdf8 29px,#e9e3d9 30px);border:1px solid #e2dcd2;border-radius:7px;min-height:90px;line-height:30px;font-family:Georgia,serif;font-size:11px;color:#293a4c}.health-note-paper.muted-note{color:#84847d}.health-checkin-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.health-checkin-list>div{border-left:3px solid #c79d54;background:#faf8f3;padding:10px 11px}.health-checkin-date{font-size:8px;color:#8a6c40}.health-checkin-list strong{display:block;font-size:10px;margin-top:3px}.health-checkin-list p{font-size:8px;color:#7b7f82;margin:4px 0 0}
+.health-empty{background:#fff;border:1px dashed #d9d2c8;border-radius:10px;padding:35px;text-align:center;color:#85847e;font-size:11px}
+@media(max-width:1000px){.health-book-nav{grid-template-columns:repeat(3,1fr)}.health-now-grid{grid-template-columns:1fr 1fr}.health-cycle-focus{grid-column:1/-1;grid-row:auto}.health-test-summary{grid-template-columns:1fr 1fr}.health-identity-grid{grid-template-columns:1fr 1fr}.health-notes-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.health-book-header{align-items:flex-start}.health-book-owner{display:none}.health-book-body{padding:15px}.health-cover{grid-template-columns:1fr;padding:24px}.health-cover-seal{width:90px;height:90px}.health-cover-seal span{font-size:30px}.health-cover-copy h1{font-size:31px}.health-book-nav{grid-template-columns:1fr 1fr}.health-now-grid,.health-focus-columns,.health-cycle-info-grid,.health-cycle-footer,.health-identity-grid,.health-test-summary,.health-test-kpis{grid-template-columns:1fr}.health-cycle-focus{grid-template-columns:90px 1fr}.health-cycle-ring{width:82px;height:82px}.health-cycle-ring strong{font-size:21px}.health-page-heading{align-items:flex-start;flex-direction:column}.health-page-heading h2{font-size:25px}.health-measure-head,.health-measure-row{grid-template-columns:85px 90px 1fr}.health-measure-head span:last-child,.health-measure-row span:last-child{display:none}.health-timeline:before{left:92px}.health-timeline-row{grid-template-columns:72px 40px 1fr}.health-timeline-date{padding-right:8px;font-size:10px}}
+@media print{.health-book-nav{display:none!important}.health-book-body{min-height:0;background:#fff}.health-passport-book{box-shadow:none;border:0}.passport-manager-grid{display:none!important}}
 </style>
 </head>
 <body>
@@ -494,6 +530,9 @@ let clientVisioWeek=0;
 let clientVisioDay='';
 let clientQuestionnaireExpanded=false;
 let clientMobileMenuOpen=false;
+let passportBookPage='identity';
+let passportSelectedTestKey='';
+let passportActiveModel=null;
 const UI_STATUS_TO_DB={'Actif':'active','Inactif':'inactive','Pause':'paused','Onboarding':'onboarding','Prospect':'prospect'};
 
 function isoDate(v){return v?String(v).slice(0,10):''}
@@ -1079,14 +1118,16 @@ function passportModelFromCoach(c){
  const appts=(db.appointments||[]).filter(a=>a.client_id===c.id);
  return {name:c.name,initials:c.initials||initials(c.name),pole:c.pole,offer:c.offer,sport:c.sport||'',specialty:c.specialty||'',level:c.level||'',start:c.start,end:c.end,status:c.status,
    cycle:{title:c.cycle?.title||'',start:c.cycle?.start||'',end:c.cycle?.end||'',priorities:c.cycle?.priorities||'',vigilance:c.cycle?.vigilance||''},
-   tests:passportTestRows(c.tests),events:passportEventRows(c.events),checkins:c.checkins||[],appointments:passportAppointmentRows(appts)};
+   tests:passportTestRows(c.tests),events:passportEventRows(c.events),checkins:c.checkins||[],appointments:passportAppointmentRows(appts),
+   observations:{decisions:c.decisions||'',visio:c.visioNotes||'',privateNote:c.privateNote||''}};
 }
 function passportModelFromClient(s){
  const c=s.client||{},cy=s.cycle||{};
  const name=[c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ');
  return {name,initials:initials(name),pole:c.current_pole||'',offer:c.current_offer||'',sport:c.current_sport||'',specialty:c.position_or_specialty||'',level:c.level||'',start:isoDate(c.start_date),end:isoDate(c.engagement_end_date),status:c.status||'',
    cycle:{title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||''},
-   tests:passportTestRows(s.tests),events:passportEventRows(s.events),checkins:s.checkins||[],appointments:passportAppointmentRows(s.appointments)};
+   tests:passportTestRows(s.tests),events:passportEventRows(s.events),checkins:s.checkins||[],appointments:passportAppointmentRows(s.appointments),
+   observations:{decisions:'',visio:'',privateNote:''}};
 }
 function passportTestGroups(tests){
  const groups={};
@@ -1198,61 +1239,158 @@ function passportTestOverview(groups){
    return '<div class="pp-test-overview-row"><div><strong>'+esc(g.name)+'</strong><span>'+fmtDate(last.date)+' • '+g.rows.length+' mesure'+(g.rows.length>1?'s':'')+'</span></div><div class="pp-test-latest">'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</div><div class="pp-delta '+tone+'">'+esc(change)+'</div></div>';
  }).join('')+'</div>';
 }
-function renderPremiumPassport(m){
- const groups=passportTestGroups(m.tests),main=groups.find(g=>g.rows.length>=2)||groups[0];
- const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()),past=(m.appointments||[]).filter(a=>new Date(a.starts_at)<new Date());
- const next=future[0]||null,last=past.length?past[past.length-1]:null;
- const left=m.end?daysUntil(m.end):null;
- const engagementTone=left===null?'neutral':left<0?'warn':left<=14?'warn':'good';
- const engagementText=left===null?'À définir':left<0?'Échéance dépassée':left===0?'Échéance aujourd’hui':left+' j';
+function passportGroupBest(group){
+ if(!group?.rows?.length)return null;
+ const lib=testLibraryItem(group.name),dir=lib?.better||'higher';
+ return group.rows.reduce((best,row)=>{
+   if(!best)return row;
+   return dir==='lower'?(row.num<best.num?row:best):(row.num>best.num?row:best);
+ },null);
+}
+function passportSelectedGroup(groups){
+ if(!(groups||[]).length)return null;
+ let g=groups.find(x=>normalizeTestName(x.name)===passportSelectedTestKey);
+ if(!g){g=groups.find(x=>x.rows.length>=2)||groups[0];passportSelectedTestKey=normalizeTestName(g.name)}
+ return g;
+}
+function passportStatusLabel(status){
+ const v=String(status||'').toLowerCase();
+ if(v==='active'||v==='actif')return 'Suivi actif';
+ if(v==='onboarding')return 'Onboarding';
+ if(v==='paused'||v==='pause')return 'En pause';
+ if(v==='inactive'||v==='inactif')return 'Suivi terminé';
+ return status||'Suivi AK PRIME';
+}
+function passportBookNav(){
+ const items=[['identity','Identité'],['situation','Situation'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['notes','Observations']];
+ return '<nav class="health-book-nav">'+items.map(([k,l],i)=>'<button class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'"><span>0'+(i+1)+'</span>'+l+'</button>').join('')+'</nav>';
+}
+function passportIdentityPage(m){
+ const since=m.start?fmtDate(m.start):'À définir';
+ const end=m.end?fmtDate(m.end):'À définir';
+ const profile=[m.sport,m.specialty,m.level].filter(Boolean);
+ return '<div class="health-page identity-page">'+
+  '<div class="health-cover">'+
+   '<div class="health-cover-seal"><span>AK</span><small>PRIME</small></div>'+
+   '<div class="health-cover-copy"><div class="health-kicker">CARNET INDIVIDUEL DE SUIVI SPORTIF</div><h1>'+esc(m.name||'Client AK PRIME')+'</h1><p>'+esc(profile.join(' • ')||'Profil sportif à compléter')+'</p><div class="health-cover-tags"><span>'+esc(m.pole||'—')+'</span><span>'+esc(m.offer||'—')+'</span><span>'+esc(passportStatusLabel(m.status))+'</span></div></div>'+
+  '</div>'+
+  '<div class="health-identity-grid">'+
+   '<div class="health-id-card"><span>Discipline</span><strong>'+esc(m.sport||'À renseigner')+'</strong></div>'+
+   '<div class="health-id-card"><span>Poste / spécialité</span><strong>'+esc(m.specialty||'À renseigner')+'</strong></div>'+
+   '<div class="health-id-card"><span>Niveau</span><strong>'+esc(m.level||'À renseigner')+'</strong></div>'+
+   '<div class="health-id-card"><span>Suivi depuis</span><strong>'+since+'</strong></div>'+
+   '<div class="health-id-card"><span>Échéance actuelle</span><strong>'+end+'</strong></div>'+
+   '<div class="health-id-card"><span>Référent</span><strong>AK PRIME</strong></div>'+
+  '</div>'+
+  '<div class="health-identity-objective"><span>OBJECTIF / PRIORITÉS ACTUELLES</span><strong>'+esc(m.cycle?.priorities||'À définir avec le coach')+'</strong></div>'+
+ '</div>';
+}
+function passportSituationPage(m){
  const cs=passportCycleStats(m.cycle);
- const events=(m.events||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-8);
- const dates=passportImportantDates(m,events,next);
- const priorities=(m.cycle?.priorities||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,5);
- const vigilance=(m.cycle?.vigilance||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
- const nextDate=dates.next;
- const mainDelta=passportMetricDelta(main);
- const mainTone=mainDelta?.improved===true?'up':mainDelta?.improved===false?'down':'neutral';
- const mainChange=mainDelta&&mainDelta.count>=2&&mainDelta.pct!==null?passportSigned(mainDelta.pct)+' %':'—';
- return '<div class="premium-passport pp-v2">'+
-  '<div class="pp-v2-head">'+
-   '<div class="pp-v2-identity"><div class="pp-avatar">'+esc(m.initials||'AK')+'</div><div><div class="pp-eyebrow">Passeport AK PRIME</div><div class="pp-name">'+esc(m.name||'Client AK PRIME')+'</div><div class="pp-muted pp-tiny">'+esc([m.sport,m.specialty,m.level].filter(Boolean).join(' • ')||'Accompagnement AK PRIME')+'</div><div class="pp-tagrow"><span class="pp-tag">'+esc(m.pole||'—')+'</span><span class="pp-tag">'+esc(m.offer||'—')+'</span><span class="pp-pill '+engagementTone+'">'+esc(engagementText)+'</span></div></div></div>'+
-   '<div class="pp-v2-head-message"><span>Objectif actuel</span><strong>'+esc(m.cycle?.priorities||'À définir avec le coach')+'</strong></div>'+
+ const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const next=future[0]||null;
+ const dates=passportImportantDates(m,m.events||[],next);
+ const groups=passportTestGroups(m.tests),metrics=groups.map(g=>({g,d:passportMetricDelta(g)})).filter(x=>x.d&&x.d.count>=2);
+ const improved=metrics.filter(x=>x.d.improved===true).length;
+ const latestTest=groups.map(g=>g.rows[g.rows.length-1]).filter(Boolean).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+ return '<div class="health-page">'+
+  '<div class="health-page-heading"><div><span class="health-kicker">SITUATION ACTUELLE</span><h2>Où j’en suis aujourd’hui</h2></div><div class="health-page-date">'+fmtDate(localDateISO())+'</div></div>'+
+  '<div class="health-now-grid">'+
+   '<div class="health-cycle-focus"><div class="health-cycle-ring" style="--p:'+cs.pct+'"><div><strong>'+cs.pct+'%</strong><span>'+(cs.weekNow&&cs.weeks?'Semaine '+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div><div><span>Cycle en cours</span><h3>'+esc(m.cycle?.title||'À définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p><div class="health-long-progress"><i style="width:'+cs.pct+'%"></i></div></div></div>'+
+   '<div class="health-now-card"><span>Prochaine date importante</span><strong>'+(dates.next?fmtDate(dates.next.date):'—')+'</strong><small>'+esc(dates.next?.label||'Aucune échéance planifiée')+'</small></div>'+
+   '<div class="health-now-card"><span>Prochaine visio</span><strong>'+(next?fmtDate(next.starts_at):'—')+'</strong><small>'+(next?fmtTime(next.starts_at):'À planifier')+'</small></div>'+
+   '<div class="health-now-card"><span>Progressions mesurées</span><strong>'+improved+' / '+metrics.length+'</strong><small>tests avec au moins 2 mesures</small></div>'+
+   '<div class="health-now-card"><span>Dernière mesure</span><strong>'+esc(latestTest?.name||'—')+'</strong><small>'+(latestTest?fmtDate(latestTest.date):'Aucun test')+'</small></div>'+
   '</div>'+
-  '<div class="pp-command-grid">'+
-   '<div class="pp-command-card pp-cycle-command"><div class="pp-command-label">AVANCEMENT DU CYCLE</div><div class="pp-cycle-command-inner">'+
-    '<div class="pp-ring" style="--p:'+cs.pct+'"><div><strong>'+cs.pct+'%</strong><span>'+((cs.weekNow&&cs.weeks)?'S'+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div>'+
-    '<div class="pp-cycle-command-copy"><h3>'+esc(m.cycle?.title||'Cycle à définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p>'+
-     '<div class="pp-cycle-track"><i style="width:'+cs.pct+'%"></i></div>'+
-     '<div class="pp-cycle-meta"><span>'+(cs.remaining===null?'Dates à définir':cs.remaining>0?cs.remaining+' jours restants':cs.remaining===0?'Fin du cycle aujourd’hui':'Cycle terminé')+'</span><span>'+esc(priorities[0]||'Priorité à définir')+'</span></div>'+
-    '</div></div></div>'+
-   '<div class="pp-command-card pp-next-command"><div class="pp-command-label">PROCHAINE DATE IMPORTANTE</div>'+
-    (nextDate?'<div class="pp-next-date">'+fmtDate(nextDate.date)+'</div><h3>'+esc(nextDate.label)+'</h3><p>'+esc(nextDate.kind==='visio'?'Prochain rendez-vous planifié':nextDate.kind==='cycle'?'Échéance du cycle actuel':nextDate.kind==='engagement'?'Échéance de l’accompagnement':'Jalon du parcours')+'</p>':'<div class="pp-next-date">—</div><h3>Aucune échéance</h3><p>Les prochaines dates importantes apparaîtront ici.</p>')+
-    (next?'<div class="pp-next-mini"><span>Prochaine visio</span><strong>'+fmtDateTime(next.starts_at)+'</strong></div>':'')+
-   '</div>'+
-   '<div class="pp-command-card pp-main-metric '+mainTone+'"><div class="pp-command-label">REPÈRE PERFORMANCE</div>'+
-    (main?'<div class="pp-main-metric-name">'+esc(main.name)+'</div><div class="pp-main-metric-value">'+esc(main.rows[main.rows.length-1].value)+' <span>'+esc(main.rows[main.rows.length-1].unit||main.unit||'')+'</span></div><div class="pp-main-metric-change">'+esc(mainChange)+' depuis la première mesure</div>':'<div class="pp-main-metric-name">Aucun test</div><div class="pp-main-metric-value">—</div><div class="pp-main-metric-change">Ajoute des résultats au Passeport</div>')+
-   '</div>'+
+  '<div class="health-focus-columns"><div><span>Focus actuel</span><strong>'+esc((m.cycle?.priorities||'À définir').split(/[;\n]+/)[0])+'</strong></div><div><span>Point de vigilance</span><strong>'+esc((m.cycle?.vigilance||'Aucun signalé').split(/[;\n]+/)[0])+'</strong></div></div>'+
+ '</div>';
+}
+function passportCyclePage(m){
+ const cs=passportCycleStats(m.cycle),weeks=cs.weeks||6,current=cs.weekNow||1;
+ const priorities=(m.cycle?.priorities||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
+ const vigilance=(m.cycle?.vigilance||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
+ const weekNodes=Array.from({length:Math.min(weeks,12)},(_,i)=>i+1).map(w=>'<div class="health-week-node '+(w<current?'done':w===current?'current':'')+'"><b>S'+w+'</b><span>'+(w<current?'✓':w===current?'Maintenant':'')+'</span></div>').join('');
+ return '<div class="health-page">'+
+  '<div class="health-page-heading"><div><span class="health-kicker">CYCLE EN COURS</span><h2>'+esc(m.cycle?.title||'Cycle à définir')+'</h2><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="health-cycle-percent"><strong>'+cs.pct+'%</strong><span>avancement</span></div></div>'+
+  '<div class="health-cycle-line">'+weekNodes+'<div class="health-week-node retest"><b>FIN</b><span>Bilan / retest</span></div></div>'+
+  '<div class="health-cycle-info-grid">'+
+   '<section><span class="health-section-label">Priorités du cycle</span><div class="health-number-list">'+(priorities.length?priorities.map((x,i)=>'<div><b>'+String(i+1).padStart(2,'0')+'</b><span>'+esc(x)+'</span></div>').join(''):'<p>Aucune priorité définie.</p>')+'</div></section>'+
+   '<section><span class="health-section-label">Points de vigilance</span><div class="health-number-list warn">'+(vigilance.length?vigilance.map(x=>'<div><b>!</b><span>'+esc(x)+'</span></div>').join(''):'<p>Aucun point de vigilance signalé.</p>')+'</div></section>'+
   '</div>'+
-  '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PROGRESSION</span><h3>Ce qui a bougé depuis le départ</h3></div><div class="pp-muted pp-tiny">Les couleurs tiennent compte du sens de performance du test.</div></div>'+
-   passportProgressCards(groups)+
-  '</section>'+
-  '<div class="pp-v2-two">'+
-   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">ÉVOLUTION</span><h3>'+esc(main?'Courbe — '+main.name:'Courbe principale')+'</h3></div><span class="pp-pill neutral">'+esc(main?.unit||'données')+'</span></div>'+passportLineChart(main)+'</section>'+
-   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">TESTS</span><h3>Dernières valeurs</h3></div></div>'+passportTestOverview(groups)+'</section>'+
+  '<div class="health-cycle-footer"><div><span>Durée estimée</span><strong>'+(cs.weeks?cs.weeks+' semaines':'À définir')+'</strong></div><div><span>Semaine actuelle</span><strong>'+(cs.weekNow?'S'+cs.weekNow:'—')+'</strong></div><div><span>Temps restant</span><strong>'+(cs.remaining===null?'—':cs.remaining>0?cs.remaining+' jours':cs.remaining===0?'Aujourd’hui':'Terminé')+'</strong></div></div>'+
+ '</div>';
+}
+function passportProgressPage(m){
+ const groups=passportTestGroups(m.tests),selected=passportSelectedGroup(groups);
+ if(!groups.length)return '<div class="health-page"><div class="health-page-heading"><div><span class="health-kicker">PROGRESSION</span><h2>Mes repères de performance</h2></div></div><div class="health-empty">Aucun test enregistré pour le moment.</div></div>';
+ const delta=passportMetricDelta(selected),best=passportGroupBest(selected),last=selected.rows[selected.rows.length-1],first=selected.rows[0];
+ const tone=delta?.improved===true?'good':delta?.improved===false?'watch':'neutral';
+ const deltaText=delta&&delta.count>=2&&delta.pct!==null?passportSigned(delta.pct)+' %':'Référence';
+ return '<div class="health-page">'+
+  '<div class="health-page-heading"><div><span class="health-kicker">PROGRESSION</span><h2>Mes repères de performance</h2><p>Choisis un test pour afficher son évolution complète.</p></div></div>'+
+  '<div class="health-test-summary">'+groups.map(g=>{const d=passportMetricDelta(g),l=g.rows[g.rows.length-1],t=d?.improved===true?'good':d?.improved===false?'watch':'neutral';const ch=d&&d.count>=2&&d.pct!==null?passportSigned(d.pct)+' %':'Référence';return '<button class="passportMetricBtn '+(normalizeTestName(g.name)===passportSelectedTestKey?'on':'')+' '+t+'" data-test-key="'+esc(normalizeTestName(g.name))+'"><span>'+esc(g.name)+'</span><strong>'+esc(l.value)+' '+esc(l.unit||g.unit||'')+'</strong><small>'+esc(ch)+'</small></button>'}).join('')+'</div>'+
+  '<div class="health-test-detail">'+
+   '<div class="health-test-detail-head"><div><span class="health-section-label">TEST SÉLECTIONNÉ</span><h3>'+esc(selected.name)+'</h3></div><span class="health-change-pill '+tone+'">'+esc(deltaText)+'</span></div>'+
+   '<div class="health-test-kpis"><div><span>Initial</span><strong>'+esc(first.value)+' '+esc(first.unit||selected.unit||'')+'</strong><small>'+fmtDate(first.date)+'</small></div><div><span>Dernier</span><strong>'+esc(last.value)+' '+esc(last.unit||selected.unit||'')+'</strong><small>'+fmtDate(last.date)+'</small></div><div><span>Meilleur</span><strong>'+esc(best?.value??'—')+' '+esc(best?.unit||selected.unit||'')+'</strong><small>'+(best?fmtDate(best.date):'—')+'</small></div><div><span>Mesures</span><strong>'+selected.rows.length+'</strong><small>dans le carnet</small></div></div>'+
+   '<div class="health-chart-shell">'+passportLineChart(selected)+'</div>'+
+   '<div class="health-measure-history"><div class="health-measure-head"><span>Date</span><span>Valeur</span><span>Contexte</span><span>Observation</span></div>'+selected.rows.slice().reverse().map(r=>'<div class="health-measure-row"><span>'+fmtDate(r.date)+'</span><strong>'+esc(r.value)+' '+esc(r.unit||selected.unit||'')+'</strong><span>'+esc(r.context||'—')+'</span><span>'+esc(r.note||'—')+'</span></div>').join('')+'</div>'+
   '</div>'+
-  '<section class="pp-v2-section pp-roadmap"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PARCOURS</span><h3>Dates & jalons importants</h3></div></div>'+
-   '<div class="pp-roadmap-line">'+
-    (events.length?events.map(e=>'<div class="pp-roadmap-node '+(String(e.date)<=localDateISO()?'done':'future')+'"><span>'+fmtDate(e.date)+'</span><strong>'+esc(e.title)+'</strong><small>'+esc(e.detail||'')+'</small></div>').join(''):'<div class="pp-empty pp-empty-soft">Ajoute des événements importants pour construire la chronologie du parcours.</div>')+
-    (m.cycle?.end?'<div class="pp-roadmap-node future"><span>'+fmtDate(m.cycle.end)+'</span><strong>Fin du cycle</strong><small>Bilan / retest à préparer</small></div>':'')+
-    (m.end?'<div class="pp-roadmap-node future"><span>'+fmtDate(m.end)+'</span><strong>Fin d’engagement</strong><small>Renouvellement ou bilan final</small></div>':'')+
-   '</div>'+
-  '</section>'+
-  '<div class="pp-v2-three">'+
-   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">PRIORITÉS</span><h3>Focus actuel</h3></div></div><div class="pp-focus-list">'+(priorities.length?priorities.map((x,i)=>'<div><b>0'+(i+1)+'</b><span>'+esc(x)+'</span></div>').join(''):'<div class="pp-empty pp-empty-soft">Priorités à définir.</div>')+'</div></section>'+
-   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">VIGILANCE</span><h3>À surveiller</h3></div></div><div class="pp-focus-list warn">'+(vigilance.length?vigilance.map((x,i)=>'<div><b>△</b><span>'+esc(x)+'</span></div>').join(''):'<div class="pp-empty pp-empty-soft">Aucun point de vigilance signalé.</div>')+'</div></section>'+
-   '<section class="pp-v2-section"><div class="pp-v2-section-head"><div><span class="pp-eyebrow">RENDEZ-VOUS</span><h3>Repères visio</h3></div></div><div class="pp-visit-grid"><div><span>Dernière</span><strong>'+(last?fmtDateTime(last.starts_at):'—')+'</strong></div><div><span>Prochaine</span><strong class="pp-gold">'+(next?fmtDateTime(next.starts_at):'—')+'</strong></div></div></section>'+
+ '</div>';
+}
+function passportTimelinePage(m){
+ const future=(m.appointments||[]).filter(a=>new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+ const rows=[...(m.events||[]).map(e=>({date:e.date,title:e.title,detail:e.detail||'',type:'Jalon'}))];
+ if(m.start)rows.push({date:m.start,title:'Début du suivi AK PRIME',detail:'Ouverture du carnet sportif.',type:'Suivi'});
+ if(m.cycle?.start)rows.push({date:m.cycle.start,title:'Début du cycle',detail:m.cycle.title||'',type:'Cycle'});
+ if(m.cycle?.end)rows.push({date:m.cycle.end,title:'Fin du cycle / bilan',detail:'Retest et bilan de cycle.',type:'Cycle'});
+ if(future[0])rows.push({date:isoDate(future[0].starts_at),title:'Prochaine visio',detail:fmtTime(future[0].starts_at),type:'Visio'});
+ if(m.end)rows.push({date:m.end,title:'Échéance d’engagement',detail:'Bilan / suite de l’accompagnement.',type:'Suivi'});
+ rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ return '<div class="health-page">'+
+  '<div class="health-page-heading"><div><span class="health-kicker">CHRONOLOGIE</span><h2>Mon parcours sportif</h2><p>Les étapes qui structurent réellement le suivi.</p></div></div>'+
+  '<div class="health-timeline">'+(rows.length?rows.map(x=>'<div class="health-timeline-row '+(x.date<=localDateISO()?'past':'future')+'"><div class="health-timeline-date">'+fmtDate(x.date)+'</div><div class="health-timeline-dot"></div><div><span>'+esc(x.type)+'</span><strong>'+esc(x.title)+'</strong><p>'+esc(x.detail||'')+'</p></div></div>').join(''):'<div class="health-empty">Aucun jalon enregistré.</div>')+'</div>'+
+ '</div>';
+}
+function passportNotesPage(m){
+ const checks=(m.checkins||[]).slice().sort((a,b)=>String(b.date??b.week_date).localeCompare(String(a.date??a.week_date))).slice(0,6);
+ const coachNotes=[m.observations?.decisions,m.observations?.visio].filter(Boolean);
+ return '<div class="health-page">'+
+  '<div class="health-page-heading"><div><span class="health-kicker">OBSERVATIONS</span><h2>Ce qu’on retient du suivi</h2><p>Les éléments qualitatifs qui donnent du sens aux chiffres.</p></div></div>'+
+  '<div class="health-notes-grid">'+
+   '<section><span class="health-section-label">Synthèse coach</span>'+(coachNotes.length?coachNotes.map(x=>'<div class="health-note-paper">'+esc(x)+'</div>').join(''):'<div class="health-note-paper muted-note">Les décisions et synthèses importantes apparaîtront ici.</div>')+'</section>'+
+   '<section><span class="health-section-label">Derniers bilans qualitatifs</span><div class="health-checkin-list">'+(checks.length?checks.map(w=>{const date=isoDate(w.date??w.week_date),coach=w.coach??w.coach_feedback??w.coach_decision??'',pain=w.pain??w.pain_or_discomfort??'',constraint=w.nextConstraint??w.next_week_constraints??'';return '<div><div class="health-checkin-date">'+fmtDate(date)+'</div><strong>'+esc(coach||'Bilan enregistré')+'</strong>'+((pain||constraint)?'<p>'+esc([pain&&'Gêne : '+pain,constraint&&'Contrainte : '+constraint].filter(Boolean).join(' • '))+'</p>':'')+'</div>'}).join(''):'<div class="health-note-paper muted-note">Aucun bilan qualitatif enregistré.</div>')+'</div></section>'+
   '</div>'+
+ '</div>';
+}
+function renderPassportBookPage(m){
+ if(passportBookPage==='situation')return passportSituationPage(m);
+ if(passportBookPage==='cycle')return passportCyclePage(m);
+ if(passportBookPage==='progress')return passportProgressPage(m);
+ if(passportBookPage==='timeline')return passportTimelinePage(m);
+ if(passportBookPage==='notes')return passportNotesPage(m);
+ return passportIdentityPage(m);
+}
+function bindPassportBook(){
+ const root=document.querySelector('.health-passport-book');if(!root||!passportActiveModel)return;
+ const body=root.querySelector('#passportBookBody');if(!body)return;
+ const rerender=()=>{
+   body.innerHTML=renderPassportBookPage(passportActiveModel);
+   root.querySelectorAll('.passportBookTab').forEach(b=>b.classList.toggle('on',b.dataset.passportPage===passportBookPage));
+   bindPassportBook();
+ };
+ root.querySelectorAll('.passportBookTab').forEach(b=>b.onclick=()=>{passportBookPage=b.dataset.passportPage||'identity';rerender()});
+ root.querySelectorAll('.passportMetricBtn').forEach(b=>b.onclick=()=>{passportSelectedTestKey=b.dataset.testKey||'';passportBookPage='progress';rerender()});
+}
+function renderPremiumPassport(m){
+ passportActiveModel=m;
+ const groups=passportTestGroups(m.tests);
+ if(groups.length&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
+   passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
+ }
+ return '<div class="health-passport-book">'+
+  '<header class="health-book-header"><div><span>AK PRIME</span><strong>Carnet sportif individuel</strong></div><div class="health-book-owner"><b>'+esc(m.name||'Client AK PRIME')+'</b><small>'+esc([m.sport,m.specialty].filter(Boolean).join(' • ')||m.pole||'Suivi sportif')+'</small></div></header>'+
+  passportBookNav()+
+  '<main id="passportBookBody" class="health-book-body">'+renderPassportBookPage(m)+'</main>'+
  '</div>';
 }
 
@@ -1388,6 +1526,7 @@ function render(){
 }
 function bind(){
  bindNotificationBells();
+ bindPassportBook();
  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}render()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
@@ -1801,6 +1940,7 @@ function renderClientPortal(){
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
+ bindPassportBook();
  bindBookingButtons();
  bindNotificationBells();
  subscribeCalendarRealtime('client');
