@@ -127,7 +127,9 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .checkout-benefits{margin:10px 0 0;padding-left:19px;color:#475467;font-size:13px;line-height:1.65}
 .checkout-step{font-size:10px;color:#8a6a32;font-weight:950;letter-spacing:.09em;text-transform:uppercase}
 .checkout-recap{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.checkout-recap>div{border:1px solid var(--line);border-radius:11px;padding:11px;background:#fbfcfe}.checkout-recap span{display:block;font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:.06em}.checkout-recap strong{display:block;margin-top:3px;font-size:13px}
-@media(max-width:650px){.checkout-options,.checkout-recap,.public-offer-foundation{grid-template-columns:1fr}.public-offer-foundation ul{grid-template-columns:1fr}.public-offer-card{min-height:0}}
+.checkout-contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.checkout-contact-grid .field{margin:0}.checkout-contact-grid .input{width:100%}
+.checkout-consents{display:flex;flex-direction:column;gap:9px;margin-top:10px}.checkout-consent{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);background:#fff;border-radius:11px;padding:11px 12px;font-size:12px;line-height:1.5;color:#475467;cursor:pointer}.checkout-consent input{margin-top:2px;flex:0 0 auto}.checkout-consent strong{color:#101828}.checkout-consent-note{font-size:11px;color:#667085;line-height:1.5;margin-top:8px}.checkout-error{display:none;margin-top:10px;border:1px solid #f4b8b8;background:#fff3f3;color:#a12929;border-radius:10px;padding:10px 11px;font-size:12px;line-height:1.45}.checkout-error.show{display:block}
+@media(max-width:650px){.checkout-options,.checkout-recap,.checkout-contact-grid,.public-offer-foundation{grid-template-columns:1fr}.public-offer-foundation ul{grid-template-columns:1fr}.public-offer-card{min-height:0}}
 @media(max-width:900px){.public-hero-inner,.public-access,.public-about{grid-template-columns:1fr}.public-poles,.public-offers{grid-template-columns:1fr 1fr}.public-process,.public-why-grid{grid-template-columns:1fr 1fr}.public-value-grid{grid-template-columns:1fr 1fr}.public-method-line{grid-template-columns:1fr 1fr 1fr}.public-hero-card{max-width:650px}.public-profile-card{min-height:0}}
 @media(max-width:650px){.public-links a{display:none}.public-nav{padding:12px 13px}.public-logo{font-size:19px}.public-hero{padding:54px 14px 52px}.public-hero h1{font-size:43px}.public-hero p{font-size:15px}.public-section{padding:54px 14px}.public-poles,.public-offers,.public-process,.public-faq,.public-why-grid,.public-value-grid,.public-experience-grid{grid-template-columns:1fr}.public-method-line{grid-template-columns:1fr}.public-offer-group-title{align-items:flex-start;flex-direction:column}.public-hero-actions .public-primary,.public-hero-actions .public-secondary{width:100%;text-align:center}.public-profile-card{padding:20px}.public-about-copy h2{font-size:32px}}
 .auth-shell{min-height:calc(100vh - 33px);display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#1d3150 0,#0d1827 48%,#08111d 100%)}
@@ -1859,15 +1861,41 @@ function openPublicOfferCheckout(button){
  [...durationEls,...paymentEls].forEach(x=>x.onchange=renderPrice);renderPrice();
  document.getElementById('continuePublicCheckout').onclick=()=>{
    const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly',p=publicCheckoutPrice(base,duration,paymentMode);
-   modal('Récapitulatif avant paiement',
-    '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix avant de continuer.</div></div>'+
+   modal('Informations avant paiement',
+    '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix et complète les informations qui serviront à créer ton accès AK PRIME.</div></div>'+
     '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
-    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Aucun paiement n’est effectué actuellement. Quand Stripe sera branché, ce bouton ouvrira le paiement sécurisé. Après validation, le compte AK PRIME sera créé et activé automatiquement avec l’adresse e-mail utilisée lors du paiement.</div></div>',
+    '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" placeholder="nom@exemple.fr"></div></div>'+
+    '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
+      '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox"><span><strong>CGV et informations contractuelles.</strong> Je reconnais avoir pris connaissance des conditions générales de vente, de la politique de confidentialité et des informations sur le droit de rétractation disponibles sur le site.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox"><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox"><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
+    '</div><div class="checkout-consent-note">Ces choix sont préparés dans le tunnel mais ne sont pas encore enregistrés : aucun paiement réel n’est actif sur cette version.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
+    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
     '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Continuer vers le paiement</button>');
    document.getElementById('backPublicCheckout').onclick=()=>openPublicOfferCheckout(button);
    document.getElementById('futureStripeCheckout').onclick=()=>{
+     const fullName=document.getElementById('checkoutFullName').value.trim();
+     const emailEl=document.getElementById('checkoutEmail'),email=emailEl.value.trim();
+     const acceptedCgv=document.getElementById('checkoutAcceptCgv').checked;
+     const healthConsent=document.getElementById('checkoutHealthConsent').checked;
+     const earlyStart=document.getElementById('checkoutEarlyStart').checked;
+     const errorBox=document.getElementById('checkoutValidationError');
+     const errors=[];
+     if(fullName.length<3)errors.push('Indique ton nom et ton prénom.');
+     emailEl.value=email;
+     if(!email||!emailEl.checkValidity())errors.push('Indique une adresse e-mail valide.');
+     if(!acceptedCgv)errors.push('Confirme la prise de connaissance des documents contractuels.');
+     if(!healthConsent)errors.push('Le consentement explicite au traitement des données sensibles est nécessaire pour préparer un accompagnement individualisé.');
+     if(!earlyStart)errors.push('Confirme ta demande de démarrage avant la fin du délai de 14 jours pour poursuivre ce parcours.');
+     if(errors.length){
+       errorBox.innerHTML='<strong>Il reste '+errors.length+' point'+(errors.length>1?'s':'')+' à compléter :</strong><br>• '+errors.map(esc).join('<br>• ');
+       errorBox.classList.add('show');
+       return;
+     }
+     errorBox.classList.remove('show');
      modal('Paiement bientôt disponible',
-      '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt.</strong><div class="tiny" style="margin-top:5px">Stripe sera connecté à cette dernière étape quand le reste du site sera finalisé.</div></div><div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
+      '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt jusqu’à Stripe.</strong><div class="tiny" style="margin-top:5px">L’identité, le choix d’offre et les consentements sont maintenant collectés avant l’étape de paiement. Ils seront persistés et vérifiés côté serveur lors du branchement Stripe.</div></div>'+
+      '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
       '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
      document.getElementById('closeCheckoutInfo').onclick=closeModal;
    };
