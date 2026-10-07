@@ -1979,7 +1979,7 @@ function performanceOfferLanding(name,price){
  ];
  const col={P1:1,P2:2,P3:3}[tier];
  return '<div class="perf-detail">'+
-  '<section class="perf-hero"><div class="perf-hero-top"><div><div class="eyebrow">PÔLE PERFORMANCE</div><h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div><div class="perf-hero-price">'+euro(price)+' €<span>par mois</span></div></div>'+
+  '<section class="perf-hero"><div class="perf-hero-top"><div><div class="eyebrow">PÔLE PERFORMANCE</div><h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div><div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
    '<div class="perf-kpis">'+d.kpis.map(k=>'<div class="perf-kpi"><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>').join('')+'</div>'+
   '</section>'+
   '<section class="perf-section"><div class="perf-section-head"><div><h3>Concrètement, comment se passe le suivi ?</h3><p>Une lecture rapide d’une semaine-type.</p></div></div><div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div></section>'+
