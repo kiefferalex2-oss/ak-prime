@@ -411,6 +411,12 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .pp-visit-grid{display:grid;grid-template-columns:1fr;gap:8px}.pp-visit-grid>div{padding:10px;background:#0e1922;border:1px solid #29353f;border-radius:10px}.pp-visit-grid span{display:block;font-size:8px;color:#718293;text-transform:uppercase}.pp-visit-grid strong{display:block;font-size:10px;margin-top:5px;line-height:1.35}
 @media(max-width:1100px){.pp-command-grid{grid-template-columns:1fr 1fr}.pp-cycle-command{grid-column:1/-1}.pp-progress-cards{grid-template-columns:1fr 1fr}.pp-v2-three{grid-template-columns:1fr 1fr}.pp-v2-three>section:last-child{grid-column:1/-1}}
 @media(max-width:780px){.pp-v2-head,.pp-v2-two,.pp-v2-three,.pp-command-grid{grid-template-columns:1fr}.pp-cycle-command{grid-column:auto}.pp-progress-cards{grid-template-columns:1fr}.pp-cycle-command-inner{grid-template-columns:90px 1fr}.pp-ring{width:84px;height:84px}.pp-ring strong{font-size:21px}.pp-cycle-meta{flex-direction:column}.pp-v2-three>section:last-child{grid-column:auto}}
+
+.coach-overview-command{display:flex;flex-direction:column;gap:12px}.coach-overview-main{background:linear-gradient(145deg,#fff,#fbfcfd);border-color:#d9e2eb}.coach-overview-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.coach-overview-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.coach-overview-stats .card{min-height:118px}.coach-overview-label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#8794a3;font-weight:900}.coach-overview-stats strong{display:block;font-size:17px;color:#1b293a;margin-top:8px}.coach-overview-stats small{display:block;font-size:9px;color:#7a8796;margin-top:5px}.coach-mini-progress,.client-mini-progress{height:6px;background:#e7ecf1;border-radius:999px;overflow:hidden;margin-top:11px}.coach-mini-progress i,.client-mini-progress i{display:block;height:100%;background:linear-gradient(90deg,#b78b49,#d6ae68);border-radius:999px}
+.passport-manager-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.passport-event-manager{background:linear-gradient(180deg,#fff,#fbfcfd)}.passport-event-list{display:flex;flex-direction:column;gap:7px;margin-top:13px}.passport-event-row{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;border:1px solid #e5eaf0;background:#fff;border-radius:11px;padding:9px 10px}.passport-event-date{font-size:10px;font-weight:900;color:#a27633}.passport-event-row strong{display:block;font-size:10px}.passport-event-row span{display:block;font-size:9px;color:#7a8796;margin-top:2px}
+.client-passport-preview{background:linear-gradient(180deg,#fff,#fbfcfd)}.client-passport-preview-grid{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:8px;margin-top:13px}.client-passport-preview-grid>div{border:1px solid #e5eaf0;background:#fff;border-radius:11px;padding:11px}.client-passport-preview-grid span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#8491a1}.client-passport-preview-grid strong{display:block;font-size:12px;margin-top:5px;color:#223247}.client-passport-preview-grid small{display:block;font-size:8px;color:#7b8796;margin-top:5px;line-height:1.35}
+@media(max-width:980px){.coach-overview-stats{grid-template-columns:1fr 1fr}.passport-manager-grid{grid-template-columns:1fr}.client-passport-preview-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.coach-overview-stats{grid-template-columns:1fr}.passport-event-row{grid-template-columns:1fr auto}.passport-event-date{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -924,7 +930,7 @@ function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inact
 
 function clientPage(){
  const c=currentClient();if(!c)return clientsPage();
- const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding & Visio'],['follow','Suivi'],['passport','Passeport'],['history','Historique'],['admin','Administratif']];
+ const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding & Visio'],['follow','Suivi'],['passport','Passeport'],['admin','Administratif']];
  return '<button class="btn ghost small no-print" id="backClients" style="margin-bottom:10px">← Clients</button>'+
  '<div class="card client-head"><div class="person"><div class="photo">'+esc(c.initials||initials(c.name))+'</div><div><div class="row"><h2>'+esc(c.name)+'</h2>'+status(c.status)+'</div><div class="meta"><span>'+esc(c.pole)+'</span><span>• '+esc(c.offer)+'</span>'+(c.sport?'<span>• '+esc(c.sport)+'</span>':'')+(c.specialty?'<span>• '+esc(c.specialty)+'</span>':'')+(c.level?'<span>• '+esc(c.level)+'</span>':'')+'</div></div></div>'+
  '<div class="metrics"><div class="metric"><span>Début</span><strong>'+fmtDate(c.start)+'</strong></div><div class="metric"><span>Fin engagement</span><strong>'+fmtDate(c.end)+'</strong></div><div class="metric"><span>Prochaine visio</span><strong>'+fmtDate(c.next)+'</strong></div></div></div>'+
@@ -934,20 +940,27 @@ function clientTab(c){
  if(state.tab==='onboarding')return onboarding(c);
  if(state.tab==='follow')return follow(c);
  if(state.tab==='passport')return passport(c);
- if(state.tab==='history')return history(c);
  if(state.tab==='admin')return admin(c);
  return overview(c);
 }
 function overview(c){
- const testCount=c.tests?.length||0; const checkCount=c.checkins?.length||0;
- return '<div class="grid2"><div class="card panel"><h3>Résumé</h3>'+
- fieldStatic('Objectif / priorités',c.cycle?.priorities||'À définir')+fieldStatic('Cycle actuel',c.cycle?.title||'À définir')+fieldStatic('Point de vigilance',c.cycle?.vigilance||'Aucun signalé')+
- '</div><div class="card panel"><h3>Avancement dossier</h3>'+
- progressRow('Questionnaire',Object.keys(c.questionnaire||{}).length?100:0)+progressRow('Visio initiale',c.visioNotes?100:30)+progressRow('Tests',testCount?100:20)+progressRow('Suivi',checkCount?100:30)+
- '</div></div><div class="grid3" style="margin-top:13px">'+
- '<div class="card panel"><h3>Tests</h3><div class="kpi"><div class="val">'+testCount+'</div><div class="sub">résultats enregistrés</div></div></div>'+
- '<div class="card panel"><h3>Check-ins</h3><div class="kpi"><div class="val">'+checkCount+'</div><div class="sub">bilans hebdomadaires</div></div></div>'+
- '<div class="card panel"><h3>Actions rapides</h3><button class="btn ghost small quickTab" data-tab="passport">Ajouter un test au Passeport</button> <button class="btn ghost small quickTab" data-tab="follow">Ajouter un check-in</button></div></div>';
+ const testCount=c.tests?.length||0,checkCount=c.checkins?.length||0;
+ const cp=cycleProgressPct(c.cycle||{});
+ const latestCheck=(c.checkins||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+ const nextAction=c.onboarding?.currentStep&&c.onboarding.currentStep!=='active'
+   ? ({questionnaire:'Questionnaire client à compléter',visio:'Visio initiale à préparer',tests:'Tests requis à finaliser',programming:'Programmation à finaliser'})[c.onboarding.currentStep]||'Onboarding en cours'
+   : (!latestCheck?'Premier bilan qualitatif à récupérer':latestCheck.reviewedAt?'Aucune action urgente':'Bilan client à traiter');
+ return '<div class="coach-overview-command">'+
+  '<div class="card panel coach-overview-main"><div class="row between"><div><div class="section-title" style="margin-top:0">À retenir</div><h3 style="font-size:18px;margin:4px 0">'+esc(nextAction)+'</h3><div class="muted tiny">La vue d’ensemble sert uniquement à savoir quoi faire ensuite. Les détails restent dans les onglets dédiés.</div></div><span class="status '+(c.onboarding?.currentStep==='active'?'green':'amber')+'">'+esc(c.status)+'</span></div>'+
+   '<div class="coach-overview-actions"><button class="btn primary small quickTab" data-tab="'+(c.onboarding?.currentStep&&c.onboarding.currentStep!=='active'?'onboarding':latestCheck&&!latestCheck.reviewedAt?'follow':'passport')+'">Ouvrir l’action prioritaire</button><button class="btn ghost small quickTab" data-tab="passport">Voir le Passeport</button></div>'+
+  '</div>'+
+  '<div class="coach-overview-stats">'+
+   '<div class="card panel"><span class="coach-overview-label">Cycle</span><strong>'+esc(c.cycle?.title||'À définir')+'</strong><div class="coach-mini-progress"><i style="width:'+cp+'%"></i></div><small>'+cp+' % du cycle</small></div>'+
+   '<div class="card panel"><span class="coach-overview-label">Passeport</span><strong>'+testCount+' résultat'+(testCount>1?'s':'')+'</strong><small>Tests / retests enregistrés</small></div>'+
+   '<div class="card panel"><span class="coach-overview-label">Bilans qualitatifs</span><strong>'+checkCount+'</strong><small>'+(latestCheck?(latestCheck.reviewedAt?'Dernier traité':'Dernier à traiter'):'Aucun bilan')+'</small></div>'+
+   '<div class="card panel"><span class="coach-overview-label">Prochaine visio</span><strong>'+fmtDate(c.next)+'</strong><small>'+esc(c.offer||'')+'</small></div>'+
+  '</div>'+
+ '</div>';
 }
 function fieldStatic(label,value){return '<div class="item"><strong>'+label+'</strong><div>'+esc(value)+'</div></div>'}
 function progressRow(label,val){return '<div style="margin-bottom:12px"><div class="row between"><span class="tiny"><strong>'+label+'</strong></span><span class="tiny muted">'+val+'%</span></div><div class="progress"><i style="width:'+val+'%"></i></div></div>'}
@@ -1027,12 +1040,21 @@ function testLibraryOptions(prefill=''){
 }
 function passportCoachTestManager(c){
  const history=(c.tests||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const events=(c.events||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
  const cats=[...new Set(TEST_LIBRARY.map(x=>x.category))];
- return '<div class="card panel passport-test-manager no-print">'+
-  '<div class="row between" style="align-items:flex-start"><div><div class="section-title" style="margin-top:0">Bibliothèque de tests</div><h3 style="margin:3px 0 5px">Ajouter un résultat au Passeport</h3><div class="muted tiny">Sélectionne un test, saisis la date et la valeur. Le résultat alimente immédiatement les graphiques du Passeport coach et client.</div></div><button class="btn primary" id="addTest">+ Ajouter un résultat</button></div>'+
-  '<div class="passport-test-categories">'+cats.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
-  '<div class="passport-test-history"><div class="row between"><h3 style="margin:0">Derniers résultats</h3><span class="status blue">'+history.length+' résultat'+(history.length>1?'s':'')+'</span></div>'+
-   (history.length?'<div class="passport-test-table">'+history.slice(0,10).map(t=>'<div class="passport-test-row"><div><strong>'+esc(t.name)+'</strong><span>'+fmtDate(t.date)+(t.context?' • '+esc(t.context):'')+'</span></div><b>'+esc(t.value)+' '+esc(t.unit||'')+'</b><button class="link deleteTest" data-id="'+t.id+'">Supprimer</button></div>').join('')+'</div>':'<div class="muted tiny" style="margin-top:10px">Aucun résultat enregistré pour le moment.</div>')+
+ return '<div class="passport-manager-grid no-print">'+
+  '<div class="card panel passport-test-manager">'+
+   '<div class="row between" style="align-items:flex-start"><div><div class="section-title" style="margin-top:0">Tests & retests</div><h3 style="margin:3px 0 5px">Alimenter la progression</h3><div class="muted tiny">Chaque résultat ajouté met à jour automatiquement le Passeport coach et client.</div></div><button class="btn primary" id="addTest">+ Résultat</button></div>'+
+   '<div class="passport-test-categories">'+cats.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+   '<div class="passport-test-history"><div class="row between"><h3 style="margin:0">Derniers résultats</h3><span class="status blue">'+history.length+'</span></div>'+
+    (history.length?'<div class="passport-test-table">'+history.slice(0,6).map(t=>'<div class="passport-test-row"><div><strong>'+esc(t.name)+'</strong><span>'+fmtDate(t.date)+(t.context?' • '+esc(t.context):'')+'</span></div><b>'+esc(t.value)+' '+esc(t.unit||'')+'</b><button class="link deleteTest" data-id="'+t.id+'">Supprimer</button></div>').join('')+'</div>':'<div class="muted tiny" style="margin-top:10px">Aucun résultat enregistré.</div>')+
+   '</div>'+
+  '</div>'+
+  '<div class="card panel passport-event-manager">'+
+   '<div class="row between" style="align-items:flex-start"><div><div class="section-title" style="margin-top:0">Dates & jalons</div><h3 style="margin:3px 0 5px">Construire le parcours</h3><div class="muted tiny">Compétition, retest, changement de cycle, reprise, objectif atteint…</div></div><button class="btn ghost" id="addEvent">+ Jalon</button></div>'+
+   '<div class="passport-event-list">'+
+    (events.length?events.slice(0,7).map(e=>'<div class="passport-event-row"><div class="passport-event-date">'+fmtDate(e.date)+'</div><div><strong>'+esc(e.title)+'</strong><span>'+esc(e.detail||'')+'</span></div><button class="link deleteEvent" data-id="'+e.id+'">Supprimer</button></div>').join(''):'<div class="muted tiny">Aucun jalon enregistré. Ajoute les dates qui structurent vraiment le parcours.</div>')+
+   '</div>'+
   '</div>'+
  '</div>';
 }
@@ -1240,10 +1262,7 @@ function passport(c){
  '<div style="margin-top:13px">'+renderPremiumPassport(passportModelFromCoach(c))+'</div>';
 }
 
-function history(c){
- return '<div class="page-title"><div><h1 style="font-size:22px">Historique</h1><p>Événements importants du parcours.</p></div><button class="btn primary" id="addEvent">+ Ajouter un événement</button></div>'+
- '<div class="card panel"><div class="timeline">'+((c.events||[]).length?c.events.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>'<div class="event"><div class="row between"><div><div class="date">'+fmtDate(e.date)+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div><button class="link deleteEvent" data-id="'+e.id+'">Suppr.</button></div></div>').join(''):'<div class="muted">Aucun événement.</div>')+'</div></div>';
-}
+
 
 function admin(c){
  return '<div class="grid2"><div class="card panel"><h3>Engagement</h3>'+
@@ -1724,7 +1743,11 @@ function renderClientHome(s){
  (c.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
  renderClientWhatsAppButton(s,c)+
  '</div>'+
- '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Mon parcours</h3><div class="muted tiny">Les derniers jalons importants.</div></div><button class="link clientGoPassport">Voir le Passeport</button></div><div class="timeline" style="margin-top:12px">'+((s.events||[]).length?s.events.slice(0,4).map(e=>'<div class="event"><div class="date">'+fmtDate(String(e.event_date).slice(0,10))+'</div><strong>'+esc(e.title)+'</strong><div class="muted tiny">'+esc(e.detail||'')+'</div></div>').join(''):'<div class="muted">Ton parcours apparaîtra ici.</div>')+'</div></div>'+
+ '<div class="client-section-card client-passport-preview"><div class="row between"><div><h3 style="margin-bottom:3px">Mon Passeport AK PRIME</h3><div class="muted tiny">Progression, cycle, tests et dates importantes sont regroupés ici.</div></div><button class="btn ghost small clientGoPassport">Ouvrir</button></div>'+
+  '<div class="client-passport-preview-grid"><div><span>Cycle actuel</span><strong>'+esc(cycle?.title||'À définir')+'</strong><div class="client-mini-progress"><i style="width:'+cycleProgressPct({start:isoDate(cycle?.start_date),end:isoDate(cycle?.end_date)})+'%"></i></div><small>'+cycleProgressPct({start:isoDate(cycle?.start_date),end:isoDate(cycle?.end_date)})+' % du cycle</small></div>'+
+  '<div><span>Résultats</span><strong>'+((s.tests||[]).length)+' test'+((s.tests||[]).length>1?'s':'')+'</strong><small>Courbes et retests dans le Passeport</small></div>'+
+  '<div><span>Dernier jalon</span><strong>'+((s.events||[])[0]?fmtDate(String((s.events||[])[0].event_date).slice(0,10)):'—')+'</strong><small>'+esc((s.events||[])[0]?.title||'Aucun jalon pour le moment')+'</small></div></div>'+
+ '</div>'+
  '</div>';
 }
 function renderClientVisios(s){
