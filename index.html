@@ -197,6 +197,7 @@ let authUser=null;
 let authProfile=null;
 let calendarChannel=null;
 let publicOfferCatalog={};
+let publicCheckoutDraft=null;
 
 async function loadPublicOfferCatalog(){
  const {data,error}=await supa.from('offer_catalog')
@@ -1910,20 +1911,23 @@ async function publicCheckoutPrice(pole,name,base,duration,paymentMode){
 function openPublicOfferCheckout(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
  const benefits=publicOfferBenefits(pole,name);
+ const sameDraft=publicCheckoutDraft&&publicCheckoutDraft.pole===pole&&publicCheckoutDraft.name===name;
+ const draft=sameDraft?publicCheckoutDraft:{pole,name,duration:3,paymentMode:'monthly',fullName:'',email:'',acceptedCgv:false,healthConsent:false,earlyStart:false};
+ publicCheckoutDraft=draft;
  modal('Choisir mon accompagnement',
   '<div class="checkout-offer-head"><div class="checkout-step">Étape 1 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Tarif de référence : '+euro(base)+' / mois</div></div>'+
   '<div><strong>Ce qui est inclus</strong><ul class="checkout-benefits">'+benefits.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
   '<div class="section-title">Durée d’engagement</div><div class="checkout-options">'+
-   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="3" checked><strong>3 mois</strong><div class="muted tiny" style="margin-top:4px">Tarif de référence de l’offre</div></label>'+
-   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="6"><strong>6 mois</strong><div class="muted tiny" style="margin-top:4px">5 % de remise sur l’engagement</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="3" '+(Number(draft.duration)===3?'checked':'')+'><strong>3 mois</strong><div class="muted tiny" style="margin-top:4px">Tarif de référence de l’offre</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutDuration" value="6" '+(Number(draft.duration)===6?'checked':'')+'><strong>6 mois</strong><div class="muted tiny" style="margin-top:4px">5 % de remise sur l’engagement</div></label>'+
   '</div>'+
   '<div class="section-title">Mode de paiement</div><div class="checkout-options">'+
-   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="monthly" checked><strong>Paiement mensuel</strong><div class="muted tiny" style="margin-top:4px">Prélèvement chaque mois</div></label>'+
-   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="upfront"><strong>Paiement comptant</strong><div class="muted tiny" style="margin-top:4px">Petite remise supplémentaire</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="monthly" '+(draft.paymentMode!=='upfront'?'checked':'')+'><strong>Paiement mensuel</strong><div class="muted tiny" style="margin-top:4px">Prélèvement chaque mois</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="upfront" '+(draft.paymentMode==='upfront'?'checked':'')+'><strong>Paiement comptant</strong><div class="muted tiny" style="margin-top:4px">Petite remise supplémentaire</div></label>'+
   '</div>'+
   '<div id="publicCheckoutPrice" class="checkout-price-box"></div>',
   '<button class="btn ghost" id="cancelPublicCheckout">Annuler</button><button class="btn primary" id="continuePublicCheckout">Continuer</button>');
- document.getElementById('cancelPublicCheckout').onclick=closeModal;
+ document.getElementById('cancelPublicCheckout').onclick=()=>{publicCheckoutDraft=null;closeModal()};
  const durationEls=[...document.querySelectorAll('input[name="checkoutDuration"]')],paymentEls=[...document.querySelectorAll('input[name="checkoutPayment"]')];
  let quoteSequence=0;
  const renderPrice=async()=>{
@@ -1943,24 +1947,35 @@ function openPublicOfferCheckout(button){
    continueBtn.disabled=true;continueBtn.textContent='Vérification…';
    const p=await publicCheckoutPrice(pole,name,base,duration,paymentMode);
    continueBtn.disabled=false;continueBtn.textContent='Continuer';
+   draft.duration=duration;draft.paymentMode=paymentMode;
    modal('Informations avant paiement',
     '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix et complète les informations qui serviront à créer ton accès AK PRIME.</div></div>'+
     '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
-    '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" placeholder="nom@exemple.fr"></div></div>'+
+    '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" value="'+esc(draft.fullName||'')+'" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" value="'+esc(draft.email||'')+'" placeholder="nom@exemple.fr"></div></div>'+
     '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
-      '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox"><span><strong>CGV et informations contractuelles.</strong> Je reconnais avoir pris connaissance des conditions générales de vente, de la politique de confidentialité et des informations sur le droit de rétractation disponibles sur le site.</span></label>'+
-      '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox"><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
-      '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox"><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> Je reconnais avoir pris connaissance des conditions générales de vente, de la politique de confidentialité et des informations sur le droit de rétractation disponibles sur le site.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
     '</div><div class="checkout-consent-note">Ces choix sont préparés dans le tunnel mais ne sont pas encore enregistrés : aucun paiement réel n’est actif sur cette version.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
     '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
     '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Continuer vers le paiement</button>');
-   document.getElementById('backPublicCheckout').onclick=()=>openPublicOfferCheckout(button);
+   const captureDraft=()=>{
+     draft.fullName=document.getElementById('checkoutFullName')?.value?.trim()||'';
+     draft.email=document.getElementById('checkoutEmail')?.value?.trim()||'';
+     draft.acceptedCgv=!!document.getElementById('checkoutAcceptCgv')?.checked;
+     draft.healthConsent=!!document.getElementById('checkoutHealthConsent')?.checked;
+     draft.earlyStart=!!document.getElementById('checkoutEarlyStart')?.checked;
+     draft.duration=duration;draft.paymentMode=paymentMode;
+     publicCheckoutDraft=draft;
+   };
+   document.getElementById('backPublicCheckout').onclick=()=>{captureDraft();openPublicOfferCheckout(button)};
    document.getElementById('futureStripeCheckout').onclick=()=>{
      const fullName=document.getElementById('checkoutFullName').value.trim();
      const emailEl=document.getElementById('checkoutEmail'),email=emailEl.value.trim();
      const acceptedCgv=document.getElementById('checkoutAcceptCgv').checked;
      const healthConsent=document.getElementById('checkoutHealthConsent').checked;
      const earlyStart=document.getElementById('checkoutEarlyStart').checked;
+     draft.fullName=fullName;draft.email=email;draft.acceptedCgv=acceptedCgv;draft.healthConsent=healthConsent;draft.earlyStart=earlyStart;draft.duration=duration;draft.paymentMode=paymentMode;publicCheckoutDraft=draft;
      const errorBox=document.getElementById('checkoutValidationError');
      const errors=[];
      if(fullName.length<3)errors.push('Indique ton nom et ton prénom.');
@@ -1979,7 +1994,7 @@ function openPublicOfferCheckout(button){
       '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt jusqu’à Stripe.</strong><div class="tiny" style="margin-top:5px">L’identité, le choix d’offre et les consentements sont maintenant collectés avant l’étape de paiement. Ils seront persistés et vérifiés côté serveur lors du branchement Stripe.</div></div>'+
       '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
       '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
-     document.getElementById('closeCheckoutInfo').onclick=closeModal;
+     document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
    };
  };
 }
