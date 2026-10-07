@@ -364,6 +364,16 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:520px){
  .client-summary-grid{grid-template-columns:1fr 1fr}.client-hero{padding:17px}.client-hero h1{font-size:21px}
 }
+
+.true-client-demo{border:1px solid #dbe3eb;border-radius:18px;overflow:hidden;background:#f3f6fa;box-shadow:0 12px 30px rgba(19,33,49,.07)}
+.true-client-demo .client-top{border-radius:0}
+.true-client-demo .client-main{max-width:none}
+.true-client-demo .client-hero{margin-bottom:12px}
+.true-client-demo .client-nav{flex-wrap:wrap}
+.true-client-demo .client-nav button{pointer-events:auto}
+.true-client-demo .client-time-grid .btn,.true-client-demo .client-week-tabs button,.true-client-demo .client-day-btn{pointer-events:none}
+.true-client-demo .premium-passport{margin:0}
+@media(max-width:760px){.true-client-demo .client-top{align-items:flex-start}.true-client-demo .client-user-mini{display:none}.true-client-demo .client-nav{width:100%}}
 </style>
 </head>
 <body>
@@ -2090,73 +2100,64 @@ function publicOfferDetailData(pole,name){
 
 function performanceDemoConfig(tier){
  tier=String(tier||'P1').toUpperCase();
- const base={
+ return {
   tier,
-  visio:tier==='P1'?'1 / mois':tier==='P2'?'2 / mois':'Jusqu’à 1 / semaine',
-  video:tier==='P1'?'2 vidéos / mois':tier==='P2'?'Analyse hebdomadaire':'Selon les besoins',
-  adaptation:tier==='P1'?'Si problème':tier==='P2'?'Hebdomadaire':'Sous 48 h si nécessaire',
-  hooper:tier!=='P1',
-  cycle:tier!=='P1',
+  visio:tier==='P1'?'1 visio / mois':tier==='P2'?'2 visios / mois':'Jusqu’à 1 visio / semaine',
+  video:tier==='P1'?'2 vidéos / mois':tier==='P2'?'Analyse vidéo hebdomadaire':'Analyse vidéo selon les besoins',
+  adjustment:tier==='P1'?'Correction si problème':tier==='P2'?'Ajustement hebdomadaire':'Ajustement sous 48 h si nécessaire',
   warmup:tier!=='P1',
+  cycle:tier!=='P1',
   sleep:tier==='P3',
   macros:tier==='P3',
   recovery:tier==='P3'
  };
- return base;
 }
 function performanceDemoHome(tier){
  const c=performanceDemoConfig(tier);
- const mods=[
-  ['Programme individualisé','Ton cycle et tes séances organisés dans ton suivi.',true],
-  ['Check-in hebdomadaire','Ressenti, séances et contraintes de la semaine.',true],
-  ['Suivi de charge sRPE','Charge d’entraînement suivie chaque semaine.',true],
-  ['Analyse vidéo',c.video,true],
-  ['Retest','Point de contrôle à 6 semaines.',true],
-  ['Questionnaire Hooper','Fatigue, stress, sommeil perçu et douleurs.',c.hooper],
-  ['Échauffement individualisé','Préparation adaptée à la séance et au contexte.',c.warmup],
-  ['Cycle menstruel','Contexte et symptômes pris en compte.',c.cycle],
-  ['Sommeil complet','Durée, qualité perçue, régularité et évolution.',c.sleep],
-  ['Budget macros','Budget calorique et macronutriments.',c.macros],
-  ['Ajustement sous 48 h','Modification rapide si l’état de forme le nécessite.',c.recovery],
-  ['Récupération dédiée','Séance de récupération ajoutée lorsque nécessaire.',c.recovery]
- ];
- return '<div class="offer-demo-banner"><div><div class="eyebrow">MON ESPACE AK PRIME</div><h4>Bonjour Alexandre</h4><p>Voilà à quoi ressemble ton espace client avec Performance '+esc(c.tier)+'.</p></div><div class="offer-demo-tier">PERFORMANCE '+esc(c.tier)+'</div></div>'+
- '<div class="offer-demo-summary">'+
-  '<div class="offer-demo-summary-card"><div class="lab">Offre</div><div class="value">Performance '+esc(c.tier)+'</div><div class="sub">Accompagnement actif</div></div>'+
-  '<div class="offer-demo-summary-card"><div class="lab">Prochaine visio</div><div class="value">'+esc(c.visio)+'</div><div class="sub">Réservation depuis ton espace</div></div>'+
-  '<div class="offer-demo-summary-card"><div class="lab">Retest</div><div class="value">Semaine 6</div><div class="sub">Progression réévaluée</div></div>'+
-  '<div class="offer-demo-summary-card"><div class="lab">Adaptation</div><div class="value">'+esc(c.adaptation)+'</div><div class="sub">Selon ton niveau de suivi</div></div>'+
+ return '<div class="client-hero"><div class="row between"><div><h1>Alexandre K.</h1><p>Performance — '+esc(c.tier)+'</p></div><span class="status green">Actif</span></div></div>'+
+ '<div class="client-summary-grid">'+
+  '<div class="client-summary-card"><div class="lab">Prochaine visio</div><div class="value">Mardi 18:30</div><div class="sub">'+esc(c.visio)+'</div></div>'+
+  '<div class="client-summary-card"><div class="lab">Cycle actuel</div><div class="value">Force & puissance</div><div class="sub">Priorités du cycle en cours</div></div>'+
+  '<div class="client-summary-card"><div class="lab">Bilan qualitatif</div><div class="value">À faire</div><div class="sub">Retours, gêne, contraintes, difficultés</div></div>'+
+  '<div class="client-summary-card"><div class="lab">Fin d’engagement</div><div class="value">74 j</div><div class="sub">Échéance suivie dans AK PRIME</div></div>'+
  '</div>'+
- '<div class="offer-demo-card"><h5>Ce que ton offre débloque</h5><div class="offer-demo-checks">'+mods.map(m=>'<div class="offer-demo-module '+(m[2]?'':'locked')+'"><b>'+esc(m[0])+' '+(m[2]?'✓':'🔒')+'</b><span>'+esc(m[2]?m[1]:'Disponible dans une offre supérieure')+'</span></div>').join('')+'</div></div>'+
- '<div class="offer-demo-grid2">'+
-  '<div class="offer-demo-card"><h5>À faire cette semaine</h5><div class="offer-demo-list"><div class="offer-demo-row"><div><strong>Compléter mon check-in</strong><span>Vendredi soir</span></div><i class="offer-demo-status amber">À faire</i></div><div class="offer-demo-row"><div><strong>Programme de la semaine</strong><span>Optitrainer</span></div><i class="offer-demo-status green">À jour</i></div></div></div>'+
-  '<div class="offer-demo-card"><h5>Mon parcours</h5><div class="offer-demo-list"><div class="offer-demo-row"><div><strong>Bilan initial terminé</strong><span>Priorités définies</span></div><i class="offer-demo-status green">Fait</i></div><div class="offer-demo-row"><div><strong>Retest prévu</strong><span>Semaine 6</span></div><i class="offer-demo-status blue">À venir</i></div></div></div>'+
+ '<div class="client-home-actions">'+
+  '<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny" style="margin-top:5px">Programme, séances et données d’entraînement sont gérés dans Optitrainer.</div><button class="btn primary small" style="margin-top:10px;pointer-events:none">Ouvrir mon entraînement</button></div>'+
+  '<div class="client-action-card"><strong>Analyse vidéo</strong><div class="muted tiny" style="margin-top:5px">'+esc(c.video)+' selon ta formule.</div><button class="btn ghost small" style="margin-top:10px;pointer-events:none">Voir le suivi</button></div>'+
+ '</div>'+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Mon parcours</h3><div class="muted tiny">Les derniers jalons importants de l’accompagnement.</div></div><span class="status blue">Passeport</span></div>'+
+  '<div class="timeline" style="margin-top:12px"><div class="event"><div class="date">03 oct.</div><strong>Bilan initial terminé</strong><div class="muted tiny">Priorités définies.</div></div><div class="event"><div class="date">07 oct.</div><strong>Cycle lancé</strong><div class="muted tiny">Programmation disponible dans Optitrainer.</div></div><div class="event"><div class="date">14 nov.</div><strong>Retest prévu</strong><div class="muted tiny">Réévaluation semaine 6.</div></div></div>'+
  '</div>';
 }
 function performanceDemoVisios(tier){
  const c=performanceDemoConfig(tier);
- return '<div class="offer-demo-banner"><div><div class="eyebrow">VISIOS</div><h4>Mes rendez-vous</h4><p>Même logique que le vrai espace : réservation, déplacement et historique.</p></div><div class="offer-demo-tier">'+esc(c.visio)+'</div></div>'+
- '<div class="offer-demo-grid2">'+
-  '<div class="offer-demo-card"><h5>Prochaine visio</h5><div class="offer-demo-row"><div><strong>Mardi 18:30</strong><span>30 min • Suivi Performance</span></div><i class="offer-demo-status green">Confirmée</i></div><div class="offer-demo-foot">Déplacement ou annulation possible depuis l’espace selon la politique de réservation.</div></div>'+
-  '<div class="offer-demo-card"><h5>Réserver un créneau</h5><div class="offer-demo-week"><div class="offer-demo-day"><b>Mardi</b><span>3 créneaux</span></div><div class="offer-demo-day"><b>Jeudi</b><span>2 créneaux</span></div><div class="offer-demo-day"><b>Samedi</b><span>2 créneaux</span></div></div><div class="offer-demo-slots"><span class="offer-demo-slot">18:00</span><span class="offer-demo-slot">18:30</span><span class="offer-demo-slot">19:00</span></div></div>'+
- '</div>'+
- '<div class="offer-demo-card"><h5>Quota de la formule</h5><p>Performance '+esc(c.tier)+' : '+esc(c.visio)+'. Le portail applique automatiquement le rythme de visio prévu par l’offre.</p></div>';
+ return '<div class="client-page-head"><div><h2>Mes visios</h2><p>Réserve, déplace ou annule tes rendez-vous avec ton coach.</p></div><span class="status green">'+esc(c.visio)+'</span></div>'+
+ '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Mardi 13 octobre • 18:30</strong><div class="muted tiny" style="margin-top:4px">30 min • Suivi Performance</div></div><span class="status green">Modifiable</span></div><div class="row" style="margin-top:10px"><button class="btn ghost small" style="pointer-events:none">Déplacer</button><button class="btn danger small" style="pointer-events:none">Annuler</button></div></div>'+
+ '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Réserver une visio</h3><div class="muted tiny">'+esc(c.visio)+' • créneaux affichés sur 3 semaines</div></div><span class="status blue">Démo</span></div>'+
+  '<div class="client-week-tabs"><button class="on">Semaine 1</button><button>Semaine 2</button><button>Semaine 3</button></div>'+
+  '<div class="client-day-strip"><button class="client-day-btn on"><strong>mar.</strong><span>13/10 • 3</span></button><button class="client-day-btn"><strong>jeu.</strong><span>15/10 • 2</span></button><button class="client-day-btn"><strong>sam.</strong><span>17/10 • 2</span></button></div>'+
+  '<div class="section-title" style="margin-top:6px">Horaires disponibles</div><div class="client-time-grid"><button class="btn ghost small">18:00</button><button class="btn ghost small">18:30</button><button class="btn ghost small">19:00</button></div>'+
+ '</div>';
 }
 function performanceDemoSuivi(tier){
  const c=performanceDemoConfig(tier);
- return '<div class="offer-demo-banner"><div><div class="eyebrow">SUIVI</div><h4>Mon suivi hebdomadaire</h4><p>Questionnaire, check-in, tests et retours restent centralisés.</p></div><div class="offer-demo-tier">'+esc(c.adaptation)+'</div></div>'+
- '<div class="offer-demo-grid2">'+
-  '<div class="offer-demo-card"><h5>Check-in de la semaine</h5><div class="offer-demo-list"><div class="offer-demo-row"><div><strong>Séances réalisées</strong><span>4 / 4</span></div><i class="offer-demo-status green">OK</i></div><div class="offer-demo-row"><div><strong>Charge sRPE</strong><span>2 840 UA</span></div><i class="offer-demo-status blue">Suivie</i></div>'+(c.hooper?'<div class="offer-demo-row"><div><strong>Questionnaire Hooper</strong><span>Fatigue • Stress • Sommeil • Douleurs</span></div><i class="offer-demo-status green">Inclus</i></div>':'<div class="offer-demo-row"><div><strong>Questionnaire Hooper</strong><span>Disponible à partir de P2</span></div><i class="offer-demo-status locked">🔒</i></div>')+'</div></div>'+
-  '<div class="offer-demo-card"><h5>Derniers tests</h5><div class="offer-demo-list"><div class="offer-demo-row"><div><strong>CMJ filmé</strong><span>Progression +4 %</span></div><i class="offer-demo-status green">Mis à jour</i></div><div class="offer-demo-row"><div><strong>Force estimée 3–6RM</strong><span>Retest semaine 6</span></div><i class="offer-demo-status blue">Suivi</i></div></div></div>'+
+ return '<div class="client-page-head"><div><h2>Mon suivi</h2><p>Dossier, retours qualitatifs, tests et lien vers l’entraînement.</p></div></div>'+
+ '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><h3 style="margin-bottom:4px">Bilan qualitatif</h3><div class="muted tiny">Complète Optitrainer sans recopier les données déjà suivies là-bas.</div></div><span class="status amber">À remplir</span></div>'+
+  '<div class="questionnaire-answers" style="margin-top:12px"><div class="questionnaire-answer"><strong>Un exercice ou une séance t’a posé problème ?</strong><div>RAS cette semaine.</div></div><div class="questionnaire-answer"><strong>Douleur ou gêne inhabituelle ?</strong><div>Légère gêne adducteur après la séance de mardi.</div></div><div class="questionnaire-answer"><strong>Contrainte semaine prochaine ?</strong><div>Déplacement professionnel jeudi.</div></div></div>'+
  '</div>'+
- '<div class="offer-demo-card"><h5>Décisions du coach</h5><p>'+esc(c.tier==='P1'?'Le programme reste stable si tout se passe bien ; une difficulté importante déclenche une correction.':c.tier==='P2'?'Charge + Hooper + contexte sportif servent au bilan hebdomadaire pour ajuster la semaine suivante.':'Charge, Hooper, sommeil complet et état de forme permettent un suivi rapproché avec ajustement sous 48 h lorsque nécessaire.')+'</p></div>';
+ '<div class="client-section-card"><h3>Mes derniers tests</h3><div class="item row between"><div><strong>CMJ filmé</strong><div class="muted tiny">03 octobre</div></div><b>+4 %</b></div><div class="item row between"><div><strong>Force estimée 3–6RM</strong><div class="muted tiny">03 octobre</div></div><b>Référence initiale</b></div><div class="item row between"><div><strong>Retest</strong><div class="muted tiny">Semaine 6</div></div><span class="status blue">À venir</span></div></div>'+
+ '<div class="client-section-card"><h3>Contact & entraînement</h3><div class="client-home-actions"><button class="btn primary" style="pointer-events:none">Ouvrir Optitrainer</button><button class="btn ghost" style="pointer-events:none">Contacter le coach</button></div><div class="muted tiny" style="margin-top:10px">Les données d’entraînement restent dans Optitrainer ; AK PRIME centralise le dossier, les échanges et les décisions importantes.</div></div>'+
+ (c.tier==='P3'?'<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Suivi P3 complémentaire</h3><div class="muted tiny">Éléments suivis en plus du programme Optitrainer.</div></div><span class="status green">P3</span></div><div class="grid2"><div class="item"><strong>Sommeil</strong><div class="muted tiny">Durée, qualité perçue et régularité.</div></div><div class="item"><strong>Budget macros</strong><div class="muted tiny">Repères calorique et macronutriments.</div></div><div class="item"><strong>Réactivité</strong><div class="muted tiny">Ajustement sous 48 h si nécessaire.</div></div><div class="item"><strong>Récupération</strong><div class="muted tiny">Séance dédiée ajoutée si utile.</div></div></div></div>':'');
 }
 function performanceDemoPassport(tier){
  const c=performanceDemoConfig(tier);
- return '<div class="offer-demo-passport"><div class="head"><div><span>PASSEPORT AK PRIME</span><b>Progression & parcours</b></div><span>PERFORMANCE '+esc(c.tier)+'</span></div>'+
- '<div class="offer-demo-pass-grid"><div class="offer-demo-pass-card"><span>Cycle actuel</span><b>Développement force & puissance</b><div class="offer-demo-progress"><i></i></div></div><div class="offer-demo-pass-card"><span>Test clé</span><b>CMJ +4 %</b></div><div class="offer-demo-pass-card"><span>Échéance</span><b>Retest S6</b></div></div>'+
- '<div class="offer-demo-pass-grid"><div class="offer-demo-pass-card"><span>Priorité</span><b>Force relative</b></div><div class="offer-demo-pass-card"><span>Charge</span><b>sRPE suivie</b></div><div class="offer-demo-pass-card"><span>Prochaine visio</span><b>'+esc(c.visio)+'</b></div></div>'+
- '<div class="offer-demo-foot" style="color:#91a1b2;border-color:#29333d">Le vrai Passeport conserve les tests, cycles, jalons, échéances et décisions importantes du parcours.</div></div>';
+ return '<div class="pp-actions"><span class="status blue">Aperçu</span></div>'+
+ '<div class="premium-passport">'+
+  '<div class="pp-topline"><div><div class="pp-eyebrow">PASSEPORT AK PRIME</div><h2 style="margin:5px 0 3px">Alexandre K.</h2><div class="pp-muted">Performance '+esc(c.tier)+' • parcours en cours</div></div><div class="pp-motto"><strong>Cycle actuel</strong><span>Force & puissance</span></div></div>'+
+  '<div class="pp-kpi-row" style="margin-top:14px"><div class="pp-kpi"><span>Retest</span><strong>Semaine 6</strong><small>Prochaine échéance</small></div><div class="pp-kpi"><span>Analyse vidéo</span><strong>'+esc(c.video)+'</strong><small>Selon la formule</small></div><div class="pp-kpi"><span>Visios</span><strong>'+esc(c.visio)+'</strong><small>Quota actuel</small></div></div>'+
+  '<div class="pp-card" style="margin-top:10px"><div class="pp-section-title">Jalons du parcours</div><div class="pp-timeline"><div class="pp-node"><strong>Bilan initial</strong><span>03 oct.</span></div><div class="pp-node"><strong>Cycle 1</strong><span>07 oct.</span></div><div class="pp-node"><strong>Retest</strong><span>S6</span></div><div class="pp-node"><strong>Bilan de cycle</strong><span>À venir</span></div></div></div>'+
+  '<div class="pp-card" style="margin-top:10px"><div class="pp-section-title">Repères</div><div class="pp-grid3"><div class="pp-list-row"><strong>Priorité</strong><div class="pp-muted">Force relative</div></div><div class="pp-list-row"><strong>Test clé</strong><div class="pp-muted">CMJ filmé</div></div><div class="pp-list-row"><strong>Échéance</strong><div class="pp-muted">Retest semaine 6</div></div></div></div>'+
+ '</div>';
 }
 function performanceDemoView(tier,view){
  if(view==='visios')return performanceDemoVisios(tier);
@@ -2166,28 +2167,29 @@ function performanceDemoView(tier,view){
 }
 function performanceDemoMarkup(tier){
  tier=String(tier||'P1').toUpperCase();
- return '<section class="perf-section"><div class="perf-section-head"><div><h3>Teste directement l’espace client</h3><p>Cette démo reprend la structure réelle du portail AK PRIME. Les données ci-dessous sont fictives.</p></div></div>'+
- '<div class="offer-demo-wrap" data-tier="'+esc(tier)+'">'+
-  '<div class="offer-demo-top"><div class="offer-demo-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+
-   '<div class="offer-demo-nav">'+
-    '<button class="offerDemoTab on" data-demo-view="home">Accueil</button>'+
-    '<button class="offerDemoTab" data-demo-view="visios">Visios</button>'+
-    '<button class="offerDemoTab" data-demo-view="suivi">Suivi</button>'+
-    '<button class="offerDemoTab" data-demo-view="passport">Passeport</button>'+
+ return '<section class="perf-section"><div class="perf-section-head"><div><h3>Teste directement l’espace client AK PRIME</h3><p>Même structure que le vrai portail. Optitrainer reste dédié au programme et aux données d’entraînement.</p></div></div>'+
+ '<div class="offer-demo-wrap true-client-demo" data-tier="'+esc(tier)+'">'+
+  '<div class="client-top" style="position:relative;top:auto;box-shadow:none"><div class="client-brand"><span class="client-brand-mark">AK</span><span>AK PRIME<small>ESPACE CLIENT</small></span></div>'+
+   '<div class="client-nav offer-demo-real-nav">'+
+    '<button class="offerDemoTab on" data-demo-view="home"><span>⌂</span>Accueil</button>'+
+    '<button class="offerDemoTab" data-demo-view="visios"><span>◷</span>Visios</button>'+
+    '<button class="offerDemoTab" data-demo-view="suivi"><span>✓</span>Suivi</button>'+
+    '<button class="offerDemoTab" data-demo-view="passport"><span>◇</span>Passeport</button>'+
    '</div>'+
-   '<div class="offer-demo-user"><strong>Alexandre K.</strong>Performance '+esc(tier)+'</div>'+
+   '<div class="client-user-mini"><strong>Alexandre K.</strong><span>Performance '+esc(tier)+'</span></div>'+
   '</div>'+
-  '<div class="offer-demo-main" id="performanceDemoBody">'+performanceDemoView(tier,'home')+'</div>'+
+  '<div class="client-main" id="performanceDemoBody" style="padding-top:16px;padding-bottom:20px">'+performanceDemoView(tier,'home')+'</div>'+
  '</div></section>';
 }
 function bindPerformanceDemo(tier){
- const wrap=document.querySelector('.offer-demo-wrap');if(!wrap)return;
+ const wrap=document.querySelector('.true-client-demo');if(!wrap)return;
  const body=document.getElementById('performanceDemoBody');if(!body)return;
  wrap.querySelectorAll('.offerDemoTab').forEach(btn=>btn.onclick=()=>{
    wrap.querySelectorAll('.offerDemoTab').forEach(x=>x.classList.toggle('on',x===btn));
    body.innerHTML=performanceDemoView(tier,btn.dataset.demoView||'home');
  });
 }
+
 function performanceOfferLanding(name,price){
  const tier=String(name||'').toUpperCase();
  const rows={
