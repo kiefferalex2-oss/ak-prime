@@ -618,7 +618,7 @@ async function loadSupabaseData(){
      events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
      renewals:(renewals[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,newEndDate:isoDate(r.new_end_date),cycleReviewDone:!!r.cycle_review_done,retestsRequired:!!r.retests_required,retestsDone:!!r.retests_done,objectivesUpdated:!!r.objectives_updated,notes:r.notes||'',processedAt:r.processed_at||''})),
      renewalChoices:(renewalChoices[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,paymentMode:r.payment_mode||'',submittedAt:r.submitted_at||'',updatedAt:r.updated_at||''})),
-     adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois'
+     adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois',portalAccessEnabled:!!x.portal_access_enabled
    };
  });
  if(state.clientId&&!db.clients.some(x=>x.id===state.clientId))state.clientId=null;
@@ -1044,7 +1044,7 @@ function onboarding(c){
  return '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Workflow onboarding</h3><div class="muted tiny">Étape actuelle : <strong>'+esc(stepLabels[ob.currentStep]||ob.currentStep)+'</strong></div></div><span class="status '+(ob.currentStep==='active'?'green':ob.currentStep==='programming'?'blue':'amber')+'">'+esc(stepLabels[ob.currentStep]||ob.currentStep)+'</span></div>'+
  '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0">'+stepOrder.map((s,i)=>'<div class="item" style="padding:9px;background:'+(i<=stepIndex?'#eef3ff':'#fbfcfe')+'"><div class="tiny '+(i<=stepIndex?'':'muted')+'">'+(i+1)+'. '+esc(stepLabels[s])+'</div></div>').join('')+'</div>'+
  (ob.currentStep==='visio'?'<button class="btn primary small" id="completeInitialVisio">Valider la visio initiale</button>':'')+
- ((ob.visioCompletedAt||ob.currentStep==='tests'||ob.currentStep==='programming'||ob.currentStep==='active')?'<div class="section-title">Tests requis avant programmation</div><div class="list">'+(reqRows||'<div class="muted tiny">Aucun test requis défini. Ajoute les tests sélectionnés après la visio, ou passe directement à la programmation si aucun test n’est nécessaire.</div>')+'</div><div class="row" style="margin-top:9px"><input id="requiredTestName" class="input grow" placeholder="Ex. CMJ, Sprint 10 m…"><button class="btn ghost small" id="addRequiredTest">Ajouter</button></div>'+
+ ((ob.visioCompletedAt||ob.currentStep==='tests'||ob.currentStep==='programming'||ob.currentStep==='active')?'<div class="section-title">Tests requis avant programmation</div><div class="list">'+(reqRows||'<div class="muted tiny">Aucun test requis défini. Ajoute les tests sélectionnés après la visio, ou passe directement à la programmation si aucun test n’est nécessaire.</div>')+'</div><div class="row" style="margin-top:9px;align-items:flex-end"><div class="grow"><label class="tiny muted" style="display:block;margin-bottom:5px">Ajouter un test requis</label><select id="requiredTestName" class="select" style="width:100%">'+testLibraryOptions()+'</select><input id="requiredTestCustom" class="input" style="display:none;margin-top:6px;width:100%" placeholder="Nom du test personnalisé"></div><button class="btn ghost small" id="addRequiredTest">Ajouter</button></div>'+
  (ob.currentStep==='tests'?'<div class="alert blue" style="margin-top:12px"><strong>Résultats à saisir dans le Passeport</strong><div class="tiny" style="margin-top:4px">'+(required.length?'Les tests requis restent suivis ici, mais tous les résultats sont ajoutés depuis le Passeport.':'Si aucun test n’est nécessaire pour ce client, passe directement à la programmation.')+'</div><div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn ghost small quickTab" data-tab="passport">Ouvrir le Passeport</button><button class="btn primary small" id="forceProgrammingReady">'+(required.length?'Passer quand même en prêt pour programmation':'Aucun test requis — passer en prêt pour programmation')+'</button></div></div>':''):'')+
  (ob.currentStep==='programming'?'<div class="alert green" style="margin-top:12px"><strong>'+(ob.testsWaived?'Prêt pour programmation — validation manuelle du coach.':'Tous les tests requis sont validés.')+'</strong><div class="tiny" style="margin-top:4px">La programmation peut maintenant être réalisée.</div><button class="btn primary small" id="completeProgramming" style="margin-top:8px">Marquer la programmation réalisée</button></div>':'')+
  (ob.currentStep==='active'?'<div class="alert green" style="margin-top:12px"><strong>Onboarding terminé.</strong> L’accompagnement est actif.</div>':'')+
@@ -1058,11 +1058,19 @@ function onboarding(c){
  '<div class="card panel"><h3>Approfondissements liés à l’offre '+esc(c.offer)+'</h3><p class="muted tiny">Ils complètent le questionnaire sans le répéter.</p>'+offerBlocks+'</div></div>';
 }
 function offerSpecificBlocks(c){
- const labels=c.pole==='Performance'?(c.offer==='P3'?['Récupération','Sommeil','Nutrition sportive','Données club','Staff / coordination','Déplacements / compétition','Routines pré/post match']:c.offer==='P2'?['Récupération','Sommeil','Nutrition sportive','Données club','Échauffement / adaptation rapide']:['Contexte sportif','Contraintes essentielles']):c.pole==='Forme & Santé'?(c.offer==='Renforcé'?['Sommeil','Récupération','Nutrition si pertinente','Habitudes de vie']:['Contraintes d’entraînement']):c.offer==='Mental Sportif'?['Situation de compétition','Erreur / pression','Routines','Imagerie sportive','Contexte staff / saison']:['Situations déclenchantes','Confiance','Stress / émotions','Concentration','Motivation'];
+ const offer=String(c.offer||'').toLowerCase();
+ const labels=c.pole==='Performance'
+   ? (offer==='p3'
+      ? ['Contexte sportif & calendrier','Récupération','Sommeil','Nutrition — besoins / macros','Périodes de forte charge / compétition','Cycle menstruel si la sportive souhaite le suivre']
+      : offer==='p2'
+        ? ['Contexte sportif & calendrier','Récupération','Échauffement individualisé','Cycle menstruel si la sportive souhaite le suivre']
+        : ['Contexte sportif & calendrier','Contraintes essentielles'])
+   : c.pole==='Forme & Santé'
+     ? (offer.includes('renfor')?['Sommeil','Bien-être / récupération','Nutrition — besoins / macros','Habitudes de vie']:['Contraintes d’entraînement'])
+     : (offer.includes('sportif')?['Situation de compétition','Erreur / pression','Routines','Imagerie sportive','Concentration / double tâche','Contexte de saison']:['Situations déclenchantes','Confiance','Stress / émotions','Concentration','Motivation']);
  return labels.map(l=>'<div class="field"><label>'+l+'</label><textarea class="textarea offerDraft" data-offer-key="'+esc(l)+'">'+esc(c.offerNotes?.[l]||'')+'</textarea></div>').join('')+
  '<button class="btn primary small saveOfferNotes">Enregistrer les approfondissements</button>';
 }
-
 
 function follow(c){
  const cy=c.cycle||{};
@@ -1523,8 +1531,12 @@ function renewalPanel(c){
 }
 
 function clientAccountBlock(c){
- if(c.authUserId)return '<div class="item"><strong class="account-good">Compte lié</strong><div class="muted tiny">'+esc(c.accountProfile?.email||c.email||'Compte client actif')+'</div></div>';
- if(c.pendingProfile)return '<div class="item"><strong class="account-wait">Compte trouvé, pas encore lié</strong><div class="muted tiny">'+esc(c.pendingProfile.email||'')+'</div><button class="btn primary small linkClientAccount" data-user-id="'+c.pendingProfile.id+'" style="margin-top:8px">Lier ce compte au dossier</button></div>';
+ if(c.authUserId){
+   return '<div class="item"><div class="row between"><div><strong class="account-good">Compte lié</strong><div class="muted tiny">'+esc(c.accountProfile?.email||c.email||'Compte client lié')+'</div></div><span class="status '+(c.portalAccessEnabled?'green':'amber')+'">'+(c.portalAccessEnabled?'Accès actif':'Accès verrouillé')+'</span></div>'+
+   '<div class="muted tiny" style="margin-top:8px">'+(c.portalAccessEnabled?'Le client peut ouvrir son espace AK PRIME.':'Le compte est lié mais le portail reste inaccessible tant que tu ne l’actives pas.')+'</div>'+
+   '<button class="btn '+(c.portalAccessEnabled?'ghost':'primary')+' small togglePortalAccess" data-enable="'+(c.portalAccessEnabled?'0':'1')+'" style="margin-top:8px">'+(c.portalAccessEnabled?'Désactiver l’accès':'Activer l’accès client')+'</button></div>';
+ }
+ if(c.pendingProfile)return '<div class="item"><strong class="account-wait">Compte trouvé, pas encore lié</strong><div class="muted tiny">'+esc(c.pendingProfile.email||'')+'</div><button class="btn primary small linkClientAccount" data-user-id="'+c.pendingProfile.id+'" style="margin-top:8px">Lier ce compte au dossier</button><div class="muted tiny" style="margin-top:6px">La liaison ne donne pas encore accès au portail : tu l’activeras ensuite manuellement.</div></div>';
  return '<div class="item"><strong>Aucun compte lié</strong><div class="muted tiny">Le client doit créer son compte AK PRIME avec l’adresse e-mail du dossier : '+esc(c.email||'à renseigner')+'. Le compte apparaîtra ensuite ici.</div></div>';
 }
 
@@ -1631,10 +1643,12 @@ function bind(){
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
  const gs=document.getElementById('globalSearch');if(gs)gs.onkeydown=e=>{if(e.key==='Enter'){state.search=e.target.value;state.view='clients';render()}};
  document.getElementById('completeInitialVisio')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('onboarding').update({visio_completed_at:new Date().toISOString(),current_step:'tests'}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio initiale validée');render()});
- document.getElementById('addRequiredTest')?.addEventListener('click',async()=>{const cl=currentClient(),inp=document.getElementById('requiredTestName'),name=inp.value.trim();if(!name)return;const list=[...(cl.onboarding?.testsRequired||[])];if(!list.some(x=>x.toLowerCase()===name.toLowerCase()))list.push(name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null,tests_waived:false,tests_waived_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis ajouté');render()});
+ const requiredSelect=document.getElementById('requiredTestName'),requiredCustom=document.getElementById('requiredTestCustom');
+ if(requiredSelect&&requiredCustom)requiredSelect.onchange=()=>{requiredCustom.style.display=requiredSelect.value==='__custom__'?'block':'none'};
+ document.getElementById('addRequiredTest')?.addEventListener('click',async()=>{const cl=currentClient(),sel=document.getElementById('requiredTestName'),custom=document.getElementById('requiredTestCustom');const name=(sel?.value==='__custom__'?custom?.value:sel?.value||'').trim();if(!name)return toast('Choisis un test requis');const list=[...(cl.onboarding?.testsRequired||[])];if(!list.some(x=>normalizeTestName(x)===normalizeTestName(name)))list.push(name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null,tests_waived:false,tests_waived_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis ajouté');render()});
  document.querySelectorAll('.removeRequiredTest').forEach(b=>b.onclick=async()=>{const cl=currentClient();const name=b.dataset.name;const list=(cl.onboarding?.testsRequired||[]).filter(x=>x!==name);const {error}=await supa.from('onboarding').update({tests_required:list,current_step:'tests',tests_completed_at:null,programming_ready_at:null,tests_waived:false,tests_waived_at:null}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Test requis retiré');render()});
  document.getElementById('forceProgrammingReady')?.addEventListener('click',async()=>{const cl=currentClient();const remaining=(cl.onboarding?.testsRequired||[]).filter(name=>!(cl.tests||[]).some(t=>normalizeTestName(t.name)===normalizeTestName(name)));const msg=remaining.length?'Il reste '+remaining.length+' test(s) sans résultat. Passer quand même en prêt pour programmation ?':'Confirmer qu’aucun autre test n’est nécessaire et passer en prêt pour programmation ?';if(!confirm(msg))return;const now=new Date().toISOString();const {error}=await supa.from('onboarding').update({tests_waived:true,tests_waived_at:now,tests_completed_at:now,programming_ready_at:now,current_step:'programming'}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Client prêt pour programmation');render()});
- document.getElementById('completeProgramming')?.addEventListener('click',async()=>{const cl=currentClient();const now=new Date().toISOString();const [a,b]=await Promise.all([supa.from('onboarding').update({onboarding_completed_at:now,current_step:'active'}).eq('client_id',cl.id),supa.from('clients').update({status:'active'}).eq('id',cl.id)]);const err=a.error||b.error;if(err)return toast('Erreur : '+err.message);await loadSupabaseData();toast('Accompagnement activé');render()});
+ document.getElementById('completeProgramming')?.addEventListener('click',async()=>{const cl=currentClient();const now=new Date().toISOString();const ops=[supa.from('onboarding').update({onboarding_completed_at:now,current_step:'active'}).eq('client_id',cl.id),supa.from('clients').update({status:'active'}).eq('id',cl.id)];if(cl.cycle?._id)ops.push(supa.from('cycles').update({status:'active'}).eq('id',cl.cycle._id));const res=await Promise.all(ops);const err=res.find(x=>x.error)?.error;if(err)return toast('Erreur : '+err.message);await loadSupabaseData();toast('Accompagnement activé');render()});
  document.querySelectorAll('.deepCheck').forEach(x=>x.onchange=async()=>{const cl=currentClient();cl.deep=cl.deep||{};cl.deep[x.dataset.key]=x.checked;try{await saveWorkspace(cl);toast('Point mis à jour')}catch(e){toast('Erreur : '+e.message)}});
  document.querySelectorAll('.workspaceDraft').forEach(x=>x.oninput=()=>{const cl=currentClient();cl[x.dataset.field]=x.value});
  document.querySelectorAll('.offerDraft').forEach(x=>x.oninput=()=>{const cl=currentClient();cl.offerNotes=cl.offerNotes||{};cl.offerNotes[x.dataset.offerKey]=x.value});
@@ -1654,7 +1668,8 @@ function bind(){
  document.querySelector('.adminNoteDraft')?.addEventListener('input',e=>{currentClient().adminNote=e.target.value});
  document.getElementById('saveAdminNote')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({admin_note:cl.adminNote||null}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);toast('Notes administratives enregistrées')});
  document.getElementById('archiveClient')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({status:'inactive'}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);cl.status='Inactif';toast('Client passé en inactif');render()});
- document.querySelectorAll('.linkClientAccount').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({auth_user_id:b.dataset.userId}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Compte client lié');render()});
+ document.querySelectorAll('.linkClientAccount').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({auth_user_id:b.dataset.userId}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Compte lié — accès portail encore verrouillé');render()});
+ document.querySelectorAll('.togglePortalAccess').forEach(b=>b.onclick=async()=>{const cl=currentClient(),enable=b.dataset.enable==='1';if(enable&&String(cl.payment||'').toLowerCase()!=='à jour'&&!confirm('Le paiement du client n’est pas indiqué comme « À jour ». Activer quand même son accès au portail ?'))return;const {error}=await supa.from('clients').update({portal_access_enabled:enable}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast(enable?'Accès client activé':'Accès client désactivé');render()});
  document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
  document.getElementById('exportData')?.addEventListener('click',exportData);
  document.getElementById('saveWhatsAppSettings')?.addEventListener('click',async()=>{const raw=document.getElementById('waNumber').value.trim(),msg=document.getElementById('waMessage').value.trim()||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';const normalized=normalizeWhatsAppNumber(raw);if(raw&&!/^\d{10,15}$/.test(normalized))return toast('Numéro WhatsApp invalide');const {error}=await supa.from('app_settings').upsert({id:1,whatsapp_number:raw||null,whatsapp_default_message:msg,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)return toast('Erreur : '+error.message);db.settings.whatsappNumber=raw;db.settings.whatsappMessage=msg;toast('WhatsApp enregistré')});
@@ -1737,22 +1752,34 @@ function openRenewalModal(cl){
  };
 }
 
+function newClientOfferOptions(pole){
+ const map={'Performance':['P1','P2','P3'],'Forme & Santé':['Standard','Renforcé'],'Mental':['Particulier','Sportif']};
+ return (map[pole]||[]).map(x=>'<option>'+esc(x)+'</option>').join('');
+}
 function openNewClient(){
  modal('Nouveau client',
  '<div class="grid2"><div class="field"><label>Nom et prénom</label><input id="mName" class="input"></div><div class="field"><label>E-mail</label><input id="mEmail" class="input"></div>'+
- '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div><div class="field"><label>Offre</label><input id="mOffer" class="input" placeholder="P1, P2, P3…"></div>'+
- '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input"></div><div class="field"><label>Date de fin</label><input id="mEnd" type="date" class="input"></div></div>',
+ '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div><div class="field"><label>Offre</label><select id="mOffer" class="select">'+newClientOfferOptions('Performance')+'</select></div>'+
+ '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input"></div><div class="field"><label>Date de fin</label><input id="mEnd" type="date" class="input"></div>'+
+ '<div class="field"><label>Statut paiement</label><select id="mPayment" class="select"><option>En attente</option><option>À jour</option></select></div></div>'+
+ '<div class="alert blue" style="margin-top:8px"><div class="tiny">Le dossier peut être préparé avant activation. L’accès client reste verrouillé tant que le compte n’est pas lié puis activé dans Administratif.</div></div>',
  '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Créer dans Supabase</button>');
  document.getElementById('cancelM').onclick=closeModal;
+ const pole=document.getElementById('mPole'),offer=document.getElementById('mOffer');
+ pole.onchange=()=>{offer.innerHTML=newClientOfferOptions(pole.value)};
  document.getElementById('saveM').onclick=async()=>{
    const name=document.getElementById('mName').value.trim();if(!name)return toast('Nom requis');
    const nm=splitName(name),start=document.getElementById('mStart').value,end=document.getElementById('mEnd').value;
-   const row={...nm,email:document.getElementById('mEmail').value.trim()||null,current_pole:document.getElementById('mPole').value,current_offer:document.getElementById('mOffer').value||'À définir',status:'onboarding',start_date:start||null,engagement_end_date:end||null,payment_status:'À jour'};
+   const row={...nm,email:document.getElementById('mEmail').value.trim()||null,current_pole:pole.value,current_offer:offer.value||'À définir',status:'onboarding',start_date:start||null,engagement_end_date:end||null,payment_status:document.getElementById('mPayment').value,portal_access_enabled:false};
    const {data,error}=await supa.from('clients').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
-   await supa.from('client_workspace').insert({client_id:data.id});
-   await supa.from('onboarding').insert({client_id:data.id,current_step:'questionnaire'});
-   const cycleStart=start||new Date().toISOString().slice(0,10);
-   await supa.from('cycles').insert({client_id:data.id,title:'Cycle initial',start_date:cycleStart,status:'planned'});
+   const [workspaceRes,onboardingRes]=await Promise.all([
+     supa.from('client_workspace').insert({client_id:data.id}),
+     supa.from('onboarding').insert({client_id:data.id,current_step:'questionnaire'})
+   ]);
+   const setupErr=workspaceRes.error||onboardingRes.error;if(setupErr)return toast('Dossier créé, mais initialisation incomplète : '+setupErr.message);
+   const cycleStart=start||localDateISO();
+   const {error:cycleErr}=await supa.from('cycles').insert({client_id:data.id,title:'Cycle initial',start_date:cycleStart,status:'planned'});
+   if(cycleErr)return toast('Dossier créé, mais cycle initial non créé : '+cycleErr.message);
    closeModal();await loadSupabaseData();state.clientId=data.id;state.view='client';state.tab='overview';toast('Client créé dans Supabase');render();
  };
 }
@@ -1950,7 +1977,7 @@ function renderClientHome(s){
  const engagementValue=!c.engagement_end_date?'À définir':d<0?'Échue':d===0?'Aujourd’hui':d+' j';
  const actionCards=[];
  if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><strong>Questionnaire initial à compléter</strong><div class="muted tiny" style="margin-top:5px">Il permet de préparer ton accompagnement et ta première visio.</div><button class="btn primary small clientGoFollow" style="margin-top:10px">Le compléter</button></div>');
- if(!week)actionCards.push('<div class="client-action-card"><strong>Bilan hebdomadaire</strong><div class="muted tiny" style="margin-top:5px">Ton retour aide à adapter la semaine suivante.</div><button class="btn ghost small clientGoFollow" style="margin-top:10px">Faire mon bilan</button></div>');
+ if(String(c.status||'').toLowerCase()==='active'&&!week)actionCards.push('<div class="client-action-card"><strong>Bilan hebdomadaire</strong><div class="muted tiny" style="margin-top:5px">Ton retour aide à adapter la semaine suivante.</div><button class="btn ghost small clientGoFollow" style="margin-top:10px">Faire mon bilan</button></div>');
  if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card"><strong>Passeport de fin de cycle</strong><div class="muted tiny" style="margin-top:5px">Ton choix est enregistré. Tu peux aussi consulter ton évolution avant la prochaine étape.</div><button class="btn ghost small clientGoPassport" style="margin-top:10px">Voir mon Passeport</button></div>');
  return '<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><span class="status green">'+esc(c.status==='active'?'Actif':c.status||'')+'</span></div></div>'+
  '<div class="client-summary-grid">'+
@@ -2173,6 +2200,7 @@ function currentWeekFriday(){
  return d.toISOString().slice(0,10);
 }
 function renderClientWeeklyCheckin(s){
+ if(String(s?.client?.status||'').toLowerCase()!=='active')return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Bilan hebdomadaire</h3><div class="muted tiny">Disponible dès l’activation de l’accompagnement.</div></div><span class="status blue">À venir</span></div></div>';
  const friday=currentWeekFriday();
  const existing=(s.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
  if(existing){
@@ -2240,7 +2268,7 @@ async function saveClientQuestionnaire(statusValue){
  const s=clientPortalState,t=s.template;if(!t)return;
  const {answers,missing}=collectQuestionnaire(t);
  if(statusValue==='submitted'&&missing.length){alert('Il reste '+missing.length+' champ(s) obligatoire(s) à compléter.\n\n• '+missing.slice(0,8).join('\n• ')+(missing.length>8?'\n…':''));return}
- const row={client_id:s.client.id,questionnaire_type:t.template_key,questionnaire_version:t.version,answers,status:statusValue,submitted_at:new Date().toISOString()};
+ const row={client_id:s.client.id,questionnaire_type:t.template_key,questionnaire_version:t.version,answers,status:statusValue,submitted_at:statusValue==='submitted'?new Date().toISOString():null};
  const {data,error}=await supa.from('questionnaire_responses').upsert(row,{onConflict:'client_id,questionnaire_type,questionnaire_version'}).select().single();
  if(error){alert('Impossible d’enregistrer : '+error.message);return}
  s.response=data;
