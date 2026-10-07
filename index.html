@@ -114,7 +114,8 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .public-value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.public-value-card{border:1px solid #26384c;background:linear-gradient(160deg,#101f31,#0d1827);border-radius:16px;padding:18px;min-height:180px}.public-value-card .num{font-size:10px;color:#d6b36f;font-weight:950;letter-spacing:.1em}.public-value-card h3{font-size:16px;margin:8px 0 7px}.public-value-card p{font-size:12px;color:#aebdcd;line-height:1.55;margin:0}
 .public-access{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}.public-access-card{background:#fff;border:1px solid #e1e7ef;border-radius:18px;padding:21px}.public-access-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #edf0f4}.public-access-row:last-child{border-bottom:0}.public-access-row .bubble{width:31px;height:31px;border-radius:50%;background:#edf2ff;color:#2f66f6;display:grid;place-items:center;font-weight:900;flex:0 0 auto}.public-access-row strong{display:block;font-size:13px}.public-access-row div div{font-size:12px;color:#667085;margin-top:3px;line-height:1.45}
 .public-faq{display:grid;grid-template-columns:1fr 1fr;gap:10px}.public-faq details{background:#fff;border:1px solid #e1e7ef;border-radius:13px;padding:15px}.public-faq summary{font-weight:850;cursor:pointer}.public-faq p{font-size:13px;color:#667085;line-height:1.55;margin:10px 0 0}
-.public-footer{padding:28px 18px;background:#07101a;color:#8494a6}.public-footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:11px}
+.public-footer{padding:28px 18px;background:#07101a;color:#8494a6}.public-footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:11px}.public-footer-links{display:flex;gap:12px;flex-wrap:wrap}.public-footer-links button{border:0;background:transparent;color:#aebdcd;padding:0;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.public-footer-links button:hover{color:#fff}
+.legal-draft{border:1px solid #efcf8e;background:#fff9ed;color:#7a5513;border-radius:12px;padding:12px 13px;font-size:12px;line-height:1.5;margin-bottom:14px}.legal-doc h3{margin:18px 0 7px;font-size:15px}.legal-doc h3:first-of-type{margin-top:0}.legal-doc p,.legal-doc li{font-size:12px;color:#475467;line-height:1.6}.legal-doc ul{padding-left:19px}.legal-placeholder{display:inline-block;background:#fff4d8;color:#7a5513;border:1px solid #efcf8e;border-radius:6px;padding:1px 5px;font-weight:800}.legal-action{border:1px solid #d8e0eb;background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px}.legal-action strong{display:block;font-size:13px}.legal-action p{margin:5px 0 0}
 .public-login-note{border:1px solid #d9e0ea;background:#f8fafc;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.45;margin-top:10px}
 .checkout-offer-head{background:linear-gradient(145deg,#0d1827,#183252);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px}
 .checkout-offer-head .tiny{color:#b9c6d5}.checkout-offer-head h3{margin:5px 0 2px;font-size:22px}
@@ -1652,9 +1653,71 @@ function renderPublicSite(){
  '<section class="public-section"><div class="public-section-inner public-access"><div><div class="public-section-head" style="margin-bottom:0"><div class="kicker">Espace client</div><h2>Un accès personnel ouvert après paiement.</h2><p>Le client ne crée pas un compte librement. L’accès sera généré à partir de la souscription validée, puis il choisira lui-même son mot de passe.</p></div></div>'+
  '<div class="public-access-card"><div class="public-access-row"><div class="bubble">1</div><div><strong>Paiement validé</strong><div>Le nom, l’e-mail et l’offre viennent du paiement.</div></div></div><div class="public-access-row"><div class="bubble">2</div><div><strong>Compte AK PRIME préparé</strong><div>Le dossier client et son accès sont créés automatiquement.</div></div></div><div class="public-access-row"><div class="bubble">3</div><div><strong>E-mail d’activation</strong><div>Le client reçoit un lien sécurisé et choisit son mot de passe.</div></div></div><div class="public-access-row"><div class="bubble">4</div><div><strong>Accès au portail</strong><div>Une fois activé, il retrouve questionnaires, visios, suivi et Passeport.</div></div></div></div></div></section>'+
  '<section class="public-section" style="padding-top:0"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Questions fréquentes</div><h2>Avant de commencer</h2></div><div class="public-faq"><details><summary>3 ou 6 mois ?</summary><p>Les deux durées seront proposées. Le client choisira son engagement lors de la souscription.</p></details><details><summary>Paiement mensuel ou comptant ?</summary><p>Les deux seront possibles. Le comptant bénéficiera d’une petite remise, sans empêcher le paiement mensuel.</p></details><details><summary>Et à la fin de l’engagement ?</summary><p>À J-14, le client choisira lui-même entre 3 mois, 6 mois, mensuel sans engagement ou arrêt. Aucune nouvelle durée ne sera imposée automatiquement.</p></details><details><summary>Peut-on créer un compte sans payer ?</summary><p>Non. En production, l’espace client sera activé uniquement après validation de la souscription.</p></details></div></div></section>'+
- '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME — Préparation physique, forme & santé, préparation mentale.</div><div>Site actuellement en phase de construction privée.</div></div></footer>'+
+ '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME — Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px">Site actuellement en phase de construction privée.</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
  '</div>';
 }
+
+function legalPlaceholder(label){return '<span class="legal-placeholder">'+esc(label)+'</span>'}
+function openPublicLegal(type){
+ const common='<div class="legal-draft"><strong>Version de travail.</strong> Ces pages sont préparées pour la structure AK PRIME mais plusieurs informations administratives doivent encore être complétées et validées avant l’ouverture réelle des paiements.</div>';
+ const docs={
+  mentions:{
+   title:'Mentions légales',
+   body:common+'<div class="legal-doc">'+
+    '<h3>Éditeur du site</h3><p>AK PRIME est un projet exploité par <strong>Alex Kieffer</strong>. Statut juridique : '+legalPlaceholder('à compléter')+'. SIREN / SIRET : '+legalPlaceholder('à compléter')+'. Adresse professionnelle : '+legalPlaceholder('à compléter')+'. E-mail : '+legalPlaceholder('adresse professionnelle à compléter')+'. Téléphone : '+legalPlaceholder('à compléter')+'.</p>'+
+    '<h3>Responsable de la publication</h3><p>Alex Kieffer.</p>'+
+    '<h3>Activité</h3><p>Coaching sportif, préparation physique et préparation mentale non clinique. Les références professionnelles, numéro de carte professionnelle et informations réglementaires applicables seront ajoutés avant lancement commercial.</p>'+
+    '<h3>Hébergement</h3><p>Le site est actuellement publié via GitHub Pages. Les coordonnées complètes de l’hébergeur seront intégrées dans la version définitive des mentions légales avant ouverture commerciale.</p>'+
+    '<h3>Propriété intellectuelle</h3><p>Les textes, éléments graphiques, interfaces, méthodes de présentation et contenus propres à AK PRIME sont protégés. Toute reproduction ou réutilisation non autorisée est interdite, sous réserve des droits appartenant à des tiers.</p>'+
+   '</div>'
+  },
+  cgv:{
+   title:'Conditions générales de vente — projet',
+   body:common+'<div class="legal-doc">'+
+    '<h3>1. Objet</h3><p>Les présentes CGV ont vocation à encadrer la vente à distance des prestations AK PRIME aux consommateurs : préparation physique, coaching Forme & Santé et préparation mentale non clinique.</p>'+
+    '<h3>2. Prestations</h3><p>Le contenu dépend du pôle et de la formule choisis : questionnaire initial, évaluation, programmation, suivi hebdomadaire, visios, tests ou réévaluations lorsqu’ils sont pertinents, accès au portail AK PRIME et, selon l’offre, accès aux outils d’entraînement utilisés par AK PRIME.</p>'+
+    '<h3>3. Prix</h3><p>Les prix affichés dans le tunnel de commande sont exprimés en euros et devront être présentés TTC lorsque la structure sera commercialement active. Le prix applicable est celui affiché avant validation de la commande.</p>'+
+    '<h3>4. Engagement et paiement</h3><p>Les offres principales sont proposées avec un engagement de 3 ou 6 mois, payable mensuellement ou comptant selon les modalités affichées. Aucun nouvel engagement n’est imposé automatiquement à l’échéance : le client choisit lui-même la suite à J-14. Les règles définitives de paiement, d’échec de prélèvement et de suspension seront intégrées lors du branchement Stripe.</p>'+
+    '<h3>5. Démarrage de l’accompagnement</h3><p>L’accès client est activé après validation du paiement. Si le client demande expressément que la prestation commence avant la fin du délai légal de rétractation, cette demande devra être recueillie dans le tunnel de commande.</p>'+
+    '<h3>6. Visios et annulations</h3><p>Une visio peut être déplacée sans perte de quota lorsqu’elle est modifiée au moins 24 heures avant son début. Une annulation à moins de 24 heures ou une absence est comptabilisée dans le quota, sauf décision commerciale contraire d’AK PRIME en cas de situation exceptionnelle.</p>'+
+    '<h3>7. Obligations du client</h3><p>Le client s’engage à communiquer des informations sincères, à signaler toute limitation importante pour la pratique et à respecter les consignes de sécurité. En cas de doute médical, douleur inhabituelle ou contre-indication, il doit solliciter un professionnel de santé compétent.</p>'+
+    '<h3>8. Limites des prestations</h3><p>AK PRIME ne réalise pas de diagnostic médical. La préparation mentale proposée est non clinique et ne remplace pas un suivi psychologique ou psychiatrique. Les conseils nutritionnels, lorsqu’ils existent, restent généraux et ne constituent pas une prise en charge diététique médicale.</p>'+
+    '<h3>9. Droit de rétractation</h3><p>Pour une prestation de services conclue à distance, le consommateur dispose en principe d’un délai légal de 14 jours à compter de la conclusion du contrat. Les modalités détaillées figurent dans la rubrique « Rétractation ».</p>'+
+    '<h3>10. Données personnelles</h3><p>Les traitements de données nécessaires à l’accompagnement sont décrits dans la Politique de confidentialité AK PRIME.</p>'+
+    '<h3>11. Médiation de la consommation</h3><p>Après une réclamation écrite préalable restée sans solution, le consommateur pourra saisir gratuitement le médiateur de la consommation désigné par AK PRIME. Médiateur : '+legalPlaceholder('à choisir et contractualiser avant lancement')+'.</p>'+
+    '<h3>12. Droit applicable</h3><p>Les contrats conclus avec des consommateurs en France sont soumis au droit français, sous réserve des dispositions protectrices impératives applicables au consommateur.</p>'+
+   '</div>'
+  },
+  privacy:{
+   title:'Politique de confidentialité — projet',
+   body:common+'<div class="legal-doc">'+
+    '<h3>Responsable du traitement</h3><p>Le responsable du traitement sera l’exploitant d’AK PRIME : Alex Kieffer / '+legalPlaceholder('structure juridique à compléter')+'. Contact données personnelles : '+legalPlaceholder('e-mail à compléter')+'.</p>'+
+    '<h3>Données traitées</h3><ul><li>identité et coordonnées ;</li><li>informations liées à l’offre, au paiement et à la relation contractuelle ;</li><li>questionnaires, objectifs et contraintes d’entraînement ;</li><li>résultats de tests, cycles, bilans hebdomadaires et historique du suivi ;</li><li>rendez-vous et événements associés ;</li><li>données techniques nécessaires à l’authentification et à la sécurité.</li></ul>'+
+    '<h3>Données sensibles</h3><p>Certaines réponses relatives à des douleurs, blessures, antécédents ou restrictions peuvent constituer des données concernant la santé. Avant le lancement réel, AK PRIME devra recueillir un <strong>consentement explicite et distinct</strong> pour ces traitements et limiter leur collecte à ce qui est réellement nécessaire.</p>'+
+    '<h3>Finalités</h3><p>Créer et sécuriser l’espace client, fournir l’accompagnement acheté, individualiser la programmation, organiser les visios, suivre la progression, gérer les paiements et échéances, répondre aux demandes et assurer la sécurité du service.</p>'+
+    '<h3>Bases juridiques</h3><p>Selon les traitements : exécution du contrat, obligations légales, intérêt légitime lié à la sécurité du service et, pour les données sensibles lorsque cela est nécessaire, consentement explicite.</p>'+
+    '<h3>Destinataires et prestataires</h3><p>Les données sont accessibles uniquement aux personnes autorisées pour assurer l’accompagnement. L’infrastructure utilise notamment Supabase pour l’authentification et la base de données. GitHub Pages héberge actuellement la partie publique du site. Stripe sera ajouté pour le paiement. WhatsApp et Optitrainer peuvent être utilisés séparément selon les besoins du suivi et leurs propres politiques de confidentialité.</p>'+
+    '<h3>Durées de conservation</h3><p>Une politique de conservation précise sera arrêtée avant lancement. Les données ne seront pas conservées plus longtemps que nécessaire au suivi, aux obligations légales et à la gestion d’éventuels litiges.</p>'+
+    '<h3>Sécurité</h3><p>AK PRIME utilise une authentification individuelle, des règles d’accès au niveau de la base de données (RLS), une séparation des droits coach/client et un verrou d’activation du portail client. Les accès administratifs et les traitements sensibles feront l’objet d’un contrôle avant mise en production.</p>'+
+    '<h3>Vos droits</h3><p>Selon le RGPD, vous pouvez notamment demander l’accès, la rectification, l’effacement, la limitation ou la portabilité de vos données, vous opposer à certains traitements et retirer votre consentement lorsque le traitement repose sur celui-ci. Vous pouvez également introduire une réclamation auprès de la CNIL.</p>'+
+   '</div>'
+  },
+  withdrawal:{
+   title:'Droit de rétractation — projet',
+   body:common+'<div class="legal-doc">'+
+    '<h3>Délai</h3><p>Pour une prestation de services achetée à distance par un consommateur, le délai légal de rétractation est en principe de <strong>14 jours à compter de la conclusion du contrat</strong>.</p>'+
+    '<h3>Démarrage avant la fin des 14 jours</h3><p>Si le client souhaite que l’accompagnement commence avant la fin de ce délai, AK PRIME devra recueillir sa demande expresse. Si le client se rétracte ensuite alors que l’exécution a déjà commencé à sa demande, il peut être redevable d’un montant proportionnel au service déjà fourni, dans les conditions prévues par la loi.</p>'+
+    '<h3>Prestation entièrement exécutée</h3><p>Lorsque les conditions légales sont réunies et que la prestation a été entièrement exécutée avant la fin du délai, le droit de rétractation peut être perdu après demande expresse de démarrage et reconnaissance préalable de cette conséquence.</p>'+
+    '<h3>Comment se rétracter ?</h3><p>Une fonctionnalité électronique de rétractation sera ajoutée en même temps que l’ouverture des paiements en ligne. Elle permettra d’identifier la commande et d’adresser la demande sans ambiguïté.</p>'+
+    '<div class="legal-action"><strong>Fonctionnalité de rétractation</strong><p>Non active actuellement : aucune vente réelle n’est encore réalisée sur cette version du site.</p></div>'+
+   '</div>'
+  }
+ };
+ const d=docs[type];if(!d)return;
+ modal(d.title,d.body,'<button class="btn primary" id="closeLegal">Fermer</button>');
+ document.getElementById('closeLegal').onclick=closeModal;
+}
+
 function openPublicLogin(message='',isError=false){
  modal('Se connecter à AK PRIME',
  '<p class="muted tiny" style="margin-top:0">Accès réservé aux clients activés et à l’équipe AK PRIME.</p>'+
@@ -1798,6 +1861,7 @@ function bindPublicSite(){
  document.getElementById('heroLoginBtn')?.addEventListener('click',()=>openPublicLogin());
  document.querySelectorAll('.publicPoleBtn').forEach(b=>b.onclick=()=>openPublicPoleDetails(b.dataset.pole));
  document.querySelectorAll('.publicOfferBtn').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
+ document.querySelectorAll('.publicLegalBtn').forEach(b=>b.onclick=()=>openPublicLegal(b.dataset.legal));
 }
 
 function showAuth(message='',isError=false){
