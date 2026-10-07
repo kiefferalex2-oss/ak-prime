@@ -376,6 +376,23 @@ function offerBaseMonthlyPrice(pole,offer){
  }
  return null;
 }
+function publicOfferCode(pole,offer){
+ const p=String(pole||'').toLowerCase(),o=String(offer||'').toLowerCase();
+ if(p.includes('forme')){
+   if(o.includes('renfor'))return 'forme_renforce';
+   if(o.includes('standard'))return 'forme_standard';
+ }
+ if(p.includes('performance')){
+   if(/\bp3\b/.test(o))return 'performance_p3';
+   if(/\bp2\b/.test(o))return 'performance_p2';
+   if(/\bp1\b/.test(o))return 'performance_p1';
+ }
+ if(p.includes('mental')){
+   if(o.includes('sportif'))return 'mental_sportif';
+   if(o.includes('particulier'))return 'mental_particulier';
+ }
+ return '';
+}
 function euro(v){
  return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:Number.isInteger(Number(v))?0:2,maximumFractionDigits:2}).format(Number(v)||0);
 }
@@ -1817,23 +1834,56 @@ function publicOfferBenefits(pole,name){
  };
  return map[key]||['Accompagnement individualisé','Suivi AK PRIME','Accès à l’espace client'];
 }
-function publicCheckoutPrice(base,duration,paymentMode){
+function publicCheckoutPriceFallback(base,duration,paymentMode){
  base=Number(base)||0;
  if(duration===3){
    const monthlyTotal=base*3;
    if(paymentMode==='upfront'){
      const total=Math.round(monthlyTotal*.97*100)/100;
-     return {headline:euro(total)+' comptant',detail:'au lieu de '+euro(monthlyTotal)+' • remise comptant 3 %',monthlyEquivalent:Math.round((total/3)*100)/100,total};
+     return {headline:euro(total)+' comptant',detail:'au lieu de '+euro(monthlyTotal)+' • remise comptant 3 %',monthlyEquivalent:Math.round((total/3)*100)/100,total,source:'fallback'};
    }
-   return {headline:euro(base)+' / mois',detail:'3 mensualités • total '+euro(monthlyTotal),monthlyEquivalent:base,total:monthlyTotal};
+   return {headline:euro(base)+' / mois',detail:'3 mensualités • total '+euro(monthlyTotal),monthlyEquivalent:base,total:monthlyTotal,source:'fallback'};
  }
  const discountedMonthly=Math.round(base*.95*100)/100;
  const sixTotal=Math.round(discountedMonthly*6*100)/100;
  if(paymentMode==='upfront'){
    const total=Math.round(sixTotal*.98*100)/100;
-   return {headline:euro(total)+' comptant',detail:'remise engagement 6 mois 5 %, puis remise comptant 2 % • au lieu de '+euro(base*6),monthlyEquivalent:Math.round((total/6)*100)/100,total};
+   return {headline:euro(total)+' comptant',detail:'remise engagement 6 mois 5 %, puis remise comptant 2 % • au lieu de '+euro(base*6),monthlyEquivalent:Math.round((total/6)*100)/100,total,source:'fallback'};
  }
- return {headline:euro(discountedMonthly)+' / mois',detail:'6 mensualités • total '+euro(sixTotal)+' • remise engagement 6 mois 5 %',monthlyEquivalent:discountedMonthly,total:sixTotal};
+ return {headline:euro(discountedMonthly)+' / mois',detail:'6 mensualités • total '+euro(sixTotal)+' • remise engagement 6 mois 5 %',monthlyEquivalent:discountedMonthly,total:sixTotal,source:'fallback'};
+}
+async function publicCheckoutPrice(pole,name,base,duration,paymentMode){
+ const offerCode=publicOfferCode(pole,name);
+ if(offerCode){
+   const {data,error}=await supa.rpc('quote_offer',{
+     p_offer_code:offerCode,
+     p_commitment_months:Number(duration),
+     p_payment_mode:paymentMode
+   });
+   const q=Array.isArray(data)?data[0]:data;
+   if(!error&&q){
+     const canonicalBase=Number(q.base_monthly_cents)/100;
+     const monthlyEquivalent=Number(q.monthly_equivalent_cents)/100;
+     const total=Number(q.total_cents)/100;
+     let headline='',detail='';
+     if(Number(duration)===3&&paymentMode==='monthly'){
+       headline=euro(monthlyEquivalent)+' / mois';
+       detail='3 mensualités • total '+euro(total);
+     }else if(Number(duration)===3){
+       headline=euro(total)+' comptant';
+       detail='au lieu de '+euro(canonicalBase*3)+' • remise comptant 3 %';
+     }else if(paymentMode==='monthly'){
+       headline=euro(monthlyEquivalent)+' / mois';
+       detail='6 mensualités • total '+euro(total)+' • remise engagement 6 mois 5 %';
+     }else{
+       headline=euro(total)+' comptant';
+       detail='remise engagement 6 mois 5 %, puis remise comptant 2 % • au lieu de '+euro(canonicalBase*6);
+     }
+     return {headline,detail,monthlyEquivalent,total,source:'server',offerCode,base:canonicalBase};
+   }
+   console.warn('AK PRIME quote_offer indisponible, utilisation du tarif indicatif local.',error);
+ }
+ return {...publicCheckoutPriceFallback(base,duration,paymentMode),offerCode};
 }
 function openPublicOfferCheckout(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
@@ -1853,14 +1903,24 @@ function openPublicOfferCheckout(button){
   '<button class="btn ghost" id="cancelPublicCheckout">Annuler</button><button class="btn primary" id="continuePublicCheckout">Continuer</button>');
  document.getElementById('cancelPublicCheckout').onclick=closeModal;
  const durationEls=[...document.querySelectorAll('input[name="checkoutDuration"]')],paymentEls=[...document.querySelectorAll('input[name="checkoutPayment"]')];
- const renderPrice=()=>{
+ let quoteSequence=0;
+ const renderPrice=async()=>{
+   const seq=++quoteSequence;
    const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly';
-   const p=publicCheckoutPrice(base,duration,paymentMode);
-   document.getElementById('publicCheckoutPrice').innerHTML='<div class="checkout-step">Récapitulatif tarifaire</div><div class="checkout-price-main">'+esc(p.headline)+'</div><div class="checkout-price-sub">'+esc(p.detail)+'</div>';
+   const box=document.getElementById('publicCheckoutPrice');
+   if(!box)return;
+   box.innerHTML='<div class="checkout-step">Récapitulatif tarifaire</div><div class="checkout-price-sub">Vérification du tarif sécurisé…</div>';
+   const p=await publicCheckoutPrice(pole,name,base,duration,paymentMode);
+   if(seq!==quoteSequence||!document.getElementById('publicCheckoutPrice'))return;
+   box.innerHTML='<div class="checkout-step">Récapitulatif tarifaire</div><div class="checkout-price-main">'+esc(p.headline)+'</div><div class="checkout-price-sub">'+esc(p.detail)+(p.source==='server'?' • tarif vérifié côté serveur':' • tarif indicatif, vérification serveur indisponible')+'</div>';
  };
- [...durationEls,...paymentEls].forEach(x=>x.onchange=renderPrice);renderPrice();
- document.getElementById('continuePublicCheckout').onclick=()=>{
-   const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly',p=publicCheckoutPrice(base,duration,paymentMode);
+ [...durationEls,...paymentEls].forEach(x=>x.onchange=()=>{renderPrice()});renderPrice();
+ document.getElementById('continuePublicCheckout').onclick=async()=>{
+   const continueBtn=document.getElementById('continuePublicCheckout');
+   const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly';
+   continueBtn.disabled=true;continueBtn.textContent='Vérification…';
+   const p=await publicCheckoutPrice(pole,name,base,duration,paymentMode);
+   continueBtn.disabled=false;continueBtn.textContent='Continuer';
    modal('Informations avant paiement',
     '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix et complète les informations qui serviront à créer ton accès AK PRIME.</div></div>'+
     '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
