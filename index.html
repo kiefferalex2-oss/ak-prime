@@ -232,6 +232,138 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
  .client-mobile-menu button span{display:inline-block;width:26px;text-align:center;margin-right:7px}
 }
 
+
+
+/* =========================================================
+   AK PRIME — UI POLISH 2026
+   Visual-only final pass for coach console + client portal
+   ========================================================= */
+:root{
+ --bg:#f5f7fa;
+ --panel:#ffffff;
+ --panel2:#f8fafc;
+ --nav:#0b1725;
+ --nav2:#12243a;
+ --text:#172033;
+ --muted:#697586;
+ --line:#e1e7ef;
+ --blue:#315f89;
+ --blue2:#eef4f8;
+ --gold:#cfa75d;
+ --green:#167457;
+ --green2:#eaf6f1;
+ --amber:#99631b;
+ --amber2:#fff7e8;
+ --red:#b33d3d;
+ --red2:#fff0f0;
+ --shadow:0 10px 28px rgba(18,31,48,.055);
+ --shadow-lg:0 20px 55px rgba(10,22,38,.09);
+}
+body{background:linear-gradient(180deg,#f7f9fb 0,#f3f6f9 100%);letter-spacing:-.005em}
+button,.btn,.nav button,.client-nav button,.link{transition:background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease}
+button:active,.btn:active{transform:translateY(1px)}
+
+/* Coach shell */
+.app{grid-template-columns:264px 1fr;background:#f5f7fa}
+.sidebar{background:
+ radial-gradient(circle at 15% 0,rgba(207,167,93,.10),transparent 24%),
+ linear-gradient(180deg,#0d1b2b 0%,#091420 100%);
+ padding:22px 14px 18px;gap:14px;border-right:1px solid rgba(255,255,255,.04);box-shadow:12px 0 34px rgba(5,13,22,.07)}
+.brand{padding:1px 8px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid rgba(255,255,255,.07)}
+.brand-mark,.client-brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#d9b66d,#b88b43);color:#0c1724;font-size:12px;font-weight:950;letter-spacing:.04em;box-shadow:0 7px 20px rgba(207,167,93,.17)}
+.brand strong{font-size:19px;letter-spacing:.095em;line-height:1}.brand span{font-size:8px;letter-spacing:.20em;color:#93a5b8;margin-top:5px}
+.sidebar-section-label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#6f8398;font-weight:900;padding:7px 12px 2px}
+.sidebar-section-label.inside{padding:4px 12px 2px}
+.nav{gap:5px}.nav button{display:flex;align-items:center;gap:10px;border:1px solid transparent;color:#adbac7;padding:10px 11px;border-radius:11px;font-size:12px;font-weight:760}
+.nav button:hover{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.05);color:#fff}
+.nav button.on{background:linear-gradient(90deg,rgba(207,167,93,.16),rgba(207,167,93,.065));border-color:rgba(207,167,93,.24);color:#f3e4c5;box-shadow:inset 3px 0 0 #cfa75d}
+.nav-ico{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:rgba(255,255,255,.045);color:#8fa3b8;font-size:13px;flex:0 0 auto}
+.nav button.on .nav-ico{background:rgba(207,167,93,.12);color:#dfbd78}.nav-label{min-width:0}
+.nav .sep{background:rgba(255,255,255,.075);margin:8px 8px 4px}
+.sidebar-note{padding:13px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);border-radius:14px;color:#91a2b3;box-shadow:none}
+.sidebar-note strong{display:block;color:#d8b875;font-size:11px;margin-bottom:4px}.sidebar-note span{display:block;font-size:10px;line-height:1.45}
+
+/* Coach topbar */
+.topbar{height:74px;background:rgba(255,255,255,.90);backdrop-filter:blur(18px);border-bottom:1px solid rgba(212,220,229,.78);padding:0 28px;box-shadow:0 5px 18px rgba(19,33,49,.025)}
+.topbar-title{display:flex;align-items:center;gap:9px}.crumb{font-size:13px;font-weight:800;color:#39475a}.topbar-role{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#9a773b;background:#fff8e9;border:1px solid #ead8b4;border-radius:999px;padding:4px 7px;font-weight:900}
+.top-actions{gap:8px}.top-search-wrap{display:flex;align-items:center;gap:6px;border:1px solid #dde4eb;background:#f8fafc;border-radius:11px;padding-left:10px;transition:.16s}.top-search-wrap:focus-within{border-color:#a9bdd1;box-shadow:0 0 0 3px rgba(49,95,137,.07);background:#fff}.top-search-wrap>span{color:#8291a2;font-size:15px}.top-search-wrap .input{border:0!important;background:transparent!important;box-shadow:none!important;outline:0!important;width:210px;padding-left:2px}
+.top-user{display:flex;align-items:center;gap:9px;padding:4px 4px 4px 10px;border-left:1px solid #e5eaf0}.top-user>div:first-child{text-align:right}.top-user strong{display:block;font-size:10px}.top-user span{display:block;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8794a3;font-size:8px;margin-top:2px}.user-email{display:none}.avatar{width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,#172a3d,#0e1d2d);border:1px solid #26394e;color:#ddb96f;box-shadow:none}
+
+/* Main surfaces */
+.content{padding:27px 28px 55px;max-width:1480px}
+.card,.client-section-card,.client-action-card{border-color:#e1e7ee;box-shadow:var(--shadow)}
+.card{border-radius:18px}
+.card:hover{border-color:#d8e0e9}
+.page-title{margin-bottom:20px}.page-title h1{font-size:28px;letter-spacing:-.03em;color:#152033}.page-title p{font-size:13px;color:#788696}
+.panel{padding:18px}.panel h3{font-size:15px;color:#263449}
+.kpis{gap:11px}.kpi{padding:17px 17px 16px;position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#cfa75d,rgba(207,167,93,.08))}.kpi .lab{font-size:10px;text-transform:uppercase;letter-spacing:.045em;font-weight:850;color:#8390a0}.kpi .val{font-size:28px;letter-spacing:-.035em;color:#142035}.kpi .sub{font-size:11px;line-height:1.4}
+.item{border-color:#e5eaf0;background:#fbfcfd;border-radius:12px;padding:11px 12px;transition:.15s}.item:hover{background:#fff;border-color:#d8e1ea;box-shadow:0 7px 18px rgba(25,39,55,.035)}
+table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-weight:900;letter-spacing:.055em}th,td{border-color:#edf1f4}tbody tr:hover td{background:#fbfcfd}
+.toolbar{background:#fbfcfd;padding:13px 15px}
+.tabs{background:#edf1f5;border:1px solid #e0e6ed;border-radius:13px;padding:5px;gap:4px}.tabs button{font-size:11px;font-weight:800;color:#6d7a89}.tabs button.on{background:#fff;color:#172033;box-shadow:0 2px 8px rgba(28,43,59,.08);border:1px solid #e0e6ed}
+.btn{border-radius:11px;padding:10px 14px;font-size:12px;font-weight:850}.btn.primary{background:linear-gradient(180deg,#355f86,#2d5578);box-shadow:0 7px 16px rgba(49,95,137,.13)}.btn.primary:hover{background:#284e70;box-shadow:0 9px 18px rgba(49,95,137,.18)}.btn.ghost{border-color:#dce3ea;background:#fff}.btn.ghost:hover{background:#f7f9fb;border-color:#cfd9e3}.btn.small{font-size:11px;padding:7px 10px}
+.input,.select,.textarea{border-color:#dce3ea;border-radius:11px;background:#fff;box-shadow:inset 0 1px 1px rgba(18,31,48,.015)}.input:focus,.select:focus,.textarea:focus{outline:0;box-shadow:0 0 0 3px rgba(49,95,137,.09);border-color:#9db3c8}
+.status{padding:5px 8px;font-size:9px;letter-spacing:.01em}
+.link{color:#315f89;font-size:11px}.link:hover{color:#214865}
+.alert{border-left:0;border:1px solid #ecd9ad;background:#fffaf0;border-radius:12px}.alert.blue{border-color:#cddbea;background:#f7faff}.alert.green{border-color:#c9e3d7;background:#f6fbf8}
+
+/* Coach client dossier header */
+.client-head{padding:19px 20px;border-radius:18px}.photo{width:64px;height:64px;border-radius:16px;background:linear-gradient(145deg,#22394f,#112235);color:#d9b46d;box-shadow:0 8px 20px rgba(11,24,38,.13)}.person h2{font-size:21px}.metric{background:#fbfcfd;border-color:#e2e8ef;border-radius:12px}
+.metrics{gap:7px}
+
+/* Modals */
+.modal-wrap{background:rgba(7,18,30,.56);backdrop-filter:blur(4px)}
+.modal{border:1px solid rgba(255,255,255,.5);box-shadow:0 30px 90px rgba(4,13,22,.28);border-radius:20px}
+.modal-head{background:#fbfcfd}.modal-head strong{font-size:14px;color:#233247}.modal-foot{background:#fbfcfd}.x{color:#7b8796;border-radius:8px;width:32px;height:32px}.x:hover{background:#eef2f6}
+
+/* Client portal */
+.client-portal{background:linear-gradient(180deg,#f7f9fb 0,#f2f5f8 100%)}
+.client-top{background:
+ radial-gradient(circle at 10% -20%,rgba(207,167,93,.12),transparent 28%),
+ linear-gradient(180deg,#0e1c2c,#0b1725);
+ padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.06);box-shadow:0 7px 24px rgba(7,17,29,.13);position:sticky;top:0;z-index:80}
+.client-brand{display:flex;align-items:center;gap:10px;font-size:14px;letter-spacing:.08em}.client-brand small{font-size:7px;color:#98a9ba;letter-spacing:.19em;margin-top:3px}.client-brand-mark{width:34px;height:34px;border-radius:10px;font-size:10px}
+.client-nav{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:4px;gap:3px}.client-nav button{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:#aab9c8;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:850}.client-nav button span{font-size:12px;color:#7f94aa}.client-nav button:hover{background:rgba(255,255,255,.05);color:#fff}.client-nav button.on{background:#d2a65b;color:#0c1723;box-shadow:0 4px 14px rgba(210,166,91,.15)}.client-nav button.on span{color:#0c1723}
+.client-top-actions{gap:8px}.client-user-mini{text-align:right;padding-left:4px}.client-user-mini strong{display:block;color:#fff;font-size:10px}.client-user-mini span{display:block;color:#8fa1b4;font-size:8px;margin-top:2px}
+.client-top .btn.ghost{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.10);color:#dce5ee}.client-top .btn.ghost:hover{background:rgba(255,255,255,.09)}
+.client-top .notification-bell{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.10)}
+.client-main{max-width:1080px;padding:26px 18px 55px}
+.client-hero{background:
+ radial-gradient(circle at 82% 15%,rgba(207,167,93,.12),transparent 27%),
+ linear-gradient(145deg,#102034,#17314b);
+ border:1px solid #263e56;padding:22px 23px;border-radius:19px;box-shadow:0 14px 32px rgba(11,26,42,.12)}
+.client-hero h1{font-size:25px;letter-spacing:-.025em}.client-hero p{font-size:11px;color:#aebdcb}
+.client-summary-grid{gap:9px}.client-summary-card{border-radius:15px;padding:14px 15px;min-height:102px;box-shadow:0 7px 20px rgba(24,37,52,.035)}.client-summary-card .lab{font-size:9px;letter-spacing:.055em}.client-summary-card .value{font-size:16px;color:#1b2a3c}.client-summary-card .sub{font-size:10px}
+.client-section-card{border-radius:17px;padding:17px;margin-top:12px}.client-section-card h3{font-size:15px;color:#203044}
+.client-action-card{border-radius:15px;padding:15px}.client-action-card.urgent{background:#fffaf1}.client-action-card.good{background:#f7fcf9}
+.client-page-head{margin-bottom:15px}.client-page-head h2{font-size:24px;letter-spacing:-.025em}.client-page-head p{font-size:11px;color:#7a8796}
+.client-engagement{border-radius:15px;box-shadow:var(--shadow)}
+.client-week-tabs button{border-radius:9px;font-size:10px}.client-week-tabs button.on{background:#13253a;border-color:#13253a}
+.client-day-btn{border-radius:11px}.client-time-grid .btn{box-shadow:none}
+.questionnaire-done{border-radius:14px}
+.client-collapsed{border-radius:14px}
+.client-home-actions{gap:9px}
+.client-tool-card{border-radius:17px;box-shadow:0 7px 20px rgba(24,37,52,.035)}.client-tool-card.akprime{background:linear-gradient(180deg,#fffdf9,#fff)}.client-tool-card.optitrainer{background:linear-gradient(180deg,#fbfdff,#fff)}
+.client-tool-tag{background:#f7f9fb}
+
+/* Premium passport refinement */
+.premium-passport{background:linear-gradient(155deg,#0b141d,#0c1721 64%,#0a1219);border-color:#28323c;box-shadow:0 18px 45px rgba(4,12,20,.18)}
+.pp-card{background:linear-gradient(145deg,rgba(17,27,36,.98),rgba(10,17,24,.98));border-color:#29343e}
+.pp-gold{color:#dcb66d}.pp-eyebrow{color:#dcb66d}
+.pp-progress i{background:linear-gradient(90deg,#b98740,#dfb568)}
+
+/* Responsive */
+@media(max-width:1100px){
+ .app{grid-template-columns:84px 1fr}
+ .sidebar{padding:17px 8px}.brand{justify-content:center;padding:2px 0 14px}.brand>div:last-child{display:none}.sidebar-section-label,.sidebar-note,.nav-label{display:none}.nav button{justify-content:center;padding:10px}.nav-ico{width:32px;height:32px;font-size:15px}.nav button.on{box-shadow:none}.top-user>div:first-child{display:none}
+}
+@media(max-width:780px){
+ .app{display:block}.sidebar{display:none}.topbar{height:64px;padding:0 13px}.topbar-role,.top-user,.top-search-wrap{display:none}.content{padding:18px 12px 42px}
+ .client-top{padding:11px 12px}.client-brand{font-size:12px}.client-brand-mark{width:31px;height:31px}.client-user-mini{display:none}
+}
+@media(max-width:520px){
+ .client-summary-grid{grid-template-columns:1fr 1fr}.client-hero{padding:17px}.client-hero h1{font-size:21px}
+}
 </style>
 </head>
 <body>
@@ -688,15 +820,18 @@ function bindNotificationBells(){
 
 function shell(inner){
  return '<div class="app">'+
- '<aside class="sidebar"><div class="brand"><strong>AK PRIME</strong><span>PERFORMANCE SYSTEM</span></div>'+
- '<div class="nav">'+
+ '<aside class="sidebar"><div class="brand"><div class="brand-mark">AK</div><div><strong>AK PRIME</strong><span>COACH CONSOLE</span></div></div>'+
+ '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('globalTests','Tests')+navBtn('calendar','Calendrier')+
- '<div class="sep"></div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
- '</div><div class="sidebar-note">Supabase connecté.<br>Données clients persistantes et protégées par authentification + RLS.</div></aside>'+
- '<main><div class="topbar"><div class="crumb">AK PRIME / '+crumb()+'</div><div class="top-actions"><input id="globalSearch" class="input" placeholder="Rechercher un client…">'+notificationBell('coach')+'<span class="user-email">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="logoutBtn">Déconnexion</button><div class="avatar">AK</div></div></div>'+
+ '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
+ '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
+ '<main><div class="topbar"><div class="topbar-title"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
-function navBtn(v,label){return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'">'+label+'</button>'}
+function navBtn(v,label){
+ const icons={dashboard:'⌂',clients:'◎',globalTests:'◇',calendar:'◷',backup:'⇩',settings:'⚙'};
+ return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'"><span class="nav-ico">'+esc(icons[v]||'•')+'</span><span class="nav-label">'+esc(label)+'</span></button>';
+}
 function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',globalTests:'Tests',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
 
 function dashboard(){
@@ -1317,7 +1452,7 @@ function renderClientEngagementBanner(c){
 function clientNavMarkup(){
  const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['suivi','✓','Suivi'],['passport','◇','Passeport']];
  const current=items.find(x=>x[0]===clientPortalView)||items[0];
- const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'">'+label+'</button>').join('')+'</div>';
+ const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
  const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
  (clientMobileMenuOpen?'<div class="client-mobile-menu">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>':'');
  return {top,mobile};
@@ -1447,7 +1582,7 @@ function renderClientPortal(){
  }else{
    main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand">AK PRIME<small>ESPACE CLIENT</small></div>'+nav.top+'<div class="row">'+nav.mobile+notificationBell('client')+'<span class="tiny">'+esc(authUser?.email||'')+'</span><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand"><span class="client-brand-mark">AK</span><span>AK PRIME<small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
