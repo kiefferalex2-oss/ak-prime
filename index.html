@@ -3025,7 +3025,7 @@ function openPublicOfferCheckout(button){
     '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
       '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> Je reconnais avoir pris connaissance des conditions générales de vente, de la politique de confidentialité et des informations sur le droit de rétractation disponibles sur le site.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
-      '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Option facultative — démarrage anticipé.</strong> Je demande expressément de commencer l’accompagnement avant la fin du délai de rétractation de 14 jours. Je comprends que, si je me rétracte après le début de l’exécution, je pourrai devoir régler la part de la prestation déjà réalisée. Si je ne coche pas cette case, mon accompagnement ne commencera pas avant l’expiration de ce délai.</span></label>'+
     '</div><div class="checkout-consent-note">Ces choix sont préparés dans le tunnel mais ne sont pas encore enregistrés : aucun paiement réel n’est actif sur cette version.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
     '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
     '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Continuer vers le paiement</button>');
@@ -3053,7 +3053,6 @@ function openPublicOfferCheckout(button){
      if(!email||!emailEl.checkValidity())errors.push('Indique une adresse e-mail valide.');
      if(!acceptedCgv)errors.push('Confirme la prise de connaissance des documents contractuels.');
      if(!healthConsent)errors.push('Le consentement explicite au traitement des données sensibles est nécessaire pour préparer un accompagnement individualisé.');
-     if(!earlyStart)errors.push('Confirme ta demande de démarrage avant la fin du délai de 14 jours pour poursuivre ce parcours.');
      if(errors.length){
        errorBox.innerHTML='<strong>Il reste '+errors.length+' point'+(errors.length>1?'s':'')+' à compléter :</strong><br>• '+errors.map(esc).join('<br>• ');
        errorBox.classList.add('show');
@@ -3062,11 +3061,44 @@ function openPublicOfferCheckout(button){
      errorBox.classList.remove('show');
      modal('Paiement bientôt disponible',
       '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt jusqu’à Stripe.</strong><div class="tiny" style="margin-top:5px">L’identité, le choix d’offre et les consentements sont maintenant collectés avant l’étape de paiement. Ils seront persistés et vérifiés côté serveur lors du branchement Stripe.</div></div>'+
-      '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
+      '<div class="alert blue"><strong>'+ (earlyStart?'Démarrage anticipé demandé':'Démarrage après le délai de rétractation') +'</strong><div class="tiny">'+ (earlyStart?'Le client a coché une demande expresse de démarrage avant 14 jours.':'Le client n’a pas demandé de démarrage anticipé : aucun accompagnement ne doit débuter avant l’expiration du délai légal.') +'</div></div>'+ '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
       '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
-     document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+     document.getElementById('closeCheckoutInfo').textContent='Tester le parcours fictif';
+     document.getElementById('closeCheckoutInfo').onclick=()=>showCheckoutDryRun({fullName,email,pole,name,duration,paymentMode,total:p.total,earlyStart});
+
    };
  };
+}
+
+
+/**
+ * Dry-run only: deliberately never writes to Supabase, Stripe, clients or invoices.
+ * Real order creation is a separate authenticated server flow.
+ */
+function showCheckoutDryRun(order){
+ const safeName=esc(order.fullName),safeOffer=esc(order.pole+' — '+order.name);
+ const safePrice=euro(Number(order.total)||0);
+ const steps=[
+  ['Commande préparée','Offre '+safeOffer+' • '+order.duration+' mois • '+safePrice],
+  ['Informations vérifiées','Client fictif : '+safeName+' • aucune donnée enregistrée'],
+  ['Consentements simulés','CGV validées dans le formulaire • démarrage anticipé : '+(order.earlyStart?'demandé':'non demandé')],
+  ['Paiement simulé','Carte de test fictive • aucun débit, aucun appel Stripe'],
+  ['Dossier client simulé','Activation théorique après confirmation du paiement'],
+  ['Facture simulée','Aucun numéro officiel et aucune écriture comptable créés']
+ ];
+ let position=0;
+ const draw=()=>{
+  modal('Simulation AK PRIME — aucun paiement réel',
+   '<div class="alert blue"><strong>Environnement de démonstration.</strong><div class="tiny">Le simulateur ne contacte ni Stripe ni la base de données : il ne crée ni client, ni facture, ni recette.</div></div>'+
+   '<div class="checkout-recap"><div><span>Offre</span><strong>'+safeOffer+'</strong></div><div><span>Engagement</span><strong>'+order.duration+' mois</strong></div><div><span>Total indicatif</span><strong>'+safePrice+'</strong></div><div><span>Mode</span><strong>'+esc(order.paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div></div>'+
+   '<div class="section-title">Scénario d’essai</div><div class="list">'+steps.map((entry,i)=>'<div class="item"><strong>'+(i<position?'✓ ':i===position?'→ ':'○ ')+esc(entry[0])+'</strong><div class="muted tiny">'+esc(entry[1])+'</div></div>').join('')+'</div>'+
+   (position===steps.length?'<div class="alert green" style="margin-top:13px"><strong>Scénario fictif terminé.</strong><div class="tiny">Il reste à tester chaque étape réelle, y compris le webhook Stripe et la facturation, une fois les intégrations raccordées.</div></div>':''),
+   '<button class="btn ghost" id="closeDryRun">Fermer</button>'+(position<steps.length?'<button class="btn primary" id="nextDryRun">Étape suivante ('+(position+1)+'/'+steps.length+')</button>':'<button class="btn primary" id="restartDryRun">Recommencer</button>'));
+  document.getElementById('closeDryRun').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+  if(position<steps.length)document.getElementById('nextDryRun').onclick=()=>{position++;draw()};
+  else document.getElementById('restartDryRun').onclick=()=>{position=0;draw()};
+ };
+ draw();
 }
 
 function bindPublicSite(){
