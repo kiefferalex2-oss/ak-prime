@@ -649,6 +649,26 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:900px){.public-site .ak-difference-layout{grid-template-columns:1fr}.public-site .ak-difference-benefits{grid-template-rows:auto;grid-template-columns:repeat(3,minmax(0,1fr))}.public-site .ak-difference-benefit{display:block;padding:18px}.public-site .ak-difference-symbol{margin-bottom:12px}}
 @media(max-width:650px){.public-site .ak-passport-highlight{padding:23px}.public-site .ak-passport-details>div{grid-template-columns:1fr;gap:3px}.public-site .ak-difference-benefits{grid-template-columns:1fr}.public-site .ak-difference-benefit{display:grid;grid-template-columns:40px 1fr}.public-site .ak-difference-symbol{margin-bottom:0}}
 
+
+/* Passeport AK PRIME — éditorial compact, distinct des grilles de cartes */
+.public-site .ak-difference-compact .ak-diff-intro{max-width:850px;margin-bottom:20px}
+.public-site .ak-difference-compact .ak-diff-intro h2{font-size:clamp(27px,3vw,39px);line-height:1.17;letter-spacing:-.03em;margin:8px 0 0;color:#121f32}
+.public-site .ak-difference-compact .ak-diff-strip{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.85fr);gap:28px;align-items:start;padding:26px 0;border-top:1px solid #d9e1eb;border-bottom:1px solid #d9e1eb}
+.public-site .ak-difference-compact .ak-diff-passport{padding:0 26px 0 0;border-right:1px solid #d9e1eb}
+.public-site .ak-difference-compact .ak-diff-passport-kicker{font-size:11px;font-weight:850;color:#a67a3f;letter-spacing:.12em;margin-bottom:9px}
+.public-site .ak-difference-compact .ak-diff-passport h3{font-size:23px;line-height:1.24;letter-spacing:-.02em;margin:0 0 12px;color:#172940}
+.public-site .ak-difference-compact .ak-diff-passport p{font-size:13px;line-height:1.75;color:#5f6d80;margin:0 0 11px}
+.public-site .ak-difference-compact .ak-diff-passport p strong{font-weight:800;color:#253950}
+.public-site .ak-difference-compact .ak-diff-passport-foot{font-size:12px;line-height:1.6;font-weight:750;color:#996f35;margin-top:13px}
+.public-site .ak-difference-compact .ak-diff-aside h3{font-size:15px;color:#172940;margin:0 0 12px}
+.public-site .ak-difference-compact .ak-diff-point{display:grid;grid-template-columns:28px minmax(0,1fr);gap:11px;align-items:start;padding:12px 0;border-bottom:1px solid #e0e6ed}
+.public-site .ak-difference-compact .ak-diff-point:last-child{border-bottom:0}
+.public-site .ak-difference-compact .ak-diff-point>b{font-size:11px;color:#b58a4f;font-weight:850}
+.public-site .ak-difference-compact .ak-diff-point strong{display:block;font-size:13px;color:#172940;line-height:1.4;margin-bottom:4px}
+.public-site .ak-difference-compact .ak-diff-point span{display:block;font-size:12px;line-height:1.65;color:#647388}
+.public-site .ak-difference-compact .ak-diff-note{font-size:10px;line-height:1.55;color:#778396;margin:11px 0 0}
+@media(max-width:780px){.public-site .ak-difference-compact .ak-diff-strip{grid-template-columns:1fr;gap:21px;padding:18px 0}.public-site .ak-difference-compact .ak-diff-passport{border-right:0;border-bottom:1px solid #d9e1eb;padding:0 0 18px}}
+
 </style>
 </head>
 <body>
@@ -2676,15 +2696,12 @@ function renderPublicSite(){
  '<div class="ak-about-career-lines"><div><strong>Handball</strong><span>Palente Besançon (national) · Section Stendhal, championne de France UNSS 2026</span></div><div><strong>Football</strong><span>Préparation physique à Thonon Évian Grand Genève · Seconde Ligue</span></div><div><strong>Boxe & haltérophilie</strong><span>Encadrement technique et préparation physique</span></div></div>'+
  '<div class="ak-about-skill-line"><span>Évaluation & profilage physique</span><span>Planification & suivi des charges</span><span>Préparation physique & réathlétisation</span><span>Préparation mentale</span><span>Sommeil, récupération & état de forme</span><span>Nutrition : besoins & macronutriments</span><span>Prise en compte du cycle menstruel</span></div></div>'+
  '</div></div></div></section>'+
- '<section class="public-section ak-difference-section" id="pourquoi-ak-prime" style="padding-top:0"><div class="public-section-inner">'+
- '<div class="public-section-head ak-difference-heading"><div class="kicker">La différence AK PRIME</div><h2>Bien plus qu’un programme : un accompagnement que vous pouvez suivre.</h2><p>Vous savez ce que vous travaillez, pourquoi vous le faites et comment votre accompagnement évolue. Vos progrès ne se résument pas à une suite de séances.</p></div>'+
- '<div class="ak-difference-layout">'+
- '<div class="ak-passport-highlight"><div class="ak-passport-heading"><div class="ak-passport-emblem">AK</div><span>VOTRE ESPACE PERSONNEL</span></div><h3>Le Passeport AK PRIME.<br><em>Le fil conducteur de votre progression.</em></h3><p>Retrouvez au même endroit les informations importantes de votre accompagnement : votre point de départ, vos objectifs, les bilans, les évaluations, les cycles de travail et les évolutions décidées ensemble, selon votre formule.</p><div class="ak-passport-details"><div><strong>Votre point de départ</strong><span>Objectifs, besoins et repères initiaux</span></div><div><strong>Votre progression</strong><span>Bilans, résultats et étapes franchies</span></div><div><strong>Votre suivi</strong><span>Échanges et ajustements consignés au fil de l’accompagnement</span></div></div><div class="ak-passport-bottom">Un historique structuré pour comprendre le chemin parcouru, pas seulement la séance du jour.</div></div>'+
- '<div class="ak-difference-benefits">'+
- '<div class="ak-difference-benefit"><div class="ak-difference-symbol">✦</div><div><h3>Un programme qui part de vous</h3><p>Votre niveau, vos objectifs, votre matériel, votre emploi du temps et votre pratique guident la construction de votre accompagnement. Vous n’avez pas à vous adapter à un programme standard.</p></div></div>'+
- '<div class="ak-difference-benefit"><div class="ak-difference-symbol">↗</div><div><h3>Des évolutions expliquées, pas des changements au hasard</h3><p>Vos résultats et vos retours servent à faire le point sur ce qui fonctionne et ce qui mérite d’évoluer. La fréquence des ajustements dépend de votre formule.</p></div></div>'+
- '<div class="ak-difference-benefit"><div class="ak-difference-symbol">◎</div><div><h3>Un vrai échange derrière les données</h3><p>Les tests, questionnaires et indicateurs sont des outils, pas une fin en soi. Vos sensations, vos contraintes et vos questions restent au cœur des décisions.</p></div></div>'+
- '</div></div></div></section>'+
+ '<section class="public-section ak-difference-section ak-difference-compact" id="pourquoi-ak-prime" style="padding-top:0"><div class="public-section-inner">'+
+ '<div class="ak-diff-intro"><div class="kicker">La différence AK PRIME</div><h2>Votre progression ne s’arrête pas à la fin d’un programme.</h2></div>'+
+ '<div class="ak-diff-strip"><div class="ak-diff-passport"><div class="ak-diff-passport-kicker">LE PASSEPORT AK PRIME</div><h3>Votre parcours sportif, au même endroit.</h3><p>Plus qu’un tableau de résultats, c’est votre carnet de suivi : objectifs, évaluations, évolution des performances, charges de travail, bilans et points d’attention y trouvent leur place selon votre accompagnement. Vous comprenez <strong>d’où vous partez, où vous en êtes et vers quoi vous avancez.</strong></p><p>Et si vous changez d’entraîneur, de préparateur physique ou de club ? L’objectif est de pouvoir <strong>transmettre, avec votre accord, un historique clair</strong> au professionnel qui prend le relais. Il dispose ainsi de repères sur votre parcours, sans devoir tout reconstruire depuis le début.</p><div class="ak-diff-passport-foot">Un suivi qui vous appartient et qui garde son utilité au-delà d’un accompagnement.</div></div>'+
+ '<div class="ak-diff-aside"><h3>Ce que cela change pour vous</h3><div class="ak-diff-point"><b>01</b><div><strong>Vous savez où vous allez</strong><span>Des objectifs et des étapes identifiables, plutôt qu’une succession de séances.</span></div></div><div class="ak-diff-point"><b>02</b><div><strong>Vous comprenez votre progression</strong><span>Vos tests, vos retours et les décisions prises donnent du sens à votre suivi.</span></div></div><div class="ak-diff-point"><b>03</b><div><strong>Vous facilitez la continuité</strong><span>En cas de changement de structure, votre historique peut servir de base à une nouvelle prise en charge, avec votre accord.</span></div></div></div></div>'+
+ '<p class="ak-diff-note">Les informations consignées varient selon le pôle et la formule. Le Passeport est un outil de suivi sportif, et non un dossier médical. Le partage ou l’export de données vers un tiers sera proposé uniquement lorsque cette fonctionnalité sera disponible et avec votre accord.</p>'+
+ '</div></section>'+
  '<section class="public-section dark"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Concrètement</div><h2>Ce que vous obtenez dans votre accompagnement.</h2><p>Le contenu exact dépend de la formule et du pôle choisi, mais le fonctionnement reste fondé sur le même cadre de suivi.</p></div><div class="public-value-grid">'+
  '<div class="public-value-card"><div class="num">01 — ÉVALUATION</div><h3>Un point de départ clair</h3><p>Questionnaire initial, échange approfondi et tests utiles pour comprendre votre profil et définir les priorités.</p></div>'+
  '<div class="public-value-card"><div class="num">02 — PLANIFICATION</div><h3>Un programme individualisé</h3><p>Séances, charges, objectifs et organisation adaptés à ton niveau, ton matériel et ton emploi du temps.</p></div>'+
