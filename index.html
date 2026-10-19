@@ -597,6 +597,20 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:900px){.public-site #apropos .ak-about-layout{grid-template-columns:1fr}.public-site #apropos .ak-about-portrait{min-height:320px}.public-site #apropos .ak-about-photo-grid{max-width:660px}}
 @media(max-width:530px){.public-site #apropos .ak-about-head h2{font-size:30px}.public-site #apropos .ak-about-achievements{grid-template-columns:1fr}.public-site #apropos .ak-about-skills{grid-template-columns:1fr}.public-site #apropos .ak-about-photo-slot{padding:10px 7px}.public-site #apropos .ak-about-photo-slot strong{font-size:10px}}
 
+
+/* A propos : portrait unique, sans galerie de tiers */
+.public-site #apropos .ak-about-layout{grid-template-columns:minmax(240px,.66fr) minmax(0,1.34fr);gap:32px}
+.public-site #apropos .ak-about-portrait{min-height:445px}
+.public-site #apropos .ak-about-body{font-size:13px;line-height:1.8;color:#617186;margin:12px 0 0}
+.public-site #apropos .ak-about-career{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:13px}
+.public-site #apropos .ak-about-career>div{padding:17px;border:1px solid #e2e8f0;border-radius:16px;background:linear-gradient(155deg,#fff,#f9fbfd)}
+.public-site #apropos .ak-about-career-tag{display:block;color:#a57837;font-weight:850;letter-spacing:.065em;font-size:10px;margin-bottom:9px}
+.public-site #apropos .ak-about-career strong{display:block;color:#182b41;font-size:14px;line-height:1.4}
+.public-site #apropos .ak-about-career p{color:#65758a;font-size:12px;line-height:1.62;margin:7px 0 0}
+.public-site #apropos .ak-about-experience-copy{margin-top:24px}
+@media(max-width:900px){.public-site #apropos .ak-about-layout{grid-template-columns:1fr}.public-site #apropos .ak-about-portrait{min-height:320px}}
+@media(max-width:530px){.public-site #apropos .ak-about-career{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -2613,16 +2627,17 @@ function renderPublicSite(){
  '<div class="public-process-card"><b>05</b><strong>Adapter</strong><p>Bilans, visios, retours et réévaluations font évoluer l’accompagnement.</p></div>'+
  '</div></div></section>'+
  '<section class="public-section" id="apropos"><div class="public-section-inner">'+
- '<div class="ak-about-head"><div class="kicker">Qui est derrière AK PRIME ?</div><h2>Une expertise construite sur le terrain.</h2><p>De la préparation physique à la préparation mentale, une expérience auprès de sportifs de différents niveaux, mise au service de votre progression.</p></div>'+
+ '<div class="ak-about-head"><div class="kicker">Qui est derrière AK PRIME ?</div><h2>Une expertise construite sur le terrain.</h2></div>'+
  '<div class="ak-about-layout">'+
- '<div class="ak-about-visual"><div class="ak-about-portrait"><span class="ak-about-visual-tag">AK PRIME · FONDATEUR</span><div class="ak-about-portrait-inner"><div class="ak-about-monogram">AK</div><span>Portrait professionnel à venir</span></div><div class="ak-about-identity"><h3>Alex Kieffer</h3><p>Préparateur physique & mental · Coach sportif</p></div></div>'+
- '<div class="ak-about-photo-grid"><div class="ak-about-photo-slot"><span>HANDBALL</span><strong>Handball national & jeunes</strong></div><div class="ak-about-photo-slot"><span>FOOTBALL</span><strong>Seconde Ligue féminine</strong></div><div class="ak-about-photo-slot"><span>BOXE</span><strong>Préparation physique</strong></div></div>'+
- '</div>'+
- '<div class="ak-about-content"><div class="ak-about-lede">Diplômé d’un Master STAPS EOPS, je m’appuie sur des expériences de terrain en handball, football, boxe et haltérophilie pour proposer un accompagnement individualisé, exigeant et accessible.</div>'+
+ '<div class="ak-about-visual"><div class="ak-about-portrait"><span class="ak-about-visual-tag">AK PRIME · FONDATEUR</span><div class="ak-about-portrait-inner"><div class="ak-about-monogram">AK</div><span>Portrait professionnel à venir</span></div><div class="ak-about-identity"><h3>Alex Kieffer</h3><p>Préparateur physique & mental · Coach sportif</p></div></div></div>'+
+ '<div class="ak-about-content"><div class="ak-about-lede">Diplômé d’un Master STAPS EOPS, spécialisé dans l’entraînement et l’optimisation de la performance, j’ai développé mon expérience auprès de sportifs de différents niveaux, du pratiquant débutant jusqu’au sport professionnel.</div>'+
+ '<p class="ak-about-body">Mon parcours m’a amené à intervenir dans plusieurs disciplines, notamment le handball, le football, la boxe et l’haltérophilie.</p>'+
+ '<p class="ak-about-body">Aujourd’hui, avec AK PRIME, je mets cette expérience au service d’un accompagnement individualisé, associant expertise technique, suivi rigoureux et relation humaine.</p>'+
  '<div class="ak-about-credentials"><span>Master STAPS EOPS</span><span>Carte professionnelle d’éducateur sportif</span></div>'+
- '<div class="ak-about-achievements"><div><strong>N2F</strong><span>Préparation physique & mentale en handball national</span></div><div><strong>Seconde Ligue</strong><span>Préparation physique en football féminin</span></div><div><strong>Champion de France</strong><span>Section sportive handball UNSS · 2026</span></div></div>'+
- '<div class="ak-about-experience-copy"><h3>Une expérience dans plusieurs disciplines</h3><p>Auprès d’équipes de handball, d’une structure de football professionnel et de pratiquants en boxe et haltérophilie, j’ai développé une approche qui associe travail de terrain, observation, données et relation humaine.</p></div>'+
- '<div class="ak-about-skills"><div><strong>Évaluation & profilage</strong><span>Force, puissance, vitesse, tests et analyses vidéo adaptés au contexte.</span></div><div><strong>Planification & suivi</strong><span>Programmation, charge d’entraînement, récupération et réathlétisation.</span></div><div><strong>Développement physique</strong><span>Musculation, qualités neuromusculaires, condition physique et spécificités sportives.</span></div><div><strong>Préparation mentale</strong><span>Confiance, émotions, routines, concentration et stratégies de recentrage.</span></div></div>'+
+ '<div class="ak-about-experience-copy"><h3>Mon parcours en quelques repères</h3></div>'+
+ '<div class="ak-about-career"><div><span class="ak-about-career-tag">HANDBALL · NATIONAL</span><strong>Palente Besançon Handball</strong><p>Préparation physique et mentale, individualisation, suivi de charge et réathlétisation.</p></div><div><span class="ak-about-career-tag">FOOTBALL · SECONDE LIGUE</span><strong>Thonon Évian Grand Genève</strong><p>Préparation physique dans un environnement professionnel de football féminin.</p></div><div><span class="ak-about-career-tag">HANDBALL · JEUNES</span><strong>Champion de France UNSS 2026</strong><p>Préparation physique de la section sportive du collège Stendhal.</p></div><div><span class="ak-about-career-tag">AUTRES DISCIPLINES</span><strong>Boxe & haltérophilie</strong><p>Encadrement et préparation physique de pratiquants de différents niveaux.</p></div></div>'+
+ '<div class="ak-about-experience-copy"><h3>Mes domaines d’expertise</h3></div>'+
+ '<div class="ak-about-skills"><div><strong>Évaluation & profilage</strong><span>Tests physiques, force, puissance, vitesse et analyse des données.</span></div><div><strong>Planification & suivi</strong><span>Programmation, gestion de la charge, récupération et réathlétisation.</span></div><div><strong>Développement physique</strong><span>Musculation, qualités neuromusculaires, endurance et préparation spécifique.</span></div><div><strong>Préparation mentale</strong><span>Confiance, gestion des émotions, concentration, routines et recentrage.</span></div></div>'+
  '</div></div></div></section>'+
  '<section class="public-section" style="padding-top:0"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Pourquoi AK PRIME ?</div><h2>Le suivi ne s’arrête pas au programme.</h2><p>Le système est conçu pour garder une vue claire sur ce qui a été décidé, ce qui a été réalisé et ce qui doit évoluer.</p></div><div class="public-why-grid">'+
  '<div class="public-why-card"><div class="why-icon">01</div><h3>Individualisation</h3><p>Le programme part du niveau, du matériel, du calendrier, des contraintes et des objectifs de la personne.</p></div>'+
