@@ -2633,12 +2633,12 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
 function openPublicPoleDetails(key){
  const configs={
   performance:{
-   label:'PÔLE PERFORMANCE',title:'Performance',
-   intro:'Un accompagnement à distance pour structurer la préparation physique, suivre la charge et augmenter progressivement le niveau de pilotage selon la formule.',
-   forWho:['Sportif amateur ambitieux ou compétiteur','Sportif souhaitant développer ses qualités physiques avec une programmation structurée','Sportif voulant suivre sa charge et objectiver sa progression à distance'],
-   work:['Tests réalisables à distance et retest à 6 semaines','Analyse technique vidéo progressive selon P1 / P2 / P3','Planification individualisée et suivi de charge sRPE','Hooper en P2 ; sommeil complet et ajustement sous 48 h en P3'],
+   label:'PÔLE PERFORMANCE',title:'Préparation physique & Réathlétisation',
+   intro:'Deux domaines complémentaires, selon votre besoin : développer vos performances sportives ou préparer votre retour au sport après une blessure.',
+   forWho:['Préparation physique : force, puissance, vitesse, explosivité, endurance et changements de direction, selon les exigences de votre discipline.','Réathlétisation : restauration progressive des capacités physiques, réexposition aux contraintes sportives et préparation du retour à l’entraînement, en complément du suivi de santé lorsque nécessaire.'], 
+   work:['Programmation de la force et des qualités neuromusculaires','Planification des charges et organisation des cycles d’entraînement','Tests de terrain réalisables à distance : force estimée, saut, vitesse, changements de direction, VMA/VMI selon le contexte','Analyse vidéo des mouvements et suivi de charge interne (sRPE)','Suivi de l’état de forme, de la récupération et du sommeil selon la formule'], 
    flow:[['01','Évaluer','Questionnaire, contexte sportif et tests réalisables à distance.'],['02','Planifier','Construire le cycle selon sport, calendrier et contraintes.'],['03','Suivre','sRPE, retours et Hooper à partir de P2.'],['04','Adapter','Du correctif en P1 au pilotage sous 48 h en P3.']],
-   note:'Pas de profilage nécessitant du matériel impossible à reproduire à distance. P1 corrige en cas de problème, P2 ajuste chaque semaine, P3 ajoute un pilotage rapproché de l’état de forme.',
+   note:'Les tests et outils sont sélectionnés en fonction du sport, du matériel et des conditions de réalisation à distance. La réathlétisation intervient en complément de la prise en charge médicale ou kinésithérapique lorsque celle-ci est nécessaire.',
    offers:[['Performance','P1',149,'Programme + sRPE + 2 vidéos/mois + retest S6 + 1 visio/mois.',false],['Performance','P2',199,'P1 + analyse vidéo hebdo + Hooper + ajustement hebdo + échauffement + cycle + 2 visios/mois.',true],['Performance','P3',299,'P2 + vidéo selon besoins + sommeil complet + macros + ajustement sous 48 h + récupération dédiée.',false]]
   },
   forme:{
@@ -2663,10 +2663,10 @@ function openPublicPoleDetails(key){
  const x=configs[key];if(!x)return;
  modal(x.title+' — AK PRIME',
   '<div class="pole-detail-hero"><div class="eyebrow">'+esc(x.label)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.intro)+'</p></div>'+
-  '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>Pour qui ?</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>Les axes de travail</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
-  '<div class="section-title">Comment se déroule l’accompagnement ?</div><div class="pole-flow">'+x.flow.map(v=>'<div><b>'+esc(v[0])+' — '+esc(v[1])+'</b>'+esc(v[2])+'</div>').join('')+'</div>'+
+  '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'Pour qui ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
+  (key==='performance'?'':'<div class="section-title">Comment se déroule l’accompagnement ?</div><div class="pole-flow">'+x.flow.map(v=>'<div><b>'+esc(v[0])+' — '+esc(v[1])+'</b>'+esc(v[2])+'</div>').join('')+'</div>')+
   '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
-  '<div class="section-title">Formules disponibles</div><div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
+  '<div class="section-title">'+(key==='performance'?'Trois formules, trois niveaux de suivi':'Formules disponibles')+'</div>'+(key==='performance'?'<p class="muted" style="font-size:13px;margin:0 0 12px">La différence entre P1, P2 et P3 porte sur l’intensité du suivi, les analyses et la fréquence des ajustements. Les contenus précis sont détaillés dans chaque offre.</p>':'')+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
  document.getElementById('closePoleDetail').onclick=closeModal;
  document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
