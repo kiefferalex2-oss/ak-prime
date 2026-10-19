@@ -3063,9 +3063,42 @@ function openPublicOfferCheckout(button){
       '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt jusqu’à Stripe.</strong><div class="tiny" style="margin-top:5px">L’identité, le choix d’offre et les consentements sont maintenant collectés avant l’étape de paiement. Ils seront persistés et vérifiés côté serveur lors du branchement Stripe.</div></div>'+
       '<div class="alert blue"><strong>'+ (earlyStart?'Démarrage anticipé demandé':'Démarrage après le délai de rétractation') +'</strong><div class="tiny">'+ (earlyStart?'Le client a coché une demande expresse de démarrage avant 14 jours.':'Le client n’a pas demandé de démarrage anticipé : aucun accompagnement ne doit débuter avant l’expiration du délai légal.') +'</div></div>'+ '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
       '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
-     document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+     document.getElementById('closeCheckoutInfo').textContent='Tester le parcours fictif';
+     document.getElementById('closeCheckoutInfo').onclick=()=>showCheckoutDryRun({fullName,email,pole,name,duration,paymentMode,total:p.total,earlyStart});
+
    };
  };
+}
+
+
+/**
+ * Dry-run only: deliberately never writes to Supabase, Stripe, clients or invoices.
+ * Real order creation is a separate authenticated server flow.
+ */
+function showCheckoutDryRun(order){
+ const safeName=esc(order.fullName),safeOffer=esc(order.pole+' — '+order.name);
+ const safePrice=euro(Number(order.total)||0);
+ const steps=[
+  ['Commande préparée','Offre '+safeOffer+' • '+order.duration+' mois • '+safePrice],
+  ['Informations vérifiées','Client fictif : '+safeName+' • aucune donnée enregistrée'],
+  ['Consentements simulés','CGV validées dans le formulaire • démarrage anticipé : '+(order.earlyStart?'demandé':'non demandé')],
+  ['Paiement simulé','Carte de test fictive • aucun débit, aucun appel Stripe'],
+  ['Dossier client simulé','Activation théorique après confirmation du paiement'],
+  ['Facture simulée','Aucun numéro officiel et aucune écriture comptable créés']
+ ];
+ let position=0;
+ const draw=()=>{
+  modal('Simulation AK PRIME — aucun paiement réel',
+   '<div class="alert blue"><strong>Environnement de démonstration.</strong><div class="tiny">Le simulateur ne contacte ni Stripe ni la base de données : il ne crée ni client, ni facture, ni recette.</div></div>'+
+   '<div class="checkout-recap"><div><span>Offre</span><strong>'+safeOffer+'</strong></div><div><span>Engagement</span><strong>'+order.duration+' mois</strong></div><div><span>Total indicatif</span><strong>'+safePrice+'</strong></div><div><span>Mode</span><strong>'+esc(order.paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div></div>'+
+   '<div class="section-title">Scénario d’essai</div><div class="list">'+steps.map((entry,i)=>'<div class="item"><strong>'+(i<position?'✓ ':i===position?'→ ':'○ ')+esc(entry[0])+'</strong><div class="muted tiny">'+esc(entry[1])+'</div></div>').join('')+'</div>'+
+   (position===steps.length?'<div class="alert green" style="margin-top:13px"><strong>Scénario fictif terminé.</strong><div class="tiny">Il reste à tester chaque étape réelle, y compris le webhook Stripe et la facturation, une fois les intégrations raccordées.</div></div>':''),
+   '<button class="btn ghost" id="closeDryRun">Fermer</button>'+(position<steps.length?'<button class="btn primary" id="nextDryRun">Étape suivante ('+(position+1)+'/'+steps.length+')</button>':'<button class="btn primary" id="restartDryRun">Recommencer</button>'));
+  document.getElementById('closeDryRun').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+  if(position<steps.length)document.getElementById('nextDryRun').onclick=()=>{position++;draw()};
+  else document.getElementById('restartDryRun').onclick=()=>{position=0;draw()};
+ };
+ draw();
 }
 
 function bindPublicSite(){
