@@ -557,6 +557,46 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:390px){.public-site #fonctionnement .public-process{grid-template-columns:1fr}.public-site #fonctionnement .public-process-card{min-height:auto}}
 @media(prefers-reduced-motion:reduce){.public-site #fonctionnement .public-process-card{transition:none}}
 
+
+/* AK PRIME — section A propos / portrait et galerie de terrain */
+.public-site #apropos .ak-about-head{max-width:770px;margin:0 0 28px}
+.public-site #apropos .ak-about-head h2{font-size:clamp(28px,3.3vw,44px);line-height:1.1;letter-spacing:-.035em;margin:9px 0 12px}
+.public-site #apropos .ak-about-head p{font-size:15px;line-height:1.7;color:#67768a;max-width:690px;margin:0}
+.public-site #apropos .ak-about-layout{display:grid;grid-template-columns:minmax(275px,.82fr) minmax(0,1.18fr);gap:28px;align-items:start}
+.public-site #apropos .ak-about-visual{min-width:0}
+.public-site #apropos .ak-about-portrait{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:375px;border-radius:24px;padding:23px;background:radial-gradient(circle at 90% 0%,#33495b,#102135 63%,#0c1827);color:#fff;overflow:hidden;box-shadow:0 20px 40px rgba(10,28,46,.13)}
+.public-site #apropos .ak-about-portrait::after{content:"";position:absolute;width:310px;height:310px;border:1px solid rgba(210,174,107,.18);border-radius:50%;right:-120px;top:65px}
+.public-site #apropos .ak-about-visual-tag{z-index:1;align-self:flex-start;font-size:10px;font-weight:800;letter-spacing:.13em;color:#e1bc78}
+.public-site #apropos .ak-about-portrait-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px 0;color:#b8c4d0;font-size:12px}
+.public-site #apropos .ak-about-monogram{width:106px;height:106px;display:grid;place-items:center;border:1px solid rgba(211,177,108,.38);border-radius:32px;background:rgba(255,255,255,.04);color:#ddb976;font-size:37px;font-weight:900;letter-spacing:-.06em}
+.public-site #apropos .ak-about-identity{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.13);padding-top:16px}
+.public-site #apropos .ak-about-identity h3{font-size:23px;margin:0 0 5px;letter-spacing:-.02em;color:#fff}
+.public-site #apropos .ak-about-identity p{font-size:12px;line-height:1.5;margin:0;color:#c1cbd6}
+.public-site #apropos .ak-about-photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.public-site #apropos .ak-about-photo-slot{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;aspect-ratio:1/1.1;padding:13px 10px;border-radius:16px;overflow:hidden;background:linear-gradient(145deg,#21364a,#0f2032);color:#fff}
+.public-site #apropos .ak-about-photo-slot:nth-child(2){background:linear-gradient(145deg,#344f5a,#112431)}
+.public-site #apropos .ak-about-photo-slot:nth-child(3){background:linear-gradient(145deg,#465063,#162235)}
+.public-site #apropos .ak-about-photo-slot::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(145deg,transparent,transparent 24px,rgba(255,255,255,.02) 25px,rgba(255,255,255,.02) 26px);z-index:-1}
+.public-site #apropos .ak-about-photo-slot span{font-size:9px;letter-spacing:.09em;font-weight:850;color:#e9c58c}
+.public-site #apropos .ak-about-photo-slot strong{font-size:12px;line-height:1.3;font-weight:750}
+.public-site #apropos .ak-about-content{min-width:0}
+.public-site #apropos .ak-about-lede{font-size:17px;line-height:1.7;color:#223249;font-weight:580}
+.public-site #apropos .ak-about-credentials{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 20px}
+.public-site #apropos .ak-about-credentials span{padding:9px 12px;border:1px solid #e5d3b5;border-radius:30px;background:#fffaf2;font-size:11px;font-weight:750;color:#956e35}
+.public-site #apropos .ak-about-achievements{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.public-site #apropos .ak-about-achievements div{display:flex;flex-direction:column;gap:8px;padding:17px 13px;border:1px solid #e4e8ee;border-radius:16px;background:#fff}
+.public-site #apropos .ak-about-achievements strong{font-size:16px;color:#15253b;line-height:1.25}
+.public-site #apropos .ak-about-achievements span{font-size:11px;line-height:1.55;color:#667589}
+.public-site #apropos .ak-about-experience-copy{margin-top:24px}
+.public-site #apropos .ak-about-experience-copy h3{margin:0 0 8px;color:#18283d;font-size:18px}
+.public-site #apropos .ak-about-experience-copy p{font-size:13px;line-height:1.75;color:#617186;margin:0}
+.public-site #apropos .ak-about-skills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}
+.public-site #apropos .ak-about-skills>div{border:1px solid #e2e8f0;border-radius:15px;padding:16px;background:#fff}
+.public-site #apropos .ak-about-skills strong{display:block;font-size:13px;color:#1a2b42;margin-bottom:7px}
+.public-site #apropos .ak-about-skills span{display:block;font-size:12px;line-height:1.6;color:#68778a}
+@media(max-width:900px){.public-site #apropos .ak-about-layout{grid-template-columns:1fr}.public-site #apropos .ak-about-portrait{min-height:320px}.public-site #apropos .ak-about-photo-grid{max-width:660px}}
+@media(max-width:530px){.public-site #apropos .ak-about-head h2{font-size:30px}.public-site #apropos .ak-about-achievements{grid-template-columns:1fr}.public-site #apropos .ak-about-skills{grid-template-columns:1fr}.public-site #apropos .ak-about-photo-slot{padding:10px 7px}.public-site #apropos .ak-about-photo-slot strong{font-size:10px}}
+
 </style>
 </head>
 <body>
@@ -2572,11 +2612,18 @@ function renderPublicSite(){
  '<div class="public-process-card"><b>04</b><strong>Planifier</strong><p>Le programme et les priorités sont construits à partir de vos données.</p></div>'+
  '<div class="public-process-card"><b>05</b><strong>Adapter</strong><p>Bilans, visios, retours et réévaluations font évoluer l’accompagnement.</p></div>'+
  '</div></div></section>'+
- '<section class="public-section" id="apropos"><div class="public-section-inner"><div class="public-about">'+
- '<div class="public-profile-card"><div><div class="public-profile-mark">AK</div><h3>Alex Kieffer</h3><div class="role">Préparateur physique & mental • Coach sportif</div><p>Une approche issue de la formation universitaire STAPS et de l’expérience de terrain, avec un objectif simple : transformer les informations utiles en décisions d’entraînement concrètes.</p></div><div class="public-credentials"><span class="public-credential">Master STAPS EOPS</span><span class="public-credential">Carte professionnelle</span><span class="public-credential">Préparation physique</span><span class="public-credential">Préparation mentale</span></div></div>'+
- '<div class="public-about-copy"><div class="public-section-head" style="margin-bottom:2px"><div class="kicker">Qui est derrière AK PRIME ?</div></div><h2>Un accompagnement construit entre terrain, données et relation humaine.</h2><p>AK PRIME est né pour proposer autre chose qu’une simple fiche d’exercices envoyée chaque semaine. L’objectif est de comprendre le contexte du client, mesurer ce qui est pertinent, planifier, suivre puis adapter réellement l’accompagnement.</p><p>La méthode s’appuie sur une formation en entraînement et optimisation de la performance, ainsi que sur des expériences de préparation physique dans le handball féminin de niveau national et le football féminin de Seconde Ligue.</p>'+
- '<div class="public-experience-grid"><div class="public-experience"><strong>Tests & évaluation</strong><span>Tests réalisables à distance et choisis selon l’objectif : force estimée, CMJ filmé, sprint / changement de direction si le contexte le permet, VMA/VMI.</span></div><div class="public-experience"><strong>Suivi de charge</strong><span>sRPE, bien-être, récupération et lecture de la charge pour guider les adaptations.</span></div><div class="public-experience"><strong>Préparation physique</strong><span>Force, puissance, vitesse, endurance, qualités spécifiques et retour progressif à l’entraînement.</span></div><div class="public-experience"><strong>Préparation mentale</strong><span>Routines, respiration, recentrage, confiance, résilience, imagerie et concentration.</span></div></div></div>'+
- '</div></div></section>'+
+ '<section class="public-section" id="apropos"><div class="public-section-inner">'+
+ '<div class="ak-about-head"><div class="kicker">Qui est derrière AK PRIME ?</div><h2>Une expertise construite sur le terrain.</h2><p>De la préparation physique à la préparation mentale, une expérience auprès de sportifs de différents niveaux, mise au service de votre progression.</p></div>'+
+ '<div class="ak-about-layout">'+
+ '<div class="ak-about-visual"><div class="ak-about-portrait"><span class="ak-about-visual-tag">AK PRIME · FONDATEUR</span><div class="ak-about-portrait-inner"><div class="ak-about-monogram">AK</div><span>Portrait professionnel à venir</span></div><div class="ak-about-identity"><h3>Alex Kieffer</h3><p>Préparateur physique & mental · Coach sportif</p></div></div>'+
+ '<div class="ak-about-photo-grid"><div class="ak-about-photo-slot"><span>HANDBALL</span><strong>Handball national & jeunes</strong></div><div class="ak-about-photo-slot"><span>FOOTBALL</span><strong>Seconde Ligue féminine</strong></div><div class="ak-about-photo-slot"><span>BOXE</span><strong>Préparation physique</strong></div></div>'+
+ '</div>'+
+ '<div class="ak-about-content"><div class="ak-about-lede">Diplômé d’un Master STAPS EOPS, je m’appuie sur des expériences de terrain en handball, football, boxe et haltérophilie pour proposer un accompagnement individualisé, exigeant et accessible.</div>'+
+ '<div class="ak-about-credentials"><span>Master STAPS EOPS</span><span>Carte professionnelle d’éducateur sportif</span></div>'+
+ '<div class="ak-about-achievements"><div><strong>N2F</strong><span>Préparation physique & mentale en handball national</span></div><div><strong>Seconde Ligue</strong><span>Préparation physique en football féminin</span></div><div><strong>Champion de France</strong><span>Section sportive handball UNSS · 2026</span></div></div>'+
+ '<div class="ak-about-experience-copy"><h3>Une expérience dans plusieurs disciplines</h3><p>Auprès d’équipes de handball, d’une structure de football professionnel et de pratiquants en boxe et haltérophilie, j’ai développé une approche qui associe travail de terrain, observation, données et relation humaine.</p></div>'+
+ '<div class="ak-about-skills"><div><strong>Évaluation & profilage</strong><span>Force, puissance, vitesse, tests et analyses vidéo adaptés au contexte.</span></div><div><strong>Planification & suivi</strong><span>Programmation, charge d’entraînement, récupération et réathlétisation.</span></div><div><strong>Développement physique</strong><span>Musculation, qualités neuromusculaires, condition physique et spécificités sportives.</span></div><div><strong>Préparation mentale</strong><span>Confiance, émotions, routines, concentration et stratégies de recentrage.</span></div></div>'+
+ '</div></div></div></section>'+
  '<section class="public-section" style="padding-top:0"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Pourquoi AK PRIME ?</div><h2>Le suivi ne s’arrête pas au programme.</h2><p>Le système est conçu pour garder une vue claire sur ce qui a été décidé, ce qui a été réalisé et ce qui doit évoluer.</p></div><div class="public-why-grid">'+
  '<div class="public-why-card"><div class="why-icon">01</div><h3>Individualisation</h3><p>Le programme part du niveau, du matériel, du calendrier, des contraintes et des objectifs de la personne.</p></div>'+
  '<div class="public-why-card"><div class="why-icon">02</div><h3>Décisions suivies</h3><p>Tests, bilans et retours servent à modifier la planification lorsque la situation l’exige.</p></div>'+
