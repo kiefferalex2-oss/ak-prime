@@ -527,6 +527,21 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .pole-performance-modal .perf-offer-card button{margin-top:auto}
 @media(max-width:700px){.pole-performance-modal .perf-offer-card{min-height:unset}.pole-performance-modal .pole-offer-intro{min-height:unset}}
 
+
+/* Identité des fenêtres de pôles : structure commune, accents adaptés */
+.pole-forme-modal .pole-detail-hero{background:radial-gradient(circle at 88% 4%,rgba(96,191,172,.24),transparent 38%),linear-gradient(120deg,#102438,#1d4a58)}
+.pole-mental-modal .pole-detail-hero{background:radial-gradient(circle at 88% 4%,rgba(195,153,220,.2),transparent 38%),linear-gradient(120deg,#131e35,#363653)}
+.pole-forme-modal .pole-detail-card:first-child{border-top-color:#4cae9a}
+.pole-mental-modal .pole-detail-card:first-child{border-top-color:#9d82bd}
+.pole-forme-modal .pole-detail-card:nth-child(2){border-top-color:#377b98}
+.pole-mental-modal .pole-detail-card:nth-child(2){border-top-color:#b18a47}
+.pole-forme-modal .perf-offer-card.featured{border-color:#4c9b91;background:linear-gradient(165deg,#effaf7,#fff 55%);box-shadow:0 18px 40px rgba(23,111,100,.11)}
+.pole-mental-modal .perf-offer-card.featured{border-color:#9783b7;background:linear-gradient(165deg,#f5f0fc,#fff 55%);box-shadow:0 18px 40px rgba(68,48,103,.1)}
+.pole-forme-modal .featured .pole-offer-badge{background:#428d81;border-color:#428d81;color:#fff}
+.pole-mental-modal .featured .pole-offer-badge{background:#826aa4;border-color:#826aa4;color:#fff}
+.pole-forme-modal .pole-offer-points li::before{color:#398978}
+.pole-mental-modal .pole-offer-points li::before{color:#8665a6}
+
 </style>
 </head>
 <body>
@@ -2679,7 +2694,15 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
   P2:{label:'Avancé',summary:'Un suivi plus précis, avec des adaptations chaque semaine.',points:['Tout le contenu P1','Analyse vidéo hebdomadaire','Questionnaire de bien-être (Hooper)','Ajustements hebdomadaires','Échauffement individualisé','Prise en compte du cycle menstruel','2 visios / mois']},
   P3:{label:'Premium',summary:'Un accompagnement rapproché, avec une gestion approfondie de votre état de forme.',points:['Tout le contenu P2','Analyses vidéo selon vos besoins','Suivi complet du sommeil','Ajustements sous 48 h','Récupération dédiée','Repères nutritionnels personnalisés (macros)']}
  };
- const details=pole==='Performance'?perf[name]:null;
+ const forme={
+  Standard:{label:'Standard',summary:'Un programme adapté à vos objectifs, avec un suivi régulier.',points:['Programmation individualisée','Bilan hebdomadaire','1 analyse vidéo / mois maximum','Corrections si difficulté signalée','1 visio / mois']},
+  'Renforcé':{label:'Renforcé',summary:'Un accompagnement plus complet et des ajustements réguliers.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Suivi du sommeil et du bien-être','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
+ };
+ const mental={
+  Particulier:{label:'Particulier',summary:'Développer vos habiletés mentales dans les situations du quotidien.',points:['Échange et questionnaire initial','Objectifs et exercices personnalisés','Motivation, émotions et résilience','Confiance, attention et routines','Jusqu’à 1 visio de 45 min / semaine']},
+  Sportif:{label:'Sportif',summary:'Mobiliser vos ressources mentales à l’entraînement et en compétition, quel que soit votre niveau.',points:['Socle des habiletés mentales générales','Routines et préparation à la compétition','Gestion de la pression et des erreurs','Imagerie, recentrage et mot-clé','Débriefs et exercices contextualisés','Jusqu’à 1 visio de 45 min / semaine']}
+ };
+ const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
  const label=details?.label||name;
  const features=details?'<ul class="pole-offer-points">'+details.points.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<p class="pole-offer-copy">'+esc(subtitle)+'</p>';
  return '<div class="pole-offer-mini '+(featured?'featured':'')+' '+(details?'perf-offer-card':'')+'">'+
@@ -2702,16 +2725,16 @@ function openPublicPoleDetails(key){
   },
   forme:{
    label:'PÔLE FORME & SANTÉ',title:'Forme & Santé',
-   intro:'Un coaching à distance pour construire une pratique régulière et individualisée, avec un niveau de pilotage plus complet dans la formule Renforcé.',
-   forWho:['Personne souhaitant reprendre ou structurer son entraînement','Pratiquant voulant progresser en musculation et condition physique','Personne souhaitant intégrer nutrition, sommeil et bien-être au pilotage de son entraînement'],
-   work:['Programme individualisé selon le matériel et les contraintes','Analyse technique vidéo selon la formule','Check-in hebdomadaire','Budget calorique / macros, sommeil et bien-être dans le Renforcé'],
+   intro:'Un entraînement conçu autour de vos objectifs, que vous repreniez une activité ou cherchiez à aller plus loin dans une pratique déjà régulière.',
+   forWho:['Débutants et personnes reprenant l’activité après une pause ou une blessure','Pratiquants réguliers souhaitant améliorer la qualité et la cohérence de leur entraînement','Toute personne souhaitant un accompagnement correspondant à ses objectifs, ses contraintes et son expérience'],
+   work:['Programmation en musculation, cardio et condition physique selon vos objectifs','Progression, choix des exercices et maîtrise technique des mouvements','Analyse vidéo et bilan d’entraînement selon la formule','Suivi de l’état de forme, du sommeil et de la récupération selon la formule','Estimation des besoins énergétiques et repères de macronutriments selon la formule'],
    flow:[['01','Comprendre','Objectifs, niveau, contraintes et matériel.'],['02','Construire','Créer un programme cohérent avec le quotidien.'],['03','Suivre','Check-in hebdomadaire et données supplémentaires en Renforcé.'],['04','Adapter','Correction si problème en Standard ; adaptation hebdomadaire en Renforcé.']],
-   note:'Standard reste centré sur la programmation. Renforcé ajoute budget macros, sommeil, bien-être et adaptation hebdomadaire systématique de la charge.',
+   note:'Les prestations varient selon la formule. Après une blessure, le coaching accompagne la reprise d’activité et ne remplace pas une rééducation ni un suivi médical lorsqu’ils sont nécessaires.',
    offers:[['Forme & Santé','Standard',99,'Programme + check-in + 1 vidéo/mois max + correction si problème + 1 visio/mois.',false],['Forme & Santé','Renforcé',149,'Standard + jusqu’à 1 vidéo/semaine + macros + sommeil + bien-être + adaptation hebdo + 2 visios/mois.',true]]
   },
   mental:{
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
-   intro:'La préparation mentale ne se limite pas à la gestion du stress : elle vise à développer vos habiletés mentales, votre connaissance de vous-même et votre capacité à agir dans les situations qui comptent pour vous. L’accompagnement est ouvert à tous, sportifs ou non, et adapté à votre contexte.',
+   intro:'Des habiletés mentales et des outils concrets pour le quotidien ou la pratique sportive, à tout niveau.',
    forWho:['Toute personne souhaitant mieux se connaître, développer ses ressources et avancer vers ses objectifs','Personne traversant des changements, des défis personnels ou des situations exigeantes','Sportif débutant, amateur ou confirmé souhaitant renforcer ses habiletés mentales à l’entraînement et en compétition'], 
    work:['Connaissance de soi, motivation, objectifs et engagement dans la durée','Gestion des émotions, pression, activation et récupération mentale','Confiance, estime de soi, dialogue interne, attention et concentration','Résilience, gestion des erreurs et adaptation face aux difficultés','Respiration, imagerie mentale, routines et stratégies de recentrage','En contexte sportif : préparation à la compétition, prise de décision, mot-clé, double tâche et débrief'], 
    flow:[['01','Faire le point','Identifier vos besoins, votre contexte et vos priorités.'],['02','Définir les objectifs','Choisir ensemble les habiletés mentales à développer.'],['03','Mettre en pratique','Expérimenter des outils adaptés entre les échanges.'],['04','Faire évoluer','Analyser les retours et transférer les acquis dans votre quotidien ou votre pratique sportive.']],
@@ -2722,12 +2745,12 @@ function openPublicPoleDetails(key){
  const x=configs[key];if(!x)return;
  modal(x.title+' — AK PRIME',
   '<div class="pole-detail-hero"><div class="eyebrow">'+esc(x.label)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.intro)+'</p></div>'+
-  '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'Pour qui ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
-  (key==='performance'?'':'<div class="section-title">Comment se déroule l’accompagnement ?</div><div class="pole-flow">'+x.flow.map(v=>'<div><b>'+esc(v[0])+' — '+esc(v[1])+'</b>'+esc(v[2])+'</div>').join('')+'</div>')+
+  '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'À qui s’adresse ce pôle ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
+  
   '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
-  '<div class="section-title">'+(key==='performance'?'Trois formules, trois niveaux de suivi':'Formules disponibles')+'</div>'+(key==='performance'?'<p class="muted" style="font-size:13px;margin:0 0 12px">Choisissez le niveau d’accompagnement adapté à vos besoins. Chaque formule dispose d’un suivi et de prestations spécifiques.</p>':'')+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
+  '<div class="section-title">Formules et niveaux de suivi</div>'+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
- if(key==='performance')document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal');
+ document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal','pole-'+(key==='forme'?'forme':key==='mental'?'mental':'performance')+'-modal');
  document.getElementById('closePoleDetail').onclick=closeModal;
  document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
 }
