@@ -2700,7 +2700,7 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
  };
  const mental={
   Particulier:{label:'Particulier',summary:'Développer vos habiletés mentales dans les situations du quotidien.',points:['Échange et questionnaire initial','Objectifs et exercices personnalisés','Motivation, émotions et résilience','Confiance, attention et routines','Jusqu’à 1 visio de 45 min / semaine']},
-  Sportif:{label:'Sportif',summary:'Mobiliser vos ressources mentales à l’entraînement et en compétition, quel que soit votre niveau.',points:['Socle des habiletés mentales générales','Routines et préparation à la compétition','Gestion de la pression et des erreurs','Imagerie, recentrage et mot-clé','Débriefs et exercices contextualisés','Jusqu’à 1 visio de 45 min / semaine']}
+  Sportif:{label:'Sportif',summary:'Mobiliser vos ressources mentales à l’entraînement et en compétition, quel que soit votre niveau.',points:['Socle des habiletés mentales générales','Routines intégrées aux entraînements habituels','Préparation mentale avant et pendant la compétition','Débrief et récupération mentale après compétition','Pression, erreurs, recentrage et mot-clé','Exercices adaptés à votre discipline','Jusqu’à 1 visio de 45 min / semaine']}
  };
  const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
  const label=details?.label||name;
@@ -2736,10 +2736,10 @@ function openPublicPoleDetails(key){
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
    intro:'Des habiletés mentales et des outils concrets pour le quotidien ou la pratique sportive, à tout niveau.',
    forWho:['Toute personne souhaitant mieux se connaître, développer ses ressources et avancer vers ses objectifs','Personne traversant des changements, des défis personnels ou des situations exigeantes','Sportif débutant, amateur ou confirmé souhaitant renforcer ses habiletés mentales à l’entraînement et en compétition'], 
-   work:['Connaissance de soi, motivation, objectifs et engagement dans la durée','Gestion des émotions, pression, activation et récupération mentale','Confiance, estime de soi, dialogue interne, attention et concentration','Résilience, gestion des erreurs et adaptation face aux difficultés','Respiration, imagerie mentale, routines et stratégies de recentrage','En contexte sportif : préparation à la compétition, prise de décision, mot-clé, double tâche et débrief'], 
+   work:['Connaissance de soi, motivation, objectifs et engagement dans la durée','Gestion des émotions, pression, activation et récupération mentale','Confiance, estime de soi, dialogue interne, attention et concentration','Résilience, gestion des erreurs et adaptation face aux difficultés','Respiration, imagerie mentale, routines et stratégies de recentrage','En contexte sportif : routines et exercices intégrés aux entraînements habituels, préparation avant et pendant la compétition, débrief et récupération mentale après, prise de décision, mot-clé et double tâche'], 
    flow:[['01','Faire le point','Identifier vos besoins, votre contexte et vos priorités.'],['02','Définir les objectifs','Choisir ensemble les habiletés mentales à développer.'],['03','Mettre en pratique','Expérimenter des outils adaptés entre les échanges.'],['04','Faire évoluer','Analyser les retours et transférer les acquis dans votre quotidien ou votre pratique sportive.']],
    note:'L’accompagnement Particulier développe les habiletés mentales dans la vie quotidienne ; la formule Sportif applique également ce travail à l’entraînement et à la compétition, quel que soit votre niveau. Il ne s’agit ni d’une psychothérapie ni d’une prise en charge de troubles psychiques.',
-   offers:[['Mental','Particulier',199,'Habiletés mentales générales + jusqu’à 1 visio de 45 min/semaine.',false],['Mental','Sportif',249,'Particulier + routines sportives, erreur/recentrage, mot-clé, double tâche et débrief compétition.',true]]
+   offers:[['Mental','Particulier',199,'Habiletés mentales générales + jusqu’à 1 visio de 45 min/semaine.',false],['Mental','Sportif',249,'Habiletés mentales et routines intégrées aux entraînements, avant, pendant et après la compétition.',true]]
   }
  };
  const x=configs[key];if(!x)return;
