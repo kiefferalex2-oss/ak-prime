@@ -593,11 +593,15 @@ async function loadSupabaseData(){
    supa.from('renewals').select('*').order('due_date',{ascending:false}),
    supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
    supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
-   supa.from('renewal_choices').select('*').order('due_date',{ascending:false})
+   supa.from('renewal_choices').select('*').order('due_date',{ascending:false}),
+   supa.from('billing_settings').select('*').eq('id',1).maybeSingle(),
+   supa.from('invoices').select('*').order('issue_date',{ascending:false}).order('created_at',{ascending:false}),
+   supa.from('payment_transactions').select('*').order('paid_at',{ascending:false}),
+   supa.from('revenue_entries').select('*').order('receipt_date',{ascending:false}).order('id',{ascending:false})
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[];
- const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id'),renewalChoices=groupBy(rcr,'client_id');
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[],billingSettings=reqs[17].data||null,invoiceRows=reqs[18].data||[],paymentRows=reqs[19].data||[],revenueRows=reqs[20].data||[];
+ const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id'),renewalChoices=groupBy(rcr,'client_id'),invoices=groupBy(invoiceRows,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
  db.clients=cr.map(x=>{
@@ -618,6 +622,7 @@ async function loadSupabaseData(){
      events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
      renewals:(renewals[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,newEndDate:isoDate(r.new_end_date),cycleReviewDone:!!r.cycle_review_done,retestsRequired:!!r.retests_required,retestsDone:!!r.retests_done,objectivesUpdated:!!r.objectives_updated,notes:r.notes||'',processedAt:r.processed_at||''})),
      renewalChoices:(renewalChoices[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,paymentMode:r.payment_mode||'',submittedAt:r.submitted_at||'',updatedAt:r.updated_at||''})),
+     invoices:invoices[x.id]||[],
      adminNote:x.admin_note||'',legalGuardian:x.legal_guardian||'',renewal:ws.renewal_choice||'3 mois',portalAccessEnabled:!!x.portal_access_enabled
    };
  });
@@ -631,6 +636,10 @@ async function loadSupabaseData(){
  db.settings.whatsappNumber=appSettings?.whatsapp_number||'';
  db.settings.whatsappMessage=appSettings?.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
  db.notificationReads=notificationReads;
+ db.billingSettings=billingSettings;
+ db.invoices=invoiceRows;
+ db.paymentTransactions=paymentRows;
+ db.revenueEntries=revenueRows;
 }
 async function saveWorkspace(client){
  const row={client_id:client.id,deep_flags:client.deep||{},offer_notes:client.offerNotes||{},visio_summary:client.visioNotes||null,coach_decisions:client.decisions||null,private_note:client.privateNote||null,renewal_choice:client.renewal||'3 mois'};
@@ -942,17 +951,17 @@ function shell(inner){
  return '<div class="app">'+
  '<aside class="sidebar"><div class="brand"><div class="brand-mark">AK</div><div><strong>AK PRIME</strong><span>COACH CONSOLE</span></div></div>'+
  '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
- navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('calendar','Calendrier')+
+ navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('billing','Facturation')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
  '<main><div class="topbar"><div class="topbar-title"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){
- const icons={dashboard:'⌂',clients:'◎',calendar:'◷',backup:'⇩',settings:'⚙'};
+ const icons={dashboard:'⌂',clients:'◎',billing:'€',calendar:'◷',backup:'⇩',settings:'⚙'};
  return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'"><span class="nav-ico">'+esc(icons[v]||'•')+'</span><span class="nav-label">'+esc(label)+'</span></button>';
 }
-function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
+function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',billing:'Facturation',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
 
 function dashboard(){
  const acts=activeClients();
@@ -1504,7 +1513,7 @@ function admin(c){
  '<div class="field"><label>Notes administratives</label><textarea class="textarea adminNoteDraft">'+esc(c.adminNote||'')+'</textarea></div>'+
  '<button class="btn primary small" id="saveAdminNote">Enregistrer les notes administratives</button>'+
  '<button class="btn danger small" id="archiveClient" style="margin-left:8px">Passer le client en inactif</button></div></div>'+
- renewalPanel(c);
+ renewalPanel(c)+invoiceClientPanel(c);
 }
 
 function renewalPanel(c){
@@ -1595,6 +1604,145 @@ function calendarPage(){
  '<div class="card panel"><h3>Historique des visios</h3><div class="list">'+(historyRows||'<div class="muted">Aucun historique pour le moment.</div>')+'</div></div></div>';
 }
 
+
+function billingReady(){
+ const b=db.billingSettings||{};
+ return !!(String(b.legal_address||'').trim()&&String(b.siren||'').trim()&&String(b.siret||'').trim());
+}
+function centsMoney(v){return euro((Number(v)||0)/100)}
+function invoiceStatusLabel(v){return ({pending:'À encaisser',paid:'Payée',partially_refunded:'Partiellement remboursée',refunded:'Remboursée'})[v]||v||'—'}
+function invoiceStatusTone(v){return v==='paid'?'green':v==='pending'?'amber':'blue'}
+function paymentMethodLabel(v){return ({card:'Carte',bank_transfer:'Virement',cash:'Espèces',check:'Chèque',other:'Autre'})[v]||v||'—'}
+
+function invoiceClientPanel(c){
+ const rows=(c.invoices||[]).slice().sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date)));
+ const list=rows.length?rows.map(i=>'<div class="item"><div class="row between"><div><strong>'+esc(i.invoice_number)+'</strong><div class="muted tiny">'+fmtDate(i.issue_date)+' • '+centsMoney(i.amount_incl_tax_cents)+'</div></div><span class="status '+invoiceStatusTone(i.payment_status)+'">'+esc(invoiceStatusLabel(i.payment_status))+'</span></div><div class="row" style="gap:8px;margin-top:9px"><button class="btn ghost small printInvoice" data-id="'+i.id+'">Imprimer / PDF</button>'+(i.payment_status==='pending'?'<button class="btn primary small markInvoicePaid" data-id="'+i.id+'">Marquer encaissée</button>':'')+'</div></div>').join(''):'<div class="muted">Aucune facture émise pour ce client.</div>';
+ return '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Facturation</h3><div class="muted tiny">Factures définitives, paiements et accès PDF.</div></div><button class="btn primary small createClientInvoice" data-client-id="'+c.id+'">+ Facture</button></div><div class="list" style="margin-top:12px">'+list+'</div></div>';
+}
+
+function billingSettingsPanel(){
+ const b=db.billingSettings||{};
+ const ready=billingReady();
+ return '<div class="card panel" style="max-width:920px;margin-top:13px">'+
+ '<div class="row between"><div><h3 style="margin-bottom:4px">Identité de facturation</h3><div class="muted tiny">Ces données sont figées dans chaque facture au moment de son émission.</div></div><span class="status '+(ready?'green':'amber')+'">'+(ready?'Prête':'À compléter')+'</span></div>'+
+ '<div class="grid2" style="margin-top:12px"><div class="field"><label>Nom légal</label><input class="input" id="billLegalName" value="'+esc(b.legal_name||'')+'"></div><div class="field"><label>Nom commercial</label><input class="input" id="billBusinessName" value="'+esc(b.business_name||'AK PRIME')+'"></div><div class="field"><label>Forme / mention</label><input class="input" id="billLegalForm" value="'+esc(b.legal_form||'Entrepreneur individuel')+'"></div><div class="field"><label>E-mail</label><input class="input" id="billEmail" value="'+esc(b.email||'contact@akprime.fr')+'"></div><div class="field"><label>SIREN</label><input class="input" id="billSiren" value="'+esc(b.siren||'')+'" placeholder="À compléter après attribution"></div><div class="field"><label>SIRET</label><input class="input" id="billSiret" value="'+esc(b.siret||'')+'" placeholder="À compléter après attribution"></div></div>'+
+ '<div class="field"><label>Adresse légale / professionnelle à faire figurer sur les factures</label><textarea class="textarea" id="billAddress">'+esc(b.legal_address||'')+'</textarea></div>'+
+ '<div class="alert blue" style="margin-top:10px"><strong>TVA</strong><div class="tiny" style="margin-top:4px">'+esc(b.vat_mention||'TVA non applicable, art. 293 B du code général des impôts')+'. Si AK PRIME devient redevable de la TVA, l’émission sera volontairement bloquée jusqu’à adaptation du système.</div></div>'+
+ '<button class="btn primary" id="saveBillingSettings" style="margin-top:10px">Enregistrer l’identité de facturation</button></div>';
+}
+
+function billingPage(){
+ const invoices=(db.invoices||[]).slice();
+ const entries=(db.revenueEntries||[]).slice();
+ const year=String(new Date().getFullYear());
+ const yearEntries=entries.filter(e=>String(e.receipt_date||'').startsWith(year));
+ const ca=yearEntries.reduce((sum,e)=>sum+(Number(e.amount_cents)||0),0);
+ const month=localDateISO().slice(0,7);
+ const monthCa=entries.filter(e=>String(e.receipt_date||'').startsWith(month)).reduce((sum,e)=>sum+(Number(e.amount_cents)||0),0);
+ const pending=invoices.filter(i=>i.payment_status==='pending');
+ const pendingTotal=pending.reduce((sum,i)=>sum+(Number(i.amount_incl_tax_cents)||0),0);
+ const invoiceRows=invoices.length?invoices.map(i=>{
+   const c=db.clients.find(x=>x.id===i.client_id);
+   return '<tr><td><strong>'+esc(i.invoice_number)+'</strong><div class="muted tiny">'+fmtDate(i.issue_date)+'</div></td><td>'+esc(c?.name||i.customer_name||'Client')+'</td><td>'+centsMoney(i.amount_incl_tax_cents)+'</td><td><span class="status '+invoiceStatusTone(i.payment_status)+'">'+esc(invoiceStatusLabel(i.payment_status))+'</span></td><td><div class="row" style="gap:6px"><button class="btn ghost small printInvoice" data-id="'+i.id+'">PDF</button>'+(i.payment_status==='pending'?'<button class="btn primary small markInvoicePaid" data-id="'+i.id+'">Encaisser</button>':'')+'</div></td></tr>';
+ }).join(''):'<tr><td colspan="5" class="muted">Aucune facture émise.</td></tr>';
+ const bookRows=entries.length?entries.map(e=>'<tr><td>'+fmtDate(e.receipt_date)+'</td><td>'+esc(e.source_label||'')+'</td><td>'+esc(e.description||'')+'</td><td>'+esc(paymentMethodLabel(e.payment_method))+'</td><td><strong>'+centsMoney(e.amount_cents)+'</strong></td></tr>').join(''):'<tr><td colspan="5" class="muted">Aucun encaissement enregistré.</td></tr>';
+ return '<div class="page-title"><div><h1>Facturation</h1><p>Factures clients, encaissements et livre des recettes AK PRIME.</p></div><button class="btn primary" id="newManualInvoice">+ Nouvelle facture</button></div>'+
+ (!billingReady()?'<div class="alert" style="margin-bottom:13px"><strong>Émission verrouillée pour le moment.</strong><div class="tiny" style="margin-top:4px">Le socle est prêt, mais aucune facture définitive ne pourra être créée tant que l’adresse de facturation, le SIREN et le SIRET ne sont pas complétés dans Paramètres.</div></div>':'')+
+ '<div class="grid3"><div class="card panel"><div class="kpi"><div class="lab">CA encaissé '+year+'</div><div class="val">'+centsMoney(ca)+'</div><div class="sub">Livre des recettes</div></div></div><div class="card panel"><div class="kpi"><div class="lab">Ce mois-ci</div><div class="val">'+centsMoney(monthCa)+'</div><div class="sub">Encaissements réels</div></div></div><div class="card panel"><div class="kpi"><div class="lab">À encaisser</div><div class="val">'+centsMoney(pendingTotal)+'</div><div class="sub">'+pending.length+' facture(s)</div></div></div></div>'+
+ '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Factures</h3><div class="muted tiny">Une facture émise est figée : une correction passera par un avoir, pas par une suppression.</div></div></div><div style="overflow:auto;margin-top:12px"><table><thead><tr><th>Facture</th><th>Client</th><th>Montant</th><th>Statut</th><th></th></tr></thead><tbody>'+invoiceRows+'</tbody></table></div></div>'+
+ '<div class="card panel" style="margin-top:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Livre des recettes</h3><div class="muted tiny">Écritures chronologiques créées automatiquement lors de chaque encaissement.</div></div><button class="btn ghost small" id="exportRevenueCsv">Exporter CSV</button></div><div style="overflow:auto;margin-top:12px"><table><thead><tr><th>Date</th><th>Origine</th><th>Libellé</th><th>Règlement</th><th>Montant</th></tr></thead><tbody>'+bookRows+'</tbody></table></div></div>';
+}
+
+function invoiceById(id){
+ return (db.invoices||[]).find(i=>i.id===id)||null;
+}
+
+function invoiceDocumentHtml(i){
+ const items=Array.isArray(i.line_items)?i.line_items:[];
+ const lines=items.map(x=>'<tr><td>'+esc(x.description||'Prestation AK PRIME')+'</td><td style="text-align:center">'+esc(String(x.quantity||1))+'</td><td style="text-align:right">'+centsMoney(x.unit_price_excl_tax_cents||0)+'</td><td style="text-align:right">'+centsMoney(x.line_total_excl_tax_cents||0)+'</td></tr>').join('');
+ return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>'+esc(i.invoice_number)+'</title><style>body{font-family:Arial,sans-serif;color:#111827;margin:0;padding:42px;font-size:13px}.top{display:flex;justify-content:space-between;gap:30px;border-bottom:3px solid #0c1b33;padding-bottom:22px}.brand{font-size:28px;font-weight:900;color:#0c1b33}.muted{color:#64748b}.box{margin-top:25px;display:grid;grid-template-columns:1fr 1fr;gap:25px}.panel{border:1px solid #dbe2ea;border-radius:10px;padding:16px}h1{font-size:22px;margin:0 0 5px}h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0 0 9px}table{width:100%;border-collapse:collapse;margin-top:28px}th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:left}th{background:#f8fafc;font-size:11px;text-transform:uppercase}.totals{margin-left:auto;margin-top:18px;width:330px}.total{display:flex;justify-content:space-between;padding:7px 0}.grand{font-size:18px;font-weight:900;border-top:2px solid #0c1b33;margin-top:4px;padding-top:10px}.foot{margin-top:34px;border-top:1px solid #e5e7eb;padding-top:14px;font-size:11px;color:#64748b}@media print{body{padding:20px}}</style></head><body>'+
+ '<div class="top"><div><div class="brand">'+esc(i.seller_business_name||'AK PRIME')+'</div><div>'+esc(i.seller_legal_name||'')+' EI</div><div class="muted">'+esc(i.seller_legal_form||'')+'</div><div style="margin-top:8px">'+esc(i.seller_address||'')+'</div><div>'+esc(i.seller_email||'')+'</div><div>SIREN : '+esc(i.seller_siren||'')+' • SIRET : '+esc(i.seller_siret||'')+'</div></div><div style="text-align:right"><h1>FACTURE</h1><strong>'+esc(i.invoice_number)+'</strong><div class="muted" style="margin-top:8px">Émise le '+fmtDate(i.issue_date)+'</div><div class="muted">Prestation du '+fmtDate(i.service_date)+'</div></div></div>'+
+ '<div class="box"><div class="panel"><h3>Facturé à</h3><strong>'+esc(i.customer_name||'')+'</strong>'+(i.customer_billing_address?'<div>'+esc(i.customer_billing_address)+'</div>':'')+(i.customer_email?'<div>'+esc(i.customer_email)+'</div>':'')+'</div><div class="panel"><h3>Paiement</h3><div>Échéance : '+fmtDate(i.due_date)+'</div><div>Statut : <strong>'+esc(invoiceStatusLabel(i.payment_status))+'</strong></div>'+(i.paid_at?'<div>Encaissée le '+fmtDate(i.paid_at)+'</div>':'')+'<div style="margin-top:6px">'+esc(i.operation_category||'Prestations de services')+'</div></div></div>'+
+ '<table><thead><tr><th>Prestation</th><th style="text-align:center">Qté</th><th style="text-align:right">Prix unitaire HT</th><th style="text-align:right">Total HT</th></tr></thead><tbody>'+lines+'</tbody></table>'+
+ '<div class="totals"><div class="total"><span>Total HT</span><strong>'+centsMoney(i.amount_excl_tax_cents)+'</strong></div><div class="total"><span>TVA</span><strong>'+centsMoney(i.tax_cents)+'</strong></div><div class="total grand"><span>Total à payer</span><span>'+centsMoney(i.amount_incl_tax_cents)+'</span></div></div>'+
+ '<div class="foot">'+(i.vat_exempt?'<div><strong>'+esc(i.vat_mention||'TVA non applicable, art. 293 B du code général des impôts')+'.</strong></div>':'')+'<div style="margin-top:5px">Facture éditée par AK PRIME. Document à conserver.</div></div></body></html>';
+}
+
+function printInvoice(id){
+ const i=typeof id==='string'?invoiceById(id):id;
+ if(!i)return alert('Facture introuvable.');
+ const w=window.open('','_blank');
+ if(!w)return alert('Autorise les fenêtres contextuelles pour ouvrir la facture.');
+ try{w.opener=null}catch(e){}
+ w.document.open();
+ w.document.write(invoiceDocumentHtml(i));
+ w.document.close();
+ setTimeout(()=>{w.focus();w.print()},250);
+}
+
+function openManualInvoice(clientId){
+ if(!billingReady()){
+   modal('Facturation à compléter','<div class="alert"><strong>Impossible d’émettre une facture définitive maintenant.</strong><div class="tiny" style="margin-top:5px">Le SIREN, le SIRET et l’adresse de facturation doivent être enregistrés avant la première facture.</div></div>','<button class="btn ghost" id="closeBillingLock">Fermer</button><button class="btn primary" id="goBillingSettings">Ouvrir les paramètres</button>');
+   document.getElementById('closeBillingLock').onclick=closeModal;
+   document.getElementById('goBillingSettings').onclick=()=>{closeModal();state.view='settings';render()};
+   return;
+ }
+ const clients=db.clients.filter(c=>c.status!=='Inactif');
+ if(!clients.length)return alert('Crée d’abord un dossier client.');
+ const selected=clients.find(c=>c.id===clientId)||clients[0];
+ const options=clients.map(c=>'<option value="'+c.id+'" '+(c.id===selected.id?'selected':'')+'>'+esc(c.name+' — '+c.pole+' '+c.offer)+'</option>').join('');
+ const defaultAmount=offerBaseMonthlyPrice(selected.pole,selected.offer)||0;
+ const defaultDesc='Accompagnement AK PRIME — '+selected.pole+' '+selected.offer;
+ modal('Émettre une facture',
+  '<div class="alert blue"><strong>Facture définitive.</strong><div class="tiny" style="margin-top:4px">Après émission, les données légales et le numéro ne pourront plus être modifiés. Une correction devra passer par un avoir.</div></div>'+
+  '<div class="field"><label>Client</label><select class="select" id="invoiceClient">'+options+'</select></div>'+
+  '<div class="field"><label>Prestation</label><input class="input" id="invoiceDescription" value="'+esc(defaultDesc)+'"></div>'+
+  '<div class="grid2"><div class="field"><label>Montant (€)</label><input class="input" id="invoiceAmount" type="number" min="0.01" step="0.01" value="'+Number(defaultAmount).toFixed(2)+'"></div><div class="field"><label>Date de prestation</label><input class="input" id="invoiceServiceDate" type="date" value="'+localDateISO()+'"></div></div>'+
+  '<div class="field"><label>Adresse de facturation du client (facultatif pour un particulier)</label><textarea class="textarea" id="invoiceCustomerAddress"></textarea></div>'+
+  '<div class="grid2"><div class="field"><label>Situation du paiement</label><select class="select" id="invoicePaymentStatus"><option value="pending">À encaisser</option><option value="paid">Déjà encaissée</option></select></div><div class="field" id="invoicePaymentMethodWrap" style="display:none"><label>Mode de règlement</label><select class="select" id="invoicePaymentMethod"><option value="card">Carte</option><option value="bank_transfer">Virement</option><option value="cash">Espèces</option><option value="check">Chèque</option><option value="other">Autre</option></select></div></div>',
+  '<button class="btn ghost" id="cancelInvoice">Annuler</button><button class="btn primary" id="confirmInvoice">Émettre la facture</button>');
+ const clientEl=document.getElementById('invoiceClient'),descEl=document.getElementById('invoiceDescription'),amountEl=document.getElementById('invoiceAmount'),statusEl=document.getElementById('invoicePaymentStatus'),methodWrap=document.getElementById('invoicePaymentMethodWrap');
+ clientEl.onchange=()=>{const c=db.clients.find(x=>x.id===clientEl.value);if(!c)return;descEl.value='Accompagnement AK PRIME — '+c.pole+' '+c.offer;amountEl.value=Number(offerBaseMonthlyPrice(c.pole,c.offer)||0).toFixed(2)};
+ statusEl.onchange=()=>{methodWrap.style.display=statusEl.value==='paid'?'block':'none'};
+ document.getElementById('cancelInvoice').onclick=closeModal;
+ document.getElementById('confirmInvoice').onclick=async()=>{
+   const amount=Math.round(Number(amountEl.value||0)*100),description=descEl.value.trim(),paymentStatus=statusEl.value,paymentMethod=paymentStatus==='paid'?document.getElementById('invoicePaymentMethod').value:null;
+   if(amount<=0)return alert('Indique un montant valide.');
+   if(description.length<3)return alert('Indique la prestation facturée.');
+   if(!confirm('Émettre cette facture définitive pour '+centsMoney(amount)+' ?'))return;
+   const btn=document.getElementById('confirmInvoice');btn.disabled=true;btn.textContent='Émission…';
+   const {data,error}=await supa.rpc('issue_manual_invoice',{p_client_id:clientEl.value,p_description:description,p_amount_cents:amount,p_service_date:document.getElementById('invoiceServiceDate').value||localDateISO(),p_customer_billing_address:document.getElementById('invoiceCustomerAddress').value.trim()||null,p_payment_status:paymentStatus,p_payment_method:paymentMethod,p_paid_at:paymentStatus==='paid'?new Date().toISOString():null});
+   if(error){btn.disabled=false;btn.textContent='Émettre la facture';return alert('Impossible d’émettre la facture : '+error.message)}
+   closeModal();
+   await loadSupabaseData();
+   const created=Array.isArray(data)?data[0]:data;
+   toast('Facture '+(created?.invoice_number||'créée'));
+   render();
+ };
+}
+
+function openMarkInvoicePaid(id){
+ const i=invoiceById(id);if(!i)return;
+ modal('Enregistrer l’encaissement','<div class="alert blue"><strong>'+esc(i.invoice_number)+' — '+centsMoney(i.amount_incl_tax_cents)+'</strong><div class="tiny" style="margin-top:4px">L’encaissement créera automatiquement une écriture dans le livre des recettes.</div></div><div class="field"><label>Mode de règlement</label><select class="select" id="paidMethod"><option value="bank_transfer">Virement</option><option value="card">Carte</option><option value="cash">Espèces</option><option value="check">Chèque</option><option value="other">Autre</option></select></div><div class="field"><label>Date d’encaissement</label><input class="input" id="paidDate" type="date" value="'+localDateISO()+'"></div>','<button class="btn ghost" id="cancelPaid">Annuler</button><button class="btn primary" id="confirmPaid">Confirmer l’encaissement</button>');
+ document.getElementById('cancelPaid').onclick=closeModal;
+ document.getElementById('confirmPaid').onclick=async()=>{
+   const date=document.getElementById('paidDate').value||localDateISO();
+   const paidAt=date+'T12:00:00+02:00';
+   const btn=document.getElementById('confirmPaid');btn.disabled=true;btn.textContent='Enregistrement…';
+   const {error}=await supa.rpc('mark_invoice_paid',{p_invoice_id:i.id,p_payment_method:document.getElementById('paidMethod').value,p_paid_at:paidAt});
+   if(error){btn.disabled=false;btn.textContent='Confirmer l’encaissement';return alert('Impossible d’enregistrer le paiement : '+error.message)}
+   closeModal();await loadSupabaseData();toast('Encaissement enregistré');render();
+ };
+}
+
+function exportRevenueCsv(){
+ const rows=[['Date','Origine','Libellé','Mode de règlement','Montant EUR'],...(db.revenueEntries||[]).map(e=>[e.receipt_date||'',e.source_label||'',e.description||'',paymentMethodLabel(e.payment_method),((Number(e.amount_cents)||0)/100).toFixed(2).replace('.',',')])];
+ const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='AK_PRIME_livre_recettes_'+localDateISO()+'.csv';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+
 function backupPage(){
  return '<div class="page-title"><div><h1>Sauvegardes</h1><p>La base principale est maintenant Supabase.</p></div></div>'+
  '<div class="grid2"><div class="card panel"><h3>Exporter une copie</h3><p class="muted">Télécharge un instantané JSON des dossiers actuellement chargés. Utile comme copie de contrôle.</p><button class="btn primary" id="exportData">Exporter les données</button></div>'+
@@ -1610,12 +1758,13 @@ function settingsPage(){
  '<div class="field"><label>URL Optitrainer par défaut</label><input class="input" id="optiBase" value="'+esc(db.settings?.optitrainerBase||'')+'"></div>'+
  '<button class="btn ghost" id="saveSettings">Enregistrer Optitrainer pour cette session</button>'+
  '<div class="alert green" style="margin-top:15px">Authentification Supabase active • base PostgreSQL active • RLS active • compte propriétaire séparé des comptes clients.</div>'+
- '<div class="alert" style="margin-top:10px">Le portail client reste en phase de test pour les données sensibles : continue à vérifier les droits avant utilisation réelle à grande échelle.</div></div>';
+ '<div class="alert" style="margin-top:10px">Le portail client reste en phase de test pour les données sensibles : continue à vérifier les droits avant utilisation réelle à grande échelle.</div></div>'+
+ billingSettingsPanel();
 }
 
 function render(){
  const root=document.getElementById('root');
- const pages={dashboard,clients:clientsPage,client:clientPage,calendar:calendarPage,backup:backupPage,settings:settingsPage};
+ const pages={dashboard,clients:clientsPage,client:clientPage,billing:billingPage,calendar:calendarPage,backup:backupPage,settings:settingsPage};
  root.innerHTML=shell((pages[state.view]||dashboard)());
  bind();
 }
@@ -1642,6 +1791,18 @@ function bind(){
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
  const gs=document.getElementById('globalSearch');if(gs)gs.onkeydown=e=>{if(e.key==='Enter'){state.search=e.target.value;state.view='clients';render()}};
+ document.getElementById('newManualInvoice')?.addEventListener('click',()=>openManualInvoice());
+ document.querySelectorAll('.createClientInvoice').forEach(b=>b.onclick=()=>openManualInvoice(b.dataset.clientId||''));
+ document.querySelectorAll('.printInvoice').forEach(b=>b.onclick=()=>printInvoice(b.dataset.id));
+ document.querySelectorAll('.markInvoicePaid').forEach(b=>b.onclick=()=>openMarkInvoicePaid(b.dataset.id));
+ document.getElementById('exportRevenueCsv')?.addEventListener('click',exportRevenueCsv);
+ document.getElementById('saveBillingSettings')?.addEventListener('click',async()=>{
+   const row={legal_name:document.getElementById('billLegalName').value.trim(),business_name:document.getElementById('billBusinessName').value.trim(),legal_form:document.getElementById('billLegalForm').value.trim(),legal_address:document.getElementById('billAddress').value.trim()||null,siren:document.getElementById('billSiren').value.trim()||null,siret:document.getElementById('billSiret').value.trim()||null,email:document.getElementById('billEmail').value.trim(),updated_at:new Date().toISOString()};
+   if(!row.legal_name||!row.business_name||!row.legal_form||!row.email)return toast('Complète les champs principaux');
+   const {error}=await supa.from('billing_settings').update(row).eq('id',1);
+   if(error)return toast('Erreur : '+error.message);
+   await loadSupabaseData();toast('Identité de facturation enregistrée');render();
+ });
  document.getElementById('completeInitialVisio')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('onboarding').update({visio_completed_at:new Date().toISOString(),current_step:'tests'}).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio initiale validée');render()});
  const requiredSelect=document.getElementById('requiredTestName'),requiredCustom=document.getElementById('requiredTestCustom');
  if(requiredSelect&&requiredCustom)requiredSelect.onchange=()=>{requiredCustom.style.display=requiredSelect.value==='__custom__'?'block':'none'};
