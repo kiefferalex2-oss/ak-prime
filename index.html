@@ -623,6 +623,32 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .public-site #apropos .ak-about-skill-line span{font-size:11px;font-weight:700;color:#916e3f;border:1px solid #e5d8c3;background:#fffaf4;border-radius:999px;padding:7px 11px}
 @media(max-width:530px){.public-site #apropos .ak-about-career-lines>div{grid-template-columns:1fr;gap:4px}}
 
+
+/* Valeur différenciante : Passeport au premier plan */
+.public-site .ak-difference-section .ak-difference-heading{max-width:920px;margin-bottom:26px}
+.public-site .ak-difference-section .ak-difference-heading h2{max-width:900px;font-size:clamp(30px,3.6vw,49px);line-height:1.12;letter-spacing:-.035em}
+.public-site .ak-difference-section .ak-difference-heading p{max-width:770px;font-size:15px;line-height:1.72}
+.public-site .ak-difference-layout{display:grid;grid-template-columns:1.17fr 1fr;align-items:stretch;gap:18px}
+.public-site .ak-passport-highlight{display:flex;flex-direction:column;position:relative;overflow:hidden;min-width:0;padding:30px;border-radius:25px;color:#fff;background:radial-gradient(circle at 90% 2%,rgba(188,150,82,.17),transparent 37%),linear-gradient(145deg,#13283e,#0d1929);box-shadow:0 17px 36px rgba(17,31,49,.16)}
+.public-site .ak-passport-highlight:after{content:"";position:absolute;inset:0;border:1px solid rgba(224,184,112,.27);border-radius:25px;pointer-events:none}
+.public-site .ak-passport-heading{display:flex;align-items:center;gap:12px;margin-bottom:23px;color:#e4bd7e;font-size:10px;letter-spacing:.13em;font-weight:850}
+.public-site .ak-passport-emblem{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(230,192,123,.5);border-radius:12px;color:#f1cb89;font-size:15px;font-weight:950;letter-spacing:-.04em}
+.public-site .ak-passport-highlight h3{margin:0 0 15px;font-size:clamp(24px,2.3vw,32px);line-height:1.2;letter-spacing:-.02em;color:#fff}
+.public-site .ak-passport-highlight h3 em{font-style:normal;color:#e5be7e}
+.public-site .ak-passport-highlight>p{font-size:13px;line-height:1.78;color:#d1dce7;margin:0 0 20px}
+.public-site .ak-passport-details{display:grid;gap:0;border-top:1px solid rgba(255,255,255,.15)}
+.public-site .ak-passport-details>div{display:grid;grid-template-columns:145px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.13)}
+.public-site .ak-passport-details strong{color:#fff;font-size:12px}
+.public-site .ak-passport-details span{color:#b9c8d8;font-size:12px;line-height:1.5}
+.public-site .ak-passport-bottom{margin-top:auto;padding-top:18px;font-size:12px;color:#edca90;font-weight:700;line-height:1.6}
+.public-site .ak-difference-benefits{display:grid;grid-template-rows:repeat(3,1fr);gap:12px}
+.public-site .ak-difference-benefit{display:grid;grid-template-columns:40px 1fr;gap:13px;align-content:center;padding:23px;border:1px solid #e0e7ef;background:#fff;border-radius:20px;box-shadow:0 5px 18px rgba(18,35,55,.035)}
+.public-site .ak-difference-symbol{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#fbf4e9;border:1px solid #f0e1c8;color:#a67838;font-size:20px;font-weight:700}
+.public-site .ak-difference-benefit h3{margin:0 0 7px;color:#13263b;font-size:16px;line-height:1.35}
+.public-site .ak-difference-benefit p{margin:0;color:#617085;font-size:12px;line-height:1.7}
+@media(max-width:900px){.public-site .ak-difference-layout{grid-template-columns:1fr}.public-site .ak-difference-benefits{grid-template-rows:auto;grid-template-columns:repeat(3,minmax(0,1fr))}.public-site .ak-difference-benefit{display:block;padding:18px}.public-site .ak-difference-symbol{margin-bottom:12px}}
+@media(max-width:650px){.public-site .ak-passport-highlight{padding:23px}.public-site .ak-passport-details>div{grid-template-columns:1fr;gap:3px}.public-site .ak-difference-benefits{grid-template-columns:1fr}.public-site .ak-difference-benefit{display:grid;grid-template-columns:40px 1fr}.public-site .ak-difference-symbol{margin-bottom:0}}
+
 </style>
 </head>
 <body>
@@ -2650,12 +2676,15 @@ function renderPublicSite(){
  '<div class="ak-about-career-lines"><div><strong>Handball</strong><span>Palente Besançon (national) · Section Stendhal, championne de France UNSS 2026</span></div><div><strong>Football</strong><span>Préparation physique à Thonon Évian Grand Genève · Seconde Ligue</span></div><div><strong>Boxe & haltérophilie</strong><span>Encadrement technique et préparation physique</span></div></div>'+
  '<div class="ak-about-skill-line"><span>Évaluation & profilage physique</span><span>Planification & suivi des charges</span><span>Préparation physique & réathlétisation</span><span>Préparation mentale</span><span>Sommeil, récupération & état de forme</span><span>Nutrition : besoins & macronutriments</span><span>Prise en compte du cycle menstruel</span></div></div>'+
  '</div></div></div></section>'+
- '<section class="public-section" style="padding-top:0"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Pourquoi AK PRIME ?</div><h2>Le suivi ne s’arrête pas au programme.</h2><p>Le système est conçu pour garder une vue claire sur ce qui a été décidé, ce qui a été réalisé et ce qui doit évoluer.</p></div><div class="public-why-grid">'+
- '<div class="public-why-card"><div class="why-icon">01</div><h3>Individualisation</h3><p>Le programme part du niveau, du matériel, du calendrier, des contraintes et des objectifs de la personne.</p></div>'+
- '<div class="public-why-card"><div class="why-icon">02</div><h3>Décisions suivies</h3><p>Tests, bilans et retours servent à modifier la planification lorsque la situation l’exige.</p></div>'+
- '<div class="public-why-card"><div class="why-icon">03</div><h3>Données + humain</h3><p>Les indicateurs structurent la réflexion sans remplacer les échanges, les sensations et le contexte réel.</p></div>'+
- '<div class="public-why-card"><div class="why-icon">04</div><h3>Historique centralisé</h3><p>Le Passeport AK PRIME conserve les étapes importantes, résultats, cycles, visios et décisions.</p></div>'+
- '</div></div></section>'+
+ '<section class="public-section ak-difference-section" id="pourquoi-ak-prime" style="padding-top:0"><div class="public-section-inner">'+
+ '<div class="public-section-head ak-difference-heading"><div class="kicker">La différence AK PRIME</div><h2>Bien plus qu’un programme : un accompagnement que vous pouvez suivre.</h2><p>Vous savez ce que vous travaillez, pourquoi vous le faites et comment votre accompagnement évolue. Vos progrès ne se résument pas à une suite de séances.</p></div>'+
+ '<div class="ak-difference-layout">'+
+ '<div class="ak-passport-highlight"><div class="ak-passport-heading"><div class="ak-passport-emblem">AK</div><span>VOTRE ESPACE PERSONNEL</span></div><h3>Le Passeport AK PRIME.<br><em>Le fil conducteur de votre progression.</em></h3><p>Retrouvez au même endroit les informations importantes de votre accompagnement : votre point de départ, vos objectifs, les bilans, les évaluations, les cycles de travail et les évolutions décidées ensemble, selon votre formule.</p><div class="ak-passport-details"><div><strong>Votre point de départ</strong><span>Objectifs, besoins et repères initiaux</span></div><div><strong>Votre progression</strong><span>Bilans, résultats et étapes franchies</span></div><div><strong>Votre suivi</strong><span>Échanges et ajustements consignés au fil de l’accompagnement</span></div></div><div class="ak-passport-bottom">Un historique structuré pour comprendre le chemin parcouru, pas seulement la séance du jour.</div></div>'+
+ '<div class="ak-difference-benefits">'+
+ '<div class="ak-difference-benefit"><div class="ak-difference-symbol">✦</div><div><h3>Un programme qui part de vous</h3><p>Votre niveau, vos objectifs, votre matériel, votre emploi du temps et votre pratique guident la construction de votre accompagnement. Vous n’avez pas à vous adapter à un programme standard.</p></div></div>'+
+ '<div class="ak-difference-benefit"><div class="ak-difference-symbol">↗</div><div><h3>Des évolutions expliquées, pas des changements au hasard</h3><p>Vos résultats et vos retours servent à faire le point sur ce qui fonctionne et ce qui mérite d’évoluer. La fréquence des ajustements dépend de votre formule.</p></div></div>'+
+ '<div class="ak-difference-benefit"><div class="ak-difference-symbol">◎</div><div><h3>Un vrai échange derrière les données</h3><p>Les tests, questionnaires et indicateurs sont des outils, pas une fin en soi. Vos sensations, vos contraintes et vos questions restent au cœur des décisions.</p></div></div>'+
+ '</div></div></div></section>'+
  '<section class="public-section dark"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Concrètement</div><h2>Ce que vous obtenez dans votre accompagnement.</h2><p>Le contenu exact dépend de la formule et du pôle choisi, mais le fonctionnement reste fondé sur le même cadre de suivi.</p></div><div class="public-value-grid">'+
  '<div class="public-value-card"><div class="num">01 — ÉVALUATION</div><h3>Un point de départ clair</h3><p>Questionnaire initial, échange approfondi et tests utiles pour comprendre votre profil et définir les priorités.</p></div>'+
  '<div class="public-value-card"><div class="num">02 — PLANIFICATION</div><h3>Un programme individualisé</h3><p>Séances, charges, objectifs et organisation adaptés à ton niveau, ton matériel et ton emploi du temps.</p></div>'+
