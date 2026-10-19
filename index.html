@@ -508,6 +508,25 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .pole-performance-modal .pole-offer-mini button{width:100%;border-radius:11px;padding:10px}
 @media(max-width:700px){.modal.pole-performance-modal{width:min(100%,calc(100vw - 16px))}.pole-performance-modal .modal-body{padding:14px}.pole-performance-modal .modal-head,.pole-performance-modal .modal-foot{padding:14px 17px}.pole-performance-modal .pole-detail-hero{padding:23px 19px}.pole-performance-modal .pole-detail-grid,.pole-performance-modal .pole-offer-compare{grid-template-columns:1fr}.pole-performance-modal .pole-detail-card{padding:18px}.pole-performance-modal .pole-offer-mini:hover{transform:none}}
 
+
+/* Cartes Performance : lecture par bénéfices, prix et prestations, non par mémo technique */
+.pole-performance-modal .pole-offer-compare{gap:16px}
+.pole-performance-modal .perf-offer-card{background:linear-gradient(165deg,#fff 0%,#f5f8fc 100%);padding:22px 19px 20px;border:1px solid #d8e2ed;border-radius:18px;min-height:420px}
+.pole-performance-modal .perf-offer-card.featured{background:linear-gradient(165deg,#fcf2df 0%,#fff 55%);border:2px solid #bf9350;box-shadow:0 18px 40px rgba(138,96,38,.14)}
+.pole-performance-modal .pole-offer-top{min-height:87px}
+.pole-performance-modal .pole-offer-badge{display:inline-block;background:#edf2f7;border:1px solid #d8e2eb;border-radius:30px;padding:5px 9px;font-size:10px;letter-spacing:.09em;font-weight:850;color:#516780;text-transform:uppercase;margin-bottom:11px}
+.pole-performance-modal .featured .pole-offer-badge{background:#c89f5c;color:#111c2b;border-color:#c89f5c}
+.pole-performance-modal .perf-offer-card h4{font-size:27px;letter-spacing:-.04em;line-height:1;margin:0 0 6px;color:#102238}
+.pole-performance-modal .pole-offer-label{font-weight:800;font-size:14px;color:#315575}
+.pole-performance-modal .perf-offer-card .price{font-size:34px;margin:13px 0 9px}
+.pole-performance-modal .perf-offer-card .price span{font-size:12px;letter-spacing:0;font-weight:600}
+.pole-performance-modal .pole-offer-intro{min-height:59px;color:#53647a;font-size:12px;line-height:1.55;margin:0 0 13px}
+.pole-performance-modal .pole-offer-points{list-style:none;padding:13px 0 12px;margin:0 0 18px;border-top:1px solid #e2e8f0;display:grid;gap:10px}
+.pole-performance-modal .pole-offer-points li{position:relative;padding-left:23px;font-size:12px;line-height:1.45;color:#293e54}
+.pole-performance-modal .pole-offer-points li::before{content:'✓';position:absolute;left:0;top:0;color:#af843d;font-weight:950}
+.pole-performance-modal .perf-offer-card button{margin-top:auto}
+@media(max-width:700px){.pole-performance-modal .perf-offer-card{min-height:unset}.pole-performance-modal .pole-offer-intro{min-height:unset}}
+
 </style>
 </head>
 <body>
@@ -2655,7 +2674,20 @@ function openPublicLogin(message='',isError=false){
 
 function poleOfferMini(pole,name,price,subtitle,featured=false){
  price=publicCatalogPrice(pole,name,price);
- return '<div class="pole-offer-mini '+(featured?'featured':'')+'"><div class="checkout-step">'+esc(featured?'Recommandée':'Formule')+'</div><h4>'+esc(name)+'</h4><div class="price">'+esc(price)+' € <span>/ mois</span></div><p>'+esc(subtitle)+'</p><button class="btn '+(featured?'primary':'ghost')+' small poleOfferSelect" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir</button></div>';
+ const perf={
+  P1:{label:'Essentiel',summary:'Une programmation individualisée avec un suivi régulier.',points:['Programmation adaptée à votre discipline','Suivi de charge (sRPE)','2 analyses vidéo / mois','Réévaluation à 6 semaines','1 visio / mois']},
+  P2:{label:'Avancé',summary:'Un suivi plus précis, avec des adaptations chaque semaine.',points:['Tout le contenu P1','Analyse vidéo hebdomadaire','Questionnaire de bien-être (Hooper)','Ajustements hebdomadaires','Échauffement individualisé','2 visios / mois']},
+  P3:{label:'Premium',summary:'Un accompagnement rapproché, avec une gestion approfondie de votre état de forme.',points:['Tout le contenu P2','Analyses vidéo selon vos besoins','Suivi complet du sommeil','Ajustements sous 48 h','Récupération dédiée','Repères nutritionnels personnalisés (macros)']}
+ };
+ const details=pole==='Performance'?perf[name]:null;
+ const label=details?.label||name;
+ const features=details?'<ul class="pole-offer-points">'+details.points.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<p class="pole-offer-copy">'+esc(subtitle)+'</p>';
+ return '<div class="pole-offer-mini '+(featured?'featured':'')+' '+(details?'perf-offer-card':'')+'">'+
+  '<div class="pole-offer-top"><span class="pole-offer-badge">'+esc(featured?'Recommandée':'Formule')+'</span><h4>'+esc(name)+'</h4><div class="pole-offer-label">'+esc(label)+'</div></div>'+
+  '<div class="price">'+esc(price)+' € <span>/ mois</span></div>'+
+  (details?'<p class="pole-offer-intro">'+esc(details.summary)+'</p>':'')+
+  features+
+  '<button class="btn '+(featured?'primary':'ghost')+' small poleOfferSelect" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir cette formule</button></div>';
 }
 function openPublicPoleDetails(key){
  const configs={
@@ -2693,7 +2725,7 @@ function openPublicPoleDetails(key){
   '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'Pour qui ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
   (key==='performance'?'':'<div class="section-title">Comment se déroule l’accompagnement ?</div><div class="pole-flow">'+x.flow.map(v=>'<div><b>'+esc(v[0])+' — '+esc(v[1])+'</b>'+esc(v[2])+'</div>').join('')+'</div>')+
   '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
-  '<div class="section-title">'+(key==='performance'?'Trois formules, trois niveaux de suivi':'Formules disponibles')+'</div>'+(key==='performance'?'<p class="muted" style="font-size:13px;margin:0 0 12px">La différence entre P1, P2 et P3 porte sur l’intensité du suivi, les analyses et la fréquence des ajustements. Les contenus précis sont détaillés dans chaque offre.</p>':'')+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
+  '<div class="section-title">'+(key==='performance'?'Trois formules, trois niveaux de suivi':'Formules disponibles')+'</div>'+(key==='performance'?'<p class="muted" style="font-size:13px;margin:0 0 12px">Choisissez le niveau d’accompagnement adapté à vos besoins. Chaque formule dispose d’un suivi et de prestations spécifiques.</p>':'')+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
  if(key==='performance')document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal');
  document.getElementById('closePoleDetail').onclick=closeModal;
