@@ -481,6 +481,33 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:720px){.akp-athlete-head{padding:20px}.akp-athlete-profile{align-items:flex-start}.akp-monogram{width:64px;height:64px;flex-basis:64px}.akp-athlete-copy h1{font-size:23px}.akp-live-state{grid-template-columns:1fr}.akp-tabs{padding:0 7px}.akp-tabs button{padding:12px 10px}.akp-body{padding:14px}.akp-page-title{align-items:flex-start;flex-direction:column}.akp-overview-main,.akp-snapshot-grid,.akp-progress-three,.akp-metric-grid,.akp-test-kpis{grid-template-columns:1fr 1fr}.akp-legend{display:none}.akp-history-head,.akp-history-row{grid-template-columns:78px 86px 1fr}.akp-history-head span:last-child,.akp-history-row span:last-child{display:none}.akp-sport-timeline:before{left:102px}.akp-timeline-item{grid-template-columns:82px 40px 1fr}.akp-timeline-date{padding-right:8px}.akp-checkin{grid-template-columns:1fr}.akp-cycle-top{align-items:flex-start}}
 @media(max-width:480px){.akp-athlete-profile{display:grid;grid-template-columns:54px 1fr;gap:12px}.akp-monogram{width:54px;height:54px}.akp-overview-main,.akp-snapshot-grid,.akp-progress-three,.akp-metric-grid,.akp-test-kpis{grid-template-columns:1fr}.akp-live-state{margin-top:2px}.akp-test-focus-head{align-items:flex-start;flex-direction:column}.akp-test-delta{text-align:left}.akp-sport-timeline:before{left:18px}.akp-timeline-item{grid-template-columns:40px 1fr}.akp-timeline-date{grid-column:2;text-align:left;padding:5px 0 2px}.akp-timeline-marker{grid-column:1;grid-row:1/3}.akp-timeline-card{grid-column:2}.akp-cycle-bottom{align-items:flex-start;flex-direction:column}}
 @media print{.akp-tabs{display:none!important}.akp-body{background:#fff;padding:10px}.akp-passport{box-shadow:none;border:0}.akp-athlete-head{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* Fenêtre Performance — hiérarchie visuelle premium, sans modifier les autres pôles */
+.modal.pole-performance-modal{width:min(980px,calc(100vw - 32px));background:#f4f7fb}
+.pole-performance-modal .modal-head{background:#fff;padding:18px 26px}
+.pole-performance-modal .modal-body{padding:24px 26px 28px}
+.pole-performance-modal .modal-foot{background:#fff;padding:15px 26px}
+.pole-performance-modal .pole-detail-hero{position:relative;overflow:hidden;background:radial-gradient(circle at 90% 0%,rgba(211,171,98,.19),transparent 35%),linear-gradient(125deg,#0a1727,#1b3451);border:1px solid #31445c;border-radius:20px;padding:28px 30px 30px;box-shadow:0 16px 32px rgba(8,22,40,.14)}
+.pole-performance-modal .pole-detail-hero::after{content:"";position:absolute;right:-55px;bottom:-105px;width:235px;height:235px;border:1px solid rgba(211,171,98,.15);border-radius:50%;pointer-events:none}
+.pole-performance-modal .pole-detail-hero h2{font-size:clamp(26px,3.8vw,35px);letter-spacing:-.025em;line-height:1.16;margin:12px 0}
+.pole-performance-modal .pole-detail-hero p{font-size:15px;line-height:1.65;max-width:760px;color:#d2dce7}
+.pole-performance-modal .pole-detail-grid{gap:15px;margin-top:18px}
+.pole-performance-modal .pole-detail-card{position:relative;border:1px solid #dae3ef;border-radius:17px;padding:22px 23px;background:#fff;box-shadow:0 8px 24px rgba(18,39,62,.045)}
+.pole-performance-modal .pole-detail-card:first-child{border-top:4px solid #d3ab62}
+.pole-performance-modal .pole-detail-card:nth-child(2){border-top:4px solid #345c86}
+.pole-performance-modal .pole-detail-card h4{font-size:16px;letter-spacing:-.015em;color:#132338;margin-bottom:14px}
+.pole-performance-modal .pole-detail-card li{font-size:13px;line-height:1.65;color:#45556b;margin:0 0 11px;padding-left:3px}
+.pole-performance-modal .pole-detail-card li::marker{color:#b18a47}
+.pole-performance-modal .section-title{color:#233b56;font-size:13px;margin:27px 0 9px;letter-spacing:.06em}
+.pole-performance-modal .pole-offer-compare{gap:14px;margin-top:14px}
+.pole-performance-modal .pole-offer-mini{border-radius:16px;background:#fff;padding:19px;border-color:#dce4ee;box-shadow:0 8px 23px rgba(18,39,62,.045);transition:transform .18s ease,box-shadow .18s ease}
+.pole-performance-modal .pole-offer-mini:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(18,39,62,.12)}
+.pole-performance-modal .pole-offer-mini.featured{background:linear-gradient(180deg,#fff9ee,#fff);border:2px solid #caa05b}
+.pole-performance-modal .pole-offer-mini .price{font-size:29px;letter-spacing:-.035em;color:#132338;margin:10px 0}
+.pole-performance-modal .pole-offer-mini p{font-size:12px;line-height:1.6;margin:5px 0 19px}
+.pole-performance-modal .pole-offer-mini button{width:100%;border-radius:11px;padding:10px}
+@media(max-width:700px){.modal.pole-performance-modal{width:min(100%,calc(100vw - 16px))}.pole-performance-modal .modal-body{padding:14px}.pole-performance-modal .modal-head,.pole-performance-modal .modal-foot{padding:14px 17px}.pole-performance-modal .pole-detail-hero{padding:23px 19px}.pole-performance-modal .pole-detail-grid,.pole-performance-modal .pole-offer-compare{grid-template-columns:1fr}.pole-performance-modal .pole-detail-card{padding:18px}.pole-performance-modal .pole-offer-mini:hover{transform:none}}
+
 </style>
 </head>
 <body>
@@ -2668,6 +2695,7 @@ function openPublicPoleDetails(key){
   '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
   '<div class="section-title">'+(key==='performance'?'Trois formules, trois niveaux de suivi':'Formules disponibles')+'</div>'+(key==='performance'?'<p class="muted" style="font-size:13px;margin:0 0 12px">La différence entre P1, P2 et P3 porte sur l’intensité du suivi, les analyses et la fréquence des ajustements. Les contenus précis sont détaillés dans chaque offre.</p>':'')+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
+ if(key==='performance')document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal');
  document.getElementById('closePoleDetail').onclick=closeModal;
  document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
 }
