@@ -57,3 +57,6 @@ document.addEventListener('click', async function(event) {
   });
  };
 })();
+
+// Charger le module de protection du back-office.
+(function(){const s=document.createElement('script');s.src='./akp-phase1-security.js';document.body.appendChild(s);})();
