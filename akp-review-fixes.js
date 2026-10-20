@@ -78,14 +78,14 @@
  const originalRenewalModal=openRenewalModal;
  openRenewalModal=function(c){
    originalRenewalModal(c);
-   if(!c||c.isTest)return;
+   if(!c)return;
    const notes=document.getElementById('renewNotes');
    const save=document.getElementById('saveM');
    if(!notes||!save)return;
-   notes.insertAdjacentHTML('beforebegin',
-     '<div class="alert" style="margin:10px 0"><strong>Renouvellement réel :</strong> un choix client ne vaut pas paiement. '+
-     'En l’absence de Stripe, toute finalisation manuelle doit être justifiée par une preuve d’accord et, si nécessaire, d’encaissement. '+
-     'Décris ces vérifications dans les notes avant de valider.</div>');
+   notes.insertAdjacentHTML('beforebegin',c.isTest
+     ? '<div class="alert blue" style="margin:10px 0">Dossier de test : renouvellement simulé, sans paiement réel.</div>'
+     : '<div class="alert" style="margin:10px 0"><strong>Renouvellement réel :</strong> le choix client ne vaut pas paiement. '+
+       'En l’absence de Stripe, justifie l’accord et le règlement hors ligne. Décris les justificatifs dans les notes.</div>');
    save.onclick=async function(){
      const decision=document.getElementById('renewDecision').value;
      const review=document.getElementById('renewReview').checked;
