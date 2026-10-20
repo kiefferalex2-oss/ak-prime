@@ -2693,8 +2693,9 @@ function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',fe
  price=publicCatalogPrice(pole,name,price);
  const preview=publicOfferPreview(pole,name);
  const displayName=pole==='Performance'?({P1:'Essentiel',P2:'Avancé',P3:'Premium'}[name]||name):name;
+ const eyebrow=pole==='Performance'?'PERFORMANCE & RÉATHLÉTISATION':pole==='Forme & Santé'?'FORME & SANTÉ':tag||pole;
  return '<div class="public-offer-card publicOfferDetailCard '+(featured?'featured':'')+'" role="button" tabindex="0" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">'+
-  '<div class="tag">'+esc(tag||pole)+'</div>'+
+  '<div class="tag">'+esc(eyebrow)+'</div>'+
   '<h4>'+esc(displayName)+'</h4>'+
   '<div class="public-price">'+esc(price)+' € <span>/ mois</span></div>'+
   '<div class="public-offer-headline">'+esc(headline||'')+'</div>'+
