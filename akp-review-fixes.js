@@ -11,12 +11,31 @@
      timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'
    }).format(new Date(next.starts_at));
  }
+
+ function normalizeReviewState(c){
+   return {...c,checkins:(c.checkins||[]).map(w=>
+     w.reviewedAt&&!String(w.coach||'').trim()?{...w,reviewedAt:''}:w)};
+ }
+ const originalFollow=follow;
+ follow=function(c){
+   const oldBlank=(c.checkins||[]).filter(w=>w.reviewedAt&&!String(w.coach||'').trim());
+   const html=originalFollow(normalizeReviewState(c));
+   if(!oldBlank.length)return html;
+   return '<div class="alert" style="margin-bottom:12px"><strong>'+oldBlank.length+
+     ' bilan(s) marqué(s) traité(s) sans retour du coach.</strong> Ajoute une décision ou un commentaire pour clôturer correctement ces suivis.</div>'+html;
+ };
+ const originalCoachNotifications=coachNotifications;
+ coachNotifications=function(){
+   const old=db.clients;
+   try{db.clients=old.map(normalizeReviewState);return originalCoachNotifications()}
+   finally{db.clients=old}
+ };
  const oldDashboard=dashboard;
  dashboard=function(){
    const all=db.clients;
    let output;
    try{
-     db.clients=all.filter(c=>!c.isTest).map(c=>({...c,next:nextScheduledVisioDate(c)}));
+     db.clients=all.filter(c=>!c.isTest).map(c=>normalizeReviewState({...c,next:nextScheduledVisioDate(c)}));
      output=oldDashboard();
    }finally{db.clients=all}
    const real=all.filter(c=>!c.isTest);
