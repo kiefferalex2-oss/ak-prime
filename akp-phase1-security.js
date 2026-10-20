@@ -104,12 +104,12 @@
    });
  }
  async function showAudit(id){
-   const {data,error}=await supa.from('client_change_audit').select('changed_at,changed_by,old_values,new_values').eq('client_id',id).order('changed_at',{ascending:false}).limit(60);
+   const {data,error}=await supa.from('client_change_audit').select('changed_at,changed_by,reason,old_values,new_values').eq('client_id',id).order('changed_at',{ascending:false}).limit(60);
    if(error)return feedback('Historique indisponible : '+error.message);
    const rows=(data||[]).map(row=>{
      const old=row.old_values||{},next=row.new_values||{};
      const differences=Object.keys(next).filter(k=>JSON.stringify(old[k])!==JSON.stringify(next[k]));
-     return '<div class="item"><strong>'+esc(new Date(row.changed_at).toLocaleString('fr-FR'))+'</strong><div class="muted tiny">Modifications : '+esc(differences.join(' • ')||'—')+'</div><div class="muted tiny">Auteur : '+esc(row.changed_by?'Utilisateur connecté':'Système')+'</div></div>';
+     return '<div class="item"><strong>'+esc(new Date(row.changed_at).toLocaleString('fr-FR'))+'</strong><div class="muted tiny">Modifications : '+esc(differences.join(' • ')||'—')+'</div><div class="muted tiny">Auteur : '+esc(row.changed_by?'Utilisateur connecté':'Système')+'</div>'+(row.reason?'<div class="tiny"><strong>Motif :</strong> '+esc(row.reason)+'</div>':'')+'</div>';
    }).join('');
    modal('Historique des modifications',rows||'<p class="muted">Aucune modification sensible enregistrée depuis l’activation du journal.</p>','<button class="btn primary" id="phase1CloseAudit">Fermer</button>');
    document.getElementById('phase1CloseAudit').onclick=closeModal;
@@ -238,4 +238,4 @@
 })();
 
 // Corrections validées lors de la première revue du back-office.
-(function(){const s=document.createElement('script');s.src='./akp-review-fixes.js';document.body.appendChild(s);})();
+(function(){const s=document.createElement('script');s.src='./akp-review-fixes.js';s.onload=()=>{if(authUser?.id&&['owner','coach'].includes(authProfile?.role)&&document.querySelector('.content'))render()};document.body.appendChild(s);})();
