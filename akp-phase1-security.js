@@ -236,3 +236,6 @@
  }
 
 })();
+
+// Corrections validées lors de la première revue du back-office.
+(function(){const s=document.createElement('script');s.src='./akp-review-fixes.js';document.body.appendChild(s);})();
