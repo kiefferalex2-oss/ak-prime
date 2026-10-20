@@ -86,14 +86,38 @@
      '<div class="alert" style="margin:10px 0"><strong>Renouvellement réel :</strong> un choix client ne vaut pas paiement. '+
      'En l’absence de Stripe, toute finalisation manuelle doit être justifiée par une preuve d’accord et, si nécessaire, d’encaissement. '+
      'Décris ces vérifications dans les notes avant de valider.</div>');
-   const originalSave=save.onclick;
-   save.onclick=function(event){
-     if(notes.value.trim().length<25){
-       alert('Décris dans les notes le consentement du client, les justificatifs vérifiés et le motif de cette finalisation manuelle (25 caractères minimum).');
+   save.onclick=async function(){
+     const decision=document.getElementById('renewDecision').value;
+     const review=document.getElementById('renewReview').checked;
+     const retestsRequired=document.getElementById('renewRetestsRequired').checked;
+     const retestsDone=document.getElementById('renewRetestsDone').checked;
+     const objectives=document.getElementById('renewObjectives').checked;
+     const noteText=notes.value.trim();
+     if(!c.isTest&&noteText.length<25){
+       alert('Décris dans les notes le consentement du client, les justificatifs vérifiés et le motif de la finalisation manuelle (25 caractères minimum).');
        notes.focus();return;
      }
-     if(!confirm('Tu confirmes personnellement que le nouveau contrat peut être activé, même sans paiement Stripe automatique ?'))return;
-     return originalSave?.call(this,event);
+     if(retestsRequired&&!retestsDone&&!confirm('Retests nécessaires mais non réalisés : finaliser malgré tout ?'))return;
+     if(!c.isTest&&!confirm('Tu confirmes personnellement que le contrat peut être renouvelé sans paiement Stripe automatiquement vérifié ?'))return;
+     save.disabled=true;
+     try{
+       const {error}=await supa.rpc('owner_finalize_client_renewal',{
+         p_client_id:c.id,p_due_date:c.end,p_decision:decision,
+         p_cycle_review_done:review,p_retests_required:retestsRequired,p_retests_done:retestsDone,
+         p_objectives_updated:objectives,p_notes:noteText||null,
+         p_manual_exception_confirmed:!c.isTest
+       });
+       if(error)throw Error(error.message);
+       const renewalLabel=decision==='3_months'?'3 mois':decision==='6_months'?'6 mois':
+         decision==='monthly'?'Mensuel':'Arrêt';
+       c.renewal=renewalLabel;
+       try{await saveWorkspace(c)}catch(err){console.warn('Note d’option non synchronisée',err)}
+       closeModal();await loadSupabaseData();render();
+       toast('Renouvellement enregistré et contrat mis à jour ensemble.');
+     }catch(err){
+       alert('Renouvellement non appliqué : '+err.message);
+       save.disabled=false;
+     }
    };
  };
 
