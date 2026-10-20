@@ -26,3 +26,34 @@ document.addEventListener('click', async function(event) {
  };
  picker.click();
 },true);
+
+
+// AK PRIME — Mot de passe oublié dans la fenêtre de connexion.
+(function(){
+ const originalLogin=openPublicLogin;
+ openPublicLogin=function(...args){
+  originalLogin(...args);
+  const password=document.getElementById('authPassword');
+  if(!password||document.getElementById('forgotPassword'))return;
+  const link=document.createElement('button');
+  link.type='button';link.id='forgotPassword';link.className='link';
+  link.textContent='Mot de passe oublié ?';
+  link.style.cssText='display:block;margin:8px 0 14px;padding:0;text-align:left';
+  password.closest('.field')?.after(link);
+  link.addEventListener('click',async()=>{
+   const email=document.getElementById('authEmail')?.value.trim()||'';
+   if(!email||!document.getElementById('authEmail').checkValidity()){
+    setAuthMsg('Renseigne d’abord ton adresse e-mail valide.',true);return;
+   }
+   link.disabled=true;
+   try{
+    const {error}=await supa.auth.resetPasswordForEmail(email,{
+     redirectTo:'https://ak-prime.pages.dev/reinitialiser-mot-de-passe.html'
+    });
+    if(error)throw error;
+    setAuthMsg('Si cette adresse correspond à un compte AK PRIME, tu recevras un e-mail pour définir un nouveau mot de passe.',false);
+   }catch(err){setAuthMsg('Envoi impossible : '+err.message,true)}
+   finally{link.disabled=false}
+  });
+ };
+})();
