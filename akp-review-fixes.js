@@ -74,6 +74,38 @@
      ahead+' résultat(s) daté(s) dans le futur.</strong> Ils restent dans les enregistrements, mais sont exclus des statistiques d’évolution actuelles.</div>'+html;
    return html;
  };
+
+ const originalRenewalModal=openRenewalModal;
+ openRenewalModal=function(c){
+   originalRenewalModal(c);
+   if(!c||c.isTest)return;
+   const notes=document.getElementById('renewNotes');
+   const save=document.getElementById('saveM');
+   if(!notes||!save)return;
+   notes.insertAdjacentHTML('beforebegin',
+     '<div class="alert" style="margin:10px 0"><strong>Renouvellement réel :</strong> un choix client ne vaut pas paiement. '+
+     'En l’absence de Stripe, toute finalisation manuelle doit être justifiée par une preuve d’accord et, si nécessaire, d’encaissement. '+
+     'Décris ces vérifications dans les notes avant de valider.</div>');
+   const originalSave=save.onclick;
+   save.onclick=function(event){
+     if(notes.value.trim().length<25){
+       alert('Décris dans les notes le consentement du client, les justificatifs vérifiés et le motif de cette finalisation manuelle (25 caractères minimum).');
+       notes.focus();return;
+     }
+     if(!confirm('Tu confirmes personnellement que le nouveau contrat peut être activé, même sans paiement Stripe automatique ?'))return;
+     return originalSave?.call(this,event);
+   };
+ };
+
+ const originalAdmin=admin;
+ admin=function(c){
+   let html=originalAdmin(c);
+   const hasRecordedPayment=(db.paymentTransactions||[]).some(p=>p.client_id===c.id&&p.status==='paid');
+   if(!c.isTest&&!hasRecordedPayment&&String(c.payment||'').toLowerCase()==='à jour'){
+     html='<div class="alert" style="margin-bottom:13px"><strong>Statut de paiement non vérifié :</strong> le dossier indique « À jour », mais aucune transaction confirmée n’est associée à ce client dans AK PRIME. Cette information ne prouve pas un règlement réel.</div>'+html;
+   }
+   return html;
+ };
  const originalAccountBlock=clientAccountBlock;
  clientAccountBlock=function(c){
    let html=originalAccountBlock(c);
