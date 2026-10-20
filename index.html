@@ -1992,16 +1992,22 @@ function settingsPage(){
 let contractEvidence=[];
 let contractEvidenceError='';
 function contractsPage(){
- if(authProfile?.role!=='owner')return '<div class="alert">Accès réservé à l’administrateur.</div>';
- const rows=contractEvidence.map(o=>'<tr><td>'+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+esc(o.status||'—')+'</td><td><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">Télécharger JSON</button></td></tr>').join('');
- return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Acceptations horodatées, conditions retenues et dossiers téléchargeables. Accès propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
+ if(authProfile?.role!=='owner')return '<div class="alert">Accès réservé au propriétaire.</div>';
+ const rows=contractEvidence.map(o=>{
+  const archived=!o.contract_snapshot&&!!o.evidence_checksum;
+  return '<tr><td>'+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+ (archived?'<span class="status blue">Archivée hors site</span>':'<span class="status green">Preuve disponible</span>')+'<div class="muted tiny">'+esc(o.status||'')+'</div></td><td style="min-width:185px">'+(archived?'<div class="muted tiny">Réimportez votre JSON pour retrouver la copie complète.</div>':'<div class="row" style="flex-wrap:wrap;gap:5px"><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">JSON</button><button class="btn ghost small printContractEvidence" data-id="'+esc(o.id)+'">PDF</button><button class="btn ghost small archiveContractEvidence" data-id="'+esc(o.id)+'">Archiver</button></div>')+'</td></tr>';
+ }).join('');
+ return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Archives téléchargeables, copie Supabase facultative et réimport sécurisé. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
  (contractEvidenceError?'<div class="alert red">'+esc(contractEvidenceError)+'</div>':'')+
- '<div class="card panel"><div class="row between"><div><h3>Dossiers enregistrés : '+contractEvidence.length+'</h3><div class="muted tiny">Une demande préparée n’équivaut pas à un paiement confirmé. Les fichiers JSON conservent toutes les données de preuve.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Télécharger tout (JSON)</button></div>'+
- '<div style="overflow-x:auto;margin-top:15px"><table class="table"><thead><tr><th>Client</th><th>Offre</th><th>Total</th><th>CGV acceptées</th><th>Statut</th><th>Export</th></tr></thead><tbody>'+ (rows||'<tr><td colspan="6" class="muted">Aucune acceptation enregistrée pour le moment.</td></tr>')+'</tbody></table></div></div>';
+ '<div class="card panel"><div class="row between"><div><h3>'+contractEvidence.length+' dossier(s)</h3><div class="muted tiny">Supabase conserve l’index de preuve après archivage. L’archive locale doit être sauvegardée dans deux emplacements privés.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Exporter les preuves disponibles (JSON)</button></div>'+
+ '<div class="row" style="flex-wrap:wrap;gap:10px;margin-top:12px"><label class="btn ghost" for="importContractEvidence" style="cursor:pointer">Réimporter un JSON individuel</label><input type="file" accept=".json,application/json" id="importContractEvidence" style="display:none"></div>'+
+ '<div style="overflow-x:auto;margin-top:15px"><table class="table"><thead><tr><th>Client</th><th>Offre</th><th>Total</th><th>CGV acceptées</th><th>Stockage</th><th>Actions</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="muted">Aucun dossier enregistré.</td></tr>')+'</tbody></table></div>'+
+ '<div class="alert" style="margin-top:12px"><strong>Important :</strong> archiver retire uniquement le document contractuel complet de Supabase ; les informations indispensables au suivi de commande restent conservées. Le bouton PDF ouvre l’impression du navigateur : choisissez « Enregistrer en PDF ». Le PDF sert à la lecture ; <strong>conservez impérativement le fichier JSON</strong> pour le réimport et la vérification.</div></div>';
 }
 function downloadContractJSON(data,filename){
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
- const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function loadContractEvidence(){
  if(authProfile?.role!=='owner')return;
@@ -2009,13 +2015,47 @@ async function loadContractEvidence(){
  contractEvidenceError=error?error.message:'';
  contractEvidence=error?[]:(Array.isArray(data)?data:[]);
 }
+function printContractEvidence(o){
+ const p=window.open('','_blank');
+ if(!p){alert('Autorisez les fenêtres contextuelles pour enregistrer le PDF.');return;}
+ const field=(k,v)=>'<tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">'+esc(k)+'</th><td style="padding:7px;border-bottom:1px solid #ddd">'+esc(String(v??'—'))+'</td></tr>';
+ const rows=[['Référence',o.id],['Client',o.full_name],['E-mail',o.email],['Offre',o.offer_code],['Engagement',o.commitment_months+' mois'],['Règlement',o.payment_mode],['Total',euro(Number(o.total_cents)/100)],['Version des CGV',o.cgv_version],['Acceptation',o.cgv_accepted_at],['Démarrage anticipé',o.early_start_requested?'Oui':'Non'],['Demande anticipée le',o.early_start_requested_at],['Consentement santé',o.health_consent?'Oui':'Non'],['Version confidentialité',o.privacy_version],['Statut',o.status]].map(x=>field(...x)).join('');
+ p.document.write('<!doctype html><html lang="fr"><meta charset="utf-8"><title>AK PRIME — Preuve '+esc(o.id)+'</title><style>body{font-family:Arial,sans-serif;padding:35px;color:#19283c}h1{font-size:24px}table{width:100%;border-collapse:collapse}small{color:#667085}</style><h1>AK PRIME — Récapitulatif de preuve contractuelle</h1><small>Document de lecture. Conservez aussi le JSON original pour le contrôle et le réimport.</small><table>'+rows+'</table><p><small>Document généré pour archivage privé, sans certification de signature électronique.</small></p></html>');
+ p.document.close();p.focus();setTimeout(()=>p.print(),400);
+}
 function bindContractEvidence(){
  document.getElementById('refreshContractEvidence')?.addEventListener('click',async()=>{await loadContractEvidence();render()});
- document.getElementById('downloadAllContractEvidence')?.addEventListener('click',()=>downloadContractJSON({exported_at:new Date().toISOString(),records:contractEvidence},'ak-prime-preuves-contractuelles.json'));
+ document.getElementById('downloadAllContractEvidence')?.addEventListener('click',()=>{
+  downloadContractJSON({exported_at:new Date().toISOString(),records:contractEvidence.filter(o=>o.contract_snapshot)},'ak-prime-preuves-completes.json');
+ });
  document.querySelectorAll('.exportContractEvidence').forEach(b=>b.addEventListener('click',()=>{
   const record=contractEvidence.find(x=>x.id===b.dataset.id);
-  if(record)downloadContractJSON(record,'ak-prime-preuve-'+record.id+'.json');
+  if(record?.contract_snapshot)downloadContractJSON(record,'ak-prime-preuve-'+record.id+'.json');
  }));
+ document.querySelectorAll('.printContractEvidence').forEach(b=>b.addEventListener('click',()=>{const o=contractEvidence.find(x=>x.id===b.dataset.id);if(o?.contract_snapshot)printContractEvidence(o)}));
+ document.querySelectorAll('.archiveContractEvidence').forEach(b=>b.addEventListener('click',async()=>{
+  const o=contractEvidence.find(x=>x.id===b.dataset.id);
+  if(!o?.contract_snapshot)return;
+  const answer=prompt('Avant de retirer la copie intégrale du serveur, téléchargez le JSON du dossier et sauvegardez-le sur deux supports privés. Le serveur ne pourra PAS le recréer si vous perdez le fichier. Pour confirmer, saisissez ARCHIVER :');
+  if(answer!=='ARCHIVER')return;
+  b.disabled=true;
+  const {error}=await supa.rpc('owner_archive_contract_evidence',{p_order_id:o.id});
+  if(error)alert('Archivage refusé : '+error.message);
+  await loadContractEvidence();render();
+ }));
+ document.getElementById('importContractEvidence')?.addEventListener('change',async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  if(file.size>2_000_000){alert('Fichier trop volumineux.');return;}
+  try{
+   const parsed=JSON.parse(await file.text());
+   if(!parsed?.id||!parsed?.contract_snapshot||Array.isArray(parsed))throw Error('Choisissez un export JSON individuel complet.');
+   if(!confirm('Réimporter la preuve '+parsed.id+' dans Supabase ? Le serveur vérifiera son empreinte.'))return;
+   const {error}=await supa.rpc('owner_restore_contract_evidence',{p_order_id:parsed.id,p_snapshot:parsed.contract_snapshot});
+   if(error)throw Error(error.message);
+   await loadContractEvidence();render();alert('Archive restaurée et vérifiée.');
+  }catch(err){alert('Import refusé : '+err.message)}
+  e.target.value='';
+ });
 }
 function render(){
  const root=document.getElementById('root');
