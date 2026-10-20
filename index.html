@@ -3285,12 +3285,12 @@ function openPublicOfferCheckout(button){
     '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
     '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" value="'+esc(draft.fullName||'')+'" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" value="'+esc(draft.email||'')+'" placeholder="nom@exemple.fr"></div></div>'+
     '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
-      '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> Je reconnais avoir pris connaissance des conditions générales de vente, de la politique de confidentialité et des informations sur le droit de rétractation disponibles sur le site.</span></label>'+
+      '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> J’accepte les conditions générales de vente, dont l’engagement ferme de 3 ou 6 mois choisi ci-dessus, les modalités de paiement et les règles de résiliation anticipée. J’ai pris connaissance de la politique de confidentialité et du droit de rétractation.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
-    '</div><div class="checkout-consent-note">Ces choix sont préparés dans le tunnel mais ne sont pas encore enregistrés : aucun paiement réel n’est actif sur cette version.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
+    '</div><div class="checkout-consent-note">La preuve sera enregistrée côté serveur pour un client connecté. Aucun paiement n’est effectué à cette étape. Le démarrage avant 14 jours reste facultatif.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
     '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
-    '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Continuer vers le paiement</button>');
+    '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Enregistrer ma demande (sans paiement)</button>');
    const captureDraft=()=>{
      draft.fullName=document.getElementById('checkoutFullName')?.value?.trim()||'';
      draft.email=document.getElementById('checkoutEmail')?.value?.trim()||'';
@@ -3301,7 +3301,7 @@ function openPublicOfferCheckout(button){
      publicCheckoutDraft=draft;
    };
    document.getElementById('backPublicCheckout').onclick=()=>{captureDraft();openPublicOfferCheckout(button)};
-   document.getElementById('futureStripeCheckout').onclick=()=>{
+   document.getElementById('futureStripeCheckout').onclick=async()=>{
      const fullName=document.getElementById('checkoutFullName').value.trim();
      const emailEl=document.getElementById('checkoutEmail'),email=emailEl.value.trim();
      const acceptedCgv=document.getElementById('checkoutAcceptCgv').checked;
@@ -3315,18 +3315,37 @@ function openPublicOfferCheckout(button){
      if(!email||!emailEl.checkValidity())errors.push('Indique une adresse e-mail valide.');
      if(!acceptedCgv)errors.push('Confirme la prise de connaissance des documents contractuels.');
      if(!healthConsent)errors.push('Le consentement explicite au traitement des données sensibles est nécessaire pour préparer un accompagnement individualisé.');
-     if(!earlyStart)errors.push('Confirme ta demande de démarrage avant la fin du délai de 14 jours pour poursuivre ce parcours.');
      if(errors.length){
        errorBox.innerHTML='<strong>Il reste '+errors.length+' point'+(errors.length>1?'s':'')+' à compléter :</strong><br>• '+errors.map(esc).join('<br>• ');
        errorBox.classList.add('show');
        return;
      }
      errorBox.classList.remove('show');
-     modal('Paiement bientôt disponible',
-      '<div class="alert blue"><strong>Le tunnel AK PRIME est prêt jusqu’à Stripe.</strong><div class="tiny" style="margin-top:5px">L’identité, le choix d’offre et les consentements sont maintenant collectés avant l’étape de paiement. Ils seront persistés et vérifiés côté serveur lors du branchement Stripe.</div></div>'+
-      '<div class="checkout-recap"><div><span>Client</span><strong>'+esc(fullName)+'</strong></div><div><span>E-mail</span><strong>'+esc(email)+'</strong></div><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div></div>',
-      '<button class="btn primary" id="closeCheckoutInfo">Compris</button>');
-     document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+     const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Enregistrement sécurisé…';
+     try {
+       const {data:{session}}=await supa.auth.getSession();
+       if(!session?.user)throw Error('Connectez-vous d’abord à votre compte AK PRIME pour associer la preuve à votre identité');
+       if(email.toLowerCase()!==String(session.user.email||'').toLowerCase())throw Error('Utilisez l’adresse e-mail de votre compte connecté');
+       if(p.source!=='server'||!p.offerCode)throw Error('Le tarif sécurisé est momentanément indisponible');
+       const {data:result,error:saveError}=await supa.functions.invoke('prepare-checkout-order',{body:{
+         offerCode:p.offerCode,duration,paymentMode,fullName,acceptedCgv:true,
+         healthConsent,earlyStart,cgvVersion:'akprime-cgv-2026-10-20-firm-commitment',
+         privacyVersion:'akprime-privacy-2026-10-20'
+       }});
+       if(saveError||!result?.order?.id)throw Error(result?.error||saveError?.message||'Enregistrement indisponible');
+       const order=result.order;
+       modal('Demande enregistrée — aucun paiement',
+         '<div class="alert green"><strong>Votre acceptation contractuelle a été enregistrée.</strong><div class="tiny" style="margin-top:5px">Référence : '+esc(order.id)+'. Cette opération prépare la commande mais n’active pas votre accompagnement.</div></div>'+
+         '<div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Montant total</span><strong>'+euro(Number(order.total_cents)/100)+'</strong></div><div><span>Paiement</span><strong>Non effectué</strong></div></div>'+
+         '<p class="muted tiny" style="margin-top:12px">La confirmation définitive et le paiement seront disponibles après activation du tunnel sécurisé.</p>',
+         '<button class="btn primary" id="closeCheckoutInfo">Fermer</button>');
+       document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+     }catch(err){
+       errorBox.textContent='Enregistrement impossible : '+(err?.message||'Erreur inattendue')+'. Aucun paiement effectué.';
+       errorBox.classList.add('show');
+     }finally{
+       const active=document.getElementById('futureStripeCheckout');if(active){active.disabled=false;active.textContent='Enregistrer ma demande (sans paiement)';}
+     }
    };
  };
 }
