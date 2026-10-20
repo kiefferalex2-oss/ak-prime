@@ -59,4 +59,4 @@ document.addEventListener('click', async function(event) {
 })();
 
 // Charger le module de protection du back-office.
-(function(){const s=document.createElement('script');s.src='./akp-phase1-security.js';document.body.appendChild(s);})();
+(function(){const s=document.createElement('script');s.src='./akp-phase1-security.js';s.onload=()=>{if(document.querySelector('.content')&&authUser&&['owner','coach'].includes(authProfile?.role)){loadSupabaseData().then(()=>render()).catch(e=>console.error('Phase 1 : synchronisation impossible',e));}};document.body.appendChild(s);})();
