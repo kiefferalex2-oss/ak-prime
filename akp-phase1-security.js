@@ -32,8 +32,8 @@
      '<div class="grid2">'+
        '<div class="card panel"><h3>Créer une sauvegarde chiffrée</h3><p class="muted">Exporte les tables métier Supabase. Le fichier est chiffré AES-GCM avant téléchargement avec une phrase secrète que tu choisis.</p>'+
        '<button class="btn primary" id="exportOwnerEncrypted">Télécharger la sauvegarde chiffrée</button></div>'+
-       '<div class="card panel"><h3>Vérifier une sauvegarde</h3><p class="muted">Déchiffre et contrôle localement un fichier, sans rien modifier dans Supabase.</p>'+
-       '<button class="btn ghost" id="verifyOwnerEncrypted">Vérifier un fichier</button><input type="file" accept=".json,application/json" id="verifyOwnerInput" style="display:none"></div>'+
+       '<div class="card panel"><h3>Consulter une sauvegarde</h3><p class="muted">Ouvre le fichier chiffré avec ta phrase secrète, puis parcours les dossiers sauvegardés en lecture seule, sans toucher à Supabase.</p>'+
+       '<button class="btn ghost" id="verifyOwnerEncrypted">Ouvrir / vérifier un fichier</button><input type="file" accept=".json,application/json" id="verifyOwnerInput" style="display:none"></div>'+
      '</div><div class="alert" style="margin-top:13px"><strong>Portée et limites :</strong> cet export contient des données personnelles et potentiellement des données de santé ; le fichier doit rester privé. Il ne contient ni les mots de passe Supabase Auth, ni les fichiers Storage, ni la configuration du projet. La restauration automatique est volontairement désactivée : une restauration doit d’abord être préparée et testée sans écraser les données en production. Perdre la phrase secrète rend le fichier inutilisable.</div>';
  };
  const oldRender=render;
@@ -95,7 +95,7 @@
      document.getElementById('exportOwnerEncrypted')?.addEventListener('click',encryptedExport);
      const input=document.getElementById('verifyOwnerInput');
      document.getElementById('verifyOwnerEncrypted')?.addEventListener('click',()=>input?.click());
-     if(input)input.onchange=()=>verifyLocalBackup(input.files?.[0]);
+     if(input)input.onchange=()=>{const file=input.files?.[0];input.value='';verifyLocalBackup(file)};
    }
  }
  function filterRows(){
@@ -148,18 +148,91 @@
    }catch(e){feedback('Échec de sauvegarde : '+e.message)}
    finally{if(button)button.disabled=false}
  }
+
+ function readableTableLabel(name){
+   const labels={
+     clients:'Dossiers clients',profiles:'Profils des comptes',tests:'Résultats des tests',
+     checkins:'Bilans hebdomadaires',cycles:'Cycles',passport_events:'Jalons du Passeport',
+     appointments:'Rendez-vous',invoices:'Factures',revenue_entries:'Livre des recettes',
+     payment_transactions:'Transactions',renewals:'Renouvellements',renewal_choices:'Choix de renouvellement',
+     client_workspace:'Notes coach',questionnaire_responses:'Réponses questionnaires',
+     checkout_orders:'Demandes et preuves contractuelles',client_change_audit:'Historique des changements'
+   };
+   return labels[name]||name.replaceAll('_',' ');
+ }
+ function rowDisplayName(row,i){
+   if(!row||typeof row!=='object')return 'Enregistrement '+(i+1);
+   const p=[row.first_name,row.last_name].filter(Boolean).join(' ').trim();
+   const main=p||row.full_name||row.customer_name||row.invoice_number||
+      row.test_name||row.title||row.description||row.email||row.notification_key;
+   const raw=String(main||('Enregistrement '+(i+1)));
+   return raw.length>90?raw.slice(0,90)+'…':raw;
+ }
+ function openBackupViewer(data){
+   if(authProfile?.role!=='owner')return feedback('Accès réservé au propriétaire.');
+   const tables=data.tables||{};
+   const names=Object.keys(tables).filter(name=>Array.isArray(tables[name]))
+     .sort((a,b)=>readableTableLabel(a).localeCompare(readableTableLabel(b),'fr'));
+   const count=names.reduce((n,t)=>n+tables[t].length,0);
+   const date=new Date(data.exported_at);
+   const dateText=Number.isFinite(date.getTime())?date.toLocaleString('fr-FR'):'date inconnue';
+   const options=names.map(n=>'<option value="'+esc(n)+'">'+
+     esc(readableTableLabel(n))+' ('+tables[n].length+')</option>').join('');
+   modal('Sauvegarde AK PRIME — lecture seule',
+     '<div class="alert green"><strong>Fichier vérifié et déchiffré.</strong><div class="tiny" style="margin-top:4px">'+
+     esc(dateText)+' • '+names.length+' catégories • '+count+' enregistrements</div></div>'+
+     '<div class="alert" style="margin:10px 0">Ces informations sont affichées uniquement dans ton navigateur. Aucune donnée n’est restaurée dans Supabase. Ferme cette fenêtre après consultation, surtout sur un ordinateur partagé.</div>'+
+     '<div class="grid2" style="margin:12px 0">'+
+     '<div class="field"><label>Catégorie</label><select class="select" id="backupViewTable">'+options+'</select></div>'+
+     '<div class="field"><label>Rechercher dans cette catégorie</label><input class="input" id="backupViewSearch" maxlength="100" placeholder="Nom, date, référence…"></div></div>'+
+     '<div id="backupViewList" class="list" style="max-height:440px;overflow:auto"></div>',
+     '<button class="btn primary" id="backupViewClose">Fermer</button>');
+   document.getElementById('backupViewClose').onclick=closeModal;
+   const selector=document.getElementById('backupViewTable');
+   const search=document.getElementById('backupViewSearch');
+   const list=document.getElementById('backupViewList');
+   if(names.includes('clients'))selector.value='clients';
+   function refresh(){
+     const name=selector.value;
+     const all=Array.isArray(tables[name])?tables[name]:[];
+     const q=search.value.trim().toLocaleLowerCase('fr');
+     const found=q?all.map((row,i)=>({row,i})).filter(x=>JSON.stringify(x.row).toLocaleLowerCase('fr').includes(q)):all.map((row,i)=>({row,i}));
+     const visible=found.slice(0,25);
+     list.innerHTML='<div class="muted tiny">'+found.length+' résultat(s) • '+Math.min(found.length,25)+' affiché(s)'+
+       (found.length>25?' — affine la recherche pour voir les suivants':'')+'</div>'+
+       (visible.length?visible.map(({row,i})=>{
+         const raw=JSON.stringify(row,null,2);
+         const pretty=raw.length>15000?raw.slice(0,15000)+'\\n… contenu tronqué à l’affichage':raw;
+         return '<details class="item" style="margin-top:8px"><summary style="cursor:pointer"><strong>'+
+            esc(rowDisplayName(row,i))+'</strong><span class="muted tiny" style="margin-left:10px">'+
+            esc(String(row?.issue_date||row?.performed_at||row?.week_date||row?.created_at||''))+
+            '</span></summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:260px;overflow:auto;margin-top:10px">'+
+            esc(pretty)+'</pre></details>';
+       }).join(''):'<div class="muted">Aucun enregistrement.</div>');
+   }
+   selector.onchange=()=>{search.value='';refresh()};
+   search.oninput=refresh;
+   refresh();
+ }
  async function verifyLocalBackup(file){
    if(!file)return;
+   if(authProfile?.role!=='owner')return feedback('Accès réservé au propriétaire.');
    try{
+     if(file.size>30000000)throw Error('Fichier trop volumineux pour le lecteur local.');
      const payload=JSON.parse(await file.text());
-     if(payload.format!=='akprime-encrypted-backup'||payload.version!==1||payload.cipher!=='AES-256-GCM'||payload.kdf!=='PBKDF2-SHA256'||payload.iterations!==310000)throw Error('Format ou version non pris en charge.');
+     if(payload.format!=='akprime-encrypted-backup'||payload.version!==1||
+       payload.cipher!=='AES-256-GCM'||payload.kdf!=='PBKDF2-SHA256'||
+       payload.iterations!==310000)throw Error('Format ou version non pris en charge.');
      const pass=prompt('Phrase secrète du fichier de sauvegarde :');if(pass===null)return;
      const key=await deriveKey(pass,base64ToBytes(payload.salt));
-     const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(payload.iv)},key,base64ToBytes(payload.ciphertext));
+     const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(payload.iv)},
+       key,base64ToBytes(payload.ciphertext));
      const data=JSON.parse(new TextDecoder().decode(clear));
-     if(data.product!=='AK PRIME'||data.schema_version!==1||!data.tables)throw Error('Format interne invalide.');
-     const count=Object.keys(data.tables).length;
-     feedback('Fichier vérifié avec succès : '+count+' tables, sauvegarde du '+new Date(data.exported_at).toLocaleString('fr-FR')+'. Aucune donnée modifiée.');
-   }catch(e){feedback('Vérification impossible : mot de passe incorrect, fichier endommagé ou format inconnu. '+e.message)}
+     if(data.product!=='AK PRIME'||data.schema_version!==1||
+       !data.tables||typeof data.tables!=='object'||Array.isArray(data.tables))
+       throw Error('Format interne invalide.');
+     openBackupViewer(data);
+   }catch(e){feedback('Impossible d’ouvrir la sauvegarde : phrase secrète incorrecte, fichier endommagé ou format non reconnu. '+e.message)}
  }
+
 })();
