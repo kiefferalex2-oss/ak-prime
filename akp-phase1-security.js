@@ -168,6 +168,60 @@
    const raw=String(main||('Enregistrement '+(i+1)));
    return raw.length>90?raw.slice(0,90)+'…':raw;
  }
+
+ function backupRowKey(table,row){
+   if(!row||typeof row!=='object')return null;
+   if(row.id!==null&&row.id!==undefined)return 'id:'+String(row.id);
+   if(table==='client_workspace'&&row.client_id)return 'client:'+String(row.client_id);
+   if(table==='notification_reads'&&row.user_id&&row.notification_key)
+     return 'notice:'+row.user_id+':'+row.notification_key;
+   return null;
+ }
+ async function compareBackupReadOnly(saved,button,view){
+   if(authProfile?.role!=='owner')return feedback('Accès réservé au propriétaire.');
+   if(!button||!view)return;
+   button.disabled=true;button.textContent='Comparaison en cours…';
+   try{
+     const {data:live,error}=await supa.rpc('owner_export_backup');
+     if(error)throw Error(error.message);
+     if(!live?.tables||live.schema_version!==saved.schema_version)
+       throw Error('Structure des données différente : comparaison indisponible.');
+     let missingTotal=0,changedTotal=0,newTotal=0;
+     const rows=[];
+     for(const [name,stored] of Object.entries(saved.tables||{})){
+       if(!Array.isArray(stored))continue;
+       const current=live.tables[name];
+       if(!Array.isArray(current)){
+         rows.push('<tr><td>'+esc(readableTableLabel(name))+'</td><td>'+stored.length+
+          '</td><td colspan="3">Table absente du nouvel export : à examiner</td></tr>');
+         continue;
+       }
+       const oldKeys=new Map(stored.map(x=>[backupRowKey(name,x),x]).filter(x=>x[0]!==null));
+       const liveKeys=new Map(current.map(x=>[backupRowKey(name,x),x]).filter(x=>x[0]!==null));
+       if(!oldKeys.size&&!liveKeys.size){
+         rows.push('<tr><td>'+esc(readableTableLabel(name))+'</td><td>'+stored.length+
+         '</td><td colspan="3">Comparaison par nombre uniquement : '+current.length+' actuellement</td></tr>');
+         continue;
+       }
+       const missing=[...oldKeys.keys()].filter(k=>!liveKeys.has(k)).length;
+       const modified=[...oldKeys.entries()].filter(([k,v])=>
+         liveKeys.has(k)&&JSON.stringify(liveKeys.get(k))!==JSON.stringify(v)).length;
+       const extra=[...liveKeys.keys()].filter(k=>!oldKeys.has(k)).length;
+       missingTotal+=missing;changedTotal+=modified;newTotal+=extra;
+       rows.push('<tr><td>'+esc(readableTableLabel(name))+'</td><td>'+stored.length+
+          '</td><td>'+missing+'</td><td>'+modified+'</td><td>'+extra+'</td></tr>');
+     }
+     view.innerHTML='<div class="card panel"><h3>Simulation de récupération — aucune modification</h3>'+
+       '<div class="muted tiny">La comparaison porte sur les identifiants et les contenus stockés, lorsque les tables disposent d’une clé reconnue. Des différences peuvent simplement correspondre à des ajouts ou mises à jour normaux depuis la sauvegarde.</div>'+
+       '<div class="row" style="flex-wrap:wrap;margin:9px 0;gap:12px"><strong>Absents : '+missingTotal+
+       '</strong><strong>Modifiés : '+changedTotal+'</strong><strong>Plus récents dans Supabase : '+
+       newTotal+'</strong></div>'+
+       '<div style="overflow:auto;max-height:240px"><table><thead><tr><th>Catégorie</th><th>Sauvegardés</th><th>Absents</th><th>Modifiés</th><th>Nouveaux</th></tr></thead><tbody>'+
+       rows.join('')+'</tbody></table></div>'+
+       '<div class="alert" style="margin-top:10px">Ce diagnostic n’est pas une restauration. Aucune ligne n’a été ajoutée, modifiée ni supprimée. Les comptes Auth et fichiers externes ne sont pas comparés.</div></div>';
+   }catch(err){view.textContent='Comparaison impossible : '+err.message}
+   finally{button.disabled=false;button.textContent='Comparer de nouveau avec Supabase'}
+ }
  function openBackupViewer(data){
    if(authProfile?.role!=='owner')return feedback('Accès réservé au propriétaire.');
    const tables=data.tables||{};
@@ -185,9 +239,14 @@
      '<div class="grid2" style="margin:12px 0">'+
      '<div class="field"><label>Catégorie</label><select class="select" id="backupViewTable">'+options+'</select></div>'+
      '<div class="field"><label>Rechercher dans cette catégorie</label><input class="input" id="backupViewSearch" maxlength="100" placeholder="Nom, date, référence…"></div></div>'+
-     '<div id="backupViewList" class="list" style="max-height:440px;overflow:auto"></div>',
+     '<div id="backupViewList" class="list" style="max-height:440px;overflow:auto"></div>'+
+     '<div id="backupCompareResult" style="margin-top:12px"></div>',
+     '<button class="btn ghost" id="backupCompareLive">Comparer avec Supabase (lecture seule)</button>'+
      '<button class="btn primary" id="backupViewClose">Fermer</button>');
    document.getElementById('backupViewClose').onclick=closeModal;
+   document.getElementById('backupCompareLive').onclick=()=>compareBackupReadOnly(
+     data,document.getElementById('backupCompareLive'),document.getElementById('backupCompareResult'));
+
    const selector=document.getElementById('backupViewTable');
    const search=document.getElementById('backupViewSearch');
    const list=document.getElementById('backupViewList');
