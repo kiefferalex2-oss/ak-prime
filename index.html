@@ -1179,16 +1179,16 @@ function shell(inner){
  '<aside class="sidebar"><div class="brand"><div class="brand-mark">AK</div><div><strong>AK PRIME</strong><span>COACH CONSOLE</span></div></div>'+
  '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('billing','Facturation')+navBtn('calendar','Calendrier')+
- '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+navBtn('settings','Paramètres')+
+ '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+(authProfile?.role==='owner'?navBtn('contracts','Preuves contractuelles'):'')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
  '<main><div class="topbar"><div class="topbar-title"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){
- const icons={dashboard:'⌂',clients:'◎',billing:'€',calendar:'◷',backup:'⇩',settings:'⚙'};
+ const icons={dashboard:'⌂',clients:'◎',billing:'€',calendar:'◷',backup:'⇩',contracts:'▤',settings:'⚙'};
  return '<button class="'+(state.view===v?'on':'')+'" data-nav="'+v+'"><span class="nav-ico">'+esc(icons[v]||'•')+'</span><span class="nav-label">'+esc(label)+'</span></button>';
 }
-function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',billing:'Facturation',calendar:'Calendrier',backup:'Sauvegardes',settings:'Paramètres'};return map[state.view]||'Back-office'}
+function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',billing:'Facturation',calendar:'Calendrier',backup:'Sauvegardes',contracts:'Preuves contractuelles',settings:'Paramètres'};return map[state.view]||'Back-office'}
 
 function dashboard(){
  const acts=activeClients();
@@ -1989,16 +1989,45 @@ function settingsPage(){
  billingSettingsPanel();
 }
 
+let contractEvidence=[];
+let contractEvidenceError='';
+function contractsPage(){
+ if(authProfile?.role!=='owner')return '<div class="alert">Accès réservé à l’administrateur.</div>';
+ const rows=contractEvidence.map(o=>'<tr><td>'+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+esc(o.status||'—')+'</td><td><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">Télécharger JSON</button></td></tr>').join('');
+ return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Acceptations horodatées, conditions retenues et dossiers téléchargeables. Accès propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
+ (contractEvidenceError?'<div class="alert red">'+esc(contractEvidenceError)+'</div>':'')+
+ '<div class="card panel"><div class="row between"><div><h3>Dossiers enregistrés : '+contractEvidence.length+'</h3><div class="muted tiny">Une demande préparée n’équivaut pas à un paiement confirmé. Les fichiers JSON conservent toutes les données de preuve.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Télécharger tout (JSON)</button></div>'+
+ '<div style="overflow-x:auto;margin-top:15px"><table class="table"><thead><tr><th>Client</th><th>Offre</th><th>Total</th><th>CGV acceptées</th><th>Statut</th><th>Export</th></tr></thead><tbody>'+ (rows||'<tr><td colspan="6" class="muted">Aucune acceptation enregistrée pour le moment.</td></tr>')+'</tbody></table></div></div>';
+}
+function downloadContractJSON(data,filename){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function loadContractEvidence(){
+ if(authProfile?.role!=='owner')return;
+ const {data,error}=await supa.rpc('owner_contract_evidence');
+ contractEvidenceError=error?error.message:'';
+ contractEvidence=error?[]:(Array.isArray(data)?data:[]);
+}
+function bindContractEvidence(){
+ document.getElementById('refreshContractEvidence')?.addEventListener('click',async()=>{await loadContractEvidence();render()});
+ document.getElementById('downloadAllContractEvidence')?.addEventListener('click',()=>downloadContractJSON({exported_at:new Date().toISOString(),records:contractEvidence},'ak-prime-preuves-contractuelles.json'));
+ document.querySelectorAll('.exportContractEvidence').forEach(b=>b.addEventListener('click',()=>{
+  const record=contractEvidence.find(x=>x.id===b.dataset.id);
+  if(record)downloadContractJSON(record,'ak-prime-preuve-'+record.id+'.json');
+ }));
+}
 function render(){
  const root=document.getElementById('root');
- const pages={dashboard,clients:clientsPage,client:clientPage,billing:billingPage,calendar:calendarPage,backup:backupPage,settings:settingsPage};
+ const pages={dashboard,clients:clientsPage,client:clientPage,billing:billingPage,calendar:calendarPage,backup:backupPage,contracts:contractsPage,settings:settingsPage};
  root.innerHTML=shell((pages[state.view]||dashboard)());
  bind();
 }
 function bind(){
  bindNotificationBells();
  bindPassportBook();
- document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}render()});
+ bindContractEvidence();
+ document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}if(state.view==='contracts')await loadContractEvidence();render()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
