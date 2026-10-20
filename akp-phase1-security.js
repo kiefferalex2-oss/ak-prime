@@ -19,9 +19,9 @@
      const flags=new Map((clients.data||[]).map(x=>[x.id,!!x.is_test]));
      for(const c of db.clients||[])c.isTest=flags.get(c.id)||false;
    }
-   if(!settings.error&&settings.data?.optitrainer_base_url){
+   if(!settings.error){
      db.settings=db.settings||{};
-     db.settings.optitrainerBase=settings.data.optitrainer_base_url;
+     db.settings.optitrainerBase=settings.data?.optitrainer_base_url||'';
    }
    return result;
  };
