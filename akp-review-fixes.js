@@ -83,6 +83,30 @@
    }
    return html;
  };
+
+ const oldBillingReady=billingReady;
+ billingReady=function(){
+   const b=db.billingSettings||{};
+   const siren=String(b.siren||'').replace(/\s/g,'');
+   const siret=String(b.siret||'').replace(/\s/g,'');
+   if(!/^\d{9}$/.test(siren)||!/^\d{14}$/.test(siret)||siret.slice(0,9)!==siren)return false;
+   if(!String(b.legal_name||'').trim()||!String(b.legal_address||'').trim())return false;
+   return oldBillingReady();
+ };
+ document.addEventListener('click',e=>{
+   const btn=e.target.closest?.('#saveSettings');
+   if(!btn||state.view!=='settings')return;
+   e.preventDefault();e.stopImmediatePropagation();
+   const url=document.getElementById('optiBase')?.value.trim()||'';
+   if(url&&(!/^https:\/\//i.test(url)||url.length>500)){
+     alert('Entre une URL Optitrainer HTTPS valide (500 caractères maximum).');return;
+   }
+   btn.disabled=true;
+   supa.from('app_settings').upsert({id:1,optitrainer_base_url:url||null,updated_at:new Date().toISOString()},{onConflict:'id'})
+     .then(async({error})=>{if(error)throw Error(error.message);db.settings.optitrainerBase=url;toast('Lien Optitrainer enregistré dans Supabase.')})
+     .catch(err=>alert('Enregistrement impossible : '+err.message))
+     .finally(()=>{btn.disabled=false});
+ },true);
  document.addEventListener('change',async e=>{
    const input=e.target;
    if(!input?.classList?.contains('pathSave')||state.view!=='client'||state.tab!=='admin')return;
@@ -130,13 +154,20 @@
      }
    }
    const enable=e.target.closest?.('.togglePortalAccess');
-   if(enable&&enable.dataset.enable==='1'&&state.view==='client'){
-     const c=currentClient();
-     if(!c?.isTest){
-       if(!confirm('Activation manuelle exceptionnelle : aucun paiement Stripe n’a encore été vérifié automatiquement. Confirmer que tu autorises explicitement cet accès ?')){
-         e.preventDefault();e.stopImmediatePropagation();
-       }
-     }
+   if(enable&&state.view==='client'){
+     e.preventDefault();e.stopImmediatePropagation();
+     const c=currentClient(),turnOn=enable.dataset.enable==='1';
+     if(authProfile?.role!=='owner')return alert('Seul le propriétaire peut modifier les accès.');
+     const intro=turnOn&&!c?.isTest
+       ? 'ACTIVATION EXCEPTIONNELLE sans validation Stripe automatique. Précise le motif et la preuve de ton autorisation :'
+       : turnOn?'Motif de l’accès de test (au moins 15 caractères) :'
+       :'Motif de la désactivation (au moins 15 caractères) :';
+     const reason=prompt(intro);
+     if(!reason||reason.trim().length<15)return alert('Modification annulée : motif obligatoire.');
+     if(turnOn&&!c?.isTest&&!confirm('Confirmer ton autorisation exceptionnelle pour ce client réel, sans présumer un paiement Stripe ?'))return;
+     supa.rpc('owner_set_portal_access',{p_client_id:c.id,p_enabled:turnOn,p_reason:reason.trim()})
+       .then(async({error})=>{if(error)throw Error(error.message);await loadSupabaseData();render();toast(turnOn?'Accès activé (motif conservé).':'Accès désactivé (motif conservé).')})
+       .catch(async err=>{alert('Accès inchangé : '+err.message);await loadSupabaseData();render()});
    }
  },true);
 })();
