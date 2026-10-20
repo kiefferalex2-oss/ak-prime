@@ -140,6 +140,41 @@
    return html;
  };
 
+
+ const originalBookingPanel=renderBookingPanel;
+ renderBookingPanel=function(portal){
+   const out=originalBookingPanel(portal);
+   const p=portal?.bookingPolicy;
+   if(!p||!p.quota_count)return out;
+   const quota=Math.max(0,Number(p.quota_count)||0);
+   const period=p.quota_period==='week'?'week':'month';
+   const localIso=(d)=>new Intl.DateTimeFormat('sv-SE',{
+     timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'
+   }).format(d);
+   const key=(d)=>{
+     const str=localIso(d);
+     if(period==='month')return str.slice(0,7);
+     const utc=new Date(str+'T12:00:00Z');
+     const days=(utc.getUTCDay()+6)%7;
+     utc.setUTCDate(utc.getUTCDate()-days);
+     return utc.toISOString().slice(0,10);
+   };
+   const nowKey=key(new Date());
+   const statuses=new Set(['scheduled','confirmed','completed','cancelled_late','no_show']);
+   const used=(portal.appointments||[]).filter(a=>{
+     if(!statuses.has(a.status)||!a.starts_at)return false;
+     const d=new Date(a.starts_at);
+     return Number.isFinite(d.getTime())&&key(d)===nowKey;
+   }).length;
+   const remaining=Math.max(0,quota-used);
+   const periodLabel=period==='week'?'semaine':'mois';
+   const summary='<div class="client-section-card" style="margin-bottom:13px">'+
+     '<strong>Visios du '+periodLabel+' : '+used+' / '+quota+'</strong>'+
+     '<div class="muted tiny" style="margin-top:5px">'+remaining+
+     ' disponible(s) pour la période en cours. Les absences et annulations tardives comptent dans le quota.</div>'+
+     '</div>';
+   return summary+out;
+ };
  const oldBillingReady=billingReady;
  billingReady=function(){
    const b=db.billingSettings||{};
