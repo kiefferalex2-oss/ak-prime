@@ -1,12 +1,22 @@
 /* AK PRIME — Corrections première revue : affichage fiable, modifications tracées. */
 (function(){
  'use strict';
+
+ function nextScheduledVisioDate(c){
+   const next=(db.appointments||[]).filter(a=>a.client_id===c.id&&
+     ['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>new Date())
+     .sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
+   if(!next)return '';
+   return new Intl.DateTimeFormat('sv-SE',{
+     timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'
+   }).format(new Date(next.starts_at));
+ }
  const oldDashboard=dashboard;
  dashboard=function(){
    const all=db.clients;
    let output;
    try{
-     db.clients=all.filter(c=>!c.isTest);
+     db.clients=all.filter(c=>!c.isTest).map(c=>({...c,next:nextScheduledVisioDate(c)}));
      output=oldDashboard();
    }finally{db.clients=all}
    const real=all.filter(c=>!c.isTest);
@@ -30,7 +40,7 @@
  };
  const oldOverview=overview;
  overview=function(c){
-   let html=oldOverview(c);
+   let html=oldOverview({...c,next:nextScheduledVisioDate(c)});
    const d=c.end?daysUntil(c.end):null;
    if(d!==null&&d<0&&c.status==='Actif'){
      const hasCurrent=(c.renewals||[]).some(r=>r.dueDate===c.end);
@@ -69,6 +79,15 @@
  const oldPassport=passport;
  passport=function(c){
    let html=oldPassport(c);
+   if(!c.cycle?.start||!c.cycle?.end||c.cycle.end<=c.cycle.start)
+     html='<div class="alert blue" style="margin-bottom:12px">Les dates du cycle sont incomplètes ou incohérentes : le pourcentage de progression ne peut pas être interprété.</div>'+html;
+   const pain=(c.checkins||[]).filter(w=>w.pain&&w.pain.trim()&&!/^(ras|rien|non|aucune|néant|neant|0)$/i.test(w.pain.trim()))
+     .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+   if(pain){
+     html='<div class="alert" style="margin-bottom:12px"><strong>Gêne signalée lors du bilan du '+
+       esc(fmtDate(pain.date))+':</strong> '+esc(pain.pain)+
+       '. À vérifier avec le client ; la vigilance reste à apprécier par le coach.</div>'+html;
+   }
    const ahead=(c.tests||[]).filter(t=>t.date&&String(t.date).slice(0,10)>localDateISO()).length;
    if(ahead)html='<div class="alert blue" style="margin-bottom:12px"><strong>'+
      ahead+' résultat(s) daté(s) dans le futur.</strong> Ils restent dans les enregistrements, mais sont exclus des statistiques d’évolution actuelles.</div>'+html;
