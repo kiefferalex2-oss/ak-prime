@@ -119,27 +119,37 @@
  }
  function compactOnboarding(c){
    let html=oldOnboarding(c);
-   if(c.onboarding?.currentStep==='active'&&c.status!=='Actif')
+   const finished=c.onboarding?.currentStep==='active';
+   if(finished&&c.status!=='Actif')
      html=html.replaceAll('Accompagnement actif','Onboarding terminé');
-   if(c.onboarding?.currentStep!=='active')return html+plannedPanel(c);
-   // Une fois actif, les "tests requis avant programmation" appartiennent au passé.
-   // On garde le workflow, le questionnaire et les notes, sans les commandes d'onboarding révolues.
    const wrapper=document.createElement('div');
    wrapper.innerHTML=html;
    const header=[...wrapper.querySelectorAll('.section-title')]
      .find(x=>x.textContent.trim()==='Tests requis avant programmation');
    if(header){
-     let next=header.nextElementSibling;
-     while(next&&!(next.classList.contains('alert')&&next.classList.contains('green'))){
-       const after=next.nextElementSibling;next.remove();next=after;
+     // L'ancienne saisie "tests requis" reste disponible pendant l'onboarding,
+     // mais ne monopolise plus l'écran ni ne confond initial, retest et fin de cycle.
+     const panel=document.createElement('details');
+     panel.style.cssText='margin:10px 0;padding:10px;border:1px solid #d7e0eb;border-radius:10px';
+     const summary=document.createElement('summary');
+     summary.style.cssText='cursor:pointer;font-weight:600';
+     summary.textContent='Gérer les tests requis du démarrage (ancienne sélection)';
+     header.parentNode.insertBefore(panel,header);
+     panel.appendChild(summary);panel.appendChild(header);
+     let next=panel.nextElementSibling;
+     while(next&&!next.classList.contains('alert')){
+       const after=next.nextElementSibling;panel.appendChild(next);next=after;
      }
-     header.remove();
+     if(finished)panel.remove();
    }
    const green=[...wrapper.querySelectorAll('.alert.green')]
      .find(x=>x.textContent.includes('Onboarding terminé'));
    if(green)green.innerHTML='<strong>Onboarding terminé.</strong> Statut actuel du dossier : <strong>'+
-      esc(c.status)+'</strong>. Les futures évaluations sont organisées dans le Passeport et le calendrier.';
-   return wrapper.innerHTML+plannedPanel(c);
+      esc(c.status)+'</strong>. Les prochaines évaluations se préparent dans le Passeport et le calendrier.';
+   const workflow=wrapper.firstElementChild;
+   if(workflow)workflow.insertAdjacentHTML('afterend',plannedPanel(c));
+   else return html+plannedPanel(c);
+   return wrapper.innerHTML;
  }
  const oldOnboarding=onboarding;
  onboarding=compactOnboarding;
