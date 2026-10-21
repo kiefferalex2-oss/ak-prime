@@ -88,12 +88,16 @@ document.addEventListener('click', async function(event) {
       window.AKP_MODULE_READY=true;
       if(authUser&&['owner','coach'].includes(authProfile?.role)){
         loadSupabaseData().then(()=>render()).catch(e=>fail('actualisation Supabase',e.message));
+      }else if(authUser&&authProfile?.role==='client'){
+        // Réinitialise l’espace client si le module a été chargé après la session.
+        enterClientPortal(authUser,authProfile).catch(e=>
+          console.error('AK PRIME : affichage des outils client',e));
       }
       return;
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-roles-v6';
+    script.src='./'+file+'?rev=20261021-roles-v7';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
