@@ -138,6 +138,30 @@
      }catch(e){alert('Création impossible : '+e.message);button.disabled=false}
    };
  };
+
+ const legacyFollow=follow;
+ follow=function(c){
+   const rows=(c.checkins||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+   const historic=rows.length?'<details class="card panel" style="margin-top:12px">'+
+     '<summary style="cursor:pointer"><strong>Historique des anciens bilans AK PRIME ('+
+     rows.length+')</strong></summary><p class="muted tiny">Archives en lecture seule. Les nouveaux suivis de forme et de charge se font sur Optitrainer.</p>'+
+     rows.map(w=>'<div class="item"><strong>'+esc(fmtDate(w.date))+'</strong>'+
+       '<div class="muted tiny">Ressenti : '+esc(w.feeling||'—')+'</div>'+
+       '<div class="muted tiny">Gêne : '+esc(w.pain||'—')+'</div>'+
+       '<div class="muted tiny">Décision coach : '+esc(w.coach||'—')+'</div></div>').join('')+
+     '</details>':'';
+   if(c.pole==='Mental')return '<div class="page-title"><h1>Historique</h1></div>'+
+     '<div class="card panel"><h3>Préparation mentale</h3>'+
+     '<p>Les séances, routines et exercices sont dans l’onglet Préparation mentale de ce client.</p>'+
+     '<button class="btn primary small quickTab" data-tab="offer-tools">Ouvrir les séances mentales</button></div>'+historic;
+   return '<div class="page-title"><div><h1>Suivi physique — Optitrainer</h1>'+
+     '<p>La programmation, les séances, les échauffements, la charge, la récupération et l’état de forme sont gérés dans Optitrainer.</p></div></div>'+
+     '<div class="card panel"><h3>Accéder à la programmation du client</h3>'+
+     (c.cycle?.optitrainer?
+      '<a class="btn primary" href="'+esc(c.cycle.optitrainer)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Ouvrir Optitrainer</a>':
+      '<div class="alert">Renseigne le lien Optitrainer du client depuis sa fiche administrative ou ses paramètres de suivi.</div>')+
+     '<p class="muted tiny" style="margin-top:9px">Aucun bilan de forme ni séance physique n’est créé en double dans AK PRIME.</p></div>'+historic;
+ };
  const oldClientTab=clientTab;
  clientTab=function(c){
    if(state.tab==='offer-tools')return offerToolsPage(c);
@@ -147,12 +171,15 @@
  clientPage=function(){
    const c=currentClient(),html=oldClientPage();
    if(!c)return html;
+   // L'ancien "Suivi" est désormais un accès Optitrainer et à l'historique conservé.
+   const labelled=html.replace(/(<button data-tab="follow"[^>]*>)Suivi(<\/button>)/,
+     '$1'+(c.pole==='Mental'?'Historique':'Optitrainer & historique')+'$2');
    const keys=toolKeys(c);
-   if(!keys.length&&!hasSleepDiary(c))return html;
+   if(!keys.length&&!hasSleepDiary(c))return labelled;
    const active=state.tab==='offer-tools';
    const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
      esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Mental, sommeil & macros':hasSleepDiary(c)?'Agenda de sommeil':'Préparation mentale')+'</button>';
-   return html.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
+   return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
  };
  const oldOverview=overview;
  overview=function(c){
