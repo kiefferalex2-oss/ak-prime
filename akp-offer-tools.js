@@ -274,9 +274,62 @@
       '<div class="alert">Renseigne le lien Optitrainer du client depuis sa fiche administrative ou ses paramètres de suivi.</div>')+
      '<p class="muted tiny" style="margin-top:9px">Aucun bilan de forme ni séance physique n’est créé en double dans AK PRIME.</p></div>'+historic;
  };
+
+// La même grille sert au site public, aux comparatifs et à chacun des dossiers.
+ function offerRightsFor(c){
+   const key=(String(c.pole||'')+'|'+String(c.offer||'')).toLowerCase();
+   return window.AKP_OFFER_RIGHTS?.[key]||null;
+ }
+ function includedBenefitsPage(c){
+   const rights=offerRightsFor(c);
+   if(!rights)return '<div class="page-title"><h1>Prestations de la formule</h1></div>'+
+      '<div class="alert">Cette association pôle/formule ne figure pas dans le catalogue public. Vérifie la fiche avant de confirmer des prestations.</div>';
+   const groups=Object.entries(rights.groups);
+   const count=groups.reduce((total,[_,items])=>total+items.length,0);
+   const optiConfigured=!!c.cycle?.optitrainer;
+   const portalConfigured=!!c.portalAccessEnabled;
+   const videoConfigured=!!c.phone;
+   const macros=rights.groups['AK PRIME']?.some(x=>x.toLowerCase().includes('macro'))||false;
+   const publishedMacro=macros&&(db.offerEntries||[]).some(e=>
+      e.client_id===c.id&&e.tool_type==='macro_budget'&&e.client_visible&&
+      !!e.details?.pdf_path&&!e.archived_at);
+   const metrics=[
+     ...(c.pole!=='Mental'?[['Optitrainer',optiConfigured?'Lien renseigné':'Lien à renseigner',optiConfigured]]:[]),
+     ['Compte client',portalConfigured?'Accès autorisé':'Accès non autorisé',portalConfigured],
+     ...(hasVideoReviews(c)?[['WhatsApp',videoConfigured?'Numéro renseigné':'Numéro manquant',videoConfigured]]:[]),
+     ...(macros?[['Budget macro PDF',publishedMacro?'Publié au client':'À préparer / publier',publishedMacro]]:[])
+   ];
+   return '<div class="page-title"><div><h1>Prestations de la formule</h1>'+
+      '<p>Contenu prévu pour '+esc(c.name)+' • '+esc(rights.label)+'. '+
+      'Cette liste est issue de la même grille que les offres du site public.</p></div></div>'+
+      '<div class="card panel" style="margin-bottom:12px">'+
+      '<div class="row between" style="gap:12px;flex-wrap:wrap"><div><span class="muted tiny">Formule prévue au contrat</span>'+
+      '<h3>'+esc(rights.label)+'</h3>'+
+      '<div class="muted tiny">Début : '+esc(fmtDate(c.start))+' • Fin : '+esc(fmtDate(c.end))+
+      (c.initialCommitmentMonths?' • Engagement initial : '+c.initialCommitmentMonths+' mois':'')+
+      '</div></div><span class="status blue">'+count+' prestations / repères</span></div>'+
+      '<div class="alert blue" style="margin-top:12px">Les éléments ci-dessous sont <strong>inclus dans la formule</strong>. '+
+      'Leur présence dans cette liste ne confirme ni un paiement, ni une visio réalisée, ni l’activation de tous les accès.</div></div>'+
+      '<div class="grid2" style="align-items:start">'+
+      groups.map(([group,items])=>'<section class="card panel" style="height:100%">'+
+        '<div class="row between"><h3>'+esc(group)+'</h3><span class="status blue">'+items.length+'</span></div>'+
+        '<ul style="list-style:none;padding:0;margin:12px 0 0">'+
+        items.map(item=>'<li style="padding:9px 0;border-bottom:1px solid #d0d7df55;display:flex;gap:9px">'+
+         '<span style="color:#257857;font-weight:bold">✓</span><span>'+esc(item)+'</span></li>').join('')+
+        '</ul></section>').join('')+'</div>'+
+      '<div class="card panel" style="margin-top:13px"><h3>État des accès et des documents</h3>'+
+      '<p class="muted tiny">Indicateurs techniques du dossier, indépendants des droits prévus par la formule.</p>'+
+      '<div class="grid2">'+metrics.map(([label,statusText,ready])=>
+        '<div class="item"><strong>'+esc(label)+'</strong>'+
+        '<div class="tiny"><span class="status '+(ready?'green':'amber')+'">'+esc(statusText)+'</span></div></div>'
+      ).join('')+'</div>'+
+      '<p class="muted tiny" style="margin-top:12px">Les charges, questionnaires d’état de forme et séances physiques restent sur Optitrainer. '+
+      'Les analyses vidéo sont envoyées sur WhatsApp ; AK PRIME n’en garde que le compteur.</p></div>';
+ }
  const oldClientTab=clientTab;
  clientTab=function(c){
    if(state.tab==='offer-tools')return offerToolsPage(c);
+   if(state.tab==='entitlements')return includedBenefitsPage(c);
    return oldClientTab(c);
  };
  const oldClientPage=clientPage;
@@ -287,17 +340,17 @@
    const labelled=html.replace(/(<button data-tab="follow"[^>]*>)Suivi(<\/button>)/,
      '$1'+(c.pole==='Mental'?'Historique':'Optitrainer & historique')+'$2');
    const keys=toolKeys(c);
-   if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return labelled;
-   const active=state.tab==='offer-tools';
-   const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
-     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':c.pole==='Forme & Santé'&&c.offer==='Renforcé'?'Nutrition & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
-   return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
+   const hasTools=keys.length||hasSleepDiary(c)||hasVideoReviews(c);
+   const toolsTab=hasTools?'<button data-tab="offer-tools" class="'+(state.tab==='offer-tools'?'on':'')+'">'+
+     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':c.pole==='Forme & Santé'&&c.offer==='Renforcé'?'Nutrition & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>':'';
+   const rightsTab='<button data-tab="entitlements" class="'+(state.tab==='entitlements'?'on':'')+'">Prestations incluses</button>';
+   return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,
+     (_,before,end)=>before+rightsTab+toolsTab+end);
  };
  const oldOverview=overview;
  overview=function(c){
    const original=oldOverview(c);
    const keys=toolKeys(c);
-   if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return original;
    const chips=keys.map(key=>'<span class="status blue" style="margin:3px 4px 3px 0">'+esc(TOOL_SPEC[key].label)+'</span>').join('')+
      (hasSleepDiary(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Agenda de sommeil (client)</span>':'')+
      (hasVideoReviews(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Analyses vidéo WhatsApp</span>':'');
@@ -306,7 +359,10 @@
      '<h3 style="margin:5px 0">'+esc(c.pole)+' — '+esc(c.offer)+'</h3>'+
      '<div class="tiny muted">'+(c.initialCommitmentMonths?'Engagement initial : '+c.initialCommitmentMonths+' mois • ':'')+
      'Fin actuelle : '+esc(fmtDate(c.end))+'</div></div>'+
-     '<button class="btn primary small quickTab" data-tab="offer-tools">Ouvrir les outils</button></div>'+
+     '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+     '<button class="btn primary small quickTab" data-tab="entitlements">Voir tout ce qui est inclus</button>'+
+     ((keys.length||hasSleepDiary(c)||hasVideoReviews(c))?
+       '<button class="btn ghost small quickTab" data-tab="offer-tools">Ouvrir les outils</button>':'')+'</div></div>'+
      '<div style="margin-top:10px">'+chips+'</div></div>';
    return intro+original;
  };
