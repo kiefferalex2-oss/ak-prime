@@ -75,8 +75,7 @@
  const oldClientSuivi=renderClientSuivi;
  renderClientSuivi=function(s){
    if(!s?.client)return oldClientSuivi(s);
-   const mental=s.client.current_pole==='Mental'||
-     (s.client.current_pole==='Performance'&&['P2','P3'].includes(s.client.current_offer));
+   const mental=s.client.current_pole==='Mental';
    return '<div class="client-main"><div class="client-page-head"><div>'+
      '<h2>Mon accompagnement AK PRIME</h2>'+
      '<p>Questionnaire initial, préparation mentale et prestations complémentaires selon ta formule.</p></div></div>'+
@@ -87,7 +86,9 @@
      macroPanel(s)+sleepForm(s)+
      (s.akExtrasError?'<div class="alert" style="margin-top:12px">Certains outils sont temporairement indisponibles : '+safe(s.akExtrasError)+'</div>':'')+
      '<div class="client-section-card" style="margin-top:13px"><h3>Mon entraînement et mes échanges</h3>'+
-       '<p class="muted tiny">Programmation, séances, charge et état de forme : Optitrainer.</p>'+
+       '<p class="muted tiny">Programmation, séances, charge et état de forme : Optitrainer. '+ 
+       'Si ta formule prévoit des analyses vidéo, envoie les vidéos de tes mouvements directement sur WhatsApp. '+ 
+       'AK PRIME n’héberge pas les fichiers vidéo.</p>'+
        (s.client.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir Optitrainer</button>':
         '<div class="muted tiny">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
        renderClientWhatsAppButton(s,s.client)+'</div></div>';
