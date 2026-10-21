@@ -7,13 +7,19 @@
  'use strict';
  let archiveListMode='active';
  const verified=new Set();
+ const pdfConfirmed=new Set();
  let archiveLoadingError='';
  const beforeLoad=loadSupabaseData;
  loadSupabaseData=async function(...args){
    const output=await beforeLoad.apply(this,args);
    if(authProfile?.role!=='owner'&&authProfile?.role!=='coach')return output;
-   const {data,error}=await supa.from('clients')
-     .select('id,archived_at,archive_reason,is_test');
+   const [flagsRes,resumeRes]=await Promise.all([
+     supa.from('clients').select('id,archived_at,archive_reason,is_test'),
+     supa.from('client_archive_resume').select('*')
+   ]);
+   const {data,error}=flagsRes;
+   if(resumeRes.error)throw Error('Fiches de reprise indisponibles : '+resumeRes.error.message);
+   db.clientArchiveResume=resumeRes.data||[];
    if(error){archiveLoadingError=error.message;throw Error('Statut d’archivage indisponible : '+error.message)}
    archiveLoadingError='';
    const flags=new Map((data||[]).map(x=>[x.id,x]));
@@ -44,34 +50,163 @@
  admin=function(c){
    const base=oldAdmin(c);
    if(authProfile?.role!=='owner')return base;
-   const isArchived=!!c.archivedAt,hasFile=verified.has(c.id);
+   const isArchived=!!c.archivedAt,hasFile=verified.has(c.id),hasPdf=pdfConfirmed.has(c.id);
+   const summary=(db.clientArchiveResume||[]).find(x=>x.client_id===c.id);
+   const pdfInstructions='<div class="alert blue" style="margin-top:10px">'+
+     '<strong>Archive lisible :</strong> le bouton ouvre le Passeport complet dans une fenêtre adaptée à l’impression. '+
+     'Choisis ensuite « Imprimer » puis « Enregistrer au format PDF » pour conserver le fichier sur ton PC.</div>';
    return base+
     '<div class="card panel" style="margin-top:14px" id="akClientArchiveActions">'+
-      '<h3>Archivage et conservation du dossier</h3>'+
-      '<p class="muted tiny">Télécharge une copie chiffrée des données de ce client (Passeport, cycles, tests, questionnaire, séances mentales et documents en base), puis ouvre ce fichier pour le vérifier. '+
-      'Les PDF privés et les vidéos WhatsApp ne sont pas inclus dans le fichier : sauvegarde les PDF séparément.</p>'+
+      '<h3>Archivage du client</h3>'+
+      '<p class="muted tiny">Conserve le Passeport en PDF sur ton PC. AK PRIME garde une fiche de reprise synthétique : '+
+      'objectifs, vigilance, derniers résultats, cycles et jalons. Le dossier complet reste préservé en base '+
+      'pour permettre une réouverture sans perdre l’historique ni les documents légaux.</p>'+
       '<div class="row" style="gap:9px;flex-wrap:wrap;margin:12px 0">'+
-      '<button class="btn primary small" id="akExportClientDossier">1. Exporter le dossier chiffré</button>'+
-      '<button class="btn ghost small" id="akVerifyClientDossier">2. Vérifier le fichier</button>'+
-      '<button class="btn ghost small" id="akPrintClientPassport">Passeport en PDF</button>'+
-      '</div>'+
-      '<input type="file" id="akVerifyClientFile" accept=".json,application/json" style="display:none">'+
-      (hasFile?'<div class="alert green">Dossier chiffré vérifié dans cette session. Tu peux procéder à son archivage.</div>':
-       '<div class="alert">Vérifie le fichier enregistré sur ton ordinateur avant toute action irréversible.</div>')+
+      '<button class="btn primary small" id="akPrintClientPassport">1. Exporter le Passeport en PDF</button>'+
+      '</div>'+pdfInstructions+
+      '<label class="field" style="display:flex;gap:9px;align-items:flex-start;margin:14px 0 7px">'+
+       '<input type="checkbox" id="akPdfSavedConfirm" '+(hasPdf?'checked':'')+'>'+
+       '<span>J’ai bien enregistré et vérifié le PDF sur mon ordinateur.</span></label>'+
+      (hasPdf?'<div class="alert green">Archivage PDF confirmé pour cette session.</div>':'')+
       (isArchived?
        '<div class="alert blue" style="margin-top:12px"><strong>Client archivé</strong> · '+esc(fmtDate(c.archivedAt))+
-       '. Son accès client est désactivé et ses documents restent conservés dans Supabase.</div>'+
-       '<button class="btn primary small" id="akRestoreArchivedClient">Restaurer dans la liste des clients</button>':
-       '<div class="row" style="gap:9px;flex-wrap:wrap;margin-top:12px">'+
-       '<button class="btn ghost small" id="akArchiveClient" '+(!hasFile?'disabled':'')+
-       '>3. Archiver le client dans AK PRIME</button>'+
-       (c.isTest?'<button class="btn danger small" id="akDeleteTestClient" '+(!hasFile?'disabled':'')+
-        '>Supprimer définitivement ce dossier TEST</button>':'')+
-       '</div>')+
-      '<p class="muted tiny" style="margin-top:12px"><strong>Important :</strong> archiver ne supprime pas les données Supabase. '+
-      'La suppression définitive est limitée aux dossiers TEST non reliés à un compte et sans pièces financières ou données à conserver.</p>'+
+       '. Son accès client est désactivé ; la fiche de reprise et les historiques restent disponibles.</div>'+
+       '<button class="btn primary small" id="akRestoreArchivedClient">Réactiver le dossier et reprendre le Passeport</button>':
+       '<button class="btn ghost small" id="akArchiveClient" '+(!hasPdf?'disabled':'')+
+       '>2. Archiver le client dans AK PRIME</button>')+
+      (summary?resumePanel(summary):'')+
+      '<details style="margin-top:17px"><summary style="cursor:pointer;font-weight:600">Sauvegarde technique complémentaire (facultative)</summary>'+
+      '<p class="muted tiny" style="margin-top:9px">Ce fichier chiffré n’est pas destiné à être lu comme un document. '+
+      'Il sauvegarde les enregistrements techniques pour une récupération spécifique. '+
+      'Il reste requis avant la suppression définitive d’un dossier TEST, qui est irréversible.</p>'+
+      '<div class="row" style="gap:9px;flex-wrap:wrap">'+
+      '<button class="btn ghost small" id="akExportClientDossier">Sauvegarder les données chiffrées</button>'+
+      '<button class="btn ghost small" id="akVerifyClientDossier">Vérifier la sauvegarde</button></div>'+
+      '<input type="file" id="akVerifyClientFile" accept=".json,application/json" style="display:none">'+
+      (c.isTest&&!isArchived?'<button class="btn danger small" style="margin-top:10px" id="akDeleteTestClient" '+
+          (!hasFile?'disabled':'')+'>Supprimer définitivement ce dossier TEST</button>':'')+
+      '</details>'+
+      '<p class="muted tiny" style="margin-top:12px">Les PDF de budgets macro stockés séparément doivent être téléchargés à part. '+
+      'Les vidéos WhatsApp ne sont jamais hébergées ici. Archiver n’efface pas les factures ni les preuves contractuelles.</p>'+
     '</div>';
  };
+
+ function resumePanel(s){
+   const cycles=(Array.isArray(s.cycles)?s.cycles:[]);
+   const tests=(Array.isArray(s.last_tests)?s.last_tests:[]);
+   const milestones=(Array.isArray(s.recent_milestones)?s.recent_milestones:[]);
+   const cycleRows=cycles.slice(0,8).map(x=>
+     '<div class="item"><strong>'+esc(x.title||'Cycle')+'</strong>'+
+     '<div class="muted tiny">'+esc(fmtDate(x.start_date))+' → '+esc(fmtDate(x.end_date))+
+     (x.outcome_summary?' • '+esc(x.outcome_summary):'')+'</div></div>').join('');
+   const testRows=tests.slice(0,12).map(x=>
+     '<div class="item"><strong>'+esc(x.test_name||'Test')+'</strong>'+
+     '<div class="muted tiny">'+esc(fmtDate(String(x.performed_at||'').slice(0,10)))+
+     ' • '+esc(x.result_value??x.result_text??'—')+' '+esc(x.unit||'')+'</div></div>').join('');
+   return '<div class="card panel" style="margin-top:14px"><h3>Fiche de reprise AK PRIME</h3>'+
+     '<p class="muted tiny">Derniers repères enregistrés lors de l’archivage du '+
+       esc(fmtDate(String(s.saved_at||'').slice(0,10)))+'. Ils resteront visibles après réactivation.</p>'+
+     '<div class="grid2">'+
+     '<div><strong>Derniers objectifs</strong><p class="tiny">'+esc(s.goal_summary||'Non renseignés')+'</p></div>'+
+     '<div><strong>Points de vigilance</strong><p class="tiny">'+esc(s.attention_points||'Aucun renseigné')+'</p></div></div>'+
+     '<details style="margin:9px 0"><summary style="cursor:pointer">Cycles précédents ('+cycles.length+')</summary>'+
+       (cycleRows||'<p class="muted tiny">Aucun cycle disponible.</p>')+'</details>'+
+     '<details style="margin:9px 0"><summary style="cursor:pointer">Derniers tests ('+tests.length+')</summary>'+
+       (testRows||'<p class="muted tiny">Aucun test enregistré.</p>')+'</details>'+
+     '<p class="muted tiny">Jalons conservés : '+milestones.length+
+       '. Le Passeport complet et l’historique restent accessibles dans leur onglet.</p>'+
+     '</div>';
+ }
+ function safePDFText(v){return esc(String(v??'')).replaceAll('\\n','<br>')}
+ function passportPrintableHTML(c){
+   const model=passportModelFromCoach(c);
+   const cycles=(db.passportCycleHistory||[]).filter(x=>x.client_id===c.id)
+       .sort((a,b)=>String(a.start_date||'').localeCompare(String(b.start_date||'')));
+   const tests=(model.tests||[]).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+   const events=(model.events||[]).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+   const checkins=(model.checkins||[]).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+   const fmt=(d)=>d?fmtDate(d):'—';
+   const lines=(items)=>items.map(x=>'<tr>'+x.map(t=>'<td>'+safePDFText(t)+'</td>').join('')+'</tr>').join('');
+   const table=(headers,items)=>items.length?
+       '<table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
+         lines(items)+'</tbody></table>':'<p class="empty">Aucun renseignement enregistré.</p>';
+   const info=(label,value)=>'<div class="fact"><span>'+esc(label)+'</span><strong>'+safePDFText(value||'—')+'</strong></div>';
+   const cycleMs=(x)=>{
+     const start=x.start_date||x.start,end=x.end_date||x.end;
+     if(!start||!end)return '—';
+     const days=Math.round((Date.parse(end+'T12:00:00Z')-Date.parse(start+'T12:00:00Z'))/86400000)+1;
+     if(!Number.isFinite(days)||days<1)return '—';
+     const w=Math.floor(days/7),d=days%7;
+     return (w?w+' sem. ':'')+(d?d+' j':'')||'—';
+   };
+   const allCycles=cycles.length?cycles:
+      (model.cycle?.start?[{
+       title:model.cycle.title,start_date:model.cycle.start,end_date:model.cycle.end,
+       priorities:model.cycle.priorities,vigilance:model.cycle.vigilance
+      }]:[]);
+   const sport=model.sport||'Non renseigné';
+   const section=(title,inner)=>'<section><h2>'+esc(title)+'</h2>'+inner+'</section>';
+   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>'+
+     esc('AK PRIME - Passeport - '+c.name+' - '+localDateISO())+
+     '</title><style>'+
+     '@page{size:A4;margin:14mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#183048;margin:0;background:#fff;font-size:11px;line-height:1.55}'+
+     'header{padding:15px 0 22px;border-bottom:3px solid #b18b54;margin-bottom:18px}'+
+     '.brand{font-size:20px;font-weight:800;letter-spacing:1px}header h1{margin:8px 0 4px;font-size:24px}'+
+     '.subtitle{color:#5b6877}section{margin:17px 0 20px;break-inside:auto}section h2{font-size:15px;margin:0 0 9px;border-bottom:1px solid #ddd;padding-bottom:6px;color:#6e512f}'+
+     '.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}.fact{padding:8px;border:1px solid #e1e4e8;border-radius:5px;break-inside:avoid}'+
+     '.fact span{display:block;font-size:10px;color:#64748b}.fact strong{white-space:pre-wrap}'+
+     'table{width:100%;border-collapse:collapse;font-size:10px;margin-top:5px;table-layout:fixed}'+
+     'th{text-align:left;color:#334155;background:#eef1f4;padding:7px;border-bottom:1px solid #cbd5e1}'+
+     'td{padding:7px;border-bottom:1px solid #e4e7eb;overflow-wrap:anywhere;vertical-align:top}tr{break-inside:avoid}'+
+     '.empty{color:#718096;font-style:italic}.stamp{font-size:10px;color:#64748b;margin:8px 0 13px}.notice{padding:8px 11px;border-left:3px solid #b18b54;background:#f9f7f2}'+
+     '.actions{padding:12px;background:#ecf3fa;margin-bottom:15px;border:1px solid #ccdbea;border-radius:6px}'+
+     'button{background:#183048;border:0;border-radius:5px;color:white;padding:9px 14px;cursor:pointer;font-weight:600}'+
+     '@media print{.actions{display:none!important}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'+
+     '</style></head><body>'+
+     '<div class="actions"><strong>Enregistre ce Passeport sur ton ordinateur :</strong> '+
+     'clique sur le bouton, puis choisis « Enregistrer au format PDF » comme destination. '+
+     '<button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div>'+
+     '<header><div class="brand">AK PRIME</div><h1>Passeport d’accompagnement</h1>'+
+     '<div class="subtitle">'+esc(model.name)+' • '+esc(model.pole)+' — '+esc(model.offer)+'</div>'+
+     '<div class="stamp">Édité le '+esc(fmt(localDateISO()))+' • Archive personnelle du coach</div></header>'+
+     section('Profil et accompagnement','<div class="facts">'+
+       info('Sport / activité',sport)+info('Spécialité / poste',model.specialty||'—')+
+       info('Niveau',model.level||'—')+info('Formule',model.offer)+
+       info('Début de suivi',fmt(model.start))+info('Fin de suivi',fmt(model.end))+'</div>')+
+     section('Dernier cycle et points de reprise','<div class="facts">'+
+       info('Cycle de référence',model.cycle?.title||'À définir')+
+       info('Période',fmt(model.cycle?.start)+' → '+fmt(model.cycle?.end))+
+       info('Objectifs / priorités',model.cycle?.priorities||'Non renseignés')+
+       info('Vigilance',model.cycle?.vigilance||'Aucune renseignée')+'</div>')+
+     section('Historique des cycles ('+allCycles.length+')',table(
+       ['Cycle','Début','Fin','Durée','Bilan'],
+       allCycles.map(x=>[x.title||'Cycle',fmt(x.start_date||x.start),fmt(x.end_date||x.end),
+         cycleMs(x),x.outcome_summary||x.status||'—'])))+
+     section('Tests et retests ('+tests.length+')',table(
+       ['Date','Test','Résultat','Contexte / interprétation'],
+       tests.map(t=>[fmt(t.date),t.name,(t.value??'—')+' '+(t.unit||''),
+         [t.context,t.note].filter(Boolean).join(' — ')])))+
+     section('Jalons du Passeport ('+events.length+')',table(
+       ['Date','Événement','Détail'],events.map(x=>[fmt(x.date),x.title,x.detail||'—'])))+
+     section('Bilan qualitatif et suites','<div class="facts">'+
+       info('Décisions du coach',model.observations?.decisions||'—')+
+       info('Synthèse de visio',model.observations?.visio||'—')+'</div>')+
+     (checkins.length?section('Bilans historiques ('+checkins.length+')',table(
+       ['Date','État / bilan','Retour du coach'],
+       checkins.map(x=>[fmt(x.date),x.feeling||x.pain||x.problem||'—',x.coach||'—']))):'')+
+     '<p class="notice">Ce document conserve le Passeport d’accompagnement à la date indiquée. '+
+     'Les séances et les charges d’entraînement restent dans Optitrainer, les vidéos sur WhatsApp. '+
+     'Les contrats, factures et éventuels documents PDF nutritionnels ne sont pas inclus ici.</p>'+
+     '</body></html>';
+ }
+ function exportPassportPDF(c){
+   const popup=window.open('','_blank');
+   if(!popup){alert('Le navigateur bloque la nouvelle fenêtre. Autorise les pop-ups pour AK PRIME, puis réessaie.');return;}
+   try{
+     popup.document.open();popup.document.write(passportPrintableHTML(c));popup.document.close();
+     popup.focus();
+   }catch(error){popup.close();alert('Ouverture du Passeport impossible : '+error.message)}
+ }
  function bytesToB64(bytes){
    let chars='';for(let i=0;i<bytes.length;i+=0x4000)
      chars+=String.fromCharCode(...bytes.subarray(i,i+0x4000));
@@ -203,16 +338,16 @@
      document.getElementById('akVerifyClientFile')?.click();return;
    }
    if(e.target.closest?.('#akPrintClientPassport')){
-     state.tab='passport';render();window.print();return;
+     return exportPassportPDF(c);
    }
    if(e.target.closest?.('#akArchiveClient')){
-     if(!verified.has(c.id))return alert('Vérifie d’abord le fichier chiffré téléchargé.');
+     if(!pdfConfirmed.has(c.id))return alert('Enregistre d’abord le Passeport en PDF sur ton PC et confirme l’avoir vérifié.');
      const reason=prompt('Motif d’archivage (minimum 10 caractères) :');
      if(!reason||reason.trim().length<10)return;
      if(!confirm('Archiver '+c.name+' ? Son accès client sera désactivé et le dossier retiré de la liste active. Les pièces légales restent en Supabase.'))return;
      const {error}=await supa.rpc('owner_archive_client',{p_client_id:c.id,p_reason:reason.trim()});
      if(error)return alert('Archivage refusé : '+error.message);
-     verified.delete(c.id);
+     verified.delete(c.id);pdfConfirmed.delete(c.id);
      archiveListMode='archived';state.view='clients';state.tab='overview';
      await loadSupabaseData();render();toast('Dossier archivé et conservé.');
    }
@@ -221,8 +356,8 @@
      if(!reason||reason.trim().length<10)return;
      const {error}=await supa.rpc('owner_restore_client_archive',{p_client_id:c.id,p_reason:reason.trim()});
      if(error)return alert('Restauration refusée : '+error.message);
-     archiveListMode='active';state.view='clients';state.tab='overview';
-     await loadSupabaseData();render();toast('Dossier restauré dans la liste. Son accès reste désactivé.');
+     archiveListMode='active';state.view='client';state.clientId=c.id;state.tab='passport';
+     await loadSupabaseData();render();toast('Dossier restauré : Passeport ouvert au dernier état. Accès client toujours désactivé.');
    }
    if(e.target.closest?.('#akDeleteTestClient')){
      if(!verified.has(c.id))return alert('Fichier chiffré non vérifié.');
@@ -237,6 +372,12 @@
    }
  },true);
  document.addEventListener('change',e=>{
+   if(e.target?.id==='akPdfSavedConfirm'){
+     const c=currentClient();
+     if(!c)return;
+     if(e.target.checked)pdfConfirmed.add(c.id);else pdfConfirmed.delete(c.id);
+     render();return;
+   }
    if(e.target?.id!=='akVerifyClientFile')return;
    const file=e.target.files?.[0],c=currentClient();
    e.target.value='';
