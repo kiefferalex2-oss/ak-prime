@@ -18,8 +18,8 @@
    const a=Date.parse(localISO(then)+'T12:00:00Z'),b=Date.parse(localISO(now)+'T12:00:00Z');
    return Number.isFinite(a)&&Number.isFinite(b)?Math.round((a-b)/86400000):9999;
  }
- function activeClients(){
-   return (db.clients||[]).filter(c=>!c.archivedAt&&!c.isTest&&
+ function activeClients(includeTests=false){
+   return (db.clients||[]).filter(c=>!c.archivedAt&&(!c.isTest||includeTests)&&
       ['Actif','Onboarding'].includes(c.status)&&(!c.end||c.end>=localDateISO()));
  }
  function assessmentItems(clientId){
@@ -347,7 +347,7 @@
    };
  }
  function calendarEntries(){
-   const active=activeClients(),clients=new Map(active.map(c=>[c.id,c]));
+   const active=activeClients(true),clients=new Map(active.map(c=>[c.id,c]));
    const due=[];
    (db.assessmentPlans||[]).filter(p=>p.status==='planned'&&clients.has(p.client_id))
      .forEach(p=>due.push({date:localISO(p.due_date),label:p.title,client:clients.get(p.client_id),
