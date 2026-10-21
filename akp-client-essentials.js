@@ -4,8 +4,7 @@
 (function(){
  'use strict';
  const sleepEligible=c=>
-   (c?.current_pole==='Performance'&&c?.current_offer==='P3')||
-   (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
+   c?.current_pole==='Performance'&&c?.current_offer==='P3';
  const macroEligible=c=>(c?.current_pole==='Performance'&&c?.current_offer==='P3')||
    (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
  const sleepDateValue=()=>localDateISO();
