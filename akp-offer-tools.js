@@ -42,24 +42,22 @@
    ['barriers','Freins rencontrés','textarea'],['next_steps','Priorités suivantes','textarea']]}
  };
  const LABEL_SECTIONS={
-  mental:'Séances & outils de préparation mentale',
-  p1:'Suivi de l’offre Performance P1',
-  p2:'Suivi de l’offre Performance P2',
-  p3:'Outils Premium Performance P3',
-  forme:'Outils Forme & Santé'
+  mental:'Préparation mentale',
+  p1:'Suivi AK PRIME',
+  p2:'Préparation mentale P2',
+  p3:'Préparation mentale, sommeil & budget macro P3',
+  forme:'Agenda de sommeil'
  };
+ function hasSleepDiary(c){
+   return (c?.pole==='Performance'&&c?.offer==='P3')||
+     (c?.pole==='Forme & Santé'&&c?.offer==='Renforcé');
+ }
  function toolKeys(c){
    const p=String(c?.pole||''),o=String(c?.offer||'').trim().toLowerCase();
    if(p==='Mental')return ['mental_session','mental_homework','mental_practice'];
-   if(p==='Performance'){
-     if(o==='p3')return ['video_review','wellness','training_adjustment','mental_practice','sleep_entry','macro_budget','recovery_session'];
-     if(o==='p2')return ['video_review','wellness','training_adjustment','mental_practice'];
-     return ['video_review'];
-   }
-   if(p==='Forme & Santé'){
-     return o==='renforcé'?['lifestyle','habit_review','wellness','training_adjustment']:['lifestyle','habit_review'];
-   }
-   return [];
+   if(p==='Performance'&&o==='p3')return ['mental_practice','macro_budget'];
+   if(p==='Performance'&&o==='p2')return ['mental_practice'];
+   return []; // Séances, charges, forme, adaptations, vidéo, échauffements : Optitrainer.
  }
  function workspaceLabel(c){
    const p=String(c?.pole||''),o=String(c?.offer||'');
@@ -80,12 +78,15 @@
  loadSupabaseData=async function(...args){
    const result=await earlierLoad.apply(this,args);
    if(!authUser?.id||!['owner','coach'].includes(authProfile?.role))return result;
-   const [entries,commitments]=await Promise.all([
+   const [entries,commitments,sleepEntries]=await Promise.all([
      supa.from('client_offer_entries').select('*').order('entry_date',{ascending:false}).order('created_at',{ascending:false}),
-     supa.from('clients').select('id,initial_commitment_months')
+     supa.from('clients').select('id,initial_commitment_months'),
+     supa.from('client_sleep_diary').select('*').order('sleep_date',{ascending:false}).limit(800)
    ]);
-   if(entries.error||commitments.error)throw Error('Chargement des outils de prestation : '+(entries.error||commitments.error).message);
+   if(entries.error||commitments.error||sleepEntries.error)
+     throw Error('Chargement des outils de prestation : '+(entries.error||commitments.error||sleepEntries.error).message);
    db.offerEntries=entries.data||[];
+   db.clientSleepDiary=sleepEntries.data||[];
    const map=new Map((commitments.data||[]).map(c=>[c.id,c.initial_commitment_months]));
    (db.clients||[]).forEach(c=>c.initialCommitmentMonths=map.get(c.id)||null);
    return result;
@@ -147,17 +148,19 @@
    const c=currentClient(),html=oldClientPage();
    if(!c)return html;
    const keys=toolKeys(c);
-   if(!keys.length)return html;
+   if(!keys.length&&!hasSleepDiary(c))return html;
    const active=state.tab==='offer-tools';
-   const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+esc(c.pole==='Mental'?'Séances mentales':c.offer==='P3'?'Outils P3':'Outils de l’offre')+'</button>';
+   const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
+     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Mental, sommeil & macros':hasSleepDiary(c)?'Agenda de sommeil':'Préparation mentale')+'</button>';
    return html.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
  };
  const oldOverview=overview;
  overview=function(c){
    const original=oldOverview(c);
    const keys=toolKeys(c);
-   if(!keys.length)return original;
-   const chips=keys.map(key=>'<span class="status blue" style="margin:3px 4px 3px 0">'+esc(TOOL_SPEC[key].label)+'</span>').join('');
+   if(!keys.length&&!hasSleepDiary(c))return original;
+   const chips=keys.map(key=>'<span class="status blue" style="margin:3px 4px 3px 0">'+esc(TOOL_SPEC[key].label)+'</span>').join('')+
+     (hasSleepDiary(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Agenda de sommeil (client)</span>':'');
    const intro='<div class="card panel" style="margin-bottom:13px;border-left:4px solid #bc955a">'+
      '<div class="row between"><div><div class="muted tiny">Prestations incluses dans le dossier</div>'+
      '<h3 style="margin:5px 0">'+esc(c.pole)+' — '+esc(c.offer)+'</h3>'+
@@ -187,6 +190,18 @@
  }
  function offerToolsPage(c){
    const keys=toolKeys(c),all=(db.offerEntries||[]).filter(x=>x.client_id===c.id);
+   const sleepHistory=(db.clientSleepDiary||[]).filter(x=>x.client_id===c.id).slice(0,50);
+   const sleepMarkup=hasSleepDiary(c)?'<div class="card panel" style="margin-bottom:13px">'+
+     '<h3>Agenda de sommeil — rempli par le client</h3>'+
+     '<div class="muted tiny">Le client renseigne ses nuits depuis son espace personnel. Optitrainer conserve le suivi de forme et de charge.</div>'+
+     (sleepHistory.length?'<div class="list" style="margin-top:10px">'+
+       sleepHistory.map(x=>'<details class="item"><summary style="cursor:pointer"><strong>'+esc(fmtDate(x.sleep_date))+'</strong> • '+
+         esc(x.duration_hours)+' h • qualité '+esc(x.quality)+'/5</summary><div class="tiny" style="margin-top:6px">'+
+         (x.bedtime?'Coucher : '+esc(String(x.bedtime).slice(0,5))+' • ':'')+
+         (x.wakeup?'Réveil : '+esc(String(x.wakeup).slice(0,5))+' • ':'')+
+         esc(x.notes||'Aucune observation')+'</div></details>').join('')+'</div>':
+       '<div class="muted" style="margin-top:10px">Aucune nuit encore renseignée.</div>')+
+     '</div>':'';
    const regular=keys.map(type=>{
      const spec=TOOL_SPEC[type],qty=all.filter(x=>x.tool_type===type&&!x.archived_at).length;
      return '<div class="card panel" style="margin-bottom:13px">'+
@@ -199,11 +214,11 @@
    const retired=all.filter(e=>!keys.includes(e.tool_type));
    const archive=all.filter(e=>keys.includes(e.tool_type)&&e.archived_at);
    return '<div class="page-title"><div><h1>'+esc(workspaceLabel(c))+'</h1>'+
-     '<p>Outils disponibles uniquement pour '+esc(c.pole)+' — '+esc(c.offer)+'. Les données sont enregistrées dans Supabase.</p></div></div>'+
-     '<div class="alert blue" style="margin-bottom:13px"><strong>Offre '+esc(c.offer)+
-     ' :</strong> '+keys.map(t=>esc(TOOL_SPEC[t].label)).join(' • ')+
-     '. Les informations de cet espace sont réservées à l’équipe de coaching et ne sont pas publiées dans le portail client.</div>'+
-     regular+
+     '<p>AK PRIME : préparation mentale, sommeil et budgets macro. Entraînement, forme et charge : Optitrainer.</p></div></div>'+
+     '<div class="alert blue" style="margin-bottom:13px"><strong>Répartition :</strong> '+
+      'Optitrainer gère la programmation, les séances, la charge, la récupération et les échauffements. '+
+      'AK PRIME conserve ici les prestations complémentaires de '+esc(c.offer)+'.</div>'+
+     sleepMarkup+regular+
      (archive.length?'<div class="card panel"><h3>Enregistrements archivés</h3>'+
        archive.map(x=>'<div class="section-title">'+esc(TOOL_SPEC[x.tool_type]?.label||x.tool_type)+'</div>'+
          entryList(c,x.tool_type,true)).join('')+'</div>':'')+
