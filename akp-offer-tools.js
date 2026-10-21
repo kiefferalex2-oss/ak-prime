@@ -97,6 +97,7 @@
      '<div class="grid2">'+
      '<div class="field"><label>Nom et prénom</label><input id="mName" class="input" maxlength="200" autocomplete="name"></div>'+
      '<div class="field"><label>E-mail</label><input id="mEmail" type="email" class="input" maxlength="255" autocomplete="email"></div>'+
+     '<div class="field"><label>Téléphone <span class="muted tiny">(facultatif)</span></label><input id="mPhone" type="tel" class="input" maxlength="40" autocomplete="tel" placeholder="06 12 34 56 78"></div>'+
      '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div>'+
      '<div class="field"><label>Offre</label><select id="mOffer" class="select">'+newClientOfferOptions('Performance')+'</select></div>'+
      '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input" value="'+localDateISO()+'"></div>'+
@@ -114,17 +115,18 @@
    $('mStart').onchange=sync;$('mDuration').onchange=sync;sync();
    $('saveM').onclick=async()=>{
      const full=$('mName').value.trim(),start=$('mStart').value;
-     const dur=Number($('mDuration').value),email=$('mEmail').value.trim();
+     const dur=Number($('mDuration').value),email=$('mEmail').value.trim(),phone=$('mPhone').value.trim();
      if(!full||full.length<2)return alert('Renseigne le nom et le prénom du client.');
      if(email&&!$('mEmail').checkValidity())return alert('Adresse e-mail invalide.');
+     if(phone&&(!/^[+0-9 ().-]+$/.test(phone)||phone.replace(/[^0-9]/g,'').length<8||phone.replace(/[^0-9]/g,'').length>15))return alert('Numéro de téléphone invalide.');
      if(!start||!monthlyEnd(start,dur))return alert('Date de début requise.');
      if(![3,6].includes(dur))return alert('Engagement initial invalide.');
      if($('mPayment').value==='À jour'&&!confirm('Ce statut est manuel et ne prouve pas un encaissement Stripe. Confirmer ?'))return;
      const nm=splitName(full);
      const button=$('saveM');button.disabled=true;
      try{
-       const {data,error}=await supa.rpc('owner_create_client',{
-         p_first_name:nm.first_name,p_last_name:nm.last_name,p_email:email||null,
+       const {data,error}=await supa.rpc('owner_create_client_with_phone',{
+         p_first_name:nm.first_name,p_last_name:nm.last_name,p_email:email||null,p_phone:phone||null,
          p_pole:$('mPole').value,p_offer:$('mOffer').value,p_start_date:start,
          p_initial_months:dur,p_payment_status:$('mPayment').value
        });
