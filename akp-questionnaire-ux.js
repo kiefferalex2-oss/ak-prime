@@ -133,27 +133,15 @@
  onboarding=function(c){
   const root=document.createElement('div');
   root.innerHTML=previousOnboarding(c);
+  // Toute la préparation est déjà dans « Visios & notes » :
+  // aucun résumé ni doublon du questionnaire ne doit rester ici.
   const giant=root.querySelector('.akFocusGrid');
   if(giant){
-   const oldOther=giant.nextElementSibling;
-   const compact=document.createElement('div');
-   compact.className='card panel';
-   compact.style.cssText='margin:12px 0';
-   compact.innerHTML='<div class="akQHeader"><div><h3 style="margin:0">Questionnaire & préparation des visios</h3>'+
-     '<p class="muted tiny" style="margin:7px 0">Questionnaire : '+keys(c).length+
-     ' réponses · '+selectedKeys(c).length+' point(s) à approfondir. Le détail et les commentaires sont dans « Visios & notes ».</p></div>'+
-     '<button class="btn primary small akGoMinutes">Ouvrir la préparation de visio →</button></div>';
-   giant.replaceWith(compact);
-   if(oldOther&&oldOther.classList.contains('grid2')&&
-       oldOther.textContent.includes('Informations nouvelles'))oldOther.remove();
+   const other=giant.nextElementSibling;
+   giant.remove();
+   if(other&&other.classList.contains('grid2')&&other.textContent.includes('Informations nouvelles'))other.remove();
   }else{
-   const oldGrid=root.querySelector('.grid31');
-   if(oldGrid){
-    const small=document.createElement('div');small.className='card panel';
-    small.innerHTML='<h3>Questionnaire initial</h3><p>'+keys(c).length+' réponses et '+selectedKeys(c).length+
-     ' point(s) à approfondir.</p><button class="btn primary small akGoMinutes">Préparer la visio →</button>';
-    oldGrid.replaceWith(small);
-   }
+   root.querySelector('.grid31')?.remove();
   }
   return root.innerHTML;
  };
