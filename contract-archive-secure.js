@@ -70,7 +70,8 @@ document.addEventListener('click', async function(event) {
     ['akp-client-archive.js','AKP_CLIENT_ARCHIVE_READY'],
     ['akp-notifications-pause.js','AKP_ACTIVITY_PAUSE_READY'],
     ['akp-client-management.js','AKP_CLIENT_MANAGEMENT_READY'],
-    ['akp-assessments-calendar.js','AKP_ASSESSMENT_CALENDAR_READY']
+    ['akp-assessments-calendar.js','AKP_ASSESSMENT_CALENDAR_READY'],
+    ['akp-visio-notes.js','AKP_VISIO_NOTES_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -102,7 +103,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-assessments-v21';
+    script.src='./'+file+'?rev=20261021-visio-notes-v22';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
