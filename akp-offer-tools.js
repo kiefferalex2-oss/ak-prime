@@ -157,7 +157,7 @@
    return '<div class="page-title"><div><h1>Suivi physique — Optitrainer</h1>'+
      '<p>La programmation, les séances, les échauffements, la charge, la récupération et l’état de forme sont gérés dans Optitrainer.</p></div></div>'+
      '<div class="card panel"><h3>Accéder à la programmation du client</h3>'+
-     (c.cycle?.optitrainer?
+     (c.cycle?.optitrainer&&/^https:\/\//i.test(c.cycle.optitrainer)?
       '<a class="btn primary" href="'+esc(c.cycle.optitrainer)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Ouvrir Optitrainer</a>':
       '<div class="alert">Renseigne le lien Optitrainer du client depuis sa fiche administrative ou ses paramètres de suivi.</div>')+
      '<p class="muted tiny" style="margin-top:9px">Aucun bilan de forme ni séance physique n’est créé en double dans AK PRIME.</p></div>'+historic;
