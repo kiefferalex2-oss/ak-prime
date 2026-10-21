@@ -46,7 +46,7 @@
   p1:'Analyses vidéo',
   p2:'Analyses vidéo P2',
   p3:'Sommeil, budget macro & analyses vidéo P3',
-  forme:'Nutrition, sommeil & analyses vidéo'
+  forme:'Nutrition & analyses vidéo'
  };
 
  function hasVideoReviews(c){
@@ -134,8 +134,7 @@
      '</div>';
  }
  function hasSleepDiary(c){
-   return (c?.pole==='Performance'&&c?.offer==='P3')||
-     (c?.pole==='Forme & Santé'&&c?.offer==='Renforcé');
+   return c?.pole==='Performance'&&c?.offer==='P3';
  }
  function toolKeys(c){
    const p=String(c?.pole||''),o=String(c?.offer||'').trim().toLowerCase();
@@ -291,7 +290,7 @@
    if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return labelled;
    const active=state.tab==='offer-tools';
    const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
-     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':c.pole==='Forme & Santé'&&c.offer==='Renforcé'?'Nutrition, sommeil & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
+     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':c.pole==='Forme & Santé'&&c.offer==='Renforcé'?'Nutrition & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
    return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
  };
  const oldOverview=overview;
