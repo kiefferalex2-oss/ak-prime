@@ -66,7 +66,7 @@
    return null;
  }
  function isoAddMonths(date,months){
-   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(date||'')))return '';
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(String(date||'')))return '';
    const [y,m,d]=date.split('-').map(Number);
    const t=new Date(Date.UTC(y,m-1+months,1,12));
    const max=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0,12)).getUTCDate();
@@ -76,7 +76,7 @@
  function coachingMonth(c,today){
    const anchor=String(c?.start||'').slice(0,10);
    const d=String(today||localDateISO()).slice(0,10);
-   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(anchor)||anchor>d){
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(anchor)||anchor>d){
      // Date de début absente : mois civil de repli, avec mention explicite.
      return {start:d.slice(0,7)+'-01',
         end:isoAddMonths(d.slice(0,7)+'-01',1),
@@ -100,7 +100,7 @@
    weekNow.setUTCDate(weekNow.getUTCDate()-dow);
    const monday=weekNow.toISOString().slice(0,10);
    const weekReceipts=rows.filter(x=>!x.voided_at&&x.received_on>=monday&&x.received_on<=now);
-   const whatsappDigits=String(c.phone||'').replace(/\\D/g,'');
+   const whatsappDigits=String(c.phone||'').replace(/\D/g,'');
    const whatsappHref=whatsappDigits.length>=9&&whatsappDigits.length<=15?
       'https://wa.me/'+(whatsappDigits.startsWith('0')?'33'+whatsappDigits.slice(1):whatsappDigits):'';
    const cap=plan.mode==='month'?'Sur '+plan.n+' prévues dans le mois':
@@ -468,7 +468,7 @@
      document.getElementById('cancelVideoM').onclick=closeModal;
      document.getElementById('saveVideoM').onclick=async()=>{
        const date=document.getElementById('videoReceiveDate').value,notes=document.getElementById('videoReceiveNote').value.trim();
-       if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||date>localDateISO())return alert('Date de réception invalide.');
+       if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>localDateISO())return alert('Date de réception invalide.');
        const button=document.getElementById('saveVideoM');button.disabled=true;
        const {error}=await supa.from('client_video_receipts').insert({
          client_id:c.id,received_on:date,notes,channel:'whatsapp',recorded_by:authUser.id});
