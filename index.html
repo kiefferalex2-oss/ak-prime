@@ -2748,8 +2748,8 @@ async function saveClientQuestionnaire(statusValue){
 function publicOfferPreview(pole,name){
  const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
  const map={
-  'forme & santé|standard':['Programme personnalisé avec bilan chaque semaine','1 visio par mois et jusqu’à 1 analyse vidéo par mois'],
-  'forme & santé|renforcé':['Entraînement adapté chaque semaine à votre récupération','Sommeil, bien-être, repères nutritionnels et 2 visios par mois'],
+  'forme & santé|standard':['Programme individualisé avec suivi de charge via Optitrainer','1 visio par mois et jusqu’à 1 analyse vidéo par mois'],
+  'forme & santé|renforcé':['Adaptations hebdomadaires selon charge et état de forme','Repères nutritionnels et 2 visios par mois'],
   'performance|p1':['Préparation physique ou réathlétisation individualisée','2 analyses vidéo par mois et nouvelle évaluation à 6 semaines'],
   'performance|p2':['Ajustements hebdomadaires selon votre charge et votre état de forme','Échauffement personnalisé, suivi du cycle menstruel et 2 visios par mois'],
   'performance|p3':['Suivi du sommeil et ajustements sous 48 h','Récupération dédiée et repères nutritionnels personnalisés'],
@@ -2813,8 +2813,8 @@ function renderPublicSite(){
   '<section class="public-section dark" id="offres"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Les offres</div><h2>Choisissez l’accompagnement qui vous correspond.</h2><p>Comparez les formules de chaque pôle. Sélectionnez une offre pour découvrir les prestations incluses et ce qui la distingue.</p></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Forme & Santé</h3><p>Deux niveaux de suivi selon le degré d’adaptation souhaité.</p></div></div>'+
   '<div class="public-offers">'+
- publicOfferCard('Forme & Santé','Standard','99','Essentiel','Un programme construit pour vous, accompagné d’un bilan régulier.','Vous souhaitez une programmation structurée et un suivi hebdomadaire sans pilotage complet de votre état de forme.',['Programme de musculation / condition physique individualisé','Check-in chaque semaine','Adaptation en cas de retour négatif, douleur, gêne ou difficulté sur une séance','Analyse technique vidéo : 1 vidéo / mois maximum','1 visio de 30 min / mois','Programmation dans Optitrainer','Espace client + Passeport AK PRIME'],'STANDARD = le programme reste stable tant que tout se passe bien. Les modifications répondent surtout aux problèmes remontés.')+
- publicOfferCard('Forme & Santé','Renforcé','149','Suivi renforcé','Votre entraînement évolue chaque semaine selon votre récupération et vos retours.','Vous souhaitez que votre charge évolue selon votre récupération et votre quotidien.',['Tout le contenu Standard','Analyse technique vidéo : jusqu’à 1 vidéo / semaine si nécessaire','2 visios de 30 min / mois','Conception d’un budget calorique et macronutriments adapté à l’objectif, sans menus','Suivi des heures de sommeil','Suivi du bien-être','Adaptation hebdomadaire systématique du volume, de l’intensité et de la charge','Optitrainer + Passeport AK PRIME'],'RENFORCÉ = nutrition + sommeil + bien-être deviennent des données de pilotage utilisées chaque semaine pour adapter l’entraînement.',true)+
+ publicOfferCard('Forme & Santé','Standard','99','Essentiel','Un programme personnalisé avec suivi de la charge d’entraînement.','Vous souhaitez une programmation structurée avec suivi de charge, sans questionnaire d’état de forme régulier.',['Programme de musculation / condition physique individualisé','Suivi hebdomadaire de la charge dans Optitrainer','Adaptation en cas de retour négatif, douleur, gêne ou difficulté sur une séance','Analyse technique vidéo : 1 vidéo / mois maximum','1 visio de 30 min / mois','Programmation dans Optitrainer','Espace client + Passeport AK PRIME'],'STANDARD = le programme reste stable tant que tout se passe bien. Les modifications répondent surtout aux problèmes remontés.')+
+ publicOfferCard('Forme & Santé','Renforcé','149','Suivi renforcé','Votre entraînement évolue chaque semaine selon votre récupération et vos retours.','Vous souhaitez que votre charge évolue selon votre récupération et votre quotidien.',['Tout le contenu Standard','Analyse technique vidéo : jusqu’à 1 vidéo / semaine si nécessaire','2 visios de 30 min / mois','Conception d’un budget calorique et macronutriments adapté à l’objectif, sans menus','Sommeil pris en compte dans le questionnaire d’état de forme','Suivi du bien-être','Adaptation hebdomadaire systématique du volume, de l’intensité et de la charge','Optitrainer + Passeport AK PRIME'],'RENFORCÉ = suivi de charge + état de forme hebdomadaire + budget macro : ces éléments guident les adaptations, sans agenda de sommeil quotidien séparé.',true)+
  '</div></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Performance & Réathlétisation</h3><p>Préparation physique ou retour progressif au sport après une blessure : trois niveaux de suivi adaptés à votre objectif.</p></div></div>'+
   '<div class="public-offers">'+
@@ -2943,8 +2943,8 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
   P3:{label:'Premium',summary:'Un accompagnement rapproché, avec une gestion approfondie de votre état de forme.',points:['Tout le contenu P2','Analyses vidéo selon vos besoins','Suivi complet du sommeil','Ajustements sous 48 h','Récupération dédiée','Repères nutritionnels personnalisés (macros)']}
  };
  const forme={
-  Standard:{label:'Standard',summary:'Un programme adapté à vos objectifs, avec un suivi régulier.',points:['Programmation individualisée','Bilan hebdomadaire','1 analyse vidéo / mois maximum','Corrections si difficulté signalée','1 visio / mois']},
-  'Renforcé':{label:'Renforcé',summary:'Un accompagnement plus complet et des ajustements réguliers.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Suivi du sommeil et du bien-être','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
+  Standard:{label:'Standard',summary:'Un programme adapté à vos objectifs, avec un suivi régulier.',points:['Programmation individualisée','Suivi hebdomadaire de charge (Optitrainer)','1 analyse vidéo / mois maximum','Corrections si difficulté signalée','1 visio / mois']},
+  'Renforcé':{label:'Renforcé',summary:'Un accompagnement plus complet et des ajustements réguliers.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Questionnaire hebdomadaire d’état de forme (sommeil, fatigue, stress)','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
  };
  const mental={
   Particulier:{label:'Particulier',summary:'Développer vos habiletés mentales dans les situations du quotidien.',points:['Échange et questionnaire initial','Objectifs et exercices personnalisés','Motivation, émotions et résilience','Confiance, attention et routines','Jusqu’à 1 visio de 45 min / semaine']},
@@ -2976,9 +2976,9 @@ function openPublicPoleDetails(key){
    intro:'Un entraînement conçu autour de vos objectifs, que vous repreniez une activité ou cherchiez à aller plus loin dans une pratique déjà régulière.',
    forWho:['Débutants et personnes reprenant l’activité après une pause ou une blessure','Pratiquants réguliers souhaitant améliorer la qualité et la cohérence de leur entraînement','Toute personne souhaitant un accompagnement correspondant à ses objectifs, ses contraintes et son expérience'],
    work:['Programmation en musculation, cardio et condition physique selon vos objectifs','Progression, choix des exercices et maîtrise technique des mouvements','Analyse vidéo et bilan d’entraînement selon la formule','Suivi de l’état de forme, du sommeil et de la récupération selon la formule','Estimation des besoins énergétiques et repères de macronutriments selon la formule'],
-   flow:[['01','Comprendre','Objectifs, niveau, contraintes et matériel.'],['02','Construire','Créer un programme cohérent avec le quotidien.'],['03','Suivre','Check-in hebdomadaire et données supplémentaires en Renforcé.'],['04','Adapter','Correction si problème en Standard ; adaptation hebdomadaire en Renforcé.']],
+   flow:[['01','Comprendre','Objectifs, niveau, contraintes et matériel.'],['02','Construire','Créer un programme cohérent avec le quotidien.'],['03','Suivre','Charge via Optitrainer en Standard ; charge et questionnaire d’état de forme en Renforcé.'],['04','Adapter','Correction si problème en Standard ; adaptation hebdomadaire en Renforcé.']],
    note:'Les prestations varient selon la formule. Après une blessure, le coaching accompagne la reprise d’activité et ne remplace pas une rééducation ni un suivi médical lorsqu’ils sont nécessaires.',
-   offers:[['Forme & Santé','Standard',99,'Programme + check-in + 1 vidéo/mois max + correction si problème + 1 visio/mois.',false],['Forme & Santé','Renforcé',149,'Standard + jusqu’à 1 vidéo/semaine + macros + sommeil + bien-être + adaptation hebdo + 2 visios/mois.',true]]
+   offers:[['Forme & Santé','Standard',99,'Programme + suivi de charge + 1 vidéo/mois max + correction si problème + 1 visio/mois.',false],['Forme & Santé','Renforcé',149,'Standard + jusqu’à 1 vidéo/semaine + questionnaire d’état de forme + macros PDF + adaptation hebdo + 2 visios/mois.',true]]
   },
   mental:{
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
@@ -3009,13 +3009,13 @@ function publicOfferDetailData(pole,name){
   'forme & santé|standard':{
    title:'Forme & Santé — Standard',
    promise:'Un cadre d’entraînement individualisé, simple et régulier, sans pilotage quotidien de ton état de forme.',
-   diff:'Le programme reste stable tant que tout se passe bien. Les adaptations interviennent surtout lorsqu’un problème ou un retour négatif le justifie.',
+   diff:'La charge est suivie dans Optitrainer sans questionnaire d’état de forme régulier. Le programme reste stable tant que tout va bien ; une difficulté ou douleur signalée peut justifier une correction.',
    example:'Tu filmes par exemple ton squat parce que tu ne te sens pas à l’aise sur le mouvement. La vidéo est analysée, tu reçois un retour technique et le programme est corrigé si nécessaire.'
   },
   'forme & santé|renforcé':{
    title:'Forme & Santé — Renforcé',
-   promise:'Un suivi plus global où sommeil, bien-être et nutrition servent réellement à guider l’entraînement.',
-   diff:'Contrairement au Standard, l’entraînement est réévalué chaque semaine à partir de tes données, avec un budget calorique/macros et un suivi sommeil/bien-être.',
+   promise:'Un suivi plus global croisant charge et état de forme hebdomadaire, complété par un budget macro personnalisé.',
+   diff:'Contrairement au Standard, la charge et le questionnaire d’état de forme servent aux adaptations hebdomadaires. Le budget macro est inclus ; pas d’agenda de sommeil quotidien séparé.',
    example:'Tu dors moins plusieurs nuits et ton bien-être baisse sur la semaine. Ces données sont utilisées au bilan hebdomadaire pour réduire ou réorganiser volume et intensité si nécessaire.'
   },
   'performance|p1':{
@@ -3249,7 +3249,7 @@ function publicOfferBenefits(pole,name){
  const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
  const map={
   'forme & santé|standard':['Programme individualisé selon ton matériel et tes contraintes','Check-in hebdomadaire','Analyse technique vidéo : 1 vidéo / mois maximum','Adaptation en cas de retour négatif, douleur, gêne ou difficulté','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],
-  'forme & santé|renforcé':['Tout le contenu Standard','Analyse technique vidéo : jusqu’à 1 vidéo / semaine si nécessaire','2 visios de 30 min / mois','Budget calorique et macronutriments, sans menus','Suivi des heures de sommeil','Suivi du bien-être','Adaptation hebdomadaire systématique de l’entraînement et de la charge'],
+  'forme & santé|renforcé':['Tout le contenu Standard','Analyse technique vidéo : jusqu’à 1 vidéo / semaine si nécessaire','2 visios de 30 min / mois','Budget calorique et macronutriments, sans menus','Sommeil pris en compte dans le questionnaire d’état de forme','Suivi du bien-être','Adaptation hebdomadaire systématique de l’entraînement et de la charge'],
   'performance|p1':['Programmation individualisée selon sport, calendrier, niveau et matériel','Tests réalisables à distance','Analyse technique vidéo : jusqu’à 2 vidéos / mois','Suivi de charge sRPE + check-in hebdomadaire','Retest à 6 semaines','Modification uniquement si retour négatif / douleur / problème physique / difficulté majeure','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],
   'performance|p2':['Tout le contenu P1','Analyse technique vidéo hebdomadaire des mouvements prioritaires, regroupée dans un envoi','Questionnaire Hooper','Ajustement hebdomadaire selon charge + bien-être + contexte','Échauffement individualisé','Phase de récupération gérée par allègement de la programmation','Prise en compte du cycle menstruel chez les femmes','2 visios de 30 min / mois'],
   'performance|p3':['Tout le contenu P2','Analyse technique vidéo des mouvements utiles issus des séances, selon les besoins','Suivi complet du sommeil','Budget calorique et macronutriments, sans menus','Ajustement sous 48 h si l’état de forme le nécessite','Séances de récupération dédiées lorsque nécessaire','Suivi rapproché des fortes charges et compétitions','Prise en compte du cycle menstruel','Jusqu’à 1 visio de 30 min / semaine'],
