@@ -6,7 +6,8 @@
  const sleepEligible=c=>
    (c?.current_pole==='Performance'&&c?.current_offer==='P3')||
    (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
- const macroEligible=c=>c?.current_pole==='Performance'&&c?.current_offer==='P3';
+ const macroEligible=c=>(c?.current_pole==='Performance'&&c?.current_offer==='P3')||
+   (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
  const sleepDateValue=()=>localDateISO();
  const safe=(v)=>esc(String(v??''));
  const oldEnterClientPortal=enterClientPortal;
