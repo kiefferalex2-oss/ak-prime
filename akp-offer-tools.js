@@ -252,27 +252,86 @@
    }finally{db.clients=all;}
  };
  const legacyFollow=follow;
+ // Archives AK PRIME : lecture compacte et progressive ; aucun doublon avec Optitrainer.
+ const checkinArchiveStyle=document.createElement('style');
+ checkinArchiveStyle.textContent=[
+  '.akOldWeeks{display:grid;gap:8px;margin-top:12px}',
+  '.akOldWeeks details{border:1px solid #e1e7ee;border-radius:11px;background:#fbfcfe;overflow:hidden}',
+  '.akOldWeeks summary{cursor:pointer;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:11px 13px;list-style:none}',
+  '.akOldWeeks summary::-webkit-details-marker{display:none}',
+  '.akOldWeeks summary::before{content:"›";font-size:20px;font-weight:bold;line-height:1;color:#40617a}',
+  '.akOldWeeks details[open]>summary::before{transform:rotate(90deg)}',
+  '.akOldWeeks summary strong{flex:1;min-width:120px}',
+  '.akOldWeeks .akOldDetail{border-top:1px solid #e1e7ee;padding:12px 14px;display:grid;gap:9px}',
+  '.akOldWeeks .akOldField{display:grid;grid-template-columns:minmax(110px,.28fr) 1fr;gap:8px;align-items:start}',
+  '.akOldWeeks .akOldField>span{font-size:12px;color:#64768a}',
+  '.akOldWeeks .akOldField>div{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}',
+  '.akOldIntro{font-size:12px;color:#63758b;margin:8px 0}',
+  '.akArchiveBadges{display:flex;gap:6px;flex-wrap:wrap}',
+  '@media(max-width:620px){.akOldWeeks .akOldField{grid-template-columns:1fr;gap:2px}}'
+ ].join('\n');
+ document.head.appendChild(checkinArchiveStyle);
+ function legacyCheckinArchive(c){
+   const rows=(c.checkins||[]).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+   if(!rows.length)return '';
+   const clean=value=>String(value??'').trim();
+   const hasPain=w=>clean(w.pain)&&!/^(ras|rien|non|aucun(?:e)?|néant|neant|0|non signalé)$/i.test(clean(w.pain));
+   const painCount=rows.filter(hasPain).length;
+   const decisionCount=rows.filter(w=>clean(w.coach)).length;
+   const items=rows.map(w=>{
+     const entries=[
+       ['Ressenti général',w.feeling],
+       ['Séances non réalisées',w.missed],
+       ['Problèmes de séance / exercice',w.problem],
+       ['Gêne ou douleur signalée',w.pain],
+       ['Contraintes de la semaine suivante',w.nextConstraint],
+       ['Autres informations',w.other],
+       ['Retour / décision du coach',w.coach]
+     ].filter(([label,value])=>clean(value));
+     const badges=[
+       hasPain(w)?'<span class="status amber">Gêne signalée</span>':'',
+       clean(w.coach)?'<span class="status green">Décision notée</span>':'',
+       !entries.length?'<span class="status blue">Sans informations</span>':''
+     ].join('');
+     return '<details><summary><strong>'+esc(fmtDate(w.date))+'</strong>'+
+       '<span class="akArchiveBadges">'+badges+'</span></summary>'+
+       '<div class="akOldDetail">'+
+       (entries.length?entries.map(([label,value])=>
+          '<div class="akOldField"><span>'+esc(label)+'</span><div>'+esc(value)+'</div></div>').join(''):
+         '<p class="muted tiny" style="margin:0">Aucune réponse exploitable n’avait été renseignée pour cette semaine.</p>')+
+       '</div></details>';
+   }).join('');
+   return '<details class="card panel" style="margin-top:13px">'+
+     '<summary style="cursor:pointer"><strong>Archives des anciens bilans AK PRIME</strong> '+
+     '<span class="status blue">'+rows.length+' semaine'+(rows.length>1?'s':'')+'</span>'+
+     (painCount?' <span class="status amber">'+painCount+' gêne'+(painCount>1?'s':'')+'</span>':'')+
+     '</summary>'+
+     '<p class="akOldIntro">Bilans historiques en lecture seule, antérieurs au suivi centralisé dans Optitrainer. Ouvre seulement la semaine à consulter. '+
+     (decisionCount?decisionCount+' décision(s) de coach conservée(s).':'Aucune décision coach enregistrée dans ces archives.')+
+     '</p>'+
+     '<div class="akOldWeeks">'+items+'</div></details>';
+ }
  follow=function(c){
-   const rows=(c.checkins||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-   const historic=rows.length?'<details class="card panel" style="margin-top:12px">'+
-     '<summary style="cursor:pointer"><strong>Historique des anciens bilans AK PRIME ('+
-     rows.length+')</strong></summary><p class="muted tiny">Archives en lecture seule. Les nouveaux suivis de forme et de charge se font sur Optitrainer.</p>'+
-     rows.map(w=>'<div class="item"><strong>'+esc(fmtDate(w.date))+'</strong>'+
-       '<div class="muted tiny">Ressenti : '+esc(w.feeling||'—')+'</div>'+
-       '<div class="muted tiny">Gêne : '+esc(w.pain||'—')+'</div>'+
-       '<div class="muted tiny">Décision coach : '+esc(w.coach||'—')+'</div></div>').join('')+
-     '</details>':'';
-   if(c.pole==='Mental')return '<div class="page-title"><h1>Historique</h1></div>'+
+   const historic=legacyCheckinArchive(c);
+   if(c.pole==='Mental')return '<div class="page-title"><h1>Historique & suivi mental</h1></div>'+
      '<div class="card panel"><h3>Préparation mentale</h3>'+
-     '<p>Les séances, routines et exercices sont dans l’onglet Préparation mentale de ce client.</p>'+
-     '<button class="btn primary small quickTab" data-tab="offer-tools">Ouvrir les séances mentales</button></div>'+historic;
-   return '<div class="page-title"><div><h1>Suivi physique — Optitrainer</h1>'+
-     '<p>La programmation, les séances, les échauffements, la charge, la récupération et l’état de forme sont gérés dans Optitrainer.</p></div></div>'+
-     '<div class="card panel"><h3>Accéder à la programmation du client</h3>'+
+     '<p>Les séances, routines et exercices sont dans l’onglet Préparation mentale du client. '+
+     'Les comptes rendus de visio et le travail à prévoir sont dans « Visios & notes ».</p>'+
+     '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+     '<button class="btn primary small quickTab" data-tab="offer-tools">Ouvrir les séances mentales</button>'+
+     '<button class="btn ghost small quickTab" data-tab="visio_notes">Visios & notes</button></div></div>'+historic;
+   return '<div class="page-title"><div><h1>Suivi hebdomadaire — Optitrainer</h1>'+
+     '<p>Retrouve les questionnaires d’état de forme, la charge, la récupération et les séances dans Optitrainer. '+
+     'AK PRIME n’envoie pas lui-même un formulaire hebdomadaire automatique.</p></div></div>'+
+     '<div class="card panel"><div class="row between" style="flex-wrap:wrap;gap:12px;align-items:start">'+
+     '<div><h3 style="margin:0 0 6px">Suivi actuel du client</h3>'+
+     '<p class="muted tiny" style="margin:0">Les nouveaux check-ins se consultent sur Optitrainer ; les conclusions utiles et actions se conservent dans « Visios & notes ».</p></div>'+
      (c.cycle?.optitrainer&&/^https:\/\//i.test(c.cycle.optitrainer)?
-      '<a class="btn primary" href="'+esc(c.cycle.optitrainer)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Ouvrir Optitrainer</a>':
-      '<div class="alert">Renseigne le lien Optitrainer du client depuis sa fiche administrative ou ses paramètres de suivi.</div>')+
-     '<p class="muted tiny" style="margin-top:9px">Aucun bilan de forme ni séance physique n’est créé en double dans AK PRIME.</p></div>'+historic;
+       '<a class="btn primary" href="'+esc(c.cycle.optitrainer)+'" target="_blank" rel="noopener noreferrer">Ouvrir Optitrainer ↗</a>':
+       '<span class="status amber">Lien Optitrainer à renseigner</span>')+
+     '</div>'+
+     '<button class="btn ghost small quickTab" data-tab="visio_notes" style="margin-top:12px">Consigner une décision / action</button></div>'+
+     historic;
  };
 
 // La même grille sert au site public, aux comparatifs et à chacun des dossiers.
