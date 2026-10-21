@@ -403,7 +403,8 @@
      const {error}=await supa.rpc('owner_restore_client_archive',{p_client_id:c.id,p_reason:reason.trim()});
      if(error)return alert('Restauration refusée : '+error.message);
      archiveListMode='active';state.view='client';state.clientId=c.id;state.tab='passport';
-     await loadSupabaseData();render();toast('Dossier restauré : Passeport ouvert au dernier état. Accès client toujours désactivé.');
+     passportBookPage='overview';passportSelectedTestKey='';
+     await loadSupabaseData();render();toast('Dossier restauré : Passeport ouvert sur le point de reprise. Accès client toujours désactivé.');
    }
    if(e.target.closest?.('#akDeleteTestClient')){
      if(!verified.has(c.id))return alert('Fichier chiffré non vérifié.');
