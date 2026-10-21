@@ -1618,7 +1618,7 @@ function passportCyclePage(m){
   '<div class="akp-page-title"><div><span>CYCLE</span><h2>'+esc(m.cycle?.title||'Cycle actuel')+'</h2><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="akp-big-stat"><strong>'+cs.pct+'%</strong><span>avancement</span></div></div>'+
   '<div class="akp-cycle-layout">'+
    '<section class="akp-panel akp-cycle-timeline"><div class="akp-section-head"><div><span class="akp-label">PLANIFICATION</span><h3>'+(cs.weekNow&&cs.weeks?'Semaine '+cs.weekNow+' sur '+cs.weeks:'Frise du cycle')+'</h3></div><span class="akp-mini-status">'+(cs.remaining!==null&&cs.remaining>0?cs.remaining+' j restants':cs.remaining===0?'Dernier jour':cs.remaining!==null?'Terminé':'À dater')+'</span></div>'+
-    '<div class="akp-week-track">'+Array.from({length:weeks},(_,i)=>i+1).map(w=>'<div class="akp-week '+(w<current?'done':w===current?'current':'future')+'"><div class="akp-week-dot">'+(w<current?'✓':w)+'</div><span>S'+w+'</span></div>').join('')+'<div class="akp-week finish"><div class="akp-week-dot">R</div><span>Retest</span></div></div>'+
+    '<div class="akp-week-track">'+Array.from({length:weeks},(_,i)=>i+1).map(w=>'<div class="akp-week '+(w<current?'done':w===current?'current':'future')+'"><div class="akp-week-dot">'+(w<current?'✓':w)+'</div><span>S'+w+'</span></div>').join('')+'<div class="akp-week finish"><div class="akp-week-dot">'+(retest?'R':'B')+'</div><span>'+(retest?'Retest':'Bilan')+'</span></div></div>'+
     '<div class="akp-cycle-milestones"><span class="akp-label">JALONS DU CYCLE</span>'+(cycleEvents.length?cycleEvents.slice(0,6).map(e=>'<div><b>'+fmtDate(e.date)+'</b><span>'+esc(e.title)+'</span></div>').join(''):'<p>Aucun jalon spécifique enregistré sur ce cycle.</p>')+'</div>'+
    '</section>'+
    '<aside class="akp-cycle-side">'+
@@ -1661,7 +1661,7 @@ function passportTimelinePage(m){
  const next=passportNextAppointment(m);
  if(m.start)rows.push({date:m.start,title:'Début du suivi AK PRIME',detail:'Ouverture de l’accompagnement.',auto:true});
  if(m.cycle?.start)rows.push({date:m.cycle.start,title:'Début du cycle — '+(m.cycle.title||'cycle actuel'),detail:'',auto:true});
- if(m.cycle?.end)rows.push({date:m.cycle.end,title:'Fin du cycle / retest',detail:'Bilan du cycle en cours.',auto:true});
+ if(m.cycle?.end)rows.push({date:m.cycle.end,title:'Fin prévue du cycle',detail:'Échéance du cycle : pas un résultat de retest.',auto:true});
  if(next?.starts_at)rows.push({date:isoDate(next.starts_at),title:'Prochaine visio',detail:fmtTime(next.starts_at),auto:true});
  if(m.end)rows.push({date:m.end,title:'Fin d’engagement',detail:'Échéance actuelle de l’accompagnement.',auto:true});
  const seen=new Set(),unique=rows.filter(x=>{const k=x.date+'|'+x.title.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.date.localeCompare(b.date));
@@ -3634,6 +3634,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261021-visio-notes-v22"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261021-cycles-v23"></script>
 </body>
 </html>
