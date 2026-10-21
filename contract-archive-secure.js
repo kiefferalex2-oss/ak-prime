@@ -48,7 +48,7 @@ document.addEventListener('click', async function(event) {
    link.disabled=true;
    try{
     const {error}=await supa.auth.resetPasswordForEmail(email,{
-     redirectTo:'https://ak-prime.pages.dev/reinitialiser-mot-de-passe.html'
+     redirectTo:window.location.origin+'/reinitialiser-mot-de-passe.html'
     });
     if(error)throw error;
     setAuthMsg('Si cette adresse correspond à un compte AK PRIME, tu recevras un e-mail pour définir un nouveau mot de passe.',false);
