@@ -319,7 +319,8 @@
      }
    }
    (db.appointments||[]).filter(a=>['scheduled','confirmed'].includes(a.status)&&clients.has(a.client_id))
-     .forEach(a=>due.push({date:localISO(a.starts_at),label:'Visio '+fmtDateTime(a.starts_at),
+     .forEach(a=>due.push({date:new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(a.starts_at)),
+      label:'Visio '+fmtDateTime(a.starts_at),
       client:clients.get(a.client_id),group:'Visio',key:'visio-'+a.id,action:'onboarding'}));
    return due.sort((a,b)=>a.date.localeCompare(b.date));
  }
