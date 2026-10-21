@@ -104,6 +104,13 @@
    wrapper.querySelectorAll('.client-action-card').forEach(item=>{
      if(item.querySelector('strong')?.textContent?.trim()==='Bilan hebdomadaire')item.remove();
    });
+   wrapper.querySelectorAll('.section-title').forEach(header=>{
+     if(header.textContent.trim()!=='À faire')return;
+     const grid=header.nextElementSibling;
+     if(grid?.classList.contains('grid2')&&!grid.querySelector('.client-action-card')){
+       grid.remove();header.remove();
+     }
+   });
    return wrapper.innerHTML;
  };
  function prefillSleep(s,day){
