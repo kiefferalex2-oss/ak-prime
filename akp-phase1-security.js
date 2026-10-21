@@ -294,7 +294,5 @@
    }catch(e){feedback('Impossible d’ouvrir la sauvegarde : phrase secrète incorrecte, fichier endommagé ou format non reconnu. '+e.message)}
  }
 
+window.AKP_PHASE1_READY=true;
 })();
-
-// Corrections validées lors de la première revue du back-office.
-(function(){const s=document.createElement('script');s.src='./akp-review-fixes.js';s.onload=()=>{if(authUser?.id&&['owner','coach'].includes(authProfile?.role)&&document.querySelector('.content'))render()};document.body.appendChild(s);})();
