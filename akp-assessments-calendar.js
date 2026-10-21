@@ -79,8 +79,10 @@
    return [...scheduledNotifications(),...oldNotifications()].sort((a,b)=>
      Number(!!a.read)-Number(!!b.read)||(b.priority||0)-(a.priority||0));
  };
- function planRows(c,limit=20){
-   const rows=assessmentItems(c.id);
+ function planRows(c,phase,limit=20){
+   const rows=assessmentItems(c.id).filter(p=>p.phase===phase).sort((a,b)=>
+     Number(a.status!=='planned')-Number(b.status!=='planned')||
+     String(a.due_date).localeCompare(String(b.due_date)));
    return rows.slice(0,limit).map(p=>{
      const outcome=p.status==='completed'?'Réalisée':p.status==='cancelled'?'Annulée':
        diffDays(p.due_date)<0?'En retard':diffDays(p.due_date)<=7?'À préparer':'Planifiée';
@@ -103,6 +105,17 @@
  function plannedPanel(c){
    const count=assessmentItems(c.id).filter(p=>p.status==='planned').length;
    const mentally=c.pole==='Mental';
+   const sections=(mentally?['cycle_end']:['initial','retest','cycle_end']).map(phase=>{
+     const rows=assessmentItems(c.id).filter(p=>p.phase===phase);
+     const pending=rows.filter(p=>p.status==='planned').length;
+     return '<details class="card panel" style="margin:9px 0" '+(pending?'open':'')+'>'+
+       '<summary style="cursor:pointer"><strong>'+esc(LABEL[phase])+'</strong> '+
+       '<span class="status '+(pending?'amber':'blue')+'">'+pending+' à traiter</span> '+
+       '<span class="muted tiny">('+rows.length+' au total)</span></summary>'+
+       '<div class="list" style="margin-top:9px">'+
+       (planRows(c,phase,12)||'<p class="muted tiny">Aucune échéance pour cette étape.</p>')+
+       '</div></details>';
+   }).join('');
    return '<div class="card panel" id="akAssessments" style="margin:14px 0">'+
      '<div class="row between" style="gap:12px;flex-wrap:wrap"><div><h3>Évaluations & échéances</h3>'+
      '<p class="muted tiny">'+(mentally?'Préparation mentale : bilans de fin de cycle, sans batterie physique automatique.':
@@ -115,7 +128,7 @@
        '<button class="btn primary small akNewAssessment">+ Planifier une évaluation</button>'+
        '<button class="btn ghost small akRefreshAssessments">Mettre à jour les échéances</button>':'')+
      '<button class="btn ghost small akAssessmentToCalendar">Voir le calendrier</button></div>'+
-     '<div class="list">'+(planRows(c,30)||'<div class="muted tiny">Aucune évaluation planifiée pour le moment.</div>')+'</div></div>';
+     '<div>'+sections+'</div></div>';
  }
  function compactOnboarding(c){
    let html=oldOnboarding(c);
@@ -147,8 +160,17 @@
    if(green)green.innerHTML='<strong>Onboarding terminé.</strong> Statut actuel du dossier : <strong>'+
       esc(c.status)+'</strong>. Les prochaines évaluations se préparent dans le Passeport et le calendrier.';
    const workflow=wrapper.firstElementChild;
-   if(workflow)workflow.insertAdjacentHTML('afterend',plannedPanel(c));
-   else return html+plannedPanel(c);
+   if(workflow&&finished){
+     const historical=document.createElement('details');
+     historical.className='card panel';
+     historical.style.marginBottom='12px';
+     historical.innerHTML='<summary style="cursor:pointer;font-weight:700">Parcours de démarrage terminé — afficher l’historique</summary>';
+     workflow.replaceWith(historical);
+     historical.appendChild(workflow);
+     wrapper.insertAdjacentHTML('afterbegin',plannedPanel(c));
+   }else if(workflow){
+     workflow.insertAdjacentHTML('afterend',plannedPanel(c));
+   }else return html+plannedPanel(c);
    return wrapper.innerHTML;
  }
  const oldOnboarding=onboarding;
@@ -206,7 +228,7 @@
     '<div class="field"><label>Échéance planifiée (si applicable)</label><select class="select" id="akTestPlan">'+
       '<option value="">Résultat hors planning</option>'+
       options.map(p=>'<option value="'+esc(p.id)+'" '+(p.id===planId?'selected':'')+'>'+
-         esc(fmtDate(p.due_date))+' — '+esc(p.title)+'</option>').join('')+'</select></div>'+
+         esc(LABEL[p.phase])+' · '+esc(fmtDate(p.due_date))+' — '+esc(p.title)+'</option>').join('')+'</select></div>'+
     '<div class="field"><label>Test</label><select id="tLibrary" class="select">'+testLibraryOptions(prefill)+'</select></div>'+
     '<div class="field"><label>Date de réalisation</label><input id="tDate" type="date" class="input" value="'+esc(date||localDateISO())+'"></div>'+
     '<div class="field" id="tCustomWrap" style="display:none"><label>Nom du test personnalisé</label>'+
@@ -308,12 +330,21 @@
  async function classifyOld(c,id){
    const t=(c.tests||[]).find(x=>x.id===id);
    if(!t)return;
-   const phase=prompt('Classement du résultat « '+t.name+' » : saisis initial, retest ou cycle_end :','initial');
-   if(!['initial','retest','cycle_end'].includes(phase))return alert('Valeurs admises : initial, retest, cycle_end.');
-   if(!confirm('Classer cet ancien test comme « '+LABEL[phase]+' » ? Aucun résultat n’est modifié.'))return;
-   const {error}=await supa.from('tests').update({assessment_phase:phase}).eq('id',id).eq('client_id',c.id);
-   if(error)return alert('Classement impossible : '+error.message);
-   await loadSupabaseData();render();toast('Ancien test classé.');
+   modal('Classer un ancien résultat — '+esc(t.name),
+     '<p class="muted tiny">Choisis son étape. La valeur et la date ne seront pas modifiées.</p>'+
+     '<div class="field"><label>Étape de l’évaluation</label><select class="select" id="akLegacyPhase">'+
+     [['initial','Évaluation initiale'],['retest','Retest'],['cycle_end','Bilan fin de cycle']].map(([phase,label])=>
+       '<option value="'+phase+'">'+label+'</option>').join('')+'</select></div>',
+     '<button class="btn ghost" id="akLegacyCancel">Annuler</button>'+
+     '<button class="btn primary" id="akLegacySave">Classer le résultat</button>');
+   document.getElementById('akLegacyCancel').onclick=closeModal;
+   document.getElementById('akLegacySave').onclick=async()=>{
+     const phase=document.getElementById('akLegacyPhase').value;
+     const button=document.getElementById('akLegacySave');button.disabled=true;
+     const {error}=await supa.from('tests').update({assessment_phase:phase}).eq('id',id).eq('client_id',c.id);
+     if(error){button.disabled=false;return alert('Classement impossible : '+error.message);}
+     closeModal();await loadSupabaseData();render();toast('Ancien test classé comme '+LABEL[phase]+'.');
+   };
  }
  function calendarEntries(){
    const active=activeClients(),clients=new Map(active.map(c=>[c.id,c]));
@@ -336,8 +367,8 @@
  }
  function calendarPanel(){
    const today=localDateISO(),until=addDays(today,horizon),events=calendarEntries();
-   const items=events.filter(x=>x.date&&x.date<=until);
-   const overdue=items.filter(x=>x.date<today),future=items.filter(x=>x.date>=today);
+   const overdue=events.filter(x=>x.date&&x.date<today&&x.group==='Évaluation');
+   const future=events.filter(x=>x.date>=today&&x.date<=until);
    const start=new Date(today+'T12:00:00Z'),offset=(start.getUTCDay()+6)%7;
    start.setUTCDate(start.getUTCDate()-offset);
    const weeks=Math.ceil((horizon+offset+1)/7);
@@ -356,7 +387,7 @@
      }).join('');
      return '<div style="display:grid;grid-template-columns:repeat(7,minmax(135px,1fr));gap:6px;margin-bottom:6px">'+cells+'</div>';
    }).join('');
-   const shortRows=items.slice(0,85).map(x=>{
+   const renderDeadlineRows=list=>list.slice(0,85).map(x=>{
      const late=x.date<today;
      return '<div class="item row between" style="gap:10px;flex-wrap:wrap"><div><span class="status '+
        (late?'amber':'blue')+'">'+esc(fmtDate(x.date))+'</span> <strong>'+esc(x.group)+
@@ -365,6 +396,7 @@
        '<button class="btn ghost small akOpenAssessmentClient" data-client="'+esc(x.client.id)+
        '" data-tab="'+esc(x.action)+'">Dossier</button></div>';
    }).join('');
+   const overdueRows=renderDeadlineRows(overdue),futureRows=renderDeadlineRows(future);
    return '<div class="card panel" style="margin-bottom:14px">'+
      '<div class="row between" style="gap:12px;flex-wrap:wrap"><div>'+
      '<h3>Calendrier des échéances clients</h3>'+
@@ -377,12 +409,13 @@
       '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:5px">'+
        ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(x=>'<strong class="tiny muted" style="padding:7px">'+x+'</strong>').join('')+
        '</div>'+matrix+'</div></div>'+
-     (overdue.length?'<details style="margin-top:12px" open><summary><strong>Échéances passées ('+
-       overdue.length+')</strong></summary><p class="muted tiny">Vérifie celles qui ont déjà été traitées.</p>'+
-       '<div class="list">'+shortRows+'</div></details>':
-       '<details style="margin-top:12px"><summary><strong>Liste chronologique ('+future.length+
-       ' à venir)</strong></summary><div class="list">'+shortRows+'</div></details>')+
-     '</div>';
+     (overdue.length?'<details style="margin-top:12px" open><summary><strong>Évaluations en retard ('+
+       overdue.length+')</strong></summary><p class="muted tiny">Évaluations non clôturées uniquement.</p>'+
+       '<div class="list">'+overdueRows+'</div></details>':'')+
+     '<details style="margin-top:12px" open><summary><strong>Prochaines échéances ('+future.length+
+       ')</strong></summary><div class="list">'+
+       (futureRows||'<div class="muted tiny">Aucune échéance dans les '+horizon+' prochains jours.</div>')+
+       '</div></details></div>';
  }
  const previousCalendar=calendarPage;
  calendarPage=function(){return calendarPanel()+previousCalendar();};
