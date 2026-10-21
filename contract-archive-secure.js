@@ -140,6 +140,7 @@ document.addEventListener('click', async function(event) {
      '<div class="grid2">'+
      '<div class="field"><label>Nom et prénom</label><input id="mName" class="input" autocomplete="name" maxlength="200"></div>'+
      '<div class="field"><label>E-mail</label><input id="mEmail" class="input" type="email" autocomplete="email" maxlength="255"></div>'+
+     '<div class="field"><label>Téléphone <span class="muted tiny">(facultatif)</span></label><input id="mPhone" class="input" type="tel" autocomplete="tel" maxlength="40" placeholder="06 12 34 56 78 ou +33 6..."></div>'+
      '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div>'+
      '<div class="field"><label>Offre</label><select id="mOffer" class="select"></select></div>'+
      '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input" value="'+localDateISO()+'"></div>'+
@@ -168,20 +169,21 @@ document.addEventListener('click', async function(event) {
    syncOffers();syncEnd();
    get('saveM').onclick=async()=>{
      const name=get('mName').value.trim();
-     const email=get('mEmail').value.trim();
+     const email=get('mEmail').value.trim(),phone=get('mPhone').value.trim();
      const pole=get('mPole').value,offer=get('mOffer').value;
      const start=get('mStart').value,duration=Number(get('mDuration').value);
      const end=monthEnd(start,duration);
      if(name.length<2)return alert('Renseigne le nom et le prénom.');
      if(email&&!get('mEmail').checkValidity())return alert('E-mail invalide.');
+     if(phone&&(!/^[+0-9 ().-]+$/.test(phone)||phone.replace(/[^0-9]/g,'').length<8||phone.replace(/[^0-9]/g,'').length>15))return alert('Numéro de téléphone invalide.');
      if(!end||![3,6].includes(duration))return alert('Date de début ou engagement invalide.');
      if(get('mPayment').value==='À jour'&&!confirm('Ce statut est manuel et ne prouve pas un paiement Stripe. Confirmer ?'))return;
      const words=name.split(/\s+/);
      const first=words.shift()||'',last=words.join(' ')||'-';
      const btn=get('saveM');btn.disabled=true;
      try{
-       const {data,error}=await supa.rpc('owner_create_client',{
-         p_first_name:first,p_last_name:last,p_email:email||null,
+       const {data,error}=await supa.rpc('owner_create_client_with_phone',{
+         p_first_name:first,p_last_name:last,p_email:email||null,p_phone:phone||null,
          p_pole:pole,p_offer:offer,p_start_date:start,p_initial_months:duration,
          p_payment_status:get('mPayment').value
        });
@@ -205,4 +207,19 @@ document.addEventListener('click', async function(event) {
    event.stopPropagation();
    openDirectForm();
  },true);
+})();
+
+// Le numéro demandé dans chacun des trois questionnaires initiaux est prérempli
+// lorsqu'il a déjà été saisi par le coach à la création du dossier.
+(function(){
+ 'use strict';
+ if(typeof renderClientQuestionnaire!=='function')return;
+ const original=renderClientQuestionnaire;
+ renderClientQuestionnaire=function(template,answers){
+   if(!template?.questions?.some(q=>q.key==='phone'))return original(template,answers);
+   const fromDossier=clientPortalState?.client?.phone||'';
+   const safeAnswers={...(answers||{})};
+   if(!safeAnswers.phone&&fromDossier)safeAnswers.phone=fromDossier;
+   return original(template,safeAnswers);
+ };
 })();
