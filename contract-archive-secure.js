@@ -107,3 +107,102 @@ document.addEventListener('click', async function(event) {
   },true);
   next(0);
 })();
+
+
+// Création client fiable : route prioritaire déclenchée directement depuis ce
+// script déjà inclus par index.html (sans dépendre de modules optionnels).
+(function(){
+ 'use strict';
+ const RELEASE='engagement-direct-20261021-v1';
+ window.AKP_CLIENT_CREATE_RELEASE=RELEASE;
+ const options={
+   'Performance':['P1','P2','P3'],
+   'Forme & Santé':['Standard','Renforcé'],
+   'Mental':['Particulier','Sportif']
+ };
+ function monthEnd(date,months){
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return '';
+   const [year,month,day]=date.split('-').map(Number);
+   const test=new Date(Date.UTC(year,month-1,day,12));
+   if(Number.isNaN(test.getTime())||test.getUTCFullYear()!==year||
+      test.getUTCMonth()!==month-1||test.getUTCDate()!==day)return '';
+   const shifted=new Date(Date.UTC(year,month-1+months,1,12));
+   const maximum=new Date(Date.UTC(shifted.getUTCFullYear(),shifted.getUTCMonth()+1,0,12)).getUTCDate();
+   shifted.setUTCDate(Math.min(day,maximum));
+   return shifted.toISOString().slice(0,10);
+ }
+ function openDirectForm(){
+   if(authProfile?.role!=='owner')return alert('Création réservée au propriétaire AK PRIME.');
+   if(typeof modal!=='function'||!supa?.rpc){
+     return alert('Le back-office n’est pas totalement chargé. Actualise et reconnecte-toi.');
+   }
+   modal('Nouveau client',
+     '<div class="grid2">'+
+     '<div class="field"><label>Nom et prénom</label><input id="mName" class="input" autocomplete="name" maxlength="200"></div>'+
+     '<div class="field"><label>E-mail</label><input id="mEmail" class="input" type="email" autocomplete="email" maxlength="255"></div>'+
+     '<div class="field"><label>Pôle</label><select id="mPole" class="select"><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div>'+
+     '<div class="field"><label>Offre</label><select id="mOffer" class="select"></select></div>'+
+     '<div class="field"><label>Date de début</label><input id="mStart" type="date" class="input" value="'+localDateISO()+'"></div>'+
+     '<div class="field"><label>Engagement initial</label><select id="mDuration" class="select">'+
+     '<option value="3">3 mois</option><option value="6">6 mois</option></select></div>'+
+     '<div class="field"><label>Date de fin automatique</label><input id="mEnd" type="date" class="input" readonly></div>'+
+     '<div class="field"><label>Statut paiement (manuel)</label><select id="mPayment" class="select">'+
+     '<option>En attente</option><option>À jour</option></select></div></div>'+
+     '<div class="alert blue" style="margin-top:10px">La durée initiale est de 3 ou 6 mois. Le mensuel est proposé au renouvellement. '+
+     'La fin est calculée automatiquement et le portail reste désactivé avant validation.</div>'+
+     '<div class="muted tiny" style="margin-top:7px">Version du formulaire : '+RELEASE+'</div>',
+     '<button class="btn ghost" id="cancelM">Annuler</button>'+
+     '<button class="btn primary" id="saveM">Créer dans Supabase</button>');
+   const get=id=>document.getElementById(id);
+   function syncOffers(){
+     const pole=get('mPole')?.value;
+     get('mOffer').innerHTML=(options[pole]||[]).map(x=>'<option>'+x+'</option>').join('');
+   }
+   function syncEnd(){
+     get('mEnd').value=monthEnd(get('mStart').value,Number(get('mDuration').value));
+   }
+   get('mPole').onchange=syncOffers;
+   get('mStart').onchange=syncEnd;
+   get('mDuration').onchange=syncEnd;
+   get('cancelM').onclick=closeModal;
+   syncOffers();syncEnd();
+   get('saveM').onclick=async()=>{
+     const name=get('mName').value.trim();
+     const email=get('mEmail').value.trim();
+     const pole=get('mPole').value,offer=get('mOffer').value;
+     const start=get('mStart').value,duration=Number(get('mDuration').value);
+     const end=monthEnd(start,duration);
+     if(name.length<2)return alert('Renseigne le nom et le prénom.');
+     if(email&&!get('mEmail').checkValidity())return alert('E-mail invalide.');
+     if(!end||![3,6].includes(duration))return alert('Date de début ou engagement invalide.');
+     if(get('mPayment').value==='À jour'&&!confirm('Ce statut est manuel et ne prouve pas un paiement Stripe. Confirmer ?'))return;
+     const words=name.split(/\s+/);
+     const first=words.shift()||'',last=words.join(' ')||'-';
+     const btn=get('saveM');btn.disabled=true;
+     try{
+       const {data,error}=await supa.rpc('owner_create_client',{
+         p_first_name:first,p_last_name:last,p_email:email||null,
+         p_pole:pole,p_offer:offer,p_start_date:start,p_initial_months:duration,
+         p_payment_status:get('mPayment').value
+       });
+       if(error)throw Error(error.message);
+       closeModal();
+       await loadSupabaseData();
+       state.view='client';state.clientId=data;state.tab='overview';render();
+       toast('Dossier créé : engagement '+duration+' mois, échéance '+fmtDate(end));
+     }catch(err){
+       alert('Le dossier n’a pas pu être créé : '+err.message);
+       btn.disabled=false;
+     }
+   };
+ }
+ // Capture de l'action avant le handler historique d'index.html.
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#newClient');
+   if(!button)return;
+   event.preventDefault();
+   event.stopImmediatePropagation();
+   event.stopPropagation();
+   openDirectForm();
+ },true);
+})();
