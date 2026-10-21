@@ -46,6 +46,35 @@
        '</div></div></div>'+core;
    }finally{db.clients=all}
  };
+
+ const originalPassportModel=passportModelFromCoach;
+ passportModelFromCoach=function(c){
+   const model=originalPassportModel(c);
+   model.archiveResume=(db.clientArchiveResume||[]).find(x=>x.client_id===c.id)||null;
+   return model;
+ };
+ const originalPassportOverview=passportOverviewPage;
+ passportOverviewPage=function(m){
+   const original=originalPassportOverview(m);
+   const resume=m.archiveResume;
+   if(!resume)return original;
+   const tests=Array.isArray(resume.last_tests)?resume.last_tests.slice(0,6):[];
+   const lastCycle=resume.last_cycle||{};
+   const intro='<div class="akp-panel" style="margin-bottom:14px;padding:18px">'+
+     '<div class="akp-label">POINT DE REPRISE • DERNIER ARCHIVAGE</div>'+
+     '<h3>Reprendre là où le Passeport s’était arrêté</h3>'+
+     '<p class="muted tiny">Repères conservés le '+esc(fmtDate(String(resume.saved_at||'').slice(0,10)))+
+     '. Le Passeport et ses évaluations historiques restent accessibles ci-dessous.</p>'+
+     '<div class="grid2">'+
+     '<div><strong>Dernier cycle</strong><div class="tiny">'+esc(lastCycle.title||'À définir')+
+     ' · '+esc(fmtDate(lastCycle.start))+' → '+esc(fmtDate(lastCycle.end))+'</div></div>'+
+     '<div><strong>Priorité précédente</strong><div class="tiny">'+esc(resume.goal_summary||'Non renseignée')+'</div></div>'+
+     '<div><strong>Points de vigilance</strong><div class="tiny">'+esc(resume.attention_points||'Non renseignés')+'</div></div>'+
+     '<div><strong>Derniers tests</strong><div class="tiny">'+
+       (tests.length?tests.map(t=>esc(t.test_name)+' : '+esc(t.result_value??t.result_text??'—')+' '+esc(t.unit||'')).join(' • '):
+         'Aucun test enregistré')+'</div></div></div></div>';
+   return original.replace('<div class="akp-page">','<div class="akp-page">'+intro);
+ };
  const oldAdmin=admin;
  admin=function(c){
    const base=oldAdmin(c);
