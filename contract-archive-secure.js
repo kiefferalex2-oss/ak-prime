@@ -69,7 +69,8 @@ document.addEventListener('click', async function(event) {
     ['akp-passport-cycle-history.js','AKP_CYCLE_HISTORY_READY'],
     ['akp-client-archive.js','AKP_CLIENT_ARCHIVE_READY'],
     ['akp-notifications-pause.js','AKP_ACTIVITY_PAUSE_READY'],
-    ['akp-client-management.js','AKP_CLIENT_MANAGEMENT_READY']
+    ['akp-client-management.js','AKP_CLIENT_MANAGEMENT_READY'],
+    ['akp-assessments-calendar.js','AKP_ASSESSMENT_CALENDAR_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -101,7 +102,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-client-management-v17';
+    script.src='./'+file+'?rev=20261021-assessments-v18';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
