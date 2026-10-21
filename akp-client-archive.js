@@ -37,7 +37,24 @@
    const count=all.filter(x=>!!x.archivedAt).length;
    try{
      db.clients=all.filter(x=>archiveListMode==='archived'?!!x.archivedAt:!x.archivedAt);
-     const core=olderClientsPage();
+     const core=archiveListMode==='archived'?
+       '<div class="grid2">'+db.clients.map(c=>{
+         const snapshot=(db.clientArchiveResume||[]).find(x=>x.client_id===c.id);
+         const cycle=snapshot?.last_cycle||{};
+         const tests=(Array.isArray(snapshot?.last_tests)?snapshot.last_tests:[]).slice(0,3);
+         return '<div class="card panel"><div class="row between"><div><h3>'+esc(c.name)+'</h3>'+
+           '<div class="muted tiny">'+esc(c.pole)+' • '+esc(c.offer)+' • Archivé le '+
+           esc(fmtDate(String(c.archivedAt||'').slice(0,10)))+'</div></div>'+
+           '<span class="status amber">ARCHIVÉ</span></div>'+
+           '<div style="margin-top:12px"><strong>Dernier cycle : </strong>'+esc(cycle.title||'Non renseigné')+'</div>'+
+           '<div class="tiny" style="margin-top:7px"><strong>Objectifs :</strong> '+esc(snapshot?.goal_summary||'À compléter')+'</div>'+
+           '<div class="tiny" style="margin-top:7px"><strong>Vigilance :</strong> '+esc(snapshot?.attention_points||'Aucune enregistrée')+'</div>'+
+           '<div class="tiny muted" style="margin-top:7px"><strong>Derniers tests :</strong> '+
+             (tests.length?tests.map(t=>esc(t.test_name)+': '+esc(t.result_value??t.result_text??'—')+
+               ' '+esc(t.unit||'')).join(' • '):'Aucun')+'</div>'+
+           '<button class="btn primary small openClient" data-id="'+esc(c.id)+
+           '" data-tab-target="admin" style="margin-top:13px">Ouvrir / réactiver le dossier</button></div>';
+       }).join('')+'</div>':olderClientsPage();
      return '<div class="card panel" style="margin-bottom:12px"><div class="row between" style="gap:12px;flex-wrap:wrap">'+
        '<div><strong>Gestion des dossiers</strong><p class="muted tiny">Les dossiers archivés sont conservés mais masqués de la liste active.</p></div>'+
        '<div class="row" style="gap:8px">'+
