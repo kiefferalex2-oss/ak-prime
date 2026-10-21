@@ -104,11 +104,13 @@
      '<div class="section-title">Archiver ou supprimer</div>'+
      '<div class="row" style="gap:9px;flex-wrap:wrap">'+
      (!archived(c)?'<button class="btn ghost small akGoArchive">Archiver le dossier (Passeport PDF)</button>':'')+
-     (c.isTest&&!archived(c)?'<button class="btn danger small akDeleteEmptyTest">Supprimer définitivement ce dossier TEST vide</button>':'')+
+     (c.isTest&&!archived(c)?'<button class="btn danger small akDeleteEmptyTest">Supprimer définitivement ce dossier TEST vide</button>':
+       !archived(c)&&['Inactif','Onboarding','Prospect'].includes(c.status)&&!c.authUserId?
+       '<button class="btn danger small akDiscardDraft">Supprimer un brouillon créé par erreur</button>':'')+
      '</div>'+
      '<p class="muted tiny" style="margin-top:8px">'+
      (c.isTest?'La suppression définitive n’est autorisée que si aucun document, paiement, compte ou suivi n’est à conserver.':
-       'Pour un vrai client, on archive plutôt que supprimer afin de conserver contrats, factures et historique de suivi.')+
+       'Un dossier inactif / onboarding, sans contrat, compte ni suivi, peut être supprimé après confirmation. Pour un vrai client accompagné, on archive plutôt que supprimer.')+
      '</p></div>';
    return main+html+decisionHistory(c);
  };
@@ -170,8 +172,9 @@
    const st=e.target.closest?.('.akManageStatus'),
      off=e.target.closest?.('.akChangeOffer'),
      archive=e.target.closest?.('.akGoArchive'),
-     del=e.target.closest?.('.akDeleteEmptyTest');
-   if(!st&&!off&&!archive&&!del)return;
+     del=e.target.closest?.('.akDeleteEmptyTest'),
+     draft=e.target.closest?.('.akDiscardDraft');
+   if(!st&&!off&&!archive&&!del&&!draft)return;
    if(state.view!=='client'||!OWNER())return;
    e.preventDefault();e.stopImmediatePropagation();
    const c=currentClient();if(!c)return;
@@ -179,6 +182,24 @@
    if(off)return offerModal(c);
    if(archive){
      document.getElementById('akClientArchiveActions')?.scrollIntoView({behavior:'smooth',block:'start'});
+     return;
+   }
+   if(draft){
+     if(!['Inactif','Onboarding','Prospect'].includes(c.status))
+       return alert('Cette opération est réservée aux dossiers brouillons inactifs ou en onboarding.');
+     if(c.authUserId||c.portalAccessEnabled)
+       return alert('Ce dossier possède un compte client : archive-le plutôt que le supprimer.');
+     const name=prompt('Suppression définitive du brouillon : saisis exactement « '+c.name+' » pour confirmer :');
+     if(name!==c.name)return;
+     if(!confirm('Confirme-tu qu’aucun contrat n’a été signé et qu’aucune prestation n’a été réalisée pour ce dossier ?'))return;
+     if(!confirm('Dernière confirmation : supprimer définitivement ce brouillon ? Supabase bloquera toute suppression si des données importantes sont présentes.'))return;
+     const {error}=await supa.rpc('owner_discard_empty_draft_client',{
+       p_client_id:c.id,p_confirm_name:name,p_no_client_service:true
+     });
+     if(error)return alert('Suppression refusée : '+error.message+
+       '\\nCe dossier peut être archivé à la place.');
+     state.view='clients';state.clientId=null;state.tab='overview';
+     await loadSupabaseData();render();toast('Brouillon vide supprimé.');
      return;
    }
    if(del){
