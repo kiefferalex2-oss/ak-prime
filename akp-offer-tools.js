@@ -181,7 +181,12 @@
        esc(x.title)+'</strong> <span class="muted tiny">• '+esc(fmtDate(x.entry_date))+
        (archived?' • Archivé':'')+'</span></summary>'+
        '<div style="margin-top:9px">'+lines+'</div>'+
+       (type==='macro_budget'?
+          '<div class="tiny" style="margin-top:9px"><strong>PDF :</strong> '+(x.details?.pdf_path?'Joint et sécurisé':'À ajouter')+
+          ' • <strong>Accès client :</strong> '+(x.client_visible?'Publié':'Brouillon')+'</div>':'')+
        '<div class="row" style="margin-top:12px;gap:9px">'+
+       (type==='macro_budget'&&x.details?.pdf_path?
+         '<button class="btn ghost small offerMacroPdf" data-id="'+esc(x.id)+'">Ouvrir le PDF</button>':'')+
        (archived?'<button class="btn ghost small offerToolRestore" data-id="'+esc(x.id)+'">Restaurer</button>':
         '<button class="btn ghost small offerToolEdit" data-id="'+esc(x.id)+'">Modifier</button>'+
         '<button class="btn ghost small offerToolArchive" data-id="'+esc(x.id)+'">Archiver</button>')+
@@ -242,7 +247,11 @@
     '<div class="grid2"><div class="field"><label>Date</label><input id="offerEntryDate" type="date" class="input" value="'+esc(row?.entry_date||localDateISO())+'"></div>'+
     '<div class="field"><label>Intitulé</label><input id="offerEntryTitle" class="input" maxlength="180" value="'+esc(row?.title||spec.label)+'"></div></div>'+
     '<div class="grid2">'+spec.fields.map(([key,label,kind])=>fieldHtml(key,label,kind,details[key])).join('')+'</div>'+
-    (type==='macro_budget'?'<div class="alert blue tiny">Repère : protéines et glucides = 4 kcal/g ; lipides = 9 kcal/g. Les objectifs sont personnalisés par le coach, sans menus détaillés.</div>':''),
+    (type==='macro_budget'?'<div class="alert blue tiny">Repère : protéines et glucides = 4 kcal/g ; lipides = 9 kcal/g. Objectifs journaliers sans menus détaillés.</div>'+
+     '<div class="field" style="margin-top:12px"><label>Fichier PDF du budget macro (5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
+     '<label class="check"><input id="offerMacroPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Rendre ce budget et son PDF accessibles au client</label>'+
+     (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Sans PDF joint, le budget reste un brouillon privé.</div>'):''),
+
     '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Enregistrer</button>');
    document.getElementById('cancelM').onclick=closeModal;
    document.getElementById('saveM').onclick=async()=>{
@@ -269,22 +278,52 @@
        if(Math.abs(sum-Number(out.kcal))>150&&!confirm('Les macros représentent environ '+Math.round(sum)+' kcal, différent de l’objectif '+out.kcal+' kcal. Continuer ?'))return;
      }
      if(type==='sleep_entry'&&(!out.hours||!out.quality))return alert('Renseigne la durée et la qualité du sommeil.');
+     const macro=type==='macro_budget';
+     const pdf=macro?document.getElementById('offerMacroPdfFile')?.files?.[0]:null;
+     const publish=macro&&!!document.getElementById('offerMacroPublish')?.checked;
+     if(pdf&&(pdf.size>5242880||pdf.size===0||!(/\.pdf$/i.test(pdf.name)&&pdf.type==='application/pdf')))
+       return alert('Sélectionne un PDF valide de 5 Mo maximum.');
+     if(publish&&!pdf&&!row?.details?.pdf_path)return alert('Joins d’abord un PDF pour publier le budget.');
      const save=document.getElementById('saveM');save.disabled=true;
+     let uploadedPath='';
      try{
-       const data={client_id:c.id,tool_type:type,entry_date:date,title,details:out};
+       const details={...out};
+       if(macro&&row?.details?.pdf_path)details.pdf_path=row.details.pdf_path;
+       if(pdf){
+         uploadedPath=c.id+'/'+crypto.randomUUID()+'.pdf';
+         const result=await supa.storage.from('akprime-macro-pdfs').upload(uploadedPath,pdf,{cacheControl:'3600',contentType:'application/pdf',upsert:false});
+         if(result.error)throw Error('PDF : '+result.error.message);
+         details.pdf_path=uploadedPath;
+       }
+       const data={client_id:c.id,tool_type:type,entry_date:date,title,details};
        let res;
-       if(row)res=await supa.from('client_offer_entries').update({entry_date:date,title,details:out}).eq('id',row.id).eq('client_id',c.id);
-       else res=await supa.from('client_offer_entries').insert({...data,created_by:authUser.id});
+       if(row)res=await supa.from('client_offer_entries').update({
+         entry_date:date,title,details,client_visible:publish
+       }).eq('id',row.id).eq('client_id',c.id);
+       else res=await supa.from('client_offer_entries').insert({...data,
+          client_visible:publish,created_by:authUser.id});
        if(res.error)throw Error(res.error.message);
-       closeModal();await loadSupabaseData();render();toast('Outil enregistré dans Supabase.');
-     }catch(e){alert('Enregistrement impossible : '+e.message);save.disabled=false}
+       closeModal();await loadSupabaseData();render();
+       toast(macro?(publish?'Budget macro et PDF publiés au client.':'Budget enregistré en brouillon.'):'Outil enregistré dans Supabase.');
+     }catch(e){
+       if(uploadedPath)await supa.storage.from('akprime-macro-pdfs').remove([uploadedPath]);
+       alert('Enregistrement impossible : '+e.message);save.disabled=false
+     }
    };
  }
  document.addEventListener('click',async e=>{
    if(state.view!=='client'||state.tab!=='offer-tools')return;
    const add=e.target.closest('.offerToolAdd'),edit=e.target.closest('.offerToolEdit');
    const archive=e.target.closest('.offerToolArchive'),restore=e.target.closest('.offerToolRestore');
+   const pdfButton=e.target.closest('.offerMacroPdf');
    const c=currentClient();
+   if(pdfButton){
+     const row=(db.offerEntries||[]).find(x=>x.id===pdfButton.dataset.id&&x.client_id===c.id);
+     if(!row?.details?.pdf_path)return alert('Aucun PDF joint.');
+     const {data,error}=await supa.storage.from('akprime-macro-pdfs').createSignedUrl(row.details.pdf_path,90);
+     if(error||!data?.signedUrl)return alert('Impossible d’ouvrir le PDF : '+(error?.message||'lien indisponible'));
+     window.open(data.signedUrl,'_blank','noopener');return;
+   }
    if(add){editEntry(c,add.dataset.type,null);return}
    if(edit){const row=(db.offerEntries||[]).find(x=>x.id===edit.dataset.id&&x.client_id===c.id);
      if(row)editEntry(c,row.tool_type,row);return}
