@@ -46,7 +46,7 @@
   p1:'Analyses vidéo',
   p2:'Analyses vidéo P2',
   p3:'Sommeil, budget macro & analyses vidéo P3',
-  forme:'Analyses vidéo & sommeil'
+  forme:'Nutrition, sommeil & analyses vidéo'
  };
 
  function hasVideoReviews(c){
@@ -141,6 +141,7 @@
    const p=String(c?.pole||''),o=String(c?.offer||'').trim().toLowerCase();
    if(p==='Mental')return ['mental_session','mental_homework','mental_practice'];
    if(p==='Performance'&&o==='p3')return ['macro_budget'];
+   if(p==='Forme & Santé'&&o==='renforcé')return ['macro_budget'];
    // Aucun module mental dans les fiches Performance : toute préparation mentale
    // intégrée se traite dans les échanges/Optitrainer, pas dans un onglet séparé.
    return []; // Séances, charges, forme, adaptations, vidéo, échauffements : Optitrainer.
@@ -290,7 +291,7 @@
    if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return labelled;
    const active=state.tab==='offer-tools';
    const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
-     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
+     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':c.pole==='Forme & Santé'&&c.offer==='Renforcé'?'Nutrition, sommeil & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
    return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
  };
  const oldOverview=overview;
