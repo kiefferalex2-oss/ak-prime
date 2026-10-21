@@ -280,4 +280,5 @@
    if(error)return alert('Modification impossible : '+error.message);
    await loadSupabaseData();render();toast(isRestore?'Enregistrement restauré.':'Enregistrement archivé.');
  },true);
+window.AKP_OFFER_TOOLS_READY=true;
 })();
