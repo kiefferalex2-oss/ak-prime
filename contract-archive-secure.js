@@ -67,7 +67,8 @@ document.addEventListener('click', async function(event) {
     ['akp-offer-tools.js','AKP_OFFER_TOOLS_READY'],
     ['akp-client-essentials.js','AKP_CLIENT_ESSENTIALS_READY'],
     ['akp-passport-cycle-history.js','AKP_CYCLE_HISTORY_READY'],
-    ['akp-client-archive.js','AKP_CLIENT_ARCHIVE_READY']
+    ['akp-client-archive.js','AKP_CLIENT_ARCHIVE_READY'],
+    ['akp-notifications-pause.js','AKP_ACTIVITY_PAUSE_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -99,7 +100,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-passport-pdf-resume-v15';
+    script.src='./'+file+'?rev=20261021-notifications-pause-v16';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
