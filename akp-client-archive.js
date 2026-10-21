@@ -125,6 +125,52 @@
    }catch(e){alert('Export impossible : '+e.message)}
    finally{if(button)button.disabled=false}
  }
+
+ function openSavedClientViewer(data){
+   const tables=data.tables||{};
+   const names=Object.keys(tables).filter(k=>Array.isArray(tables[k])).sort();
+   const labels={
+     clients:'Fiche client',cycles:'Historique des cycles',tests:'Tests du Passeport',
+     passport_events:'Événements du Passeport',questionnaire_responses:'Questionnaires',
+     client_workspace:'Notes',client_video_receipts:'Vidéos WhatsApp reçues',
+     client_sleep_diary:'Agenda de sommeil',client_offer_entries:'Prestations et budgets macro',
+     renewals:'Renouvellements',appointments:'Visios',invoices:'Factures',
+     checkout_orders:'Contrats',checkout_intents:'Parcours de commande'
+   };
+   modal('Dossier client sauvegardé',
+     '<div class="alert green"><strong>Fichier vérifié, consultable en lecture seule.</strong>'+
+     '<div class="tiny">Le fichier chiffré reste sur ton PC, aucune donnée n’est restaurée dans Supabase.</div></div>'+
+     '<div class="field"><label>Partie du dossier</label><select class="select" id="akSavedArchivePart">'+
+     names.map(n=>'<option value="'+esc(n)+'">'+esc(labels[n]||n.replaceAll('_',' '))+
+        ' ('+tables[n].length+')</option>').join('')+'</select></div>'+
+     '<div class="field"><label>Recherche</label><input class="input" id="akSavedArchiveSearch" placeholder="Cycle, test, date…"></div>'+
+     '<div id="akSavedArchiveRows" class="list" style="max-height:390px;overflow:auto"></div>'+
+     '<div class="alert" style="margin-top:10px">Cet export n’inclut pas le contenu des PDF privés ni les vidéos WhatsApp. '+
+     'Les fichiers PDF doivent être sauvegardés séparément.</div>',
+     '<button class="btn primary" id="akCloseArchiveViewer">Fermer</button>');
+   const selector=document.getElementById('akSavedArchivePart');
+   const search=document.getElementById('akSavedArchiveSearch');
+   const area=document.getElementById('akSavedArchiveRows');
+   if(names.includes('cycles'))selector.value='cycles';
+   else if(names.includes('clients'))selector.value='clients';
+   function refresh(){
+     const rows=tables[selector.value]||[],q=search.value.trim().toLocaleLowerCase('fr');
+     const matched=q?rows.filter(x=>JSON.stringify(x).toLocaleLowerCase('fr').includes(q)):rows;
+     area.innerHTML='<div class="muted tiny">'+matched.length+' résultat(s) • 30 affichés maximum</div>'+
+       (matched.slice(0,30).map((row,i)=>{
+         const title=row?.title||row?.test_name||row?.start_date||row?.entry_date||
+           row?.invoice_number||row?.first_name||'Élément '+(i+1);
+         const raw=JSON.stringify(row,null,2);
+         return '<details class="item" style="margin-top:8px"><summary><strong>'+esc(String(title))+
+           '</strong></summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:290px;overflow:auto;font-size:12px">'+
+           esc(raw.length>15000?raw.slice(0,15000)+'…':raw)+'</pre></details>';
+       }).join('')||'<div class="muted tiny">Aucun élément.</div>');
+   }
+   selector.onchange=()=>{search.value='';refresh()};
+   search.oninput=refresh;
+   document.getElementById('akCloseArchiveViewer').onclick=closeModal;
+   refresh();
+ }
  async function verifyFile(c,file){
    if(!file)return;
    try{
@@ -143,12 +189,8 @@
        data.client_id!==c.id||!Array.isArray(data.tables?.clients)||
        data.tables.clients[0]?.id!==c.id)throw Error('Le fichier ne correspond pas à ce client.');
      verified.add(c.id);
-     const cats=Object.entries(data.table_counts||{}).filter(([name,n])=>Number(n)>0);
-     const msg=cats.map(([name,n])=>name+' : '+n).join(' · ');
      render();
-     alert('Sauvegarde vérifiée et lisible !\n\n'+msg+
-       '\n\nLes données sont conservées dans ce fichier chiffré sur ton PC. '+
-       'Les fichiers PDF Storage ne sont pas contenus dans la sauvegarde.');
+     openSavedClientViewer(data);
    }catch(e){alert('Fichier non vérifié : '+e.message)}
  }
  document.addEventListener('click',async e=>{
