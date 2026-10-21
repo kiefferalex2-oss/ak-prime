@@ -108,7 +108,7 @@
    const sections=(mentally?['cycle_end']:['initial','retest','cycle_end']).map(phase=>{
      const rows=assessmentItems(c.id).filter(p=>p.phase===phase);
      const pending=rows.filter(p=>p.status==='planned').length;
-     return '<details class="card panel" style="margin:9px 0" '+(pending?'open':'')+'>'+
+     return '<details class="card panel" style="margin:9px 0">'+
        '<summary style="cursor:pointer"><strong>'+esc(LABEL[phase])+'</strong> '+
        '<span class="status '+(pending?'amber':'blue')+'">'+pending+' à traiter</span> '+
        '<span class="muted tiny">('+rows.length+' au total)</span></summary>'+
@@ -186,7 +186,7 @@
    const results=(c.tests||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
    const byPhase=['initial','retest','cycle_end','unclassified'].map(phase=>{
      const arr=results.filter(x=>(x.assessmentPhase||'unclassified')===phase);
-     return '<details class="card panel" style="margin:9px 0" '+(phase==='unclassified'?'':'open')+'>'+
+     return '<details class="card panel" style="margin:9px 0">'+
        '<summary style="cursor:pointer"><strong>'+esc(LABEL[phase])+'</strong> <span class="status blue">'+arr.length+'</span></summary>'+
        '<div class="muted tiny" style="margin:8px 0">'+(phase==='unclassified'?
         'Résultats enregistrés avant la nouvelle classification : à classer manuellement si tu connais leur contexte.':
