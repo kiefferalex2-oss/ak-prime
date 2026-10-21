@@ -165,11 +165,15 @@
        ).join('')+'</div>':'<div class="muted tiny">Aucun résultat dans cette catégorie.</div>')+
        '</details>';
    }).join('');
+   const oldMarkup=document.createElement('div');
+   oldMarkup.innerHTML=oldTestManager(c);
+   const eventControls=oldMarkup.querySelector('.passport-event-manager')?.outerHTML||'';
    return '<div class="passport-manager-grid no-print"><div>'+
      '<div class="card panel"><div class="row between" style="gap:10px"><div><h3>Tests & retests</h3>'+
      '<p class="muted tiny">Choisis clairement initial, retest ou fin de cycle à chaque nouvelle saisie. Les anciens résultats restent visibles.</p></div>'+
      '<button class="btn primary small" id="addTest">+ Saisir un résultat</button></div></div>'+
-     byPhase+'</div></div>'+plannedPanel(c);
+     byPhase+'</div>'+(eventControls?'<div>'+eventControls+'</div>':'')+
+     '</div>'+plannedPanel(c);
  };
  function plansByClient(c){
    return assessmentItems(c.id).filter(p=>p.status==='planned');
