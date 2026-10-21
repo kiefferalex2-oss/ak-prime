@@ -299,7 +299,5 @@
        .catch(async err=>{alert('Accès inchangé : '+err.message);await loadSupabaseData();render()});
    }
  },true);
+window.AKP_REVIEW_READY=true;
 })();
-
-// Interface et outils personnalisés selon le pôle et la formule du client.
-(function(){const s=document.createElement('script');s.src='./akp-offer-tools.js';s.onload=()=>{if(authUser?.id&&['owner','coach'].includes(authProfile?.role)&&document.querySelector('.content'))loadSupabaseData().then(()=>render()).catch(err=>console.error('Chargement des modules de prestation',err))};document.body.appendChild(s);})();
