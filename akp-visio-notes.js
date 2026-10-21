@@ -62,9 +62,10 @@
   if(!grid||grid.children.length<3)return root.innerHTML;
   const responses=grid.children[0],middle=grid.children[1];
   const analysis=middle.querySelector('.card.panel');
-  if(analysis&&analysis.textContent.includes('Analyse avant visio'))analysis.remove();
-  const title=middle.querySelector('.card.panel h3');
-  if(title)title.textContent='Synthèse et décisions de la visio initiale';
+  if(analysis&&analysis.textContent.includes('Analyse avant visio')){
+   const title=analysis.querySelector('h3');if(title)title.textContent='Préparation et notes de la visio initiale';
+   const oldList=analysis.querySelector('.item');if(oldList)oldList.remove();
+  }
   const focus=document.createElement('div');focus.className='akFocusGrid';
   focus.appendChild(responses);
   const wrap=document.createElement('div');wrap.innerHTML=focusPanel(c);focus.appendChild(wrap.firstElementChild);
@@ -137,7 +138,6 @@
   const visios=(db.appointments||[]).filter(a=>a.client_id===c.id&&!['cancelled','cancelled_late','no_show'].includes(a.status));
   const chosen=visios.find(a=>a.id===(n?.appointment_id||appointmentId));
   const type=n?.session_type||(c.onboarding?.currentStep==='active'?'followup':'initial');
-  const input=(key,value='',rows=3)=>'<div class="field"><label>'+key+'</label><textarea class="textarea akMinuteField" data-key="'+esc(value[0])+'" rows="'+rows+'"></textarea></div>';
   modal('Compte rendu — '+esc(c.name),
    '<p class="muted tiny">Notes privées. Tu peux enregistrer un brouillon avant la visio, le compléter et le terminer après.</p>'+
    '<div class="grid2"><div class="field"><label>Date de la visio</label><input type="date" class="input" id="akMinuteDate" value="'+esc(n?.session_date||dayParis(chosen?.starts_at))+'"></div>'+
