@@ -19,7 +19,8 @@
    return Number.isFinite(a)&&Number.isFinite(b)?Math.round((a-b)/86400000):9999;
  }
  function activeClients(){
-   return (db.clients||[]).filter(c=>!c.archivedAt&&!c.isTest&&['Actif','Onboarding'].includes(c.status));
+   return (db.clients||[]).filter(c=>!c.archivedAt&&!c.isTest&&
+      ['Actif','Onboarding'].includes(c.status)&&(!c.end||c.end>=localDateISO()));
  }
  function assessmentItems(clientId){
    return (db.assessmentPlans||[]).filter(p=>p.client_id===clientId)
@@ -117,7 +118,9 @@
      '<div class="list">'+(planRows(c,30)||'<div class="muted tiny">Aucune évaluation planifiée pour le moment.</div>')+'</div></div>';
  }
  function compactOnboarding(c){
-   const html=oldOnboarding(c);
+   let html=oldOnboarding(c);
+   if(c.onboarding?.currentStep==='active'&&c.status!=='Actif')
+     html=html.replaceAll('Accompagnement actif','Onboarding terminé');
    if(c.onboarding?.currentStep!=='active')return html+plannedPanel(c);
    // Une fois actif, les "tests requis avant programmation" appartiennent au passé.
    // On garde le workflow, le questionnaire et les notes, sans les commandes d'onboarding révolues.
@@ -134,7 +137,8 @@
    }
    const green=[...wrapper.querySelectorAll('.alert.green')]
      .find(x=>x.textContent.includes('Onboarding terminé'));
-   if(green)green.innerHTML='<strong>Onboarding terminé.</strong> Pour les prochaines évaluations, utilise le Passeport et le calendrier.';
+   if(green)green.innerHTML='<strong>Onboarding terminé.</strong> Statut actuel du dossier : <strong>'+
+      esc(c.status)+'</strong>. Les futures évaluations sont organisées dans le Passeport et le calendrier.';
    return wrapper.innerHTML+plannedPanel(c);
  }
  const oldOnboarding=onboarding;
