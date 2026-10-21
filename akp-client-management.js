@@ -78,6 +78,9 @@
      '<div class="field"><label>Formule actuelle</label>'+
      '<div class="alert blue">'+esc(c.pole)+' — '+esc(c.offer)+'</div></div>');
    html=html.replace(/<button class="btn danger small" id="archiveClient"[^>]*>[^<]*<\/button>/g,'');
+   // L'ancien bouton TEST dépendait d'un fichier JSON chiffré : la suppression
+   // sûre d'un dossier TEST vide est désormais accessible directement ici.
+   html=html.replace(/<button class="btn danger small" style="margin-top:10px" id="akDeleteTestClient"[^>]*>[^<]*<\/button>/g,'');
    const obsolete='<div class="card panel" style="margin-top:13px"><h3>Pause de l’accompagnement</h3>';
    const ix=html.lastIndexOf(obsolete);
    if(ix>=0)html=html.slice(0,ix); // ancienne section en fin de fiche, devenue redondante
