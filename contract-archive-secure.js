@@ -66,7 +66,8 @@ document.addEventListener('click', async function(event) {
     ['akp-review-fixes.js','AKP_REVIEW_READY'],
     ['akp-offer-tools.js','AKP_OFFER_TOOLS_READY'],
     ['akp-client-essentials.js','AKP_CLIENT_ESSENTIALS_READY'],
-    ['akp-passport-cycle-history.js','AKP_CYCLE_HISTORY_READY']
+    ['akp-passport-cycle-history.js','AKP_CYCLE_HISTORY_READY'],
+    ['akp-client-archive.js','AKP_CLIENT_ARCHIVE_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -98,7 +99,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-cycles-v9';
+    script.src='./'+file+'?rev=20261021-archive-video-v10';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
