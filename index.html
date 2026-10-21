@@ -2745,18 +2745,188 @@ async function saveClientQuestionnaire(statusValue){
 }
 
 
+// Référentiel unique : fiches clients, cartes, comparatifs et page avant inscription.
+const AKP_OFFER_RIGHTS=Object.freeze({
+ "forme & santé|standard": {
+  "label": "Forme & Santé — Standard",
+  "summary": [
+   "Suivi de la charge d'entraînement via Optitrainer, sans suivi régulier de l'état de forme",
+   "1 analyse vidéo par mois sur WhatsApp et 1 visio de 30 min par mois"
+  ],
+  "groups": {
+   "Optitrainer": [
+    "Programmation individualisée selon les objectifs, le matériel et les contraintes",
+    "Suivi hebdomadaire de la charge d’entraînement (sRPE), sans questionnaire régulier d’état de forme",
+    "Corrections de programmation seulement en cas de problème, gêne, douleur ou difficulté signalée"
+   ],
+   "WhatsApp": [
+    "Jusqu’à 1 analyse technique vidéo par mois ; envoi et retour via WhatsApp, sans stockage de vidéo sur AK PRIME"
+   ],
+   "AK PRIME": [
+    "Questionnaire initial et accès au Passeport AK PRIME : tests, cycles, progression et historique"
+   ],
+   "Visios": [
+    "1 visio de 30 minutes par mois"
+   ]
+  }
+ },
+ "forme & santé|renforcé": {
+  "label": "Forme & Santé — Renforcé",
+  "summary": [
+   "Suivi de charge ET d’état de forme hebdomadaire dans Optitrainer",
+   "Adaptations hebdomadaires, budget nutritionnel PDF et 2 visios de 30 min par mois"
+  ],
+  "groups": {
+   "Optitrainer": [
+    "Programmation individualisée selon les objectifs, le matériel et les contraintes",
+    "Suivi hebdomadaire de la charge d’entraînement (sRPE)",
+    "Questionnaire hebdomadaire d’état de forme : fatigue, stress, récupération et sommeil ressenti",
+    "Adaptation hebdomadaire de la programmation selon la charge et l’état de forme",
+    "Sommeil évalué via Optitrainer, sans agenda quotidien distinct dans AK PRIME"
+   ],
+   "WhatsApp": [
+    "Jusqu’à 1 analyse technique vidéo par semaine ; envoi et retour via WhatsApp, sans stockage de vidéo sur AK PRIME"
+   ],
+   "AK PRIME": [
+    "Questionnaire initial et Passeport AK PRIME : tests, cycles, progression et historique",
+    "Budget calorique et macronutriments personnalisé, avec PDF consultable par le client, sans menus alimentaires"
+   ],
+   "Visios": [
+    "2 visios de 30 minutes par mois"
+   ]
+  }
+ },
+ "performance|p1": {
+  "label": "Performance — P1 Essentiel",
+  "summary": [
+   "Programmation sportive individualisée et charge sRPE, sans pilotage systématique de l’état de forme",
+   "2 analyses vidéo par mois via WhatsApp et retest à 6 semaines"
+  ],
+  "groups": {
+   "Optitrainer": [
+    "Programmation individualisée selon le sport, le calendrier, le matériel et les objectifs",
+    "Suivi de charge d’entraînement sRPE",
+    "Corrections lorsque surviennent une gêne, douleur, problème physique ou difficulté importante ; pas d’ajustement systématique selon la forme"
+   ],
+   "WhatsApp": [
+    "Jusqu’à 2 analyses techniques vidéo par mois ; envoi et retour via WhatsApp, sans stockage sur AK PRIME"
+   ],
+   "AK PRIME": [
+    "Questionnaire initial et Passeport AK PRIME avec tests, cycles, historique et progression",
+    "Tests à distance selon les besoins et retest à 6 semaines"
+   ],
+   "Visios": [
+    "1 visio de 30 minutes par mois"
+   ]
+  }
+ },
+ "performance|p2": {
+  "label": "Performance — P2 Avancé",
+  "summary": [
+   "Charge + état de forme Hooper avec ajustements hebdomadaires dans Optitrainer",
+   "Analyse vidéo hebdomadaire via WhatsApp et 2 visios de 30 min par mois"
+  ],
+  "groups": {
+   "Optitrainer": [
+    "Programmation individualisée selon le sport, le calendrier, le matériel et les objectifs",
+    "Suivi de charge sRPE et questionnaire d’état de forme Hooper (fatigue, stress, sommeil perçu, douleurs)",
+    "Adaptations hebdomadaires de la charge et de la programmation selon les retours",
+    "Échauffement individualisé via les exercices Optitrainer",
+    "Récupération par allègement de la programmation, sans séance dédiée supplémentaire",
+    "Prise en compte du cycle menstruel lorsque pertinent",
+    "Routines ou techniques mentales intégrées à la préparation, sans onglet mental séparé"
+   ],
+   "WhatsApp": [
+    "1 analyse vidéo par semaine des mouvements prioritaires, via WhatsApp"
+   ],
+   "AK PRIME": [
+    "Questionnaire initial et Passeport AK PRIME : tests, cycles et progression",
+    "Retest à 6 semaines"
+   ],
+   "Visios": [
+    "2 visios de 30 minutes par mois"
+   ]
+  }
+ },
+ "performance|p3": {
+  "label": "Performance — P3 Premium",
+  "summary": [
+   "Pilotage rapproché et ajustements sous 48 h si l’état de forme le nécessite",
+   "Sommeil détaillé, macros en PDF, récupération dédiée et vidéos selon les besoins"
+  ],
+  "groups": {
+   "Optitrainer": [
+    "Programmation individualisée et suivi de charge sRPE",
+    "État de forme Hooper, suivi rapproché et adaptations sous 48 h lorsque nécessaire",
+    "Échauffement individualisé et prise en compte du cycle menstruel lorsque pertinent",
+    "Séances de récupération dédiées lorsque nécessaire, en plus des adaptations de charge",
+    "Préparation aux périodes de compétition et de forte charge ; techniques mentales intégrées si utiles"
+   ],
+   "WhatsApp": [
+    "Analyses techniques vidéo des mouvements utiles selon les besoins, sans quota fixe ni stockage sur AK PRIME"
+   ],
+   "AK PRIME": [
+    "Questionnaire initial et Passeport AK PRIME : tests, cycles et progression",
+    "Retest à 6 semaines, puis réévaluations selon les besoins",
+    "Agenda de sommeil détaillé rempli par le client : durée, qualité et régularité",
+    "Budget calorique et macronutriments personnalisé au format PDF, sans menus"
+   ],
+   "Visios": [
+    "Jusqu’à 1 visio de 30 minutes par semaine"
+   ]
+  }
+ },
+ "mental|particulier": {
+  "label": "Préparation mentale — Particulier",
+  "summary": [
+   "Stress, émotions, confiance, concentration et routines personnalisées",
+   "Séances mentales et exercices entre les visios ; jusqu’à une visio de 45 min/semaine"
+  ],
+  "groups": {
+   "AK PRIME": [
+    "Questionnaire initial de préparation mentale",
+    "Espace de séances mentales, exercices à réaliser entre les séances et routines adaptées",
+    "Respiration, recentrage, gestion des émotions, confiance, estime de soi, résilience, concentration et imagerie",
+    "Historique des séances et du parcours dans le dossier client"
+   ],
+   "Visios": [
+    "Visio initiale de 45 minutes",
+    "Jusqu’à 1 visio de 45 minutes par semaine"
+   ]
+  }
+ },
+ "mental|sportif": {
+  "label": "Préparation mentale — Sportif",
+  "summary": [
+   "Routines de compétition, pression, recentrage et outils mentaux spécifiques au sport",
+   "Séances et débriefs sportifs ; jusqu’à une visio de 45 min/semaine"
+  ],
+  "groups": {
+   "AK PRIME": [
+    "Questionnaire initial de préparation mentale",
+    "Espace de séances mentales, exercices entre les séances et routines personnalisées",
+    "Gestion du stress et des émotions, confiance, concentration, respiration et imagerie",
+    "Routines avant l’entraînement et la compétition, gestion de la pression, mot-clé individuel et recentrage après erreur",
+    "Imagerie sportive, double tâche et débriefs d’entraînement ou de compétition"
+   ],
+   "Visios": [
+    "Visio initiale de 45 minutes",
+    "Jusqu’à 1 visio de 45 minutes par semaine"
+   ]
+  }
+ }
+});
+window.AKP_OFFER_RIGHTS=AKP_OFFER_RIGHTS;
+function akpOfferRights(pole,name){
+ return AKP_OFFER_RIGHTS[(String(pole||'')+'|'+String(name||'')).toLowerCase()]||null;
+}
+function akpOfferItems(pole,name){
+ const rights=akpOfferRights(pole,name);
+ return rights?Object.values(rights.groups).flat():null;
+}
 function publicOfferPreview(pole,name){
- const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
- const map={
-  'forme & santé|standard':['Programme individualisé avec suivi de charge via Optitrainer','1 visio par mois et jusqu’à 1 analyse vidéo par mois'],
-  'forme & santé|renforcé':['Adaptations hebdomadaires selon charge et état de forme','Repères nutritionnels et 2 visios par mois'],
-  'performance|p1':['Préparation physique ou réathlétisation individualisée','2 analyses vidéo par mois et nouvelle évaluation à 6 semaines'],
-  'performance|p2':['Ajustements hebdomadaires selon votre charge et votre état de forme','Échauffement personnalisé, suivi du cycle menstruel et 2 visios par mois'],
-  'performance|p3':['Suivi du sommeil et ajustements sous 48 h','Récupération dédiée et repères nutritionnels personnalisés'],
-  'mental|particulier':['Outils concrets : émotions, confiance et concentration','Jusqu’à une visio de 45 minutes par semaine'],
-  'mental|sportif':['Routines intégrées aux entraînements et compétitions','Recentrage, débriefs et jusqu’à une visio de 45 minutes par semaine']
- };
- return map[key]||['Accompagnement individualisé','Suivi AK PRIME'];
+ const rights=akpOfferRights(pole,name);
+ return rights?.summary||['Accompagnement individualisé','Suivi AK PRIME'];
 }
 function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',featured=false){
  price=publicCatalogPrice(pole,name,price);
@@ -2806,7 +2976,7 @@ function renderPublicSite(){
  '</div></div></div></section>'+
  '<section class="public-section ak-difference-section ak-difference-compact" id="pourquoi-ak-prime" style="padding-top:0"><div class="public-section-inner">'+
  '<div class="ak-diff-intro"><div class="kicker">La différence AK PRIME</div><h2>Votre progression ne s’arrête pas à la fin d’un programme.</h2></div>'+
- '<div class="ak-diff-strip"><div class="ak-diff-passport"><div class="ak-diff-passport-kicker">LE PASSEPORT AK PRIME</div><h3>Votre parcours sportif, au même endroit.</h3><p>Plus qu’un tableau de résultats, c’est votre carnet de suivi : objectifs, évaluations, évolution des performances, charges de travail, bilans et points d’attention y trouvent leur place selon votre accompagnement. Vous comprenez <strong>d’où vous partez, où vous en êtes et vers quoi vous avancez.</strong></p><p>Et si vous changez d’entraîneur, de préparateur physique ou de club ? L’objectif est de pouvoir <strong>transmettre, avec votre accord, un historique clair</strong> au professionnel qui prend le relais. Il dispose ainsi de repères sur votre parcours, sans devoir tout reconstruire depuis le début.</p><div class="ak-diff-passport-foot">Un suivi qui vous appartient et qui garde son utilité au-delà d’un accompagnement.</div></div>'+
+ '<div class="ak-diff-strip"><div class="ak-diff-passport"><div class="ak-diff-passport-kicker">LE PASSEPORT AK PRIME</div><h3>Votre parcours sportif, au même endroit.</h3><p>Plus qu’un tableau de résultats, c’est votre carnet de suivi : objectifs, évaluations, évolution des performances, historique des cycles et points d’attention y trouvent leur place selon votre accompagnement. Vous comprenez <strong>d’où vous partez, où vous en êtes et vers quoi vous avancez.</strong></p><p>Et si vous changez d’entraîneur, de préparateur physique ou de club ? L’objectif est de pouvoir <strong>transmettre, avec votre accord, un historique clair</strong> au professionnel qui prend le relais. Il dispose ainsi de repères sur votre parcours, sans devoir tout reconstruire depuis le début.</p><div class="ak-diff-passport-foot">Un suivi qui vous appartient et qui garde son utilité au-delà d’un accompagnement.</div></div>'+
  '<div class="ak-diff-aside"><h3>Ce que cela change pour vous</h3><div class="ak-diff-point"><b>01</b><div><strong>Vous savez où vous allez</strong><span>Des objectifs et des étapes identifiables, plutôt qu’une succession de séances.</span></div></div><div class="ak-diff-point"><b>02</b><div><strong>Vous comprenez votre progression</strong><span>Vos tests, vos retours et les décisions prises donnent du sens à votre suivi.</span></div></div><div class="ak-diff-point"><b>03</b><div><strong>Vous facilitez la continuité</strong><span>En cas de changement de structure, votre historique peut servir de base à une nouvelle prise en charge, avec votre accord.</span></div></div></div></div>'+
  '<p class="ak-diff-note">Les informations consignées varient selon le pôle et la formule. Le Passeport est un outil de suivi sportif, et non un dossier médical. Le partage ou l’export de données vers un tiers sera proposé uniquement lorsque cette fonctionnalité sera disponible et avec votre accord.</p>'+
  '</div></section>'+
@@ -2943,14 +3113,15 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
   P3:{label:'Premium',summary:'Un accompagnement rapproché, avec une gestion approfondie de votre état de forme.',points:['Tout le contenu P2','Analyses vidéo selon vos besoins','Suivi complet du sommeil','Ajustements sous 48 h','Récupération dédiée','Repères nutritionnels personnalisés (macros)']}
  };
  const forme={
-  Standard:{label:'Standard',summary:'Un programme adapté à vos objectifs, avec un suivi régulier.',points:['Programmation individualisée','Suivi hebdomadaire de charge (Optitrainer)','1 analyse vidéo / mois maximum','Corrections si difficulté signalée','1 visio / mois']},
-  'Renforcé':{label:'Renforcé',summary:'Un accompagnement plus complet et des ajustements réguliers.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Questionnaire hebdomadaire d’état de forme (sommeil, fatigue, stress)','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
+  Standard:{label:'Standard',summary:'Un programme adapté à vos objectifs, avec suivi de charge, sans suivi régulier de l’état de forme.',points:['Programmation individualisée','Suivi hebdomadaire de charge (Optitrainer)','1 analyse vidéo / mois maximum','Corrections si difficulté signalée','1 visio / mois']},
+  'Renforcé':{label:'Renforcé',summary:'Un accompagnement croisant charge et état de forme, avec ajustements hebdomadaires.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Questionnaire hebdomadaire d’état de forme (sommeil, fatigue, stress)','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
  };
  const mental={
   Particulier:{label:'Particulier',summary:'Développer vos habiletés mentales dans les situations du quotidien.',points:['Échange et questionnaire initial','Objectifs et exercices personnalisés','Motivation, émotions et résilience','Confiance, attention et routines','Jusqu’à 1 visio de 45 min / semaine']},
   Sportif:{label:'Sportif',summary:'Mobiliser vos ressources mentales à l’entraînement et en compétition, quel que soit votre niveau.',points:['Socle des habiletés mentales générales','Routines intégrées aux entraînements habituels','Préparation mentale avant et pendant la compétition','Débrief et récupération mentale après compétition','Pression, erreurs, recentrage et mot-clé','Exercices adaptés à votre discipline','Jusqu’à 1 visio de 45 min / semaine']}
  };
  const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
+  if(details){const rights=akpOfferItems(pole,name);if(rights)details.points=rights;}
  const label=details?.label||name;
  const features=details?'<ul class="pole-offer-points">'+details.points.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<p class="pole-offer-copy">'+esc(subtitle)+'</p>';
  return '<div class="pole-offer-mini '+(featured?'featured':'')+' '+(details?'perf-offer-card':'')+'">'+
@@ -3246,17 +3417,7 @@ function openPublicOfferDetails(button){
 }
 
 function publicOfferBenefits(pole,name){
- const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
- const map={
-  'forme & santé|standard':['Programme individualisé selon ton matériel et tes contraintes','Check-in hebdomadaire','Analyse technique vidéo : 1 vidéo / mois maximum','Adaptation en cas de retour négatif, douleur, gêne ou difficulté','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],
-  'forme & santé|renforcé':['Tout le contenu Standard','Analyse technique vidéo : jusqu’à 1 vidéo / semaine si nécessaire','2 visios de 30 min / mois','Budget calorique et macronutriments, sans menus','Sommeil pris en compte dans le questionnaire d’état de forme','Suivi du bien-être','Adaptation hebdomadaire systématique de l’entraînement et de la charge'],
-  'performance|p1':['Programmation individualisée selon sport, calendrier, niveau et matériel','Tests réalisables à distance','Analyse technique vidéo : jusqu’à 2 vidéos / mois','Suivi de charge sRPE + check-in hebdomadaire','Retest à 6 semaines','Modification uniquement si retour négatif / douleur / problème physique / difficulté majeure','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],
-  'performance|p2':['Tout le contenu P1','Analyse technique vidéo hebdomadaire des mouvements prioritaires, regroupée dans un envoi','Questionnaire Hooper','Ajustement hebdomadaire selon charge + bien-être + contexte','Échauffement individualisé','Phase de récupération gérée par allègement de la programmation','Prise en compte du cycle menstruel chez les femmes','2 visios de 30 min / mois'],
-  'performance|p3':['Tout le contenu P2','Analyse technique vidéo des mouvements utiles issus des séances, selon les besoins','Suivi complet du sommeil','Budget calorique et macronutriments, sans menus','Ajustement sous 48 h si l’état de forme le nécessite','Séances de récupération dédiées lorsque nécessaire','Suivi rapproché des fortes charges et compétitions','Prise en compte du cycle menstruel','Jusqu’à 1 visio de 30 min / semaine'],
-  'mental|particulier':['Questionnaire initial','Visio initiale de 45 min','Jusqu’à 1 visio de 45 min / semaine','Stress et émotions','Respiration / recentrage','Confiance, estime de soi, résilience','Imagerie, concentration et routines','Exercices entre les visios'],
-  'mental|sportif':['Tout le contenu Particulier','Jusqu’à 1 visio de 45 min / semaine','Routine pré-entraînement / pré-compétition','Gestion de la pression','Recentrage après erreur','Mot-clé individuel','Imagerie sportive et double tâche','Débrief entraînements / compétitions importantes']
- };
- return map[key]||['Accompagnement individualisé','Suivi AK PRIME','Accès à l’espace client'];
+ return akpOfferItems(pole,name)||['Accompagnement individualisé','Suivi AK PRIME','Accès à l’espace client'];
 }
 function publicCheckoutPriceFallback(base,duration,paymentMode){
  base=Number(base)||0;
