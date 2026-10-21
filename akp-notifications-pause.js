@@ -16,6 +16,8 @@
   let lastActivityKeys=null;
   let lastActor='';
   let refreshing=false;
+  let realtimeChannel=null;
+  let realtimeActor='';
   function mappedEvents(events){
     const reads=notificationReadSet(db.notificationReads);
     const clientIndex=new Map((db.clients||[]).map(c=>[c.id,c]));
@@ -93,13 +95,27 @@
   }
   function startWatcher(){
     if(!actorIsCoach())return;
+    if(lastActor!==authUser.id){
+      lastActor=authUser.id;
+      lastActivityKeys=new Set((db.coachActivityEvents||[]).map(e=>e.event_key));
+    }
+    // Notifications instantanées si le flux temps réel est disponible.
+    if(!realtimeChannel&&typeof supa.channel==='function'){
+      realtimeActor=authUser.id;
+      realtimeChannel=supa.channel('akprime-activity-'+authUser.id)
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'coach_activity_events'},
+          ()=>refreshActivity()).subscribe();
+    }
     if(window.__AKP_ACTIVITY_POLL)return;
-    lastActor=authUser.id;
-    lastActivityKeys=new Set((db.coachActivityEvents||[]).map(e=>e.event_key));
     window.__AKP_ACTIVITY_POLL=window.setInterval(()=>{
       if(!actorIsCoach()){
         window.clearInterval(window.__AKP_ACTIVITY_POLL);
-        window.__AKP_ACTIVITY_POLL=null;lastActor='';lastActivityKeys=null;return;
+        window.__AKP_ACTIVITY_POLL=null;lastActor='';lastActivityKeys=null;
+        if(realtimeChannel){supa.removeChannel(realtimeChannel);realtimeChannel=null;realtimeActor='';}
+        return;
+      }
+      if(realtimeActor&&realtimeActor!==authUser.id&&realtimeChannel){
+        supa.removeChannel(realtimeChannel);realtimeChannel=null;realtimeActor='';
       }
       refreshActivity();
     },POLL_INTERVAL);
@@ -196,6 +212,12 @@
        current.map(a=>esc(fmtDateTime(a.starts_at))).join(', ')+
        '. Contacte ton coach si ces créneaux doivent être annulés.</div>':'')+
       '</div></div>';
+  };
+  const oldClientNotifications=clientNotifications;
+  clientNotifications=function(s){
+    const result=oldClientNotifications(s);
+    if(s?.client?.status!=='paused')return result;
+    return result.filter(n=>!String(n.key||'').startsWith('client:checkin:'));
   };
   const originalClientHome=renderClientHome;
   renderClientHome=function(s){
