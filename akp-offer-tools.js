@@ -43,11 +43,96 @@
  };
  const LABEL_SECTIONS={
   mental:'Préparation mentale',
-  p1:'Suivi AK PRIME',
-  p2:'Préparation mentale P2',
-  p3:'Préparation mentale, sommeil & budget macro P3',
-  forme:'Agenda de sommeil'
+  p1:'Analyses vidéo',
+  p2:'Analyses vidéo P2',
+  p3:'Sommeil, budget macro & analyses vidéo P3',
+  forme:'Analyses vidéo & sommeil'
  };
+
+ function hasVideoReviews(c){
+   return (c?.pole==='Performance'&&['P1','P2','P3'].includes(c?.offer))||
+      (c?.pole==='Forme & Santé'&&['Standard','Renforcé'].includes(c?.offer));
+ }
+ function videoPlan(c){
+   if(c?.pole==='Performance'){
+     if(c.offer==='P1')return {mode:'month',n:2,label:'2 analyses par mois'};
+     if(c.offer==='P2')return {mode:'week',n:1,label:'1 analyse par semaine'};
+     if(c.offer==='P3')return {mode:'needs',n:null,label:'Selon les besoins (sans quota fixe)'};
+   }
+   if(c?.pole==='Forme & Santé'){
+     if(c.offer==='Standard')return {mode:'month',n:1,label:'1 analyse par mois'};
+     if(c.offer==='Renforcé')return {mode:'week',n:1,label:'Jusqu’à 1 analyse par semaine'};
+   }
+   return null;
+ }
+ function isoAddMonths(date,months){
+   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(date||'')))return '';
+   const [y,m,d]=date.split('-').map(Number);
+   const t=new Date(Date.UTC(y,m-1+months,1,12));
+   const max=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0,12)).getUTCDate();
+   t.setUTCDate(Math.min(d,max));
+   return t.toISOString().slice(0,10);
+ }
+ function coachingMonth(c,today){
+   const anchor=String(c?.start||'').slice(0,10);
+   const d=String(today||localDateISO()).slice(0,10);
+   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(anchor)||anchor>d){
+     // Date de début absente : mois civil de repli, avec mention explicite.
+     return {start:d.slice(0,7)+'-01',
+        end:isoAddMonths(d.slice(0,7)+'-01',1),
+        index:null,estimated:true};
+   }
+   const [ay,am]=anchor.split('-').map(Number),[dy,dm]=d.split('-').map(Number);
+   let diff=(dy-ay)*12+(dm-am);
+   while(isoAddMonths(anchor,diff)>d)diff--;
+   while(isoAddMonths(anchor,diff+1)<=d)diff++;
+   return {start:isoAddMonths(anchor,diff),end:isoAddMonths(anchor,diff+1),
+      index:diff+1,estimated:false};
+ }
+ function videoMarkupFor(c){
+   if(!hasVideoReviews(c))return '';
+   const now=localDateISO(),period=coachingMonth(c,now),plan=videoPlan(c);
+   const rows=(db.videoReceipts||[]).filter(x=>x.client_id===c.id);
+   const current=rows.filter(x=>!x.voided_at&&x.received_on>=period.start&&x.received_on<period.end);
+   const before=rows.filter(x=>!x.voided_at&&x.received_on<period.start);
+   const weekNow=new Date(now+'T12:00:00Z');
+   const dow=(weekNow.getUTCDay()+6)%7;
+   weekNow.setUTCDate(weekNow.getUTCDate()-dow);
+   const monday=weekNow.toISOString().slice(0,10);
+   const weekReceipts=rows.filter(x=>!x.voided_at&&x.received_on>=monday&&x.received_on<=now);
+   const whatsappDigits=String(c.phone||'').replace(/\\D/g,'');
+   const whatsappHref=whatsappDigits.length>=9&&whatsappDigits.length<=15?
+      'https://wa.me/'+(whatsappDigits.startsWith('0')?'33'+whatsappDigits.slice(1):whatsappDigits):'';
+   const cap=plan.mode==='month'?'Sur '+plan.n+' prévues dans le mois':
+      plan.mode==='week'?'Cette semaine : '+weekReceipts.length+'/'+plan.n+' · '+plan.label:
+      'Réceptions enregistrées (pas de plafond défini)';
+   const message=plan.mode==='month'&&current.length>plan.n?' • Quota dépassé':'';
+   const available=plan.mode==='month'?Math.max(0,plan.n-current.length):null;
+   const count=(list)=>list.length+' vidéo'+(list.length>1?'s':'');
+   return '<div class="card panel" style="margin-bottom:13px">'+
+     '<div class="row between"><div><h3>Analyses vidéo — WhatsApp</h3>'+
+     '<p class="muted tiny">Aucune vidéo n’est hébergée sur AK PRIME. Tu coches uniquement les vidéos effectivement reçues sur WhatsApp.</p></div>'+
+     '<span class="status blue">'+esc(plan.label)+'</span></div>'+
+     '<div class="grid2" style="margin:13px 0">'+
+       '<div class="item"><div class="muted tiny">Mois d’accompagnement'+(period.index?' n°'+period.index:'')+'</div>'+
+       '<strong style="font-size:22px">'+current.length+'</strong>'+
+       '<div class="tiny">'+esc(fmtDate(period.start))+' au '+esc(fmtDate(new Date(new Date(period.end+'T12:00:00Z').getTime()-86400000).toISOString().slice(0,10)))+'</div></div>'+
+       '<div class="item"><div class="muted tiny">Repère de l’offre</div><strong>'+esc(cap)+esc(message)+'</strong>'+
+       '<div class="tiny">'+(available!==null?'Restantes : '+available:'Total avant cette période : '+before.length)+'</div></div>'+
+     '</div>'+
+     (period.estimated?'<div class="alert">Date de début absente ou future : compteur affiché sur le mois civil provisoirement.</div>':'')+
+     '<div class="row" style="gap:9px;flex-wrap:wrap">'+
+      '<button class="btn primary small akAddVideo" data-client="'+esc(c.id)+'">+ Vidéo reçue</button>'+
+      (whatsappHref?'<a class="btn ghost small" href="'+whatsappHref+'" target="_blank" rel="noopener noreferrer">Contacter sur WhatsApp</a>':'<span class="muted tiny">Ajoute le téléphone du client pour lui écrire sur WhatsApp.</span>')+
+     '</div>'+
+     (current.length?'<div class="section-title">Réceptions de ce mois</div>'+
+       '<div class="list">'+current.slice().sort((a,b)=>String(b.received_on).localeCompare(String(a.received_on))).map(x=>
+       '<div class="item row between"><div><strong>'+esc(fmtDate(x.received_on))+'</strong>'+
+       (x.notes?'<div class="muted tiny">'+esc(x.notes)+'</div>':'')+'</div>'+
+       (authProfile?.role==='owner'?'<button class="btn ghost small akVoidVideo" data-id="'+esc(x.id)+'">Annuler</button>':'')+
+       '</div>').join('')+'</div>':'<div class="muted tiny" style="margin-top:12px">Aucune vidéo reçue pour ce mois d’accompagnement.</div>')+
+     '</div>';
+ }
  function hasSleepDiary(c){
    return (c?.pole==='Performance'&&c?.offer==='P3')||
      (c?.pole==='Forme & Santé'&&c?.offer==='Renforcé');
@@ -55,8 +140,9 @@
  function toolKeys(c){
    const p=String(c?.pole||''),o=String(c?.offer||'').trim().toLowerCase();
    if(p==='Mental')return ['mental_session','mental_homework','mental_practice'];
-   if(p==='Performance'&&o==='p3')return ['mental_practice','macro_budget'];
-   if(p==='Performance'&&o==='p2')return ['mental_practice'];
+   if(p==='Performance'&&o==='p3')return ['macro_budget'];
+   // Aucun module mental dans les fiches Performance : toute préparation mentale
+   // intégrée se traite dans les échanges/Optitrainer, pas dans un onglet séparé.
    return []; // Séances, charges, forme, adaptations, vidéo, échauffements : Optitrainer.
  }
  function workspaceLabel(c){
@@ -78,15 +164,17 @@
  loadSupabaseData=async function(...args){
    const result=await earlierLoad.apply(this,args);
    if(!authUser?.id||!['owner','coach'].includes(authProfile?.role))return result;
-   const [entries,commitments,sleepEntries]=await Promise.all([
+   const [entries,commitments,sleepEntries,videoReceipts]=await Promise.all([
      supa.from('client_offer_entries').select('*').order('entry_date',{ascending:false}).order('created_at',{ascending:false}),
      supa.from('clients').select('id,initial_commitment_months'),
-     supa.from('client_sleep_diary').select('*').order('sleep_date',{ascending:false}).limit(800)
+     supa.from('client_sleep_diary').select('*').order('sleep_date',{ascending:false}).limit(800),
+     supa.from('client_video_receipts').select('*').order('received_on',{ascending:false}).limit(2000)
    ]);
-   if(entries.error||commitments.error||sleepEntries.error)
-     throw Error('Chargement des outils de prestation : '+(entries.error||commitments.error||sleepEntries.error).message);
+   if(entries.error||commitments.error||sleepEntries.error||videoReceipts.error)
+     throw Error('Chargement des outils de prestation : '+(entries.error||commitments.error||sleepEntries.error||videoReceipts.error).message);
    db.offerEntries=entries.data||[];
    db.clientSleepDiary=sleepEntries.data||[];
+   db.videoReceipts=videoReceipts.data||[];
    const map=new Map((commitments.data||[]).map(c=>[c.id,c.initial_commitment_months]));
    (db.clients||[]).forEach(c=>c.initialCommitmentMonths=map.get(c.id)||null);
    return result;
@@ -199,19 +287,20 @@
    const labelled=html.replace(/(<button data-tab="follow"[^>]*>)Suivi(<\/button>)/,
      '$1'+(c.pole==='Mental'?'Historique':'Optitrainer & historique')+'$2');
    const keys=toolKeys(c);
-   if(!keys.length&&!hasSleepDiary(c))return labelled;
+   if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return labelled;
    const active=state.tab==='offer-tools';
    const tab='<button data-tab="offer-tools" class="'+(active?'on':'')+'">'+
-     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Mental, sommeil & macros':hasSleepDiary(c)?'Agenda de sommeil':'Préparation mentale')+'</button>';
+     esc(c.pole==='Mental'?'Préparation mentale':c.offer==='P3'?'Sommeil, macros & vidéos':hasSleepDiary(c)?'Sommeil & vidéos':'Analyses vidéo')+'</button>';
    return labelled.replace(/(<div class="card tabs no-print">[\s\S]*?)(<\/div>)/,(_,before,end)=>before+tab+end);
  };
  const oldOverview=overview;
  overview=function(c){
    const original=oldOverview(c);
    const keys=toolKeys(c);
-   if(!keys.length&&!hasSleepDiary(c))return original;
+   if(!keys.length&&!hasSleepDiary(c)&&!hasVideoReviews(c))return original;
    const chips=keys.map(key=>'<span class="status blue" style="margin:3px 4px 3px 0">'+esc(TOOL_SPEC[key].label)+'</span>').join('')+
-     (hasSleepDiary(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Agenda de sommeil (client)</span>':'');
+     (hasSleepDiary(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Agenda de sommeil (client)</span>':'')+
+     (hasVideoReviews(c)?'<span class="status blue" style="margin:3px 4px 3px 0">Analyses vidéo WhatsApp</span>':'');
    const intro='<div class="card panel" style="margin-bottom:13px;border-left:4px solid #bc955a">'+
      '<div class="row between"><div><div class="muted tiny">Prestations incluses dans le dossier</div>'+
      '<h3 style="margin:5px 0">'+esc(c.pole)+' — '+esc(c.offer)+'</h3>'+
@@ -247,6 +336,7 @@
  function offerToolsPage(c){
    const keys=toolKeys(c),all=(db.offerEntries||[]).filter(x=>x.client_id===c.id);
    const sleepHistory=(db.clientSleepDiary||[]).filter(x=>x.client_id===c.id).slice(0,50);
+   const videoMarkup=videoMarkupFor(c);
    const sleepMarkup=hasSleepDiary(c)?'<div class="card panel" style="margin-bottom:13px">'+
      '<h3>Agenda de sommeil — rempli par le client</h3>'+
      '<div class="muted tiny">Le client renseigne ses nuits depuis son espace personnel. Optitrainer conserve le suivi de forme et de charge.</div>'+
@@ -273,8 +363,8 @@
      '<p>AK PRIME : préparation mentale, sommeil et budgets macro. Entraînement, forme et charge : Optitrainer.</p></div></div>'+
      '<div class="alert blue" style="margin-bottom:13px"><strong>Répartition :</strong> '+
       'Optitrainer gère la programmation, les séances, la charge, la récupération et les échauffements. '+
-      'AK PRIME conserve ici les prestations complémentaires de '+esc(c.offer)+'.</div>'+
-     sleepMarkup+regular+
+      'AK PRIME conserve ici les analyses vidéo reçues, le sommeil et les budgets macro selon ta formule.</div>'+
+     videoMarkup+sleepMarkup+regular+
      (archive.length?'<div class="card panel"><h3>Enregistrements archivés</h3>'+
        archive.map(x=>'<div class="section-title">'+esc(TOOL_SPEC[x.tool_type]?.label||x.tool_type)+'</div>'+
          entryList(c,x.tool_type,true)).join('')+'</div>':'')+
@@ -362,6 +452,42 @@
      }
    };
  }
+
+ document.addEventListener('click',async e=>{
+   const plus=e.target.closest?.('.akAddVideo'),minus=e.target.closest?.('.akVoidVideo');
+   if(!plus&&!minus||state.view!=='client'||state.tab!=='offer-tools')return;
+   e.preventDefault();e.stopImmediatePropagation();
+   const c=currentClient();
+   if(!c||!hasVideoReviews(c))return;
+   if(plus){
+     modal('Enregistrer une vidéo reçue sur WhatsApp',
+      '<div class="alert blue">Cette action enregistre seulement la date et une note. Aucune vidéo ni pièce jointe n’est stockée sur AK PRIME.</div>'+
+      '<div class="field"><label>Date de réception</label><input id="videoReceiveDate" class="input" type="date" max="'+localDateISO()+'" value="'+localDateISO()+'"></div>'+
+      '<div class="field"><label>Note facultative (exercice analysé)</label><input id="videoReceiveNote" class="input" maxlength="220" placeholder="Ex. Squat : analyse technique"></div>',
+      '<button class="btn ghost" id="cancelVideoM">Annuler</button><button class="btn primary" id="saveVideoM">Comptabiliser +1</button>');
+     document.getElementById('cancelVideoM').onclick=closeModal;
+     document.getElementById('saveVideoM').onclick=async()=>{
+       const date=document.getElementById('videoReceiveDate').value,notes=document.getElementById('videoReceiveNote').value.trim();
+       if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||date>localDateISO())return alert('Date de réception invalide.');
+       const button=document.getElementById('saveVideoM');button.disabled=true;
+       const {error}=await supa.from('client_video_receipts').insert({
+         client_id:c.id,received_on:date,notes,channel:'whatsapp',recorded_by:authUser.id});
+       if(error){button.disabled=false;return alert('Erreur : '+error.message)}
+       closeModal();await loadSupabaseData();render();toast('Vidéo reçue comptabilisée.');
+     };
+     return;
+   }
+   if(minus){
+     if(authProfile?.role!=='owner')return alert('Seul le propriétaire peut annuler une réception.');
+     const row=(db.videoReceipts||[]).find(x=>x.id===minus.dataset.id&&x.client_id===c.id);
+     if(!row)return;
+     const reason=prompt('Motif de correction (8 caractères minimum) :');
+     if(!reason||reason.trim().length<8)return;
+     const {error}=await supa.rpc('owner_void_video_receipt',{p_id:row.id,p_reason:reason.trim()});
+     if(error)return alert('Correction refusée : '+error.message);
+     await loadSupabaseData();render();toast('Réception annulée, historique conservé.');
+   }
+ },true);
  document.addEventListener('click',async e=>{
    if(state.view!=='client'||state.tab!=='offer-tools')return;
    const add=e.target.closest('.offerToolAdd'),edit=e.target.closest('.offerToolEdit');
