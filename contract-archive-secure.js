@@ -92,7 +92,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261021-engagement-2';
+    script.src='./'+file+'?rev=20261021-phone-and-engagement-4';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
