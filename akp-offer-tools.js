@@ -139,6 +139,30 @@
    };
  };
 
+
+// Les alertes de check-ins internes deviennent historiques, pas des tâches du jour :
+ // Optitrainer centralise désormais l'état de forme et la charge.
+ const earlierDashboard=dashboard;
+ dashboard=function(){
+   const all=db.clients;
+   try{
+     db.clients=all.map(c=>({...c,checkins:[]}));
+     const wrapper=document.createElement('div');
+     wrapper.innerHTML=earlierDashboard();
+     wrapper.querySelectorAll('.card').forEach(card=>{
+       if(card.querySelector('h3')?.textContent?.trim()==='Check-ins à traiter')card.remove();
+     });
+     return wrapper.innerHTML;
+   }finally{db.clients=all;}
+ };
+ const earlierCoachNotifications=coachNotifications;
+ coachNotifications=function(){
+   const all=db.clients;
+   try{
+     db.clients=all.map(c=>({...c,checkins:[]}));
+     return earlierCoachNotifications();
+   }finally{db.clients=all;}
+ };
  const legacyFollow=follow;
  follow=function(c){
    const rows=(c.checkins||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
