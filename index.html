@@ -1223,7 +1223,7 @@ function clientsPage(){
  });
  return '<div class="page-title"><div><h1>Clients</h1><p>'+db.clients.length+' dossiers dans la V2.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
  '<div class="card"><div class="toolbar"><input id="clientSearch" class="input" placeholder="Rechercher…" value="'+esc(state.search)+'">'+
- '<select id="statusFilter" class="select"><option>Tous</option><option>Actif</option><option>Onboarding</option><option>Pause</option><option>Prospect</option><option>Inactif</option></select>'+
+ '<select id="statusFilter" class="select"><option>Tous</option><option>Actif</option><option>Onboarding</option><option>Pause</option><option>Inactif</option></select>'+
  '<select id="poleFilter" class="select"><option>Tous</option><option>Performance</option><option>Forme & Santé</option><option>Mental</option></select></div>'+
  '<div style="overflow:auto"><table><thead><tr><th>Client</th><th>Pôle</th><th>Offre</th><th>Statut</th><th>Paiement</th><th>Prochaine visio</th><th></th></tr></thead><tbody>'+
  list.map(c=>'<tr><td><strong>'+esc(c.name)+'</strong><div class="muted tiny">'+esc(c.email||'')+'</div></td><td>'+esc(c.pole)+'</td><td>'+esc(c.offer)+'</td><td>'+status(c.status)+'</td><td>'+esc(c.payment||'—')+'</td><td>'+fmtDate(c.next)+'</td><td><button class="link openClient" data-id="'+c.id+'">Ouvrir</button></td></tr>').join('')+
