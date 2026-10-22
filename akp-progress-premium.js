@@ -119,8 +119,35 @@
    const W=900,H=285,left=65,right=36,top=38,bottom=47;
    const width=W-left-right,height=H-top-bottom;
    const low=Math.min(...values),high=Math.max(...values),spread=high-low;
-   const pad=spread?Math.max(spread*.16,Math.abs(high)*.005):Math.max(Math.abs(high)*.08,.5);
-   const vMin=low-pad,vMax=high+pad,extent=vMax-vMin;
+   // Les graduations doivent être des entiers réguliers : 0, 5, 10, 15...
+   // Les mesures réelles gardent leur précision et ne sont jamais arrondies.
+   const niceStep=raw=>{
+     const wanted=Math.max(1,raw),pow=Math.pow(10,Math.floor(Math.log10(wanted)));
+     for(const mult of [1,2,5,10]){
+       if(mult*pow>=wanted-1e-10)return Math.max(1,Math.round(mult*pow));
+     }
+     return Math.max(1,Math.round(pow*10));
+   };
+   const nearZero=(low>=0&&high>0&&low<=high*.55)||
+     (high<=0&&low<0&&high>=low*.55)||(low<=0&&high>=0);
+   let tickStep=niceStep((nearZero?Math.max(Math.abs(low),Math.abs(high)):Math.max(spread,1))/5);
+   let vMin,vMax;
+   if(nearZero){
+     vMin=low<0?Math.floor(low/tickStep)*tickStep:0;
+     vMax=high>0?Math.ceil(high/tickStep)*tickStep:0;
+   }else{
+     tickStep=niceStep(Math.max(spread,1)/4);
+     const pad=Math.max(spread*.10,tickStep*.1);
+     vMin=Math.floor((low-pad)/tickStep)*tickStep;
+     vMax=Math.ceil((high+pad)/tickStep)*tickStep;
+   }
+   if(vMax<=vMin)vMax=vMin+tickStep;
+   if((vMax-vMin)/tickStep>8){
+     tickStep=niceStep((vMax-vMin)/5);
+     vMin=Math.floor(vMin/tickStep)*tickStep;
+     vMax=Math.ceil(vMax/tickStep)*tickStep;
+   }
+   const extent=vMax-vMin;
    const spots=data.map((r,i)=>{
      const x=left+(data.length===1?width/2:i*width/(data.length-1));
      const y=top+(vMax-Number(r.num))/extent*height;
@@ -129,9 +156,10 @@
    const N=v=>Number(v).toFixed(2);
    const line=spots.map(x=>N(x.x)+','+N(x.y)).join(' ');
    const closed=[left+','+(top+height),line,(left+width)+','+(top+height)].join(' ');
-   const grid=Array.from({length:5},(_,i)=>{
-     const y=top+height*i/4,v=vMax-extent*i/4;
-     const tick=Number(v.toFixed(2)).toLocaleString('fr-FR',{maximumFractionDigits:2});
+   const tickCount=Math.round(extent/tickStep);
+   const grid=Array.from({length:tickCount+1},(_,i)=>{
+     const v=vMin+i*tickStep,y=top+(vMax-v)/extent*height;
+     const tick=Math.round(v).toLocaleString('fr-FR',{maximumFractionDigits:0});
      return '<g><line class="akProg2Grid" x1="'+left+'" y1="'+N(y)+'" x2="'+(W-right)+'" y2="'+N(y)+'"/>'+
        '<text class="akProg2Axis" x="'+(left-14)+'" y="'+N(y+4)+'" text-anchor="end">'+esc(tick)+'</text></g>';
    }).join('');
