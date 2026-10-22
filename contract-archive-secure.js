@@ -82,7 +82,8 @@ document.addEventListener('click', async function(event) {
     ['akp-progress-premium.js','AKP_PASSPORT_PROGRESSION_READY'],
     ['akp-timeline-compact.js','AKP_COMPACT_TIMELINE_READY'],
     ['akp-followup-qualitative.js','AKP_QUALITATIVE_FOLLOWUP_READY'],
-    ['akp-admin-accordions.js','AKP_ADMIN_ACCORDIONS_READY']
+    ['akp-admin-accordions.js','AKP_ADMIN_ACCORDIONS_READY'],
+    ['akp-calendar-compact.js','AKP_CALENDAR_COMPACT_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -114,7 +115,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261022-admin-accordion-v52';
+    script.src='./'+file+'?rev=20261022-calendar-compact-v53';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
