@@ -246,13 +246,9 @@
  }
  // La fiche sportive prime sur les courbes dans la première page,
  // tandis que la vue d'ensemble historique reste accessible en seconde partie.
- const priorOverview=passportOverviewPage;
- passportOverviewPage=function(m){
-  return athletePage(m)+
-   '<details style="margin:15px 0 0;border:1px solid #e0e5ec;border-radius:12px;background:white;padding:13px">'+
-   '<summary style="cursor:pointer;font-weight:800">Afficher le tableau de progression actuel</summary>'+
-   '<div style="margin-top:12px">'+priorOverview(m)+'</div></details>';
- };
+ // La progression a désormais sa propre synthèse dans l'onglet Sommaire.
+ // Le Profil sportif conserve uniquement la fiche et les historiques du sportif.
+ passportOverviewPage=function(m){return athletePage(m);};
  function attachCoachModel(c,m){
   const row=(db.akPassportProfileRows||[]).find(x=>x.client_id===c.id);
   m.akPassportProfile=row||empty;
