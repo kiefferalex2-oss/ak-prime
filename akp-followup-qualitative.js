@@ -42,7 +42,7 @@
  function fromCheckin(w){
   return {
    date:String(w.date||w.week_date||'').slice(0,10),
-   coach:meaningful(w.coach||w.coach_feedback||w.coach_decision),
+   coach:(w.reviewedAt||w.reviewed_at)?meaningful(w.coach||w.coach_feedback||w.coach_decision):'',
    feeling:meaningful(w.feeling||w.overall_week),
    pain:meaningful(w.pain||w.pain_or_discomfort),
    problem:meaningful(w.problem||w.exercise_problem),
