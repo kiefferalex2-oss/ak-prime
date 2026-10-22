@@ -228,7 +228,7 @@
        '<span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
        '<span class="akpCoachFoldText"><strong>Dates & jalons</strong>'+
        '<small>Compétitions, échéances et événements du parcours</small></span></span>'+
-       '<span class="akpCoachFoldCount">'+(c.events||[]).length+' jalon'+((c.events||[]).length>1?'s':'')+'</span></summary>'+
+       '<span class="akpCoachFoldCount">'+(c.events||[]).filter(isEditablePassportEvent).length+' jalon'+((c.events||[]).filter(isEditablePassportEvent).length>1?'s':'')+'</span></summary>'+
        '<div class="akpCoachFoldBody">'+eventControls+'</div></details>':'')+
      '</div>'+plannedPanel(c);
  };

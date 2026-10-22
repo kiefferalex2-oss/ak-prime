@@ -1349,9 +1349,17 @@ function testLibraryOptions(prefill=''){
  html+='<option value="__custom__" '+(prefill&&!testLibraryItem(prefill)?'selected':'')+'>Autre test…</option>';
  return html;
 }
+// Les renouvellements sont des actes administratifs : ils ne doivent pas être
+// modifiés ni supprimés depuis les jalons sportifs.
+function isEditablePassportEvent(event){
+ const type=String(event?.eventType||event?.event_type||'').toLowerCase();
+ const title=String(event?.title||'').trim();
+ return type!=='renewal'&&!/^renouvellement(?:\b|[\s_:-])/i.test(title);
+}
 function passportCoachTestManager(c){
  const history=(c.tests||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
- const events=(c.events||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const events=(c.events||[]).filter(isEditablePassportEvent)
+   .slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
  const cats=[...new Set(TEST_LIBRARY.map(x=>x.category))];
  return '<div class="passport-manager-grid no-print">'+
   '<div class="card panel passport-test-manager">'+
@@ -1364,7 +1372,7 @@ function passportCoachTestManager(c){
   '<div class="card panel passport-event-manager">'+
    '<div class="row between" style="align-items:flex-start"><div><div class="section-title" style="margin-top:0">Dates & jalons</div><h3 style="margin:3px 0 5px">Construire le parcours</h3><div class="muted tiny">Compétition, retest, changement de cycle, reprise, objectif atteint…</div></div><button class="btn ghost" id="addEvent">+ Jalon</button></div>'+
    '<div class="passport-event-list">'+
-    (events.length?events.slice(0,7).map(e=>'<div class="passport-event-row"><div class="passport-event-date">'+fmtDate(e.date)+'</div><div><strong>'+esc(e.title)+'</strong><span>'+esc(e.detail||'')+'</span></div><button class="link deleteEvent" data-id="'+e.id+'">Supprimer</button></div>').join(''):'<div class="muted tiny">Aucun jalon enregistré. Ajoute les dates qui structurent vraiment le parcours.</div>')+
+    (events.length?events.slice(0,7).map(e=>'<div class="passport-event-row"><div class="passport-event-date">'+fmtDate(e.date)+'</div><div><strong>'+esc(e.title)+'</strong><span>'+esc(e.detail||'')+'</span></div><div class="row" style="gap:9px;flex-wrap:wrap;justify-content:flex-end"><button class="link editEvent" data-id="'+esc(e.id)+'">Modifier</button><button class="link deleteEvent" data-id="'+esc(e.id)+'">Supprimer</button></div></div>').join(''):'<div class="muted tiny">Aucun jalon enregistré. Ajoute les dates qui structurent vraiment le parcours.</div>')+
    '</div>'+
   '</div>'+
  '</div>';
@@ -2120,8 +2128,9 @@ function bind(){
  document.getElementById('addCheckin')?.addEventListener('click',openCheckin);
  document.querySelectorAll('.reviewCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const ta=document.querySelector('.coachCheckinFeedback[data-id="'+b.dataset.id+'"]');const feedback=ta?.value.trim()||'';const {error}=await supa.from('checkins').update({coach_feedback:feedback||null,coach_decision:feedback||null,reviewed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);const w=cl.checkins.find(x=>x.id===b.dataset.id);if(w){w.coach=feedback;w.reviewedAt=new Date().toISOString()}toast('Check-in traité');render()});
  document.querySelectorAll('.deleteCheckin').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('checkins').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.checkins=cl.checkins.filter(x=>x.id!==b.dataset.id);toast('Check-in supprimé');render()});
- document.getElementById('addEvent')?.addEventListener('click',openEvent);
- document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
+ document.getElementById('addEvent')?.addEventListener('click',()=>openEvent());
+ document.querySelectorAll('.editEvent').forEach(b=>b.onclick=()=>openEvent(b.dataset.id));
+ document.querySelectorAll('.deleteEvent').forEach(b=>b.onclick=async()=>{const cl=currentClient();if(!isEditablePassportEvent((cl.events||[]).find(e=>e.id===b.dataset.id)))return toast('Événement administratif non modifiable ici.');const {error}=await supa.from('passport_events').delete().eq('id',b.dataset.id).eq('client_id',cl.id);if(error)return toast('Erreur : '+error.message);cl.events=cl.events.filter(x=>x.id!==b.dataset.id);toast('Événement supprimé');render()});
  document.getElementById('printPassport')?.addEventListener('click',()=>window.print());
  document.getElementById('openRenewal')?.addEventListener('click',()=>openRenewalModal(currentClient()));
  document.querySelector('.adminNoteDraft')?.addEventListener('input',e=>{currentClient().adminNote=e.target.value});
@@ -2298,17 +2307,43 @@ function openCheckin(){
    closeModal();toast('Check-in ajouté');render();
  };
 }
-function openEvent(){
- modal('Ajouter un événement au parcours',
- '<div class="field"><label>Date</label><input id="eDate" type="date" class="input"></div><div class="field"><label>Titre</label><input id="eTitle" class="input" placeholder="Retest, changement de club, retour compétition…"></div><div class="field"><label>Détail</label><textarea id="eDetail" class="textarea"></textarea></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
+function openEvent(eventId=''){
+ const client=currentClient();if(!client)return;
+ const existing=eventId?(client.events||[]).find(e=>e.id===eventId):null;
+ if(eventId&&!existing)return toast('Jalon introuvable : actualise le dossier.');
+ if(existing&&!isEditablePassportEvent(existing))return toast('Les renouvellements se gèrent dans la partie administrative.');
+ const editing=!!existing;
+ const kind=existing?.eventType==='competition'||/\b(competition|championnat|match|tournoi|coupe|finale|meeting|course|epreuve)\b/i.test(existing?.title||'')?'competition':'milestone';
+ const textDate=existing?.date||localDateISO();
+ const modalTitle=editing?'Modifier le jalon — '+client.name:'Ajouter un jalon au parcours';
+ modal(modalTitle,
+   '<div class="field"><label>Date du jalon</label><input id="eDate" type="date" class="input" value="'+esc(textDate)+'" required></div>'+
+   '<div class="field"><label>Type de jalon</label><select id="eKind" class="select">'+
+     '<option value="milestone" '+(kind!=='competition'?'selected':'')+'>Autre jalon sportif</option>'+
+     '<option value="competition" '+(kind==='competition'?'selected':'')+'>Compétition importante</option></select></div>'+
+   '<div class="field"><label>Titre</label><input id="eTitle" class="input" maxlength="160" placeholder="Championnat, retour à l’entraînement, objectif atteint…" value="'+esc(existing?.title||'')+'" required></div>'+
+   '<div class="field"><label>Précisions (facultatif)</label><textarea id="eDetail" class="textarea" maxlength="2000">'+esc(existing?.detail||'')+'</textarea></div>'+
+   '<p class="muted tiny">Les échéances de tests et retests se planifient dans « Évaluations & échéances ». Les renouvellements restent dans le suivi administratif.</p>',
+   '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">'+(editing?'Enregistrer les modifications':'Ajouter le jalon')+'</button>');
  document.getElementById('cancelM').onclick=closeModal;
  document.getElementById('saveM').onclick=async()=>{
-   const title=document.getElementById('eTitle').value.trim();if(!title)return toast('Titre requis');
-   const cl=currentClient(),row={client_id:cl.id,event_date:document.getElementById('eDate').value||new Date().toISOString().slice(0,10),title,detail:document.getElementById('eDetail').value||null,client_visible:true};
-   const {data,error}=await supa.from('passport_events').insert(row).select().single();if(error)return toast('Erreur : '+error.message);
-   cl.events=cl.events||[];cl.events.push({id:data.id,date:isoDate(data.event_date),title:data.title,detail:data.detail||''});
-   closeModal();toast('Événement ajouté');render();
+   const date=document.getElementById('eDate').value;
+   const title=document.getElementById('eTitle').value.trim();
+   const detail=document.getElementById('eDetail').value.trim();
+   const kind=document.getElementById('eKind').value;
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00Z')))
+     return toast('Date de jalon invalide.');
+   if(!title)return toast('Titre requis.');
+   const button=document.getElementById('saveM');button.disabled=true;
+   const row={event_date:date,title,detail:detail||null,event_type:kind};
+   const query=editing?
+     supa.from('passport_events').update(row).eq('id',existing.id).eq('client_id',client.id):
+     supa.from('passport_events').insert({...row,client_id:client.id,client_visible:true});
+   const {error}=await query.select('id').single();
+   if(error){button.disabled=false;toast('Impossible d’enregistrer le jalon : '+error.message);return;}
+   closeModal();
+   try{await loadSupabaseData();render();toast(editing?'Jalon mis à jour.':'Jalon ajouté.');}
+   catch(e){toast('Jalon enregistré, mais actualisation impossible : '+e.message);}
  };
 }
 function exportData(){
@@ -3641,6 +3676,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261022-coach-folds-v42"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261022-milestone-edit-v43"></script>
 </body>
 </html>
