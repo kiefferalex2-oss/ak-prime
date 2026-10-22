@@ -106,7 +106,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261022-pain-label-v30';
+    script.src='./'+file+'?rev=20261022-cycle-list-v31';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);

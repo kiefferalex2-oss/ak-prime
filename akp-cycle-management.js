@@ -154,7 +154,42 @@
    (chosen?esc(fmtDate(chosen.start_date))+' → '+(chosen.end_date?esc(fmtDate(chosen.end_date)):'Date de fin à définir')+
     ' · '+esc(statusLabel(chosen)):'Crée ton premier cycle')+'</p></div>'+
    '<span class="status blue">'+cycles.length+' cycle(s)</span></div>'+actions;
-  if(compact)return '<div class="card panel no-print" style="margin-bottom:12px"><div class="section-title">Gestion des cycles</div>'+overview+'</div>';
+  if(compact){
+   // Vue compacte du Passeport : chaque cycle doit être visible et modifiable,
+   // pas seulement le cycle sélectionné pour les statistiques courantes.
+   const priority=cy=>{
+    const status=statusLabel(cy);
+    return status==='En cours'?0:status==='À venir'?1:status==='À dater'?2:3;
+   };
+   const ordered=cycles.slice().sort((a,b)=>
+    priority(a)-priority(b)||
+    (priority(a)===3?String(b.start_date).localeCompare(String(a.start_date)):
+     String(a.start_date).localeCompare(String(b.start_date))));
+   const entries=ordered.map(cy=>{
+    const label=statusLabel(cy);
+    const tone=label==='En cours'||label==='Terminé'?'green':
+      label==='Période écoulée'?'amber':'blue';
+    return '<div class="row between" style="gap:13px;align-items:center;flex-wrap:wrap;'+
+     'padding:13px 15px;border:1px solid #e1e7ee;border-radius:12px;background:#fbfcfe">'+
+     '<div style="flex:1;min-width:210px"><div class="row" style="gap:9px;align-items:center;flex-wrap:wrap">'+
+     '<strong>'+esc(cy.title||'Cycle sans titre')+'</strong>'+
+     '<span class="status '+tone+'">'+esc(label)+'</span></div>'+
+     '<div class="muted tiny" style="margin-top:6px">'+esc(fmtDate(cy.start_date))+' → '+
+     (cy.end_date?esc(fmtDate(cy.end_date)):'Date de fin à définir')+'</div>'+
+     (cy.priorities?'<div class="muted tiny" style="margin-top:5px">Priorités : '+
+        esc(String(cy.priorities).slice(0,150))+'</div>':'')+
+     '</div><button class="btn ghost small akCycleEdit" data-id="'+esc(cy.id)+'">Modifier</button></div>';
+   }).join('');
+   return '<div class="card panel no-print" style="margin-bottom:12px">'+
+    '<div class="row between" style="gap:10px;align-items:center;flex-wrap:wrap">'+
+    '<div><div class="section-title" style="margin:0">Gestion des cycles</div>'+
+    '<p class="muted tiny" style="margin:6px 0 0">Tous les cycles enregistrés pour ce client.</p></div>'+
+    '<span class="status blue">'+cycles.length+' cycle(s)</span></div>'+
+    '<div style="display:grid;gap:9px;margin-top:13px">'+(entries||none)+'</div>'+
+    '<div class="akMinutesActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px">'+
+    '<button class="btn primary small akCycleNew">+ Nouveau cycle</button>'+
+    '<button class="btn ghost small akCyclePassport">Voir la chronologie</button></div></div>';
+  }
   const history=cycles.map(cy=>
     '<div class="item row between" style="gap:9px;flex-wrap:wrap"><div><strong>'+esc(cy.title)+'</strong>'+
     '<div class="muted tiny">'+esc(fmtDate(cy.start_date))+' → '+(cy.end_date?esc(fmtDate(cy.end_date)):'Fin à définir')+
