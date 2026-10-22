@@ -54,6 +54,9 @@
  const compact=document.createElement('style');
  compact.textContent="\n.akLuxCover .akLuxHero{padding:22px 27px 20px}\n.akLuxCover .akLuxHeroBody{padding:18px 0 15px;align-items:center;gap:18px;grid-template-columns:minmax(0,1.6fr) minmax(205px,.4fr)}\n.akLuxCover .akLuxHeroMain h2{font-size:clamp(25px,2.7vw,35px);margin:8px 0 9px}\n.akLuxCover .akLuxHeroMain p{font-size:12px;line-height:1.5}\n.akLuxCover .akLuxHeroNext{padding:10px 13px;margin-top:7px}\n.akLuxCover .akLuxHeroNext strong{margin:3px 0;font-size:13px}\n.akLuxCover .akLuxHeroBottom{padding-top:12px}\n.akLuxCover .akLuxHeroTop{font-size:9px}\n.akLuxHomeShortcut{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:19px 0 11px}\n.akLuxHomeShortcut>span{font-size:10px;font-weight:850;letter-spacing:.12em;color:#a27b44}\n.akLuxHomeShortcut button,.akLuxProfileTools button{background:#18334b;color:#fff;border:0;border-radius:9px;padding:10px 13px;cursor:pointer;font-size:12px;font-weight:800}\n.akLuxHomeShortcut button:hover,.akLuxProfileTools button:hover{background:#284b68}\n.akLuxCover .akp-page{padding:0!important}\n.akLuxCover .akp-page-title{margin-top:0;padding-top:0}\n.akLuxCover .akp-overview-main{margin-top:12px}\n.akLuxProfileTop{display:flex;justify-content:space-between;align-items:end;gap:18px;padding:7px 0 3px;flex-wrap:wrap}\n.akLuxProfileTop span{color:#ab7e43;font-size:10px;font-weight:900;letter-spacing:.14em}\n.akLuxProfileTop h2{color:#1a3045;font-size:clamp(23px,2.6vw,32px);line-height:1.15;letter-spacing:-.03em;margin:9px 0}\n.akLuxProfileTop p{color:#75879a;font-size:12px;line-height:1.6;max-width:670px}\n.akLuxProfileTools{display:flex;gap:8px}\n.akLuxProfilePage .akLuxSection{margin-top:18px}\n@media(max-width:720px){.akLuxCover .akLuxHeroBody{grid-template-columns:1fr;gap:9px}.akLuxCover .akLuxHero{padding:21px 19px}.akLuxCover .akLuxHeroAside{grid-template-columns:1fr 1fr}.akLuxProfileTop{align-items:start}}\n@media(max-width:520px){.akLuxCover .akLuxHeroAside{grid-template-columns:1fr}.akLuxHomeShortcut button{width:100%}}\n";
  document.head.appendChild(compact);
+ const denseStyle=document.createElement('style');
+ denseStyle.textContent="\n/* Passeport v38 : le sommaire est un portrait compact et non une large zone vide. */\n.akLuxCover .akLuxHeroV2{padding:23px 27px 17px}\n.akLuxCover .akLuxHeroV2 .akLuxHeroBody{grid-template-columns:minmax(190px,.85fr) minmax(220px,1.1fr) minmax(340px,1.2fr);align-items:center;gap:25px;padding:26px 0 21px}\n.akLuxAthleteIntro{display:flex;align-items:center;gap:14px;min-width:0}\n.akLuxAthleteMark{width:66px;height:66px;flex:0 0 66px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#edcc8d,#b68a4a);color:#15283b;box-shadow:0 6px 22px #0002;font-weight:900;font-size:21px;letter-spacing:-.03em}\n.akLuxEyebrow{display:block;font-size:9px;letter-spacing:.12em;font-weight:850;color:#ddb378}\n.akLuxAthleteIntro h3{font-size:clamp(19px,1.8vw,25px);font-weight:850;color:#fff;margin:6px 0 5px;line-height:1.17;overflow-wrap:anywhere}\n.akLuxAthleteIntro p{font-size:11px;color:#c8d6e3;line-height:1.4;margin:0;white-space:normal}\n.akLuxAthleteIntro small{display:block;font-size:10px;color:#aebecf;margin-top:8px;line-height:1.5}\n.akLuxCover .akLuxHeroV2 .akLuxHeroMain{padding-left:22px;border-left:1px solid rgba(233,197,138,.2);min-width:0}\n.akLuxCover .akLuxHeroV2 .akLuxHeroMain h2{font-size:clamp(25px,2.6vw,35px);margin:7px 0 10px;line-height:1.12}\n.akLuxCover .akLuxHeroV2 .akLuxHeroAside{display:grid;grid-template-columns:1fr 1fr;gap:9px;min-width:0}\n.akLuxCover .akLuxHeroV2 .akLuxHeroNext{margin:0;min-width:0;min-height:106px;padding:14px;display:flex;flex-direction:column;justify-content:center}\n.akLuxCover .akLuxHeroV2 .akLuxHeroNext strong{overflow-wrap:anywhere;font-size:14px;margin:8px 0 5px}\n.akLuxCover .akLuxHeroV2 .akLuxHeroNext small{font-size:10px;line-height:1.5}\n.akLuxCover .akLuxHeroV2 .akLuxHeroBottom{padding-top:14px}\n.akLuxCover .akLuxHeroV2 .akLuxTags>span{background:rgba(255,255,255,.055)}\n@media(max-width:1080px){\n.akLuxCover .akLuxHeroV2 .akLuxHeroBody{grid-template-columns:minmax(180px,1fr) minmax(180px,1fr);gap:17px;padding:18px 0}\n.akLuxCover .akLuxHeroV2 .akLuxHeroAside{grid-column:1/-1}\n.akLuxCover .akLuxHeroV2 .akLuxHeroNext{min-height:80px}\n}\n@media(max-width:670px){\n.akLuxCover .akLuxHeroV2 .akLuxHeroBody{grid-template-columns:1fr;gap:18px;padding:20px 0}\n.akLuxCover .akLuxHeroV2 .akLuxHeroMain{padding-left:0;border-left:0;border-top:1px solid rgba(233,197,138,.19);padding-top:15px}\n.akLuxCover .akLuxHeroV2 .akLuxHeroAside{grid-column:auto;grid-template-columns:1fr 1fr}\n.akLuxCover .akLuxHeroV2 .akLuxHeroNext{padding:12px;min-height:0}\n}\n@media(max-width:430px){\n.akLuxCover .akLuxHeroV2 .akLuxHeroAside{grid-template-columns:1fr}\n.akLuxCover .akLuxHeroV2 .akLuxHeroBottom{align-items:stretch}\n.akLuxCover .akLuxHeroV2 .akLuxHeroBtn{width:100%}\n}\n@media print{\n.akLuxCover .akLuxHeroV2 .akLuxHeroBody{grid-template-columns:1fr 1.1fr 1.3fr}\n}\n";
+ document.head.appendChild(denseStyle);
  const tx=x=>Array.isArray(x)?x.join(', '):x===false?'Non':x===true?'Oui':String(x??'').trim();
  const valid=x=>x!==null&&x!==undefined&&x!==''&&Number.isFinite(Number(x));
  const rows=x=>Array.isArray(x)?x:[];
@@ -95,17 +98,44 @@
  function hero(m){
   const goal=info(m,'main_goal')||'Objectif à définir avec le coach';
   const detail=info(m,'goal_detail');
-  const chips=[['Discipline',info(m,'sport')],['Poste',info(m,'position')],['Niveau',info(m,'level')],['Club',info(m,'club')]]
-   .filter(([,v])=>tx(v)).map(([k,v])=>'<span><b>'+plain(k)+'</b>'+plain(v)+'</span>').join('');
+  const discipline=info(m,'sport')||m.sport||'Discipline à préciser';
+  const specialty=info(m,'position')||m.specialty||'';
+  const club=info(m,'club'),level=info(m,'level')||m.level||'';
   const due=info(m,'deadline');
-  return '<section class="akLuxHero"><div class="akLuxHeroTop"><span>✦ &nbsp; AK PRIME / DOSSIER ATHLÈTE</span><span>PROFIL • 01</span></div>'+
-   '<div class="akLuxHeroBody"><div class="akLuxHeroMain"><span>OBJECTIF PRIORITAIRE</span><h2>'+plain(goal)+'</h2>'+
-   '<p>'+plain(detail||'Un suivi individualisé construit autour du profil, des objectifs et des retours du sportif.')+'</p></div>'+
-   '<div class="akLuxHeroAside"><div class="akLuxHeroNext"><span>CYCLE ACTUEL</span><strong>'+plain(m.cycle?.title||'À définir')+'</strong>'+
-   '<small>'+plain(m.cycle?.end?'Jusqu’au '+fmtDate(m.cycle.end):'Échéance à préciser')+'</small></div>'+
-   (due?'<div class="akLuxHeroNext"><span>ÉCHÉANCE CIBLE</span><strong>'+plain(due)+'</strong></div>':'')+'</div></div>'+
-   '<div class="akLuxHeroBottom"><div class="akLuxTags">'+(chips||'<span>Profil à enrichir</span>')+'</div>'+
-   (m.akPassportRole==='coach'?'<button class="akProfAction akLuxHeroBtn" type="button" data-action="profile">✎ &nbsp; Modifier le profil</button>':'')+
+  const cycle=tx(m.cycle?.title)||'Cycle à définir';
+  const cycleEnd=m.cycle?.end?fmtDate(m.cycle.end):'Date de fin à définir';
+  const subject=tx(m.name)||'Sportif AK PRIME';
+  const initials=tx(m.initials)||subject.split(/\s+/).slice(0,2).map(s=>s.charAt(0)).join('').toUpperCase()||'AK';
+  const meta=[
+    ['Discipline',discipline],['Poste',specialty],
+    ['Niveau',level],['Club',club]
+  ].filter(([,v])=>tx(v)).map(([k,v])=>
+    '<span><b>'+plain(k)+'</b>'+plain(v)+'</span>').join('');
+  return '<section class="akLuxHero akLuxHeroV2">'+
+   '<div class="akLuxHeroTop"><span>✦ &nbsp; AK PRIME / DOSSIER ATHLÈTE</span>'+
+   '<span>'+plain(m.pole||'ACCOMPAGNEMENT')+(m.offer?' · '+plain(m.offer):'')+'</span></div>'+
+   '<div class="akLuxHeroBody">'+
+     '<div class="akLuxAthleteIntro">'+
+      '<div class="akLuxAthleteMark" aria-hidden="true">'+plain(initials)+'</div>'+
+      '<div><span class="akLuxEyebrow">LE SPORTIF</span>'+
+       '<h3>'+plain(subject)+'</h3>'+
+       '<p>'+plain(discipline)+(specialty?' · '+plain(specialty):'')+'</p>'+
+       (m.start?'<small>Accompagnement depuis le '+plain(fmtDate(m.start))+'</small>':'')+
+      '</div></div>'+
+     '<div class="akLuxHeroMain"><span>OBJECTIF PRIORITAIRE</span>'+
+       '<h2>'+plain(goal)+'</h2>'+
+       '<p>'+plain(detail||'À approfondir avec le sportif dans le profil détaillé.')+'</p></div>'+
+     '<div class="akLuxHeroAside">'+
+       '<div class="akLuxHeroNext"><span>CYCLE ACTUEL</span>'+
+         '<strong>'+plain(cycle)+'</strong>'+
+         '<small>'+plain(cycleEnd)+'</small></div>'+
+       '<div class="akLuxHeroNext"><span>ÉCHÉANCE CIBLE</span>'+
+         '<strong>'+plain(due||'À définir')+'</strong>'+
+         '<small>'+ (due?'Objectif du sportif':'À préciser lors du prochain bilan')+'</small></div>'+
+     '</div></div>'+
+   '<div class="akLuxHeroBottom"><div class="akLuxTags">'+(meta||'<span>Profil à enrichir</span>')+'</div>'+
+    (m.akPassportRole==='coach'?'<button class="akProfAction akLuxHeroBtn" type="button" data-action="profile">'+
+      '✎ &nbsp; Modifier le profil</button>':'')+
    '</div></section>';
  }
  function metrics(m){
