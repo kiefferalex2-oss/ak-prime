@@ -67,6 +67,20 @@
  '.akProg2ChartNote{font-size:10px;line-height:1.55;color:#8291a1;margin:8px 0 0}',
  '.akProg2History{padding:23px 24px 25px}',
  '.akProg2HistoryTitle{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px}',
+ '.akProg2HistoryFold{border:1px solid #e3e9ef;border-radius:11px;background:#fff;overflow:hidden}',
+ '.akProg2HistoryFold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}',
+ '.akProg2HistoryFold>summary::-webkit-details-marker{display:none}',
+ '.akProg2HistoryFold>summary:hover{background:#fafbfd}',
+ '.akProg2HistoryFoldTitle{display:flex;align-items:center;gap:11px;min-width:0}',
+ '.akProg2HistoryFoldIcon{color:#ad814b;background:#f8f0e3;width:31px;height:31px;border-radius:8px;display:grid;place-items:center;font-size:17px;font-weight:900}',
+ '.akProg2HistoryFoldTitle strong{display:block;color:#21394f;font-size:13px;font-weight:850}',
+ '.akProg2HistoryFoldTitle small{display:block;color:#8796a4;font-size:10px;margin-top:4px}',
+ '.akProg2HistoryFoldCount{display:flex;align-items:center;gap:12px;font-size:11px;color:#6c8296;font-weight:800;white-space:nowrap}',
+ '.akProg2HistoryFoldArrow{display:inline-block;font-size:19px;color:#8b9aa8;transition:transform .15s}',
+ '.akProg2HistoryFold[open] .akProg2HistoryFoldArrow{transform:rotate(180deg)}',
+ '.akProg2HistoryFoldBody{border-top:1px solid #e8edf1;padding:12px}',
+ '.akProg2HistoryFoldBody .akProg2TableWrap{border-radius:9px}',
+ '@media(max-width:540px){.akProg2HistoryFold>summary{padding:12px}.akProg2HistoryFoldCount{gap:6px}.akProg2HistoryFoldTitle small{font-size:9px}}',
  '.akProg2HistoryTitle h4{font-size:15px;margin:0;color:#20394f;font-weight:850}',
  '.akProg2HistoryTitle span{font-size:10px;color:#8493a2}',
  '.akProg2TableWrap{border:1px solid #e4eaf0;border-radius:11px;overflow-x:auto}',
@@ -256,10 +270,15 @@
         '<strong>Courbe des résultats</strong><small>Valeurs réelles du test, en '+esc(unit(last)||selected.unit||'unité renseignée')+
         '</small></div><span class="akProg2ChartDirection">'+esc(sense)+'</span></div>'+
         passportLineChart(selected)+'</div>'+
-      '<div class="akProg2History"><div class="akProg2HistoryTitle"><h4>Historique des mesures</h4>'+
-      '<span>'+measureWord(rows.length)+' · de la plus récente à la première</span></div>'+
-      '<div class="akProg2TableWrap"><table class="akProg2Table"><thead><tr><th>Date</th><th>Résultat</th>'+
-       '<th>Contexte</th><th>Observation coach</th></tr></thead><tbody>'+history+'</tbody></table></div></div>'+
+      '<div class="akProg2History"><details class="akProg2HistoryFold">'+
+       '<summary><span class="akProg2HistoryFoldTitle"><span class="akProg2HistoryFoldIcon" aria-hidden="true">≡</span>'+
+        '<span><strong>Historique des mesures</strong><small>Résultats, contexte et observations du coach</small></span></span>'+
+        '<span class="akProg2HistoryFoldCount">'+measureWord(rows.length)+
+        '<span class="akProg2HistoryFoldArrow" aria-hidden="true">⌄</span></span></summary>'+
+       '<div class="akProg2HistoryFoldBody">'+
+        '<div class="akProg2TableWrap"><table class="akProg2Table"><thead><tr><th>Date</th><th>Résultat</th>'+
+        '<th>Contexte</th><th>Observation coach</th></tr></thead><tbody>'+history+'</tbody></table></div>'+
+       '</div></details></div>'+
      '</section>';
    return '<div class="akp-page akProg2">'+
      '<div class="akProg2Head"><div><span class="akProg2Eyebrow">PROGRESSION / ANALYSE</span>'+

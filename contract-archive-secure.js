@@ -78,7 +78,8 @@ document.addEventListener('click', async function(event) {
     ['akp-athlete-passport.js','AKP_ATHLETE_PASSPORT_READY'],
     ['akp-passport-premium.js','AKP_PASSPORT_PREMIUM_READY'],
     ['akp-sport-milestones.js','AKP_SPORT_MILESTONES_READY'],
-    ['akp-progress-premium.js','AKP_PASSPORT_PROGRESSION_READY']
+    ['akp-progress-premium.js','AKP_PASSPORT_PROGRESSION_READY'],
+    ['akp-timeline-compact.js','AKP_COMPACT_TIMELINE_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
@@ -110,7 +111,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261022-round-axis-v45';
+    script.src='./'+file+'?rev=20261022-timeline-groups-v46';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
