@@ -77,6 +77,7 @@ document.addEventListener('click', async function(event) {
     ['akp-weekly-checkin.js','AKP_WEEKLY_CHECKIN_READY'],
     ['akp-athlete-passport.js','AKP_ATHLETE_PASSPORT_READY'],
     ['akp-passport-premium.js','AKP_PASSPORT_PREMIUM_READY'],
+    ['akp-passport-header-clean.js','AKP_PASSPORT_HEADER_CLEAN_READY'],
     ['akp-sport-milestones.js','AKP_SPORT_MILESTONES_READY'],
     ['akp-progress-premium.js','AKP_PASSPORT_PROGRESSION_READY'],
     ['akp-timeline-compact.js','AKP_COMPACT_TIMELINE_READY'],
@@ -112,7 +113,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261022-qualitative-v48';
+    script.src='./'+file+'?rev=20261022-profile-header-v49';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
