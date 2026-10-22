@@ -1599,12 +1599,14 @@ function passportOverviewPage(m){
  const groups=passportTestGroups(m.tests),top=passportTopProgress(groups,3),cs=passportCycleStats(m.cycle);
  const nextVisio=passportNextAppointment(m),nextRetest=passportNextRetest(m);
  const focus=(m.cycle?.priorities||'À définir avec le coach').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'À définir avec le coach';
- const vigilance=(m.cycle?.vigilance||'Aucun point de vigilance signalé').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'Aucun point de vigilance signalé';
+ const rawVigilance=String(m.cycle?.vigilance||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)[0]||'';
+ const hasVigilance=!!rawVigilance&&!/^(?:aucun(?:e)?|non|ras|r\s*a\s*s|rien|néant|neant|aucun point(?: de vigilance)?(?: signalé)?)$/i.test(rawVigilance);
+ const vigilance=hasVigilance?rawVigilance:'Aucun point de vigilance signalé';
  return '<div class="akp-page">'+
   '<div class="akp-page-title"><div><span>VUE D’ENSEMBLE</span><h2>État actuel</h2><p>Les informations essentielles du suivi, sans bruit.</p></div><div class="akp-date-chip">'+fmtDate(localDateISO())+'</div></div>'+
   '<div class="akp-overview-main">'+
    '<section class="akp-cycle-hero"><div class="akp-cycle-top"><div><span class="akp-label">CYCLE ACTUEL</span><h3>'+esc(m.cycle?.title||'À définir')+'</h3><p>'+fmtDate(m.cycle?.start)+' → '+fmtDate(m.cycle?.end)+'</p></div><div class="akp-cycle-score"><strong>'+cs.pct+'%</strong><span>'+(cs.weekNow&&cs.weeks?'S'+cs.weekNow+' / '+cs.weeks:'Cycle')+'</span></div></div><div class="akp-progress-track"><i style="width:'+cs.pct+'%"></i></div><div class="akp-cycle-bottom"><span>'+(cs.remaining===null?'Dates à définir':cs.remaining>0?cs.remaining+' jours restants':cs.remaining===0?'Fin aujourd’hui':'Cycle terminé')+'</span><button class="passportInlineNav" data-passport-page="cycle">Voir le cycle →</button></div></section>'+
-   '<section class="akp-key-progress"><div class="akp-section-head"><div><span class="akp-label">PROGRESSION</span><h3>3 repères clés</h3></div><button class="passportInlineNav" data-passport-page="progress">Tout voir →</button></div>'+
+   '<section class="akp-key-progress"><div class="akp-section-head"><div><span class="akp-label">PROGRESSION</span><h3>'+(top.length?top.length+' repère'+(top.length>1?'s':'')+' clé'+(top.length>1?'s':''):'Repères de progression')+'</h3></div><button class="passportInlineNav" data-passport-page="progress">Tout voir →</button></div>'+
     (top.length?'<div class="akp-progress-three">'+top.map(({g,d})=>{const last=g.rows[g.rows.length-1],p=sportPerformancePct(d),tone=d.improved===true?'up':d.improved===false?'down':'flat';return '<button class="passportMetricJump '+tone+'" data-test-key="'+esc(normalizeTestName(g.name))+'"><span>'+esc(g.name)+'</span><strong>'+esc(last.value)+' '+esc(last.unit||g.unit||'')+'</strong><b>'+(p===null?'Référence':passportSigned(p)+' %')+'</b></button>'}).join('')+'</div>':'<div class="akp-empty-inline">Les progrès clés apparaîtront après les premiers retests.</div>')+
    '</section>'+
   '</div>'+
@@ -1612,7 +1614,7 @@ function passportOverviewPage(m){
    '<div class="akp-snapshot"><span>Prochain retest</span><strong>'+(nextRetest?fmtDate(nextRetest.date):'—')+'</strong><small>'+esc(nextRetest?.title||'À planifier')+'</small></div>'+
    '<div class="akp-snapshot"><span>Prochaine visio</span><strong>'+(nextVisio?fmtDate(nextVisio.starts_at):'—')+'</strong><small>'+(nextVisio?fmtTime(nextVisio.starts_at):'À planifier')+'</small></div>'+
    '<div class="akp-snapshot focus"><span>Focus actuel</span><strong>'+esc(focus)+'</strong></div>'+
-   '<div class="akp-snapshot alert"><span>Vigilance</span><strong>'+esc(vigilance)+'</strong></div>'+
+   '<div class="akp-snapshot'+(hasVigilance?' alert':'')+'"><span>Vigilance</span><strong>'+esc(vigilance)+'</strong></div>'+
   '</div>'+
  '</div>';
 }
