@@ -72,7 +72,7 @@
   section.className='akAdminSection';
   section.dataset.akAdminFold=key(label)+'-'+index;
   section.dataset.akAdminClient=c.id||'';
-  section.open===false;
+  // Section fermée par défaut, sauf si le coach l'avait laissée ouverte.
   const summary=document.createElement('summary');
   const title=document.createElement('span');title.className='akAdminTitle';title.textContent=label;
   const meta=document.createElement('span');meta.className='akAdminMeta'+(needsAttention(c,label)?' attention':'');
@@ -88,15 +88,20 @@
   return section;
  }
  function existingSection(section,c,index){
-  const label=text(section.querySelector(':scope > summary')?.textContent)||'Historique';
+  const summary=section.querySelector(':scope > summary');
+  const label=text(summary?.textContent)||'Historique';
   section.classList.add('akAdminSection','akAdminSectionNative');
   section.dataset.akAdminFold=key(label).slice(0,50)+'-'+index;
   section.dataset.akAdminClient=c.id||'';
-  const summary=section.querySelector(':scope > summary');
-  if(summary&&!summary.querySelector('.akAdminChevron')){
+  if(summary){
+   const heading=document.createElement('span');heading.className='akAdminTitle';
+   while(summary.firstChild)heading.appendChild(summary.firstChild);
    const arrow=document.createElement('span');
    arrow.className='akAdminChevron';arrow.setAttribute('aria-hidden','true');arrow.textContent='⌄';
-   summary.appendChild(arrow);
+   summary.append(heading,arrow);
+   const body=document.createElement('div');body.className='akAdminBody';
+   while(summary.nextSibling)body.appendChild(summary.nextSibling);
+   section.appendChild(body);
   }
   section.open=openState.get(c.id+':'+section.dataset.akAdminFold)===true;
   return section;
