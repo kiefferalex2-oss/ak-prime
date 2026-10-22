@@ -4,6 +4,9 @@
  */
 (function(){
  'use strict';
+ const coachFoldStyles=document.createElement('style');
+ coachFoldStyles.textContent="\n/* Grands groupes du dossier coach : accordéons fermés par défaut */\n.akpCoachFold{border:1px solid #dce4ee;background:#fff;border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 7px 20px rgba(18,41,61,.026)}\n.akpCoachFoldSummary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:17px 20px;list-style:none}\n.akpCoachFoldSummary::-webkit-details-marker{display:none}\n.akpCoachFoldSummary:hover{background:#fafcfe}\n.akpCoachFoldTitle{display:flex;align-items:center;gap:11px;min-width:0}\n.akpCoachFoldArrow{flex:0 0 auto;font-size:17px;color:#7289a0;display:inline-block;transform:rotate(-90deg);transition:transform .15s}\n.akpCoachFold[open]>.akpCoachFoldSummary .akpCoachFoldArrow{transform:rotate(0)}\n.akpCoachFoldText{display:grid;gap:4px;min-width:0}\n.akpCoachFoldText>strong{font-size:16px;color:#152e44;line-height:1.3;font-weight:850}\n.akpCoachFoldText>small{color:#778a9c;font-size:11px;line-height:1.4}\n.akpCoachFoldCount{white-space:nowrap;flex-shrink:0;background:#eff4f8;color:#41617e;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800}\n.akpCoachFoldBody{border-top:1px solid #e5ebf1;padding:17px 20px 20px;min-width:0}\n.akpCoachFoldBody>.passport-event-manager{border:0;box-shadow:none;border-radius:0;padding:0}\n.akpCoachFoldBody>.passport-event-manager>.row.between .section-title,\n.akpCoachFoldBody>.passport-event-manager>.row.between h3{display:none}\n.akpCoachFoldBody>.passport-event-manager>.row.between{margin-bottom:11px}\n.akpCoachFoldBody .card.panel{box-shadow:none}\n@media(max-width:640px){\n .akpCoachFoldSummary{padding:13px 12px;gap:8px}\n .akpCoachFoldText>strong{font-size:14px}\n .akpCoachFoldText>small{font-size:10px}\n .akpCoachFoldCount{padding:6px 8px;font-size:10px}\n .akpCoachFoldBody{padding:12px}\n}\n";
+ document.head.appendChild(coachFoldStyles);
  const LABEL={initial:'Évaluation initiale',retest:'Retest',cycle_end:'Fin de cycle',unclassified:'Ancien résultat non classé'};
  const COLOR={initial:'blue',retest:'amber',cycle_end:'green',unclassified:'amber'};
  const MAX_TESTS=5000;
@@ -116,19 +119,23 @@
        (planRows(c,phase,12)||'<p class="muted tiny">Aucune échéance pour cette étape.</p>')+
        '</div></details>';
    }).join('');
-   return '<div class="card panel" id="akAssessments" style="margin:14px 0">'+
-     '<div class="row between" style="gap:12px;flex-wrap:wrap"><div><h3>Évaluations & échéances</h3>'+
-     '<p class="muted tiny">'+(mentally?'Préparation mentale : bilans de fin de cycle, sans batterie physique automatique.':
+   return '<details class="akpCoachFold" id="akAssessments" style="margin:14px 0">'+
+     '<summary class="akpCoachFoldSummary">'+
+     '<span class="akpCoachFoldTitle"><span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
+     '<span class="akpCoachFoldText"><strong>Évaluations & échéances</strong>'+
+     '<small>Retests, bilans et dates à suivre</small></span></span>'+
+     '<span class="akpCoachFoldCount">'+count+' à traiter</span></summary>'+
+     '<div class="akpCoachFoldBody">'+
+     '<p class="muted tiny">'+(mentally?'Bilans de fin de cycle, sans batterie physique automatique.':
        c.pole==='Performance'?'Retests à six semaines + bilans de fin de cycle, selon les dates du dossier.':
        'Évaluations selon les objectifs et bilans de fin de cycle ; pas de retest sportif automatique.')+
-     ' Chaque évaluation peut être renseignée puis clôturée indépendamment de l’onboarding.</p></div>'+
-     '<span class="status blue">'+count+' à venir / à traiter</span></div>'+
+     ' Chaque évaluation peut être renseignée puis clôturée indépendamment de l’onboarding.</p>'+
      '<div class="row" style="gap:8px;flex-wrap:wrap;margin:9px 0 12px">'+
      (authProfile?.role==='owner'&&!c.archivedAt?
        '<button class="btn primary small akNewAssessment">+ Planifier une évaluation</button>'+
        '<button class="btn ghost small akRefreshAssessments">Mettre à jour les échéances</button>':'')+
      '<button class="btn ghost small akAssessmentToCalendar">Voir le calendrier</button></div>'+
-     '<div>'+sections+'</div></div>';
+     '<div>'+sections+'</div></div></details>';
  }
  function compactOnboarding(c){
    let html=oldOnboarding(c);
@@ -204,11 +211,25 @@
    const oldMarkup=document.createElement('div');
    oldMarkup.innerHTML=oldTestManager(c);
    const eventControls=oldMarkup.querySelector('.passport-event-manager')?.outerHTML||'';
-   return '<div class="passport-manager-grid no-print"><div>'+
-     '<div class="card panel"><div class="row between" style="gap:10px"><div><h3>Tests & retests</h3>'+
-     '<p class="muted tiny">Choisis clairement initial, retest ou fin de cycle à chaque nouvelle saisie. Les anciens résultats restent visibles.</p></div>'+
-     '<button class="btn primary small" id="addTest">+ Saisir un résultat</button></div></div>'+
-     byPhase+'</div>'+(eventControls?'<div>'+eventControls+'</div>':'')+
+   return '<div class="passport-manager-grid no-print">'+
+     '<details class="akpCoachFold">'+
+     '<summary class="akpCoachFoldSummary"><span class="akpCoachFoldTitle">'+
+     '<span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
+     '<span class="akpCoachFoldText"><strong>Tests & retests</strong>'+
+     '<small>Résultats enregistrés et classification</small></span></span>'+
+     '<span class="akpCoachFoldCount">'+results.length+' résultat'+(results.length>1?'s':'')+'</span></summary>'+
+     '<div class="akpCoachFoldBody">'+
+     '<div class="row between" style="gap:10px;flex-wrap:wrap"><div>'+
+     '<p class="muted tiny">Choisis initial, retest ou fin de cycle pour chaque nouvelle saisie. Les anciens résultats restent visibles.</p></div>'+
+     '<button class="btn primary small" id="addTest">+ Saisir un résultat</button></div>'+
+     byPhase+'</div></details>'+
+     (eventControls?'<details class="akpCoachFold">'+
+       '<summary class="akpCoachFoldSummary"><span class="akpCoachFoldTitle">'+
+       '<span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
+       '<span class="akpCoachFoldText"><strong>Dates & jalons</strong>'+
+       '<small>Compétitions, échéances et événements du parcours</small></span></span>'+
+       '<span class="akpCoachFoldCount">'+(c.events||[]).length+' jalon'+((c.events||[]).length>1?'s':'')+'</span></summary>'+
+       '<div class="akpCoachFoldBody">'+eventControls+'</div></details>':'')+
      '</div>'+plannedPanel(c);
  };
  function plansByClient(c){

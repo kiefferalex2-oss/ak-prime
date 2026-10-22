@@ -185,14 +185,16 @@
        esc(String(cy.priorities||'').trim()||'À définir')+'</div>'+
      '</div><button class="btn ghost small akCycleEdit" data-id="'+esc(cy.id)+'">Modifier</button></div>';
    }).join('');
-   return '<div class="card panel no-print" style="margin-bottom:12px">'+
-    '<div class="row between" style="gap:10px;align-items:center;flex-wrap:wrap">'+
-    '<div><div class="section-title" style="margin:0">Gestion des cycles</div>'+
-    '<p class="muted tiny" style="margin:6px 0 0">Tous les cycles enregistrés pour ce client.</p></div>'+
-    '<span class="status blue">'+cycles.length+' cycle(s)</span></div>'+
-    '<div style="display:grid;gap:9px;margin-top:13px">'+(entries||none)+'</div>'+
+   return '<details class="akpCoachFold no-print" style="margin-bottom:12px">'+
+    '<summary class="akpCoachFoldSummary"><span class="akpCoachFoldTitle">'+
+    '<span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
+    '<span class="akpCoachFoldText"><strong>Gestion des cycles</strong>'+
+    '<small>Cycles enregistrés, objectifs et modifications</small></span></span>'+
+    '<span class="akpCoachFoldCount">'+cycles.length+' cycle'+(cycles.length>1?'s':'')+'</span></summary>'+
+    '<div class="akpCoachFoldBody">'+
+    '<div style="display:grid;gap:9px">'+(entries||none)+'</div>'+
     '<div class="akMinutesActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px">'+
-    '<button class="btn primary small akCycleNew">+ Nouveau cycle</button></div></div>';
+    '<button class="btn primary small akCycleNew">+ Nouveau cycle</button></div></div></details>';
   }
   const history=cycles.map(cy=>
     '<div class="item row between" style="gap:9px;flex-wrap:wrap"><div><strong>'+esc(cy.title)+'</strong>'+
