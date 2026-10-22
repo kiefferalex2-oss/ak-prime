@@ -149,17 +149,24 @@
   const latest=rows[0],first=rows[rows.length-1];
   const delta=latest&&first&&num(latest.kg)!=null&&num(first.kg)!=null&&rows.length>1?
    Math.round((Number(latest.kg)-Number(first.kg))*100)/100:null;
+  // Ne pas inventer une composition corporelle à partir du poids seul.
+  const measurements=x=>[
+   num(x.kg)!=null?x.kg+' kg':'',
+   num(x.fat_pct)!=null?'Masse grasse : '+x.fat_pct+' %':'',
+   num(x.lean_kg)!=null?'Masse maigre : '+x.lean_kg+' kg':''
+  ].filter(Boolean).join(' · ');
   const history=rows.slice(0,10).map(x=>
-   '<div><span><strong>'+esc(fmtDate(x.date))+'</strong> · '+esc(x.kg)+' kg'+
+   '<div><span><strong>'+esc(fmtDate(x.date))+'</strong> · '+esc(measurements(x))+
    (x.notes?' <span class="akProfMuted">'+esc(x.notes)+'</span>':'')+'</span>'+
    (m.akPassportRole==='coach'?'<button class="link akProfAction" data-action="weight" data-date="'+esc(x.date)+'">Modifier</button>':'')+
    '</div>').join('');
-  return panel('Poids & évolution',
-    (latest?line('Dernière mesure',latest.kg+' kg · '+fmtDate(latest.date)):'')+
-    (delta!==null?line('Évolution depuis la première mesure',(delta>0?'+':'')+delta+' kg'):'')+
-    (rows.length?'<details style="margin-top:8px"><summary style="cursor:pointer">Historique des pesées ('+rows.length+')</summary>'+
-      '<div class="akProfHistory">'+history+'</div></details>':'<p class="akProfMuted">Aucune pesée enregistrée.</p>'),
-    editButton(m,'weight','+ Ajouter une pesée'));
+  return panel('Poids & composition corporelle',
+    (latest?line('Dernière mesure',measurements(latest)+' · '+fmtDate(latest.date)):'')+
+    (delta!==null?line('Évolution du poids depuis la première mesure',(delta>0?'+':'')+delta+' kg'):'')+
+    (rows.length?'<details style="margin-top:8px"><summary style="cursor:pointer">Historique des mesures ('+rows.length+')</summary>'+
+      '<div class="akProfHistory">'+history+'</div></details>':'<p class="akProfMuted">Aucune mesure enregistrée.</p>'),
+    '<p class="akProfCardNote">Le poids est obligatoire ; masse grasse et masse maigre sont facultatives et ne sont jamais estimées automatiquement.</p>'+
+    editButton(m,'weight','+ Ajouter une mesure'));
  }
  function macroSource(m){
   if(m.akPassportMacro)return m.akPassportMacro;
@@ -387,8 +394,14 @@
     found=rows.find(x=>x.date===day);
   const d=found?.date||localDateISO();
   const content=weight?
-   input('akPointDate','Date de la pesée','date',d)+input('akPointKg','Poids (kg)','number',found?.kg)+
-   '<div class="field"><label>Contexte (facultatif)</label><textarea id="akPointNotes" class="textarea" maxlength="700">'+
+   input('akPointDate','Date de la mesure','date',d)+
+   '<p class="muted tiny">Seul le poids est obligatoire. La masse grasse et la masse maigre ne sont renseignées que si elles ont été mesurées.</p>'+
+   input('akPointKg','Poids (kg) — obligatoire','number',found?.kg)+
+   '<div class="grid2">'+
+   input('akPointFatPct','Masse grasse (%) — facultatif','number',found?.fat_pct)+
+   input('akPointLeanKg','Masse maigre (kg) — facultatif','number',found?.lean_kg)+
+   '</div>'+
+   '<div class="field"><label>Contexte / méthode de mesure (facultatif)</label><textarea id="akPointNotes" class="textarea" maxlength="700">'+
     esc(found?.notes||'')+'</textarea></div>':
    input('akPointDate','Date du point nutrition','date',d)+
    '<div class="grid2">'+[
@@ -396,11 +409,15 @@
    ].map(([key,l])=>input('akNutrition_'+key,l,'number',found?.[key])).join('')+'</div>'+
    '<div class="field"><label>Habitudes / évolution / remarques</label><textarea id="akPointNotes" class="textarea" maxlength="1200">'+
     esc(found?.notes||'')+'</textarea></div>';
-  modalBase(weight?'Pesée — '+esc(c.name):'Point nutritionnel — '+esc(c.name),content,
+  modalBase(weight?'Poids & composition corporelle — '+esc(c.name):'Point nutritionnel — '+esc(c.name),content,
    ()=>saveForm(c,()=>{
     const dayValue=val('akPointDate');
     if(!/^\d{4}-\d{2}-\d{2}$/.test(dayValue))throw Error('Date invalide.');
-    const row=weight?{date:dayValue,kg:number('akPointKg',20,500,true),notes:val('akPointNotes')}:
+    const kg=weight?number('akPointKg',20,500,true):null;
+    const fatPct=weight?number('akPointFatPct',0,100):null;
+    const leanKg=weight?number('akPointLeanKg',0,500):null;
+    if(weight&&leanKg!==null&&leanKg>kg)throw Error('La masse maigre ne peut pas dépasser le poids total.');
+    const row=weight?{date:dayValue,kg,fat_pct:fatPct,lean_kg:leanKg,notes:val('akPointNotes')}:
      {date:dayValue,kcal:number('akNutrition_kcal',0,10000),
       protein:number('akNutrition_protein',0,1000),
       carbs:number('akNutrition_carbs',0,2000),fats:number('akNutrition_fats',0,1000),notes:val('akPointNotes')};
