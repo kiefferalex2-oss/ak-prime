@@ -93,11 +93,13 @@
   for(const c of rows){
    if(c.id)cycleIds.add(c.id);
    if(c.start_date)events.push({date:toISO(c.start_date),title:'Début du cycle — '+(c.title||'Sans nom'),
-      detail:c.status==='planned'&&toISO(c.start_date)>today()?'Début prévu':'Cycle enregistré'});
+      detail:(c.status==='planned'&&toISO(c.start_date)>today()?'Début prévu':'Cycle enregistré')+
+        ' · Objectif : '+(String(c.priorities||'').trim()||'À définir')});
    if(c.end_date&&c.id!==m.cycle?.id){
     const planned=toISO(c.end_date)>today()&&c.status!=='completed';
     events.push({date:toISO(c.end_date),title:(planned?'Fin prévue du cycle — ':'Fin de cycle — ')+(c.title||'Sans nom'),
-       detail:'Du '+fmtDate(toISO(c.start_date))+' au '+fmtDate(toISO(c.end_date))});
+       detail:'Du '+fmtDate(toISO(c.start_date))+' au '+fmtDate(toISO(c.end_date))+
+         ' · Objectif : '+(String(c.priorities||'').trim()||'À définir')});
    }
   }
   for(const p of m.assessmentDates||[]){
@@ -176,8 +178,8 @@
      '<span class="status '+tone+'">'+esc(label)+'</span></div>'+
      '<div class="muted tiny" style="margin-top:6px">'+esc(fmtDate(cy.start_date))+' → '+
      (cy.end_date?esc(fmtDate(cy.end_date)):'Date de fin à définir')+'</div>'+
-     (cy.priorities?'<div class="muted tiny" style="margin-top:5px">Priorités : '+
-        esc(String(cy.priorities).slice(0,150))+'</div>':'')+
+     '<div class="muted tiny" style="margin-top:6px;white-space:pre-wrap"><b>Objectif du cycle :</b> '+
+       esc(String(cy.priorities||'').trim()||'À définir')+'</div>'+
      '</div><button class="btn ghost small akCycleEdit" data-id="'+esc(cy.id)+'">Modifier</button></div>';
    }).join('');
    return '<div class="card panel no-print" style="margin-bottom:12px">'+
@@ -187,8 +189,7 @@
     '<span class="status blue">'+cycles.length+' cycle(s)</span></div>'+
     '<div style="display:grid;gap:9px;margin-top:13px">'+(entries||none)+'</div>'+
     '<div class="akMinutesActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px">'+
-    '<button class="btn primary small akCycleNew">+ Nouveau cycle</button>'+
-    '<button class="btn ghost small akCyclePassport">Voir la chronologie</button></div></div>';
+    '<button class="btn primary small akCycleNew">+ Nouveau cycle</button></div></div>';
   }
   const history=cycles.map(cy=>
     '<div class="item row between" style="gap:9px;flex-wrap:wrap"><div><strong>'+esc(cy.title)+'</strong>'+

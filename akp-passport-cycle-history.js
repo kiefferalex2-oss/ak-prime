@@ -11,6 +11,7 @@
      start:iso(row.start_date||row.start),
      end:iso(row.end_date||row.end),
      status:String(row.status||''),
+     priorities:String(row.priorities||'').trim(),
    };
  }
  function allCycles(list,current){
@@ -66,7 +67,9 @@
        '<thead><tr><th scope="col">Cycle</th><th scope="col">Période</th><th scope="col">Durée</th><th scope="col">État</th></tr></thead><tbody>'+
        cycles.map(c=>{
           const d=duration(c),st=cycleStatus(c);
-          return '<tr><td><strong>'+esc(c.title)+'</strong></td>'+
+          return '<tr><td><strong>'+esc(c.title)+'</strong>'+
+           '<div class="muted tiny" style="margin-top:6px;white-space:pre-wrap">'+
+           '<b>Objectif du cycle :</b> '+esc(c.priorities||'À définir')+'</div></td>'+
            '<td>'+esc(c.start?fmtDate(c.start):'Début à compléter')+
            ' → '+esc(c.end?fmtDate(c.end):'Fin à compléter')+'</td>'+
            '<td>'+esc(d?.label||'À déterminer')+'</td>'+
@@ -80,7 +83,7 @@
    const result=await legacyLoad.apply(this,args);
    if(!authUser?.id||!['owner','coach'].includes(authProfile?.role))return result;
    const {data,error}=await supa.from('cycles')
-       .select('id,client_id,title,start_date,end_date,status')
+       .select('id,client_id,title,start_date,end_date,status,priorities')
        .order('start_date',{ascending:false});
    if(error)throw Error('Historique des cycles indisponible : '+error.message);
    db.passportCycleHistory=data||[];
@@ -92,7 +95,7 @@
    const session=clientPortalState;
    if(!session?.client||authProfile?.role!=='client')return;
    const {data,error}=await supa.from('cycles')
-      .select('id,client_id,title,start_date,end_date,status')
+      .select('id,client_id,title,start_date,end_date,status,priorities')
       .eq('client_id',session.client.id)
       .order('start_date',{ascending:false});
    if(clientPortalState!==session)return;
@@ -139,7 +142,8 @@
      seen.add(key);
      existing.push({date:cycle.end,title,
        detail:'Du '+(cycle.start?fmtDate(cycle.start):'début à préciser')+' au '+
-         fmtDate(cycle.end)+(period?' · Durée : '+period.label:'')});
+         fmtDate(cycle.end)+(period?' · Durée : '+period.label:'')+
+         ' · Objectif : '+(cycle.priorities||'À définir')});
    }
    return oldTimeline({...m,events:existing});
  };
