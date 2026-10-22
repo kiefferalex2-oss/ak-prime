@@ -1233,7 +1233,7 @@ function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inact
 
 function clientPage(){
  const c=currentClient();if(!c)return clientsPage();
- const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding & Visio'],['follow','Suivi'],['passport','Passeport'],['admin','Administratif']];
+ const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding'],['follow','Suivi'],['passport','Passeport'],['admin','Administratif']];
  return '<button class="btn ghost small no-print" id="backClients" style="margin-bottom:10px">← Clients</button>'+
  '<div class="card client-head"><div class="person"><div class="photo">'+esc(c.initials||initials(c.name))+'</div><div><div class="row"><h2>'+esc(c.name)+'</h2>'+status(c.status)+'</div><div class="meta"><span>'+esc(c.pole)+'</span><span>• '+esc(c.offer)+'</span>'+(c.sport?'<span>• '+esc(c.sport)+'</span>':'')+(c.specialty?'<span>• '+esc(c.specialty)+'</span>':'')+(c.level?'<span>• '+esc(c.level)+'</span>':'')+'</div></div></div>'+
  '<div class="metrics"><div class="metric"><span>Début</span><strong>'+fmtDate(c.start)+'</strong></div><div class="metric"><span>Fin engagement</span><strong>'+fmtDate(c.end)+'</strong></div><div class="metric"><span>Prochaine visio</span><strong>'+fmtDate(c.next)+'</strong></div></div></div>'+
