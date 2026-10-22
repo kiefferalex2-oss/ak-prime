@@ -2359,7 +2359,7 @@ function renderClientEngagementBanner(c){
  return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
 }
 function clientNavMarkup(){
- const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['suivi','✓','Suivi'],['passport','◇','Passeport'],['billing','€','Factures']];
+ const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['checkin','☷','Bilan hebdo'],['suivi','✓','Suivi'],['passport','◇','Passeport'],['billing','€','Factures']];
  const current=items.find(x=>x[0]===clientPortalView)||items[0];
  const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
  const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
@@ -2498,6 +2498,10 @@ function renderClientPortal(){
    main=renderClientVisios(s);
  }else if(clientPortalView==='suivi'){
    main=renderClientSuivi(s);
+ }else if(clientPortalView==='checkin'){
+   main='<div class="client-main"><div class="client-page-head"><div><h2>Mon bilan hebdomadaire</h2>'+
+     '<p>Un rapide retour sur ta semaine, tes difficultés et les changements à prévoir. Ce questionnaire complète le suivi des séances dans Optitrainer.</p>'+
+     '</div></div>'+renderClientWeeklyCheckin(s)+'</div>';
  }else if(clientPortalView==='billing'){
    main=renderClientBilling(s);
  }else{
@@ -2507,6 +2511,7 @@ function renderClientPortal(){
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
+ document.querySelectorAll('.clientGoCheckin').forEach(b=>b.onclick=()=>{clientPortalView='checkin';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
  document.querySelectorAll('.clientPrintInvoice').forEach(b=>b.onclick=()=>printInvoice(b.dataset.id));
  document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
@@ -3634,6 +3639,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261021-weekly-akprime-v28"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261022-weekly-tab-v29"></script>
 </body>
 </html>

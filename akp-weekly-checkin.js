@@ -75,13 +75,19 @@
     '<button class="btn primary" id="submitWeeklyCheckin">Envoyer mon bilan au coach</button>'+
     '<p class="muted tiny">Tes réponses sont consultées dans ton dossier AK PRIME.</p></div>';
  }
+ // L'onglet dédié est le seul endroit où le formulaire complet est affiché.
+ renderClientWeeklyCheckin=function(s){return clientBlock(s);};
  const origSuivi=renderClientSuivi;
  renderClientSuivi=function(s){
   const wrapper=document.createElement('div');wrapper.innerHTML=origSuivi(s);
   const page=wrapper.querySelector('.client-main');
-  if(!page)return clientBlock(s)+wrapper.innerHTML;
+  if(!page)return wrapper.innerHTML;
+  const card='<div class="client-section-card"><div class="row between" style="gap:10px;flex-wrap:wrap"><div>'+
+   '<h3 style="margin:0">Bilan hebdomadaire AK PRIME</h3>'+
+   '<p class="muted tiny" style="margin:6px 0 0">Ressenti de la semaine, difficultés, gênes et ajustements souhaités, une fois par semaine.</p></div>'+
+   '<button class="btn primary small clientGoCheckin">Ouvrir le bilan hebdo</button></div></div>';
   const head=page.querySelector('.client-page-head');
-  (head||page).insertAdjacentHTML(head?'afterend':'afterbegin',clientBlock(s));
+  (head||page).insertAdjacentHTML(head?'afterend':'afterbegin',card);
   return wrapper.innerHTML;
  };
  const origHome=renderClientHome;
@@ -92,7 +98,7 @@
     (pending?'Ton bilan hebdomadaire est disponible':'Prochain bilan hebdomadaire AK PRIME')+'</strong>'+
     '<div class="muted tiny" style="margin:6px 0">'+
     (pending?'Décris comment s’est passée ta semaine.':'Disponible vendredi '+fmtDate(w.next)+' à 18 h.')+'</div>'+
-    (pending?'<button class="btn primary small clientGoFollow">Compléter mon bilan</button>':'')+'</div>';
+    (pending?'<button class="btn primary small clientGoCheckin">Compléter mon bilan</button>':'')+'</div>';
   const root=document.createElement('div');root.innerHTML=html;
   const main=root.querySelector('.client-main');
   if(main){
@@ -110,7 +116,7 @@
   const key='client:checkin:'+w.due,reads=new Set((s.notificationReads||[]).map(x=>x.notification_key));
   return [{key,title:'Bilan hebdomadaire AK PRIME à compléter',
     detail:'Ton court questionnaire de fin de semaine est disponible dans Mon suivi.',
-    target:'suivi',priority:4,read:reads.has(key)},...prev];
+    target:'checkin',priority:4,read:reads.has(key)},...prev];
  };
  function pending(w){return !w.reviewedAt||!present(w.coach);}
  const oldCoachNotifications=coachNotifications;
