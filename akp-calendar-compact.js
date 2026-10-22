@@ -151,6 +151,10 @@
        '</span></button>';
     }).join('')+'</div>').join('');
   const groups=groupedDay(dayEvents);
+  const overdueBlock=overdue.length?'<details class="akCalV2Group" style="margin-top:12px"><summary>Évaluations en retard <span class="akCalV2Pill">'+overdue.length+'</span><span class="akCalV2Chevron">⌄</span></summary>'+
+    overdue.slice(0,5).map(row).join('')+
+    (overdue.length>5?'<details class="akCalV2More"><summary>Afficher '+(overdue.length-5)+' autres ↓</summary>'+overdue.slice(5).map(row).join('')+'</details>':'')+
+    '</details>':'';
   return '<section class="akCalV2Panel"><div class="akCalV2Toolbar"><div><h2>Agenda des clients</h2>'+
    '<small>Trois semaines · un seul compteur par jour, quel que soit le nombre de clients</small></div>'+
    '<div class="akCalV2Nav"><button type="button" data-ak-cal-nav="-3" title="Trois semaines précédentes" aria-label="Trois semaines précédentes">«</button>'+
@@ -163,7 +167,7 @@
    '</div>'+
    '<div class="akCalV2Chosen"><div class="akCalV2ChosenTitle"><strong>'+safe(formatDate(chosen))+
     '</strong><span>'+dayEvents.length+' événement'+(dayEvents.length!==1?'s':'')+'</span></div>'+
-   groups+'</div></section>';
+   groups+'</div>'+overdueBlock+'</section>';
  }
  function collapsible(node,label,meta,index,clientId){
   const holder=document.createElement('details');holder.className='akCalV2Acc';
