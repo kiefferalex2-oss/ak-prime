@@ -51,6 +51,9 @@
  '@media print{.akLuxHero{print-color-adjust:exact;-webkit-print-color-adjust:exact}.akLuxHeroBtn,.akLuxAction{display:none!important}.akLuxCols{grid-template-columns:1fr 1fr}.akLuxFoldInner{display:block!important}.akLuxFold summary{display:none!important}}'
  ].join('\n');
  document.head.appendChild(style);
+ const compact=document.createElement('style');
+ compact.textContent="\n.akLuxCover .akLuxHero{padding:22px 27px 20px}\n.akLuxCover .akLuxHeroBody{padding:18px 0 15px;align-items:center;gap:18px;grid-template-columns:minmax(0,1.6fr) minmax(205px,.4fr)}\n.akLuxCover .akLuxHeroMain h2{font-size:clamp(25px,2.7vw,35px);margin:8px 0 9px}\n.akLuxCover .akLuxHeroMain p{font-size:12px;line-height:1.5}\n.akLuxCover .akLuxHeroNext{padding:10px 13px;margin-top:7px}\n.akLuxCover .akLuxHeroNext strong{margin:3px 0;font-size:13px}\n.akLuxCover .akLuxHeroBottom{padding-top:12px}\n.akLuxCover .akLuxHeroTop{font-size:9px}\n.akLuxHomeShortcut{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:19px 0 11px}\n.akLuxHomeShortcut>span{font-size:10px;font-weight:850;letter-spacing:.12em;color:#a27b44}\n.akLuxHomeShortcut button,.akLuxProfileTools button{background:#18334b;color:#fff;border:0;border-radius:9px;padding:10px 13px;cursor:pointer;font-size:12px;font-weight:800}\n.akLuxHomeShortcut button:hover,.akLuxProfileTools button:hover{background:#284b68}\n.akLuxCover .akp-page{padding:0!important}\n.akLuxCover .akp-page-title{margin-top:0;padding-top:0}\n.akLuxCover .akp-overview-main{margin-top:12px}\n.akLuxProfileTop{display:flex;justify-content:space-between;align-items:end;gap:18px;padding:7px 0 3px;flex-wrap:wrap}\n.akLuxProfileTop span{color:#ab7e43;font-size:10px;font-weight:900;letter-spacing:.14em}\n.akLuxProfileTop h2{color:#1a3045;font-size:clamp(23px,2.6vw,32px);line-height:1.15;letter-spacing:-.03em;margin:9px 0}\n.akLuxProfileTop p{color:#75879a;font-size:12px;line-height:1.6;max-width:670px}\n.akLuxProfileTools{display:flex;gap:8px}\n.akLuxProfilePage .akLuxSection{margin-top:18px}\n@media(max-width:720px){.akLuxCover .akLuxHeroBody{grid-template-columns:1fr;gap:9px}.akLuxCover .akLuxHero{padding:21px 19px}.akLuxCover .akLuxHeroAside{grid-template-columns:1fr 1fr}.akLuxProfileTop{align-items:start}}\n@media(max-width:520px){.akLuxCover .akLuxHeroAside{grid-template-columns:1fr}.akLuxHomeShortcut button{width:100%}}\n";
+ document.head.appendChild(compact);
  const tx=x=>Array.isArray(x)?x.join(', '):x===false?'Non':x===true?'Oui':String(x??'').trim();
  const valid=x=>x!==null&&x!==undefined&&x!==''&&Number.isFinite(Number(x));
  const rows=x=>Array.isArray(x)?x:[];
@@ -164,7 +167,7 @@
     '<div class="akLuxFoldInner">'+legacy+'</div></details></section>';
  }
  const previous=passportOverviewPage;
- passportOverviewPage=function(m){
+ window.AKP_PREMIUM_PROFILE_PAGE=function(m){
   const mental=rights(m).mental;
   const body='<div class="akLuxCols"><div class="akLuxStack">'+
     box('02 / PARCOURS',mental?'Le profil de suivi':'L’environnement sportif',
@@ -178,7 +181,22 @@
      group(m,[['Disponibilités','availability'],['Installations','facilities'],['Lieu de pratique','training_place'],
        ['Matériel','equipment'],['Contraintes personnelles','life_constraints']]))+
     '</div></div>';
-  return '<div class="akp-page akLux">'+hero(m)+metrics(m)+body+deeper(m,previous(m))+'</div>';
+  return '<div class="akp-page akLux akLuxProfilePage">'+
+   '<header class="akLuxProfileTop"><div><span>02 / PROFIL ATHLÈTE</span>'+
+   '<h2>Le profil, au-delà des résultats</h2>'+
+   '<p>Pratique, préférences, tolérances et vigilance : toutes les informations qui permettent de personnaliser le suivi.</p></div>'+
+   (m.akPassportRole==='coach'?'<div class="akLuxProfileTools">'+
+    '<button type="button" class="akProfAction" data-action="profile">✎ Modifier la fiche</button></div>':'')+
+   '</header>'+metrics(m)+body+deeper(m,previous(m))+'</div>';
  };
- window.AKP_PASSPORT_PREMIUM_READY=true;
+passportOverviewPage=function(m){
+  const summary=typeof window.AKP_PASSPORT_ORIGINAL_OVERVIEW==='function'?
+    window.AKP_PASSPORT_ORIGINAL_OVERVIEW(m):
+    '<div class="akp-page"><p>Les repères du suivi apparaîtront ici.</p></div>';
+  return '<div class="akp-page akLux akLuxCover">'+hero(m)+
+   '<div class="akLuxHomeShortcut"><span>LE PARCOURS EN UN COUP D’ŒIL</span>'+
+   '<button class="passportInlineNav" type="button" data-passport-page="profile">Découvrir le profil sportif →</button></div>'+
+   summary+'</div>';
+ };
+  window.AKP_PASSPORT_PREMIUM_READY=true;
 })();

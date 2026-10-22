@@ -1568,7 +1568,7 @@ function passportTopProgress(groups,limit=3){
   }).slice(0,limit);
 }
 function passportBookNav(){
- const items=[['overview','Vue d’ensemble'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
+ const items=[['overview','Sommaire'],['profile','Profil sportif'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
  return '<nav class="akp-tabs">'+items.map(([k,l])=>'<button class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'">'+l+'</button>').join('')+'</nav>';
 }
 function passportHeader(m){
@@ -1608,6 +1608,7 @@ function passportOverviewPage(m){
   '</div>'+
  '</div>';
 }
+window.AKP_PASSPORT_ORIGINAL_OVERVIEW=passportOverviewPage;
 function passportCyclePage(m){
  const cs=passportCycleStats(m.cycle),weeks=Math.min(cs.weeks||6,12),current=cs.weekNow||1;
  const priorities=(m.cycle?.priorities||'').split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
@@ -1692,6 +1693,7 @@ function passportFollowupPage(m){
  '</div>';
 }
 function renderPassportBookPage(m){
+ if(passportBookPage==='profile')return typeof window.AKP_PREMIUM_PROFILE_PAGE==='function'?window.AKP_PREMIUM_PROFILE_PAGE(m):passportOverviewPage(m);
  if(passportBookPage==='cycle')return passportCyclePage(m);
  if(passportBookPage==='progress')return passportProgressPage(m);
  if(passportBookPage==='timeline')return passportTimelinePage(m);
@@ -1717,7 +1719,7 @@ function renderPremiumPassport(m){
  if(groups.length&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
    passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
  }
- if(!['overview','cycle','progress','timeline','followup'].includes(passportBookPage))passportBookPage='overview';
+ if(!['overview','profile','cycle','progress','timeline','followup'].includes(passportBookPage))passportBookPage='overview';
  return '<div class="akp-passport">'+passportHeader(m)+passportBookNav()+'<main id="passportBookBody" class="akp-body">'+renderPassportBookPage(m)+'</main></div>';
 }
 
@@ -3639,6 +3641,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261022-athlete-premium-v36"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261022-passport-pages-v37"></script>
 </body>
 </html>
