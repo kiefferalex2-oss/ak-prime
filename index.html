@@ -844,7 +844,7 @@ async function loadSupabaseData(){
      tests:(tests[x.id]||[]).map(t=>({id:t.id,name:t.test_name,date:isoDate(t.performed_at),value:t.result_value??t.result_text??'',unit:t.unit||'',context:t.context||'',note:t.coach_interpretation||''})),
      cycle:{_id:cy.id||'',title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||'',optitrainer:x.optitrainer_url||''},
      checkins:(checks[x.id]||[]).map(w=>({id:w.id,date:isoDate(w.week_date),feeling:w.overall_week||'',missed:w.missed_sessions||'',problem:w.exercise_problem||'',pain:w.pain_or_discomfort||'',nextConstraint:w.next_week_constraints||'',other:w.other_info||'',coach:w.coach_feedback||w.coach_decision||'',reviewedAt:w.reviewed_at||''})),
-     events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),title:e.title,detail:e.detail||''})),
+     events:(events[x.id]||[]).map(e=>({id:e.id,date:isoDate(e.event_date),eventType:e.event_type||'',title:e.title,detail:e.detail||''})),
      renewals:(renewals[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,newEndDate:isoDate(r.new_end_date),cycleReviewDone:!!r.cycle_review_done,retestsRequired:!!r.retests_required,retestsDone:!!r.retests_done,objectivesUpdated:!!r.objectives_updated,notes:r.notes||'',processedAt:r.processed_at||''})),
      renewalChoices:(renewalChoices[x.id]||[]).map(r=>({id:r.id,dueDate:isoDate(r.due_date),decision:r.decision,paymentMode:r.payment_mode||'',submittedAt:r.submitted_at||'',updatedAt:r.updated_at||''})),
      invoices:invoices[x.id]||[],
@@ -3641,6 +3641,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261022-profile-clean-v39"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261022-sport-cycle-v40"></script>
 </body>
 </html>
