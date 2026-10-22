@@ -124,15 +124,18 @@
   const html=formerCyclePage(m),next=(m.assessmentDates||[])
     .filter(p=>p.status==='planned'&&['initial','retest','cycle_end'].includes(p.phase))
     .sort((a,b)=>String(a.due_date).localeCompare(String(b.due_date)));
-  const section='<section class="akp-panel" style="margin-top:14px"><div class="akp-section-head">'+
-   '<div><span class="akp-label">ÉVALUATIONS DU PARCOURS</span><h3>Tests, retests et bilans planifiés</h3></div>'+
-   '<span class="akp-mini-status">'+next.length+' à venir / à traiter</span></div>'+
-   '<div class="list">'+(next.length?next.slice(0,15).map(p=>
+  const section='<details class="akp-cycle-fold" style="margin-top:14px">'+
+   '<summary class="akp-cycle-fold-head">'+
+   '<span class="akp-cycle-fold-title"><span>ÉVALUATIONS DU PARCOURS</span>'+
+   '<strong>Tests, retests et bilans planifiés</strong></span>'+
+   '<span class="akp-cycle-fold-controls"><span>'+next.length+' évaluation'+(next.length>1?'s':'')+
+   '</span><span class="akp-cycle-fold-arrow" aria-hidden="true">⌄</span></span></summary>'+
+   '<div class="akp-cycle-fold-body"><div class="list">'+(next.length?next.slice(0,15).map(p=>
     '<div class="item row between" style="gap:9px"><div><strong>'+esc(phaseName[p.phase]||'Évaluation')+
     '</strong><div class="muted tiny">'+esc(p.title||'')+'</div></div>'+
     '<span class="status '+(toISO(p.due_date)<today()?'amber':'blue')+'">'+esc(fmtDate(p.due_date))+'</span></div>').join(''):
     '<p class="muted tiny">Aucune évaluation à venir enregistrée. Les tests réellement effectués apparaissent dans la Chronologie et la Progression.</p>')+
-   '</div></section>';
+   '</div></div></details>';
   const pos=html.lastIndexOf('</div>');return pos===-1?html+section:html.slice(0,pos)+section+html.slice(pos);
  };
  function statusLabel(c){

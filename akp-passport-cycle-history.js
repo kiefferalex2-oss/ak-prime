@@ -3,6 +3,9 @@
  */
 (function(){
  'use strict';
+ const foldCSS=document.createElement('style');
+ foldCSS.textContent="\n.akp-cycle-fold{background:#fff;border:1px solid #dce3e9;border-radius:12px;overflow:hidden}\n.akp-cycle-fold .akp-cycle-fold-head{display:flex;gap:15px;justify-content:space-between;align-items:center;cursor:pointer;list-style:none;padding:15px 17px}\n.akp-cycle-fold .akp-cycle-fold-head::-webkit-details-marker{display:none}\n.akp-cycle-fold .akp-cycle-fold-head:hover{background:#f9fbfc}\n.akp-cycle-fold .akp-cycle-fold-title{display:grid;gap:6px;min-width:0}\n.akp-cycle-fold .akp-cycle-fold-title>span{font-size:9px;letter-spacing:.12em;font-weight:850;color:#a67c46}\n.akp-cycle-fold .akp-cycle-fold-title>strong{font-size:16px;line-height:1.3;font-weight:850;color:#1d3348}\n.akp-cycle-fold .akp-cycle-fold-controls{display:flex;align-items:center;gap:13px;flex-shrink:0}\n.akp-cycle-fold .akp-cycle-fold-controls>span:first-child{font-size:11px;font-weight:800;color:#577087;background:#edf3f8;padding:7px 11px;border-radius:999px;white-space:nowrap}\n.akp-cycle-fold .akp-cycle-fold-arrow{color:#8b9aaa;font-size:20px;line-height:1;transform-origin:center;transition:transform .16s}\n.akp-cycle-fold[open] .akp-cycle-fold-arrow{transform:rotate(180deg)}\n.akp-cycle-fold .akp-cycle-fold-body{border-top:1px solid #e8edf1;padding:15px 17px 17px}\n.akp-cycle-fold .akp-cycle-fold-body>p:first-child{margin-top:0}\n@media(max-width:620px){\n .akp-cycle-fold .akp-cycle-fold-head{padding:13px 12px;gap:7px}\n .akp-cycle-fold .akp-cycle-fold-title>strong{font-size:14px}\n .akp-cycle-fold .akp-cycle-fold-controls{gap:6px}\n .akp-cycle-fold .akp-cycle-fold-controls>span:first-child{font-size:9px;padding:6px 8px}\n .akp-cycle-fold .akp-cycle-fold-body{padding:12px}\n}\n";
+ document.head.appendChild(foldCSS);
  function iso(v){return v?String(v).slice(0,10):''}
  function normalized(row){
    return {
@@ -56,10 +59,14 @@
    const cycles=cycleRows(m);
    const completed=cycles.filter(c=>c.end&&c.end<localDateISO()||
       ['completed','complete','finished','done','closed','terminé','termine'].includes(c.status.toLowerCase())).length;
-   return '<section class="akp-panel" style="margin-top:16px">'+
-      '<div class="akp-section-head"><div><span class="akp-label">HISTORIQUE DES CYCLES</span>'+
-      '<h3>Cycles réalisés et durées</h3></div><span class="akp-mini-status">'+cycles.length+
-      ' cycle'+(cycles.length>1?'s':'')+' enregistré'+(cycles.length>1?'s':'')+'</span></div>'+
+   return '<details class="akp-cycle-fold" style="margin-top:16px">'+
+      '<summary class="akp-cycle-fold-head">'+
+      '<span class="akp-cycle-fold-title"><span>HISTORIQUE DES CYCLES</span>'+
+      '<strong>Cycles réalisés et durées</strong></span>'+
+      '<span class="akp-cycle-fold-controls"><span>'+cycles.length+
+      ' cycle'+(cycles.length>1?'s':'')+'</span>'+
+      '<span class="akp-cycle-fold-arrow" aria-hidden="true">⌄</span></span></summary>'+
+      '<div class="akp-cycle-fold-body">'+
       '<p class="muted tiny" style="margin:7px 0 16px">Historique des périodes suivies chez AK PRIME. '+
       'Les séances et les contenus de programmation restent consultables dans Optitrainer. '+
       'La durée est calculée du premier au dernier jour inclus.</p>'+
@@ -76,7 +83,7 @@
            '<td><span class="status '+st.css+'">'+esc(st.label)+'</span></td></tr>';
        }).join('')+'</tbody></table></div>':
        '<div class="akp-empty-inline">Aucun cycle enregistré dans le dossier.</div>')+
-      '</section>';
+      '</div></details>';
  }
  const legacyLoad=loadSupabaseData;
  loadSupabaseData=async function(...args){

@@ -142,10 +142,8 @@
    // Priorités déjà dans Gestion des cycles ; prochaine étape détaillée dans le calendrier.
    aside.innerHTML=quickNext(m)+caution(m);
   }
-  // L'ancien tableau générique d'évaluations faisait double emploi avec les jalons datés.
-  root.querySelectorAll('.akp-panel').forEach(panel=>{
-    if(panel.textContent.includes('Tests, retests et bilans planifiés'))panel.remove();
-  });
+  // Les évaluations détaillées restent consultables dans un accordéon fermé
+  // sous le calendrier sportif, sans encombrer la page à l'ouverture.
   return root.innerHTML;
  }
  const origCoach=passportModelFromCoach;
