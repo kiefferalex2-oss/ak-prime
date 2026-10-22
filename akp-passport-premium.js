@@ -101,13 +101,25 @@
   const discipline=info(m,'sport')||m.sport||'Discipline à préciser';
   const specialty=info(m,'position')||m.specialty||'';
   const club=info(m,'club'),level=info(m,'level')||m.level||'';
-  const due=info(m,'deadline');
+  const dueRaw=info(m,'deadline');
+  // Les réponses libres (« demain », « dans un mois ») ne sont pas des dates stables.
+  // Elles restent lisibles en sous-texte, sans être présentées comme une échéance calculée.
+  const rawDate=tx(dueRaw);
+  const isoMatch=rawDate.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  const frMatch=rawDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const candidate=isoMatch?isoMatch[1]+'-'+isoMatch[2]+'-'+isoMatch[3]:
+   frMatch?frMatch[3]+'-'+frMatch[2]+'-'+frMatch[1]:'';
+  const d=candidate?new Date(candidate+'T12:00:00Z'):null;
+  const isValidDate=!!d&&Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===candidate;
+  const due=isValidDate?fmtDate(candidate):'À dater';
+  const dueHelp=isValidDate?'Objectif du sportif':
+   rawDate?'Échéance saisie : '+rawDate:'Date à préciser avec le sportif';
   const cycle=tx(m.cycle?.title)||'Cycle à définir';
   const cycleEnd=m.cycle?.end?fmtDate(m.cycle.end):'Date de fin à définir';
   const subject=tx(m.name)||'Sportif AK PRIME';
   const initials=tx(m.initials)||subject.split(/\s+/).slice(0,2).map(s=>s.charAt(0)).join('').toUpperCase()||'AK';
   const meta=[
-    ['Discipline',discipline],['Poste',specialty],
+    ['Discipline',discipline],['Poste / spécialité',specialty],
     ['Niveau',level],['Club',club]
   ].filter(([,v])=>tx(v)).map(([k,v])=>
     '<span><b>'+plain(k)+'</b>'+plain(v)+'</span>').join('');
@@ -130,8 +142,8 @@
          '<strong>'+plain(cycle)+'</strong>'+
          '<small>'+plain(cycleEnd)+'</small></div>'+
        '<div class="akLuxHeroNext"><span>ÉCHÉANCE CIBLE</span>'+
-         '<strong>'+plain(due||'À définir')+'</strong>'+
-         '<small>'+ (due?'Objectif du sportif':'À préciser lors du prochain bilan')+'</small></div>'+
+         '<strong>'+plain(due)+'</strong>'+
+         '<small>'+plain(dueHelp)+'</small></div>'+
      '</div></div>'+
    '<div class="akLuxHeroBottom"><div class="akLuxTags">'+(meta||'<span>Profil à enrichir</span>')+'</div>'+
     (m.akPassportRole==='coach'?'<button class="akProfAction akLuxHeroBtn" type="button" data-action="profile">'+
