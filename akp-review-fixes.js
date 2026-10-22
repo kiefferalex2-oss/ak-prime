@@ -1,6 +1,16 @@
 /* AK PRIME — Corrections première revue : affichage fiable, modifications tracées. */
 (function(){
  'use strict';
+ function akpPainReported(value){
+  const norm=String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+   .toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:]+/g,' ')
+   .replace(/\s+/g,' ').trim();
+  if(!norm)return false;
+  if(/^(?:non|nan|r\s*a\s*s|rien|neant|aucun|aucune|0|n\/a|sans objet|non rien|non ras)$/.test(norm))return false;
+  if(/^(?:(?:non\s+)?rien (?:a signaler|de particulier|a declarer)|(?:non\s+)?(?:pas de|aucun(?:e)?) (?:douleur|gene|souci|probleme|blessure|symptome)s?(?: a signaler)?|aucune douleur (?:ni|et) (?:aucune )?gene|tout (?:va|est) bien|pas de souci particulier)$/.test(norm))return false;
+  return true;
+ }
+
 
  function nextScheduledVisioDate(c){
    const next=(db.appointments||[]).filter(a=>a.client_id===c.id&&
@@ -100,7 +110,7 @@
    let html=oldPassport(c);
    if(!c.cycle?.start||!c.cycle?.end||c.cycle.end<=c.cycle.start)
      html='<div class="alert blue" style="margin-bottom:12px">Les dates du cycle sont incomplètes ou incohérentes : le pourcentage de progression ne peut pas être interprété.</div>'+html;
-   const pain=(c.checkins||[]).filter(w=>w.pain&&w.pain.trim()&&!/^(ras|rien|non|aucune|néant|neant|0)$/i.test(w.pain.trim()))
+   const pain=(c.checkins||[]).filter(w=>akpPainReported(w.pain))
      .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
    if(pain){
      html='<div class="alert" style="margin-bottom:12px"><strong>Gêne signalée lors du bilan du '+

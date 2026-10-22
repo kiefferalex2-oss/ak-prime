@@ -15,6 +15,16 @@
  document.head.appendChild(css);
  const iso=x=>x?String(x).slice(0,10):'';
  const present=x=>String(x??'').trim();
+ function akpPainReported(value){
+  const norm=String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+   .toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:]+/g,' ')
+   .replace(/\s+/g,' ').trim();
+  if(!norm)return false;
+  if(/^(?:non|nan|r\s*a\s*s|rien|neant|aucun|aucune|0|n\/a|sans objet|non rien|non ras)$/.test(norm))return false;
+  if(/^(?:(?:non\s+)?rien (?:a signaler|de particulier|a declarer)|(?:non\s+)?(?:pas de|aucun(?:e)?) (?:douleur|gene|souci|probleme|blessure|symptome)s?(?: a signaler)?|aucune douleur (?:ni|et) (?:aucune )?gene|tout (?:va|est) bien|pas de souci particulier)$/.test(norm))return false;
+  return true;
+ }
+
  function paris(){
   const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
   const k=s=>p.find(t=>t.type===s)?.value||'';
@@ -141,7 +151,7 @@
    '<span class="status amber">'+todo.length+'</span></h3>'+
    '<div class="list">'+todo.slice(0,6).map(({c,w})=>
     '<div class="item row between"><div><strong>'+esc(c.name)+'</strong><div class="muted tiny">'+fmtDate(w.date)+
-    (present(w.pain)?' · Gêne signalée':'')+'</div></div>'+
+    (akpPainReported(w.pain)?' · Gêne signalée':'')+'</div></div>'+
     '<button class="btn ghost small openClient" data-id="'+esc(c.id)+'" data-tab-target="follow">Consulter</button></div>').join('')+
    '</div></div>'+html;
  };
@@ -151,7 +161,7 @@
     ['Gêne ou douleur',w.pain],['Ce qui gêne / à améliorer',w.other],
     ['Contraintes prochaines',w.nextConstraint]].filter(([,value])=>present(value));
    return '<details class="akWeekDetails"><summary><span>Semaine du '+fmtDate(w.date)+'</span> '+
-    (present(w.pain)?'<span class="status amber">Gêne signalée</span> ':'')+
+    (akpPainReported(w.pain)?'<span class="status amber">Gêne signalée</span> ':'')+
     '<span class="status '+(pending(w)?'amber':'green')+'">'+(pending(w)?'À traiter':'Traité')+'</span></summary>'+
     '<div style="margin-top:12px">'+(answers.length?answers.map(([label,val])=>
      '<div class="akWeekFact"><span>'+esc(label)+'</span><div>'+esc(val)+'</div></div>').join(''):

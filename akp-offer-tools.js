@@ -275,7 +275,17 @@
    const rows=(c.checkins||[]).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
    if(!rows.length)return '';
    const clean=value=>String(value??'').trim();
-   const hasPain=w=>clean(w.pain)&&!/^(ras|rien|non|aucun(?:e)?|néant|neant|0|non signalé)$/i.test(clean(w.pain));
+ function akpPainReported(value){
+  const norm=String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+   .toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:]+/g,' ')
+   .replace(/\s+/g,' ').trim();
+  if(!norm)return false;
+  if(/^(?:non|nan|r\s*a\s*s|rien|neant|aucun|aucune|0|n\/a|sans objet|non rien|non ras)$/.test(norm))return false;
+  if(/^(?:(?:non\s+)?rien (?:a signaler|de particulier|a declarer)|(?:non\s+)?(?:pas de|aucun(?:e)?) (?:douleur|gene|souci|probleme|blessure|symptome)s?(?: a signaler)?|aucune douleur (?:ni|et) (?:aucune )?gene|tout (?:va|est) bien|pas de souci particulier)$/.test(norm))return false;
+  return true;
+ }
+
+   const hasPain=w=>akpPainReported(w.pain);
    const painCount=rows.filter(hasPain).length;
    const decisionCount=rows.filter(w=>clean(w.coach)).length;
    const items=rows.map(w=>{
