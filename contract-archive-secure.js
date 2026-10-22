@@ -111,7 +111,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261022-timeline-groups-v46';
+    script.src='./'+file+'?rev=20261022-timeline-summary-v47';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
