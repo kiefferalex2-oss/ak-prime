@@ -203,5 +203,12 @@ saveClientQuestionnaire=async function(...args){
   clientPortalView='home';renderClientPortal();
  }
 };
+document.addEventListener('click',event=>{
+ const button=event.target.closest?.('.clientGoInitial');
+ if(!button||!clientPortalState?.akInitialReady)return;
+ event.preventDefault();event.stopImmediatePropagation();
+ clientPortalView='onboarding';
+ renderClientPortal();
+},true);
 window[KEY]=true;
 })();
