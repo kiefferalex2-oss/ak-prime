@@ -147,7 +147,7 @@ renderClientPortal=function(...args){
    await enterClientPortal(authUser,authProfile);
    clientPortalView=previousView;
    renderClientPortal();
-   toast('Formule TEST modifiée : l’ancienne visio initiale a été réinitialisée. Tu peux en réserver une nouvelle dans le questionnaire.');
+   toast('Formule TEST modifiée : tes anciennes visios de simulation ont été neutralisées. Ton quota repart de zéro, et tu peux réserver une nouvelle visio initiale.');
   }catch(err){
    btn.disabled=false;btn.textContent='Appliquer cette formule';
    alert('Impossible de modifier la formule test : '+(err?.message||'Erreur.'));
