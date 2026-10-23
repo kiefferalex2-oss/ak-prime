@@ -104,6 +104,15 @@ style.textContent=[
  '.akIntroLegal .qblock:last-child{border-bottom:0}',
  '.akIntroLegalLinks{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 13px}',
  '.akIntroStartHelp{font-size:12px;line-height:1.65;color:#576f85;padding:13px 22px 0;margin:0}',
+ '.akIntroVisio{padding:17px 22px}.akIntroVisio p{margin:5px 0 14px;font-size:12px;color:#60798e;line-height:1.6}',
+ '.akIntroVisioTop{display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap}',
+ '.akIntroVisioTop h3{font-size:15px;margin:0;color:#18354e}.akIntroVisioTag{font-size:11px;font-weight:850;color:#3e7159;background:#edf7f1;padding:6px 10px;border-radius:50px}',
+ '.akIntroVisioTimeGrid{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}',
+ '.akIntroVisioTimeGrid button{border:1px solid #bfcedb;background:#fff;color:#1a4667;font-weight:800;padding:10px 14px;border-radius:9px;cursor:pointer}',
+ '.akIntroVisioTimeGrid button:hover{border-color:#24608e;background:#f3f8fc}',
+ '.akIntroVisioDay{width:100%;max-width:340px;margin-top:7px}',
+ '.akIntroVisioBooked{border-radius:9px;background:#f1f8f4;padding:13px;color:#25523e;font-size:13px}',
+
  '.akIntroSection .qblock:has([data-key="preferred_start_date"]){grid-column:1 / -1;max-width:420px}',
  '@media(max-width:680px){.akIntroStartHelp{padding:12px 14px 0}}',
  '.akIntroLegalLinks button{background:#f7fafc;color:#29536c;border:1px solid #d8e5ec;border-radius:8px;font-size:11px;padding:8px 11px;font-weight:850;cursor:pointer}',
@@ -113,7 +122,102 @@ style.textContent=[
  '@media(max-width:680px){.akIntroPage{padding:13px 10px 35px}.akIntroHero{padding:19px}.akIntroFields{grid-template-columns:1fr;padding:10px 14px}.akIntroFields .qblock{grid-column:1!important}.akIntroSection h2,.akIntroLegal{padding:14px}.akIntroActions{padding:14px}}'
 ].join('\n');
 document.head.appendChild(style);
-function groupQuestions(template,answers){
+function initialVisioBooked(s){
+ const records=(s.appointments||[]).filter(a=>a.appointment_type==='Visio initiale')
+   .sort((a,b)=>String(b.created_at||b.starts_at).localeCompare(String(a.created_at||a.starts_at)));
+ return records.find(a=>a.status!=='cancelled')||null;
+}
+function initialVisioMarkup(s){
+ const booked=initialVisioBooked(s),rows=s.akInitialSlots||[],client=s.client||{};
+ const isComplete=booked?.status==='completed'||!!s.akInitialVisioCompleted;
+ let inner='';
+ if(booked&&['scheduled','confirmed'].includes(booked.status)){
+  inner='<div class="akIntroVisioBooked"><strong>✓ Ta première visio est réservée</strong>'+
+    '<div style="margin-top:5px">'+esc(fmtDateTime(booked.starts_at))+' · '+esc(booked.duration_minutes||30)+' min · Hors quota</div>'+
+    '<div style="margin-top:7px;color:#60798e;font-size:12px">Pour déplacer ou annuler cette visio, ouvre l’onglet Visios de ton espace.</div>'+
+    '<button type="button" class="btn ghost small" id="akInitialOpenVisios" style="margin-top:12px">Gérer cette visio</button></div>';
+ }else if(isComplete){
+  inner='<div class="akIntroVisioBooked"><strong>✓ Visio initiale déjà réalisée</strong><div style="margin-top:5px">Elle ne décompte aucune visio de ta formule.</div></div>';
+ }else if(booked){
+  inner='<div class="alert">La visio initiale a déjà été utilisée ou annulée tardivement. Contacte ton coach pour organiser la suite, sans décompte sur le quota de ta formule.</div>';
+ }else if(s.akInitialSlotError){
+  inner='<div class="alert">Impossible de lire les disponibilités : '+esc(s.akInitialSlotError)+'</div>'+
+    '<button type="button" class="btn ghost small" id="akInitialReload">Réessayer</button>';
+ }else if(!rows.length){
+  inner='<div class="muted tiny">Aucun créneau disponible sur les trois prochaines semaines. Tu peux réessayer ou demander au coach d’ouvrir des disponibilités.</div>'+
+    '<button type="button" class="btn ghost small" id="akInitialReload" style="margin-top:12px">Actualiser les disponibilités</button>';
+ }else{
+  const byDate={};
+  rows.forEach(slot=>{
+   const key=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(slot.starts_at));
+   (byDate[key]||(byDate[key]=[])).push(slot);
+  });
+  const dates=Object.keys(byDate).sort();
+  if(!dates.includes(s.akInitialDay))s.akInitialDay=dates[0];
+  inner='<label for="akInitialDay" class="qtitle">Choisis un jour</label>'+
+   '<select class="select akIntroVisioDay" id="akInitialDay">'+dates.map(day=>
+    '<option value="'+esc(day)+'" '+(day===s.akInitialDay?'selected':'')+'>'+
+    esc(new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'}).format(new Date(day+'T12:00:00Z')))+'</option>').join('')+'</select>'+
+   '<div class="section-title" style="margin-top:14px">Horaires disponibles (heure de Paris)</div>'+
+   '<div class="akIntroVisioTimeGrid" id="akInitialTimes">'+
+   (byDate[s.akInitialDay]||[]).map(sl=>'<button type="button" class="akInitialBookSlot" data-start="'+esc(sl.starts_at)+'">'+esc(fmtTime(sl.starts_at))+'</button>').join('')+
+   '</div><button class="btn ghost small" id="akInitialReload" type="button" style="margin-top:15px">Actualiser les créneaux</button>';
+ }
+ return '<section class="akIntroSection" id="akInitialVisioWrap"><div class="akIntroVisio">'+
+   '<div class="akIntroVisioTop"><div><h3>Réserver ma première visio initiale</h3>'+
+   '<p>Choisis directement un créneau de '+(s.bookingPolicy?.duration_minutes|| (client.current_pole==='Mental'?45:30))+
+   ' minutes. Cette visio de démarrage est incluse en plus de tes visios habituelles.</p></div>'+
+   '<span class="akIntroVisioTag">HORS QUOTA · INCLUSE</span></div>'+
+   inner+'</div></section>';
+}
+async function reloadInitialVisioSlots(s,button){
+ if(button)button.disabled=true;
+ const from=localDateISO(),until=new Date(Date.parse(from+'T12:00:00Z')+20*86400000).toISOString().slice(0,10);
+ const {data,error}=await supa.rpc('get_my_initial_visio_slots',{p_from:from,p_to:until});
+ if(clientPortalState!==s)return;
+ s.akInitialSlots=data||[];
+ s.akInitialSlotError=error?.message||'';
+ const wrap=document.getElementById('akInitialVisioWrap');
+ if(wrap){wrap.outerHTML=initialVisioMarkup(s);bindInitialVisio(s)}
+}
+function bindInitialVisio(s){
+ const wrapper=document.getElementById('akInitialVisioWrap');
+ if(!wrapper)return;
+ wrapper.querySelector('#akInitialDay')?.addEventListener('change',event=>{
+  s.akInitialDay=event.target.value;
+  const day=s.akInitialDay;
+  const filtered=(s.akInitialSlots||[]).filter(sl=>
+   new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(sl.starts_at))===day);
+  const grid=wrapper.querySelector('#akInitialTimes');
+  if(grid)grid.innerHTML=filtered.map(sl=>'<button type="button" class="akInitialBookSlot" data-start="'+esc(sl.starts_at)+'">'+esc(fmtTime(sl.starts_at))+'</button>').join('');
+ });
+ wrapper.querySelector('#akInitialReload')?.addEventListener('click',e=>reloadInitialVisioSlots(s,e.currentTarget));
+ wrapper.querySelector('#akInitialOpenVisios')?.addEventListener('click',async e=>{
+  const was=clientPortalView;
+  await exitInitialQuestionnaire(e);
+  if(clientPortalView==='home'&&was==='onboarding'){
+   clientPortalView='visios';renderClientPortal();
+  }
+ });
+ wrapper.addEventListener('click',async e=>{
+  const button=e.target.closest('.akInitialBookSlot');if(!button||button.disabled)return;
+  const start=button.dataset.start;
+  if(!confirm('Confirmer ta visio initiale du '+fmtDateTime(start)+' ?\\nCette visio ne sera pas décomptée de ton quota mensuel ou hebdomadaire.'))return;
+  button.disabled=true;
+  const {error}=await supa.rpc('book_my_initial_visio',{p_starts_at:start});
+  if(error){button.disabled=false;alert(error.message||'Ce créneau n’est plus disponible.');return}
+  const {data, error:readError}=await supa.from('appointments').select('*')
+    .eq('client_id',s.client.id).order('starts_at',{ascending:true});
+  if(!readError){
+   s.appointments=data||[];
+   const node=document.getElementById('akInitialVisioWrap');
+   if(node){node.outerHTML=initialVisioMarkup(s);bindInitialVisio(s)}
+  }
+  toast('Visio initiale réservée : hors quota de la formule.');
+  if(readError)alert('Réservation enregistrée. Recharge ton espace pour consulter les détails : '+readError.message);
+ });
+}
+function groupQuestions(template,answers,s){
  const groups=new Map();
  template.questions.forEach(question=>{
   const group=question.group||baseGroup(question);
@@ -130,7 +234,7 @@ function groupQuestions(template,answers){
     '<button type="button" data-ak-legal="cgv">Lire les CGV</button>'+
     '<button type="button" data-ak-legal="privacy">Lire la confidentialité</button>'+
     '<button type="button" data-ak-legal="withdrawal">Lire la rétractation</button></div>':'')+
-  qs.map(qn=>renderQuestion(qn,answers?.[qn.key])).join('')+'</div></section>').join('');
+  qs.map(qn=>renderQuestion(qn,answers?.[qn.key])).join('')+'</div></section>'+ (name==='Démarrage'?initialVisioMarkup(s):'')).join('');
 }
 // Sortie volontaire : sauvegarde uniquement les modifications non enregistrées.
 // Aucune soumission, aucun consentement enregistré comme accepté à cette étape.
@@ -194,11 +298,11 @@ function standalone(s){
   '<p>'+esc(labels[offerCode(c)]||c.current_pole)+' · '+
   esc(received?'Réponses enregistrées dans ton dossier.':"Prends le temps de répondre : cet espace est réservé au questionnaire, sans autres outils de suivi.")+
   '</p></header>'+
-  (received?'<div class="akIntroDone"><strong>Questionnaire transmis au coach</strong>'+
+  (received?initialVisioMarkup(s)+'<div class="akIntroDone"><strong>Questionnaire transmis au coach</strong>'+
    '<div class="muted tiny" style="margin:8px 0">Tes réponses restent accessibles ici, en lecture seule.</div>'+
    renderQuestionnaireAnswers(t,answers)+
    '<button class="btn primary" style="margin-top:18px" id="akIntroContinue">Retour à mon espace</button></div>':
-  '<form id="clientQuestionnaire" class="qform">'+groupQuestions(t,answers)+
+  '<form id="clientQuestionnaire" class="qform">'+groupQuestions(t,answers,s)+
    '<div class="akIntroActions"><div class="akIntroInfo">Tu peux conserver un brouillon et revenir plus tard. L’envoi final communique tes réponses et ta date de démarrage souhaitée au coach.</div>'+
    '<button class="btn ghost" type="button" id="saveQuestionnaireDraft">Enregistrer mon brouillon</button>'+
    '<button class="btn ghost" type="button" id="akIntroLeave">Enregistrer et quitter</button>'+
@@ -209,6 +313,7 @@ function standalone(s){
  document.getElementById('akIntroContinue')?.addEventListener('click',()=>{clientPortalView='home';renderClientPortal()});
  document.getElementById('akIntroExit')?.addEventListener('click',exitInitialQuestionnaire);
  document.getElementById('akIntroLeave')?.addEventListener('click',exitInitialQuestionnaire);
+ bindInitialVisio(s);
  document.getElementById('akIntroChangeOffer')?.addEventListener('click',async()=>{
    const btn=document.getElementById('akIntroChangeOffer');
    const next=document.getElementById('akIntroDemoOffer')?.value;
@@ -258,6 +363,15 @@ enterClientPortal=async function(...args){
  if(error){console.error('Questionnaire initial :',error);s.akInitialError=error.message;return}
  s.response=data||null;
  s.akInitialReady=true;
+ const from=localDateISO(),until=new Date(Date.parse(from+'T12:00:00Z')+20*86400000).toISOString().slice(0,10);
+ const [initialSlots,initialOnboarding]=await Promise.all([
+  supa.rpc('get_my_initial_visio_slots',{p_from:from,p_to:until}),
+  supa.from('onboarding').select('visio_completed_at').eq('client_id',s.client.id).maybeSingle()
+ ]);
+ if(clientPortalState!==s)return;
+ s.akInitialSlots=initialSlots.data||[];
+ s.akInitialSlotError=initialSlots.error?.message||'';
+ s.akInitialVisioCompleted=!!initialOnboarding.data?.visio_completed_at;
  // Une connexion ouvre toujours l'accueil : le questionnaire reste
  // accessible depuis l'onglet Questionnaire et le rappel « À faire ».
  // L'onboarding n'empêche pas de consulter les autres rubriques.
