@@ -122,11 +122,52 @@ function groupQuestions(template,answers){
     '<button type="button" data-ak-legal="withdrawal">Lire la rétractation</button></div>':'')+
   qs.map(qn=>renderQuestion(qn,answers?.[qn.key])).join('')+'</div></section>').join('');
 }
+// Sortie volontaire : sauvegarde uniquement les modifications non enregistrées.
+// Aucune soumission, aucun consentement enregistré comme accepté à cette étape.
+async function exitInitialQuestionnaire(event){
+ const button=event?.currentTarget;
+ const s=clientPortalState;
+ if(!s?.akInitialReady){return;}
+ if(s.response?.status!=='submitted'){
+  const form=document.getElementById('clientQuestionnaire');
+  if(form){
+   const {answers}=collectQuestionnaire(s.template);
+   const existing=s.response?.answers||{};
+   const blankFor=q=>q.type==='multiselect'?[]:q.type==='consent'?false:'';
+   const changed=s.template.questions.some(q=>{
+    const a=answers[q.key],b=existing[q.key]??blankFor(q);
+    return JSON.stringify(a)!==JSON.stringify(b);
+   });
+   if(changed){
+    if(button)button.disabled=true;
+    const row={
+     client_id:s.client.id,questionnaire_type:s.template.template_key,
+     questionnaire_version:s.template.version,answers,
+     status:'draft',submitted_at:null
+    };
+    const {data,error}=await supa.from('questionnaire_responses')
+      .upsert(row,{onConflict:'client_id,questionnaire_type,questionnaire_version'})
+      .select().single();
+    if(error){
+     if(button)button.disabled=false;
+     alert('Impossible de sauvegarder le brouillon : '+error.message+
+       '\\nTes réponses sont toujours affichées. Réessaie avant de quitter.');
+     return;
+    }
+    s.response=data;
+    toast('Ton brouillon a été enregistré.');
+   }
+  }
+ }
+ clientPortalView='home';
+ renderClientPortal();
+}
 function standalone(s){
  const c=s.client,t=s.template,received=s.response?.status==='submitted',answers=s.response?.answers||{};
  const html='<div class="akIntroPage"><div class="akIntroLayout">'+
   '<div class="akIntroTop"><div class="akIntroBrand">AK PRIME <span style="font-size:10px;color:#8798a8">/ QUESTIONNAIRE INITIAL</span></div>'+
   '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
+  '<button type="button" class="btn ghost small" id="akIntroExit">← Accéder à mon espace</button>'+
   (c.is_test?'<span style="font-size:10px;font-weight:850;color:#9f7944">COMPTE TEST · SANS PAIEMENT</span>'+
    '<select class="select" id="akIntroDemoOffer" aria-label="Offre à tester">'+
    Object.keys(labels).map(key=>'<option value="'+key+'" '+(key===offerCode(c)?'selected':'')+'>'+esc(labels[key])+'</option>').join('')+'</select>'+
@@ -144,11 +185,14 @@ function standalone(s){
   '<form id="clientQuestionnaire" class="qform">'+groupQuestions(t,answers)+
    '<div class="akIntroActions"><div class="akIntroInfo">Tu peux conserver un brouillon et revenir plus tard. L’envoi final communique tes réponses au coach. La date de début a été choisie lors de la commande, pas dans ce questionnaire.</div>'+
    '<button class="btn ghost" type="button" id="saveQuestionnaireDraft">Enregistrer mon brouillon</button>'+
+   '<button class="btn ghost" type="button" id="akIntroLeave">Enregistrer et quitter</button>'+
    '<button class="btn primary" type="button" id="submitQuestionnaire">Envoyer au coach</button></div></form>')+
   '</div></div>';
  document.getElementById('root').innerHTML=html;
  document.getElementById('akIntroLogout').onclick=async()=>{await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';showAuth();};
  document.getElementById('akIntroContinue')?.addEventListener('click',()=>{clientPortalView='home';renderClientPortal()});
+ document.getElementById('akIntroExit')?.addEventListener('click',exitInitialQuestionnaire);
+ document.getElementById('akIntroLeave')?.addEventListener('click',exitInitialQuestionnaire);
  document.getElementById('akIntroChangeOffer')?.addEventListener('click',async()=>{
    const btn=document.getElementById('akIntroChangeOffer');
    const next=document.getElementById('akIntroDemoOffer')?.value;
@@ -189,9 +233,10 @@ enterClientPortal=async function(...args){
  if(error){console.error('Questionnaire initial :',error);s.akInitialError=error.message;return}
  s.response=data||null;
  s.akInitialReady=true;
- if(!data||data.status!=='submitted'){
-  if(s.client.is_test||s.client.status==='onboarding')clientPortalView='onboarding';
- }
+ // Une connexion ouvre toujours l'accueil : le questionnaire reste
+ // accessible depuis l'onglet Questionnaire et le rappel « À faire ».
+ // L'onboarding n'empêche pas de consulter les autres rubriques.
+ clientPortalView='home';
  renderClientPortal();
 };
 const oldRender=renderClientPortal;
