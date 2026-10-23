@@ -1246,13 +1246,68 @@ function clientsPage(){
 }
 function status(s){return '<span class="status '+(s==='Actif'?'green':s==='Inactif'?'red':s==='Onboarding'?'amber':'blue')+'">'+esc(s)+'</span>'}
 
+// Un lien unique par client, enregistré dans clients.optitrainer_url.
+function safeOptitrainerLink(raw){
+ const value=String(raw||'').trim();
+ if(!value||value.length>2000)return '';
+ try{
+  const url=new URL(value);
+  if(url.protocol!=='https:'||!url.hostname||url.username||url.password)return '';
+  return url.href;
+ }catch(_){return ''}
+}
+function renderCoachOptitrainerAccess(c){
+ const current=c.cycle?.optitrainer||'';
+ const safe=safeOptitrainerLink(current);
+ return '<section class="card panel akCoachOptiCard" style="margin:13px 0;padding:17px">'+
+  '<div class="row between" style="gap:12px;flex-wrap:wrap;align-items:center">'+
+   '<div><h3 style="margin:0 0 4px">Accès Optitrainer du client</h3>'+
+   '<div class="muted tiny">Renseigne le lien personnel du client. Il apparaîtra dans son espace AK PRIME, rubrique « Mon accompagnement ».</div></div>'+
+   '<span class="status '+(safe?'green':'amber')+'">'+(safe?'Lien communiqué':'Lien à renseigner')+'</span>'+
+  '</div>'+
+  '<div class="row" style="margin-top:13px;gap:9px;align-items:center;flex-wrap:wrap">'+
+   '<input class="input" id="akCoachOptiUrl" type="url" inputmode="url" maxlength="2000" autocomplete="off" spellcheck="false"'+
+     ' placeholder="https://app.optitrainer.fr/..." aria-label="Lien Optitrainer personnel du client"'+
+     ' value="'+esc(current)+'" style="flex:1 1 310px;min-width:0">'+
+   '<button class="btn primary small" type="button" id="akCoachOptiSave">Enregistrer le lien</button>'+
+   '<button class="btn ghost small" type="button" id="akCoachOptiRemove" '+(current?'':'disabled')+'>Supprimer</button>'+
+   (safe?'<a class="btn ghost small" href="'+esc(safe)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Ouvrir ↗</a>':'')+
+  '</div><div class="muted tiny" id="akCoachOptiResult" role="status" style="margin-top:8px">'+
+   (current&&!safe?'Le lien enregistré n’est pas une URL HTTPS valide. Corrige-le pour le rendre accessible.':
+    'Le client retrouvera ce lien après actualisation de son espace.')+
+  '</div></section>';
+}
+async function saveCoachOptitrainerUrl(value,button){
+ const client=currentClient(),input=document.getElementById('akCoachOptiUrl'),notice=document.getElementById('akCoachOptiResult');
+ if(!client||!input)return;
+ const trimmed=String(value||'').trim();
+ const url=trimmed?safeOptitrainerLink(trimmed):'';
+ if(trimmed&&!url){
+  if(notice){notice.textContent='Renseigne une URL complète commençant par https:// (sans identifiants intégrés).';notice.style.color='#b42318';}
+  input.focus();return;
+ }
+ if(button)button.disabled=true;
+ try{
+  const {data,error}=await supa.from('clients').update({optitrainer_url:url||null}).eq('id',client.id)
+    .select('id,optitrainer_url').single();
+  if(error)throw error;
+  if(!data||data.id!==client.id)throw Error('Enregistrement non confirmé par la base de données.');
+  client.cycle=client.cycle||{};
+  client.cycle.optitrainer=data.optitrainer_url||'';
+  toast(url?'Lien Optitrainer enregistré et disponible côté client.':'Lien Optitrainer supprimé de l’espace client.');
+  render();
+ }catch(error){
+  if(button)button.disabled=false;
+  if(notice){notice.textContent='Échec de l’enregistrement : '+(error.message||String(error));notice.style.color='#b42318';}
+ }
+}
 function clientPage(){
  const c=currentClient();if(!c)return clientsPage();
  const tabs=[['overview','Vue d’ensemble'],['onboarding','Onboarding'],['follow','Suivi'],['passport','Passeport'],['admin','Administratif']];
  return '<button class="btn ghost small no-print" id="backClients" style="margin-bottom:10px">← Clients</button>'+
  '<div class="card client-head"><div class="person"><div class="photo">'+esc(c.initials||initials(c.name))+'</div><div><div class="row"><h2>'+esc(c.name)+'</h2>'+status(c.status)+'</div><div class="meta"><span>'+esc(c.pole)+'</span><span>• '+esc(c.offer)+'</span>'+(c.sport?'<span>• '+esc(c.sport)+'</span>':'')+(c.specialty?'<span>• '+esc(c.specialty)+'</span>':'')+(c.level?'<span>• '+esc(c.level)+'</span>':'')+'</div></div></div>'+
  '<div class="metrics"><div class="metric"><span>Début</span><strong>'+fmtDate(c.start)+'</strong></div><div class="metric"><span>Fin engagement</span><strong>'+fmtDate(c.end)+'</strong></div><div class="metric"><span>Prochaine visio</span><strong>'+fmtDate(c.next)+'</strong></div></div></div>'+
- '<div class="card tabs no-print">'+tabs.map(t=>'<button data-tab="'+t[0]+'" class="'+(state.tab===t[0]?'on':'')+'">'+t[1]+'</button>').join('')+'</div>'+clientTab(c);
+ '<div class="card tabs no-print">'+tabs.map(t=>'<button data-tab="'+t[0]+'" class="'+(state.tab===t[0]?'on':'')+'">'+t[1]+'</button>').join('')+'</div>'+renderCoachOptitrainerAccess(c)+clientTab(c);
 }
 function clientTab(c){
  if(state.tab==='onboarding')return onboarding(c);
@@ -2101,6 +2156,10 @@ function bind(){
  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}if(state.view==='contracts')await loadContractEvidence();render()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
+ document.getElementById('akCoachOptiSave')?.addEventListener('click',e=>
+  saveCoachOptitrainerUrl(document.getElementById('akCoachOptiUrl')?.value,e.currentTarget));
+ document.getElementById('akCoachOptiRemove')?.addEventListener('click',e=>
+  saveCoachOptitrainerUrl('',e.currentTarget));
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
  document.querySelectorAll('.quickTab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
  document.querySelectorAll('.accBtn').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'));
@@ -2159,7 +2218,7 @@ function bind(){
  document.getElementById('archiveClient')?.addEventListener('click',async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({status:'inactive'}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);cl.status='Inactif';toast('Client passé en inactif');render()});
  document.querySelectorAll('.linkClientAccount').forEach(b=>b.onclick=async()=>{const cl=currentClient();const {error}=await supa.from('clients').update({auth_user_id:b.dataset.userId}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Compte lié — accès portail encore verrouillé');render()});
  document.querySelectorAll('.togglePortalAccess').forEach(b=>b.onclick=async()=>{const cl=currentClient(),enable=b.dataset.enable==='1';if(enable&&String(cl.payment||'').toLowerCase()!=='à jour'&&!confirm('Le paiement du client n’est pas indiqué comme « À jour ». Activer quand même son accès au portail ?'))return;const {error}=await supa.from('clients').update({portal_access_enabled:enable}).eq('id',cl.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast(enable?'Accès client activé':'Accès client désactivé');render()});
- document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=c.cycle?.optitrainer||db.settings?.optitrainerBase;if(u)window.open(u,'_blank');else toast('Ajoute un lien Optitrainer')});
+ document.getElementById('openOpti')?.addEventListener('click',()=>{const c=currentClient();const u=safeOptitrainerLink(c.cycle?.optitrainer||db.settings?.optitrainerBase);if(u)window.open(u,'_blank','noopener,noreferrer');else toast('Ajoute un lien Optitrainer HTTPS valide')});
  document.getElementById('exportData')?.addEventListener('click',exportData);
  document.getElementById('saveWhatsAppSettings')?.addEventListener('click',async()=>{const raw=document.getElementById('waNumber').value.trim(),msg=document.getElementById('waMessage').value.trim()||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';const normalized=normalizeWhatsAppNumber(raw);if(raw&&!/^\d{10,15}$/.test(normalized))return toast('Numéro WhatsApp invalide');const {error}=await supa.from('app_settings').upsert({id:1,whatsapp_number:raw||null,whatsapp_default_message:msg,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)return toast('Erreur : '+error.message);db.settings.whatsappNumber=raw;db.settings.whatsappMessage=msg;toast('WhatsApp enregistré')});
  document.getElementById('saveSettings')?.addEventListener('click',()=>{db.settings=db.settings||{};db.settings.optitrainerBase=document.getElementById('optiBase').value;toast('Paramètre enregistré pour cette session')});
@@ -2505,7 +2564,7 @@ function renderClientHome(s){
  renderClientRenewalCard(s)+
  (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':renewalPending?'':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
  '<div class="client-home-actions">'+
- (c.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
+ (safeOptitrainerLink(c.optitrainer_url)?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
  renderClientWhatsAppButton(s,c)+
  '</div>'+
  '<div class="client-section-card client-passport-preview"><div class="row between"><div><h3 style="margin-bottom:3px">Mon Passeport AK PRIME</h3><div class="muted tiny">Progression, cycle, tests et dates importantes sont regroupés ici.</div></div><button class="btn ghost small clientGoPassport">Ouvrir</button></div>'+
@@ -2543,7 +2602,7 @@ function renderClientSuivi(s){
  renderClientWeeklyCheckin(s)+
  renderClientQuestionnaireSection(s)+
  '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Tests & progression</h3><div class="muted tiny">Tes résultats, retests et courbes sont regroupés dans ton Passeport AK PRIME.</div></div><button class="btn ghost small clientGoPassport">Voir mon Passeport</button></div></div>'+
- '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(c.optitrainer_url?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
+ '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(safeOptitrainerLink(c.optitrainer_url)?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
  '</div>';
 }
 function renderClientPortal(){
@@ -2576,7 +2635,7 @@ function renderClientPortal(){
  document.getElementById('openClientRenewalChoice')?.addEventListener('click',openClientRenewalChoice);
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
  document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;clientMobileMenuOpen=false;showAuth()};
- document.getElementById('clientOpti')?.addEventListener('click',()=>window.open(c.optitrainer_url,'_blank'));
+ document.getElementById('clientOpti')?.addEventListener('click',()=>{const url=safeOptitrainerLink(c.optitrainer_url);if(url)window.open(url,'_blank','noopener,noreferrer');else toast('Le lien Optitrainer est indisponible. Contacte ton coach.')});
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
