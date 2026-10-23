@@ -95,9 +95,9 @@
        '<p class="muted tiny" style="margin:0 0 12px;line-height:1.65">Programmation, séances, charge et état de forme : Optitrainer. '+
        'Si ta formule prévoit des analyses vidéo, envoie les vidéos de tes mouvements directement sur WhatsApp. '+
        'AK PRIME n’héberge pas les fichiers vidéo.</p>'+
-       (s.client.optitrainer_url?'':'<div class="muted tiny" style="line-height:1.55">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
+       (safeOptitrainerLink(s.client.optitrainer_url)?'':'<div class="muted tiny" style="line-height:1.55">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
        '<div class="akTrainingActions" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;clear:both;margin-top:18px">'+
-       (s.client.optitrainer_url?'<button class="btn primary" id="clientOpti" type="button">Ouvrir Optitrainer</button>':'')+
+       (safeOptitrainerLink(s.client.optitrainer_url)?'<button class="btn primary" id="clientOpti" type="button">Ouvrir Optitrainer</button>':'')+
        renderClientWhatsAppButton(s,s.client)+'</div></div></div>';
  };
  const originalClientHome=renderClientHome;
