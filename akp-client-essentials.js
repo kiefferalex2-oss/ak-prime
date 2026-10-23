@@ -113,9 +113,10 @@
  renderClientSuivi=function(s){
    if(!s?.client)return oldClientSuivi(s);
    const mental=s.client.current_pole==='Mental';
-   return '<div class="client-main"><div class="client-page-head"><div>'+
-     '<h2>Mon accompagnement AK PRIME</h2>'+
-     '<p>Questionnaire initial, préparation mentale et prestations complémentaires selon ta formule.</p></div></div>'+
+   return '<div class="client-main akWowFollowPage"><div class="client-page-head"><div>'+
+     '<h2>Ton accompagnement, à ton image.</h2>'+
+     '<p>Des outils pensés pour ton objectif, avec un suivi humain à chaque étape.</p></div>'+
+     '<span class="status blue">'+safe(s.client.current_offer||'Suivi personnalisé')+'</span></div>'+
      (mental?'<div class="client-section-card" style="margin-top:13px"><h3>Préparation mentale</h3>'+
        '<p class="muted tiny">Les exercices, routines et séances sont individualisés avec ton coach. '+
        'Les notes internes du coach ne sont pas visibles dans cet espace.</p></div>':'')+
