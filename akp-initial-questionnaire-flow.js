@@ -55,11 +55,13 @@ const EXTRA={
   q('mental_sport_routine','As-tu déjà une routine de performance ou de retour au calme ?','textarea',false,'Préparation mentale'),
   q('mental_sport_calendar','Quelles sont tes principales échéances sportives à venir ?','textarea',false,'Objectifs')]
 };
+Object.assign(QUESTION_LABELS,Object.fromEntries(Object.values(EXTRA).flat().map(x=>[x.key,x.label])));
 const LEGAL=[
  q('ak_cgv_ack','Je confirme avoir consulté les conditions générales de vente et compris les modalités de l’accompagnement. Sur un compte TEST, cette confirmation est une simulation et ne constitue pas une commande payante.','consent',true,'Confirmations'),
  q('ak_privacy_ack','J’ai pris connaissance de la politique de confidentialité et de l’utilisation de mes réponses pour préparer mon suivi.','consent',true,'Confirmations'),
  q('ak_health_ack','J’accepte explicitement le traitement des informations sensibles que je communique volontairement (douleurs, blessures, santé ou sommeil), uniquement pour individualiser et sécuriser mon accompagnement.','consent',true,'Confirmations')
-];
+]; 
+Object.assign(QUESTION_LABELS,Object.fromEntries(LEGAL.map(x=>[x.key,x.label])));
 function offerCode(c){
  if(c.current_pole==='Performance')return 'performance_'+String(c.current_offer||'').toLowerCase();
  if(c.current_pole==='Forme & Santé')return /renfor/i.test(c.current_offer||'')?'forme_renforce':'forme_standard';
