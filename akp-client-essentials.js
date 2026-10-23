@@ -1,5 +1,5 @@
 /* AK PRIME : espace client complémentaire d'Optitrainer.
- * Sommeil auto-déclaré + budget macro PDF ; les séances physiques restent sur Optitrainer.
+ * Objectifs macro publiés par le coach ; recommandations PDF facultatives.
  */
 (function(){
  'use strict';
@@ -61,7 +61,7 @@
    if(!macroEligible(s.client))return '';
    const item=s.akMacro;
    if(!item)return '<div class="client-section-card" style="margin-top:13px"><h3>Mon budget macronutritionnel</h3>'+
-     '<div class="muted tiny">Ton coach déposera ici ton budget personnalisé au format PDF lorsqu’il sera prêt.</div></div>';
+     '<div class="muted tiny">Tes objectifs nutritionnels personnalisés apparaîtront ici lorsque ton coach les aura publiés.</div></div>';
    return '<div class="client-section-card" style="margin-top:13px"><h3>Mon budget macronutritionnel</h3>'+
      '<div class="muted tiny">'+safe(item.title||'Budget personnalisé')+' · '+safe(fmtDate(item.entry_date))+'</div>'+
      '<div class="client-summary-grid" style="margin:12px 0">'+
@@ -69,8 +69,9 @@
        ['carbs','Glucides','g / jour'],['fats','Lipides','g / jour']].map(([k,l,u])=>
          '<div class="client-summary-card"><div class="lab">'+l+'</div><div class="value">'+
          safe(item[k]??'—')+'</div><div class="sub">'+u+'</div></div>').join('')+'</div>'+
-     '<button class="btn primary" id="akDownloadMacro">Consulter mon budget PDF</button>'+
-     '<div class="muted tiny" style="margin-top:8px">Document personnel : accès réservé à ton compte AK PRIME.</div></div>';
+     (item.notes?'<div class="muted tiny" style="white-space:pre-wrap;margin:10px 0">'+safe(item.notes)+'</div>':'')+
+     (item.pdf_path?'<button class="btn ghost" id="akDownloadMacro">Consulter les recommandations alimentaires (PDF)</button>':'')+
+     '<div class="muted tiny" style="margin-top:8px">Repères journaliers individualisés · communiqués par ton coach AK PRIME.</div></div>';
  }
  const oldClientSuivi=renderClientSuivi;
  renderClientSuivi=function(s){
