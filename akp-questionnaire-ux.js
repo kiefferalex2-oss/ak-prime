@@ -31,7 +31,7 @@
   ['Sommeil & récupération',/sommeil|sleep|fatigue|récupération|recuperation|energy|énergie|wake/],
   ['Profil & coordonnées',/nom|pr[eé]nom|adresse|e.?mail|t[eé]l[eé]phone|naissance|contact|ville|profession/],
   ['Pratique sportive',/club|structure|sport|niveau|poste|discipline|comp[eé]tition|entra[iî]nement|saison|[eé]quipe|experience|exp[eé]rience/],
-  ['Objectifs & échéances',/objectif|motivation|projet|[eé]ch[eé]ance|date importante|attente|performance recherch[eé]e/],
+  ['Objectifs & échéances',/objectif|motivation|projet|[eé]ch[eé]ance|date importante|attente|performance recherch[eé]e|preferred_start_date|d[eé]but d.accompagnement/],
   ['Disponibilités & matériel',/disponibilit|horaire|mat[eé]riel|installation|[eé]quipement|salle|organisation|fr[eé]quence|cr[eé]neau/],
   ['Santé & précautions',/blessure|douleur|g[eê]ne|sant[eé]|restriction|limitation|patholog|ant[eé]c[eé]dent|traitement|m[eé]decin|sommeil|fatigue|op[eé]ration|grossesse/],
   ['Consentement & informations',/consentement|confirmation|rgpd|autorisation|r[eè]gle|condition|donn[eé]es personnelles/]
@@ -124,7 +124,13 @@
    '<div style="margin-top:12px">'+offerSpecificBlocks(c)+'</div></details>';
  }
  function questionnaireSection(c){
-  return '<div class="card panel" style="margin-bottom:14px">'+
+  const requested=/^\\d{4}-\\d{2}-\\d{2}$/.test(c.questionnaire?.preferred_start_date||'')
+    ?c.questionnaire.preferred_start_date:'';
+  const startStatus=requested?
+   '<div class="alert blue" style="margin-bottom:13px"><strong>Date de début souhaitée par le client : '+esc(fmtDate(requested))+'</strong>'+
+   '<div class="tiny" style="margin-top:5px">Date indiquée dans le dossier : '+esc(c.start?fmtDate(c.start):'Non confirmée')+
+   '. La demande du questionnaire ne modifie pas automatiquement le contrat ni les échéances. À confirmer avec le client.</div></div>':'';
+  return startStatus+'<div class="card panel" style="margin-bottom:14px">'+
    '<div class="akQHeader"><div><h2 style="font-size:18px;margin:0">Préparation de la visio initiale</h2>'+
    '<p class="muted tiny" style="margin:6px 0 12px">Toutes les réponses et les questions à poser sont regroupées ici, en menus déroulants.</p></div>'+
    '<div class="row" style="gap:8px;flex-wrap:wrap"><span class="status blue">Privé coach</span>'+
