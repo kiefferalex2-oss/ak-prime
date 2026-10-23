@@ -79,6 +79,36 @@
      (item.pdf_path?'<button class="btn ghost" id="akDownloadMacro">Consulter les recommandations alimentaires (PDF)</button>':'')+
      '<div class="muted tiny" style="margin-top:8px">Repères journaliers individualisés · communiqués par ton coach AK PRIME.</div></div>';
  }
+ function trainingLinksCard(s){
+   const c=s.client||{},cfg=s.appSettings||{};
+   const opti=safeOptitrainerLink(c.optitrainer_url||'');
+   const whatsAppNum=normalizeWhatsAppNumber(cfg.whatsapp_number||'');
+   const msg=(cfg.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.')+
+     ((c.first_name||'').trim()?'\n\n'+c.first_name.trim():'');
+   const wa=whatsAppNum?whatsappUrl(cfg.whatsapp_number,msg):'';
+   const optiCard=opti?
+     '<a class="akTrainingService akTrainingServiceOpti" href="'+safe(opti)+'" target="_blank" rel="noopener noreferrer" aria-label="Ouvrir Optitrainer dans un nouvel onglet">'+
+       '<span class="akTrainingMark akTrainingMarkOpti" aria-hidden="true">O</span>'+
+       '<span class="akTrainingServiceCopy"><strong>Optitrainer</strong><small>Programme, séances et suivi de charge</small></span>'+
+       '<span class="akTrainingServiceAction">Ouvrir <span aria-hidden="true">↗</span></span></a>':
+     '<div class="akTrainingService akTrainingServiceInactive"><span class="akTrainingMark akTrainingMarkOpti" aria-hidden="true">O</span>'+
+       '<span class="akTrainingServiceCopy"><strong>Optitrainer</strong><small>Ton lien sera ajouté par ton coach</small></span>'+
+       '<span class="akTrainingPending">À venir</span></div>';
+   const waCard=wa?
+     '<a class="akTrainingService akTrainingServiceWhatsApp" href="'+safe(wa)+'" target="_blank" rel="noopener noreferrer" aria-label="Contacter Alex sur WhatsApp dans un nouvel onglet">'+
+       '<span class="akTrainingMark akTrainingMarkWhatsApp" aria-hidden="true">W</span>'+
+       '<span class="akTrainingServiceCopy"><strong>WhatsApp</strong><small>Échanges avec Alex et analyses vidéo</small></span>'+
+       '<span class="akTrainingServiceAction">Contacter <span aria-hidden="true">↗</span></span></a>':
+     '<div class="akTrainingService akTrainingServiceInactive"><span class="akTrainingMark akTrainingMarkWhatsApp" aria-hidden="true">W</span>'+
+       '<span class="akTrainingServiceCopy"><strong>WhatsApp</strong><small>Contact en cours de configuration</small></span>'+
+       '<span class="akTrainingPending">À venir</span></div>';
+   return '<section class="client-section-card akClientTrainingCard">'+
+     '<div class="akTrainingHeader"><div><h3>Mon entraînement et mes échanges</h3>'+
+     '<p>Retrouve ici ton programme et le contact avec ton coach.</p></div></div>'+
+     '<div class="akTrainingServices">'+optiCard+waCard+'</div>'+
+     '<p class="akTrainingFootnote">Les vidéos des mouvements sont envoyées sur WhatsApp, sans hébergement sur AK PRIME.</p>'+
+     '</section>';
+ }
  const oldClientSuivi=renderClientSuivi;
  renderClientSuivi=function(s){
    if(!s?.client)return oldClientSuivi(s);
@@ -91,14 +121,7 @@
        'Les notes internes du coach ne sont pas visibles dans cet espace.</p></div>':'')+
      macroPanel(s)+sleepForm(s)+
      (s.akExtrasError?'<div class="alert" style="margin-top:12px">Certains outils sont temporairement indisponibles : '+safe(s.akExtrasError)+'</div>':'')+
-     '<div class="client-section-card akClientTrainingCard" style="margin-top:13px"><h3>Mon entraînement et mes échanges</h3>'+
-       '<p class="muted tiny" style="margin:0 0 12px;line-height:1.65">Programmation, séances, charge et état de forme : Optitrainer. '+
-       'Si ta formule prévoit des analyses vidéo, envoie les vidéos de tes mouvements directement sur WhatsApp. '+
-       'AK PRIME n’héberge pas les fichiers vidéo.</p>'+
-       (safeOptitrainerLink(s.client.optitrainer_url)?'':'<div class="muted tiny" style="line-height:1.55">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
-       '<div class="akTrainingActions" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;clear:both;margin-top:18px">'+
-       (safeOptitrainerLink(s.client.optitrainer_url)?'<button class="btn primary" id="clientOpti" type="button">Ouvrir Optitrainer</button>':'')+
-       renderClientWhatsAppButton(s,s.client)+'</div></div></div>';
+     trainingLinksCard(s)+'</div>';
  };
  const originalClientHome=renderClientHome;
  renderClientHome=function(s){
