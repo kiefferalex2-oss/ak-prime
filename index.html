@@ -1061,6 +1061,56 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .ak-wow *, .ak-wow *:before, .ak-wow *:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
 
+
+/* Client booking, billing and follow-up — presentation only */
+.ak-wow .akWowUpcoming{
+ overflow:hidden;position:relative;
+ background:linear-gradient(112deg,#0b2339,#19445d)!important;
+ border-color:#315770!important;color:#f6f8fc;
+}
+.ak-wow .akWowUpcoming:after{
+ content:"✦";position:absolute;right:23px;bottom:-28px;
+ color:rgba(242,201,131,.10);font-size:142px;line-height:1;pointer-events:none;
+}
+.ak-wow .akWowUpcoming strong{color:#fff}
+.ak-wow .akWowUpcoming>.row{position:relative;z-index:1}
+.ak-wow .akWowUpcoming>.row .muted{color:#b3cbda}
+.ak-wow .akWowUpcoming>.row .muted.tiny:first-child{color:#e1bd80;font-size:10px;letter-spacing:.10em;font-weight:900}
+.ak-wow .akWowUpcoming>.row strong{font-size:22px!important;letter-spacing:-.027em}
+.ak-wow .akWowUpcoming>.row .status{border:1px solid rgba(118,238,174,.2);background:rgba(76,173,131,.24);color:#d0f9e5}
+.ak-wow .akWowUpcoming>.row .status.amber{border-color:rgba(232,185,104,.25);background:rgba(232,185,104,.16);color:#ffe3b0}
+.ak-wow .akWowUpcoming>.muted{color:#d6e4ef}
+.ak-wow .akWowUpcoming .btn.ghost{background:rgba(255,255,255,.10);color:#fff;border-color:rgba(255,255,255,.23)}
+.ak-wow .akWowUpcoming .btn.ghost:hover{background:rgba(255,255,255,.20)}
+.ak-wow .akWowUpcoming .btn.danger{background:rgba(255,255,255,.08);color:#ffc0b9;border-color:rgba(255,191,184,.18)}
+.ak-wow .akWowUpcoming .btn.primary{background:#e3b779;color:#15293d}
+.ak-wow .akWowUpcoming .alert{color:#f3d9b0;background:rgba(255,230,191,.11);border-color:rgba(255,226,178,.23)}
+.ak-wow .akWowBookingCard{padding:27px!important}
+.ak-wow .akWowBookingCard h3{font-size:23px!important;letter-spacing:-.035em}
+.ak-wow .akWowBookingCard .status.blue{padding:8px 13px}
+.ak-wow .akWowBillingList{display:grid;gap:14px}
+.ak-wow .akWowBillingList>.client-section-card{margin:0!important;position:relative;overflow:hidden}
+.ak-wow .akWowBillingList>.client-section-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#e1b76f,#f2dfbd)}
+.ak-wow .akWowBillingList>.client-section-card h3{font-size:19px!important}
+.ak-wow .akWowBillingList>.client-section-card .btn{margin-top:15px!important}
+.ak-wow .akWowCheckinPage .qform .qblock{box-shadow:0 5px 20px rgba(15,53,87,.035)}
+.ak-wow .akWowCheckinPage .client-section-card>h3{font-size:19px}
+.ak-wow #akSleepDiary .grid2{gap:13px 17px}
+.ak-wow #akSleepDiary .grid2 .field{margin-bottom:4px}
+.ak-wow #akSleepDiary .textarea{min-height:94px}
+.ak-wow #akSleepDiary #akSaveSleep{padding:13px 20px}
+.ak-wow #akSleepDiary .section-title{margin-top:19px}
+.ak-wow .akClientTrainingCard{padding:25px!important}
+.ak-wow .akClientTrainingCard .akTrainingHeader h3{font-size:19px}
+.ak-wow .akClientTrainingCard .akTrainingHeader p{font-size:12px}
+@media(max-width:560px){
+ .ak-wow .akWowBookingCard{padding:18px!important}
+ .ak-wow .akWowBookingCard h3{font-size:20px!important}
+ .ak-wow .akWowUpcoming>.row strong{font-size:18px!important}
+ .ak-wow .akWowBillingList>.client-section-card>.row{flex-wrap:wrap}
+ .ak-wow #akSleepDiary .grid2{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -2961,10 +3011,10 @@ function renderClientHome(s){
 function renderClientBilling(s){
  const invoices=(s.invoices||[]).slice().sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date)));
  const rows=invoices.length?invoices.map(i=>'<div class="client-section-card"><div class="row between"><div><div class="muted tiny">FACTURE</div><h3 style="margin:4px 0">'+esc(i.invoice_number)+'</h3><div class="muted tiny">Émise le '+fmtDate(i.issue_date)+' • prestation du '+fmtDate(i.service_date)+'</div></div><div style="text-align:right"><div style="font-size:19px;font-weight:900">'+centsMoney(i.amount_incl_tax_cents)+'</div><span class="status '+invoiceStatusTone(i.payment_status)+'">'+esc(invoiceStatusLabel(i.payment_status))+'</span></div></div><button class="btn ghost small clientPrintInvoice" data-id="'+i.id+'" style="margin-top:12px">Imprimer / enregistrer en PDF</button></div>').join(''):'<div class="client-section-card"><h3>Mes factures</h3><div class="muted">Aucune facture disponible pour le moment.</div></div>';
- return '<div class="client-main"><div class="client-page-head"><div><h2>Mes factures</h2><p>Retrouve ici les factures émises par AK PRIME.</p></div><span class="status blue">'+invoices.length+' document'+(invoices.length>1?'s':'')+'</span></div>'+rows+'</div>';
+ return '<div class="client-main akWowBillingPage"><div class="client-page-head"><div><h2>Ton espace administratif.</h2><p>Tous tes documents de facturation AK PRIME, au même endroit.</p></div><span class="status blue">'+invoices.length+' document'+(invoices.length>1?'s':'')+'</span></div><div class="akWowBillingList">'+rows+'</div></div>';
 }
 function renderClientVisios(s){
- return '<div class="client-main"><div class="client-page-head"><div><h2>Mes visios</h2><p>Réserve, déplace ou annule tes rendez-vous avec Alex.</p></div><span class="status green">Temps réel</span></div><div id="clientBookingPanel">'+renderBookingPanel(s)+'</div></div>';
+ return '<div class="client-main akWowVisiosPage"><div class="client-page-head"><div><h2>Le temps d’échanger.</h2><p>Retrouve tes rendez-vous et réserve le prochain créneau qui te convient.</p></div><span class="status green">● Calendrier en direct</span></div><div id="clientBookingPanel">'+renderBookingPanel(s)+'</div></div>';
 }
 function renderQuestionnaireAnswers(template,answers){
  if(!template)return '<div class="muted">Questionnaire indisponible.</div>';
@@ -2999,7 +3049,7 @@ function renderClientPortal(){
  }else if(clientPortalView==='suivi'){
    main=renderClientSuivi(s);
  }else if(clientPortalView==='checkin'){
-   main='<div class="client-main"><div class="client-page-head"><div><h2>Mon bilan hebdomadaire</h2>'+
+   main='<div class="client-main akWowCheckinPage"><div class="client-page-head"><div><h2>Ton bilan de la semaine.</h2>'+
      '<p>Un rapide retour sur ta semaine, tes difficultés et les changements à prévoir. Ce questionnaire complète le suivi des séances dans Optitrainer.</p>'+
      '</div></div>'+renderClientWeeklyCheckin(s)+'</div>';
  }else if(clientPortalView==='billing'){
@@ -3064,14 +3114,14 @@ function renderBookingPanel(s){
  const selected=clientVisioDay?byDate[clientVisioDay]||[]:[];
  const nextActions=next?(()=>{
    const h=hoursUntil(next.starts_at),late=h<24;
-   return '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><div class="muted tiny">'+(next.appointment_type==='Visio initiale'?'VISIO INITIALE · HORS QUOTA':'PROCHAINE VISIO')+'</div><strong style="font-size:18px">'+fmtDateTime(next.starts_at)+'</strong><div class="muted tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
+   return '<div class="client-section-card akWowUpcoming" style="margin-top:0"><div class="row between"><div><div class="muted tiny">'+(next.appointment_type==='Visio initiale'?'VISIO INITIALE · HORS QUOTA':'PROCHAINE VISIO')+'</div><strong style="font-size:18px">'+fmtDateTime(next.starts_at)+'</strong><div class="muted tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
    (late?'<div class="alert" style="margin-top:10px"><div class="tiny">'+(next.appointment_type==='Visio initiale'?'À moins de 24 h, contacte ton coach pour déplacer la visio initiale. Elle reste hors quota.':'À moins de 24 h, le déplacement automatique est fermé. Une annulation reste comptabilisée dans ton quota.')+'</div></div>':'<div class="muted tiny" style="margin-top:9px">'+(next.appointment_type==='Visio initiale'?'Tu peux déplacer cette visio initiale jusqu’à 24 h avant. Elle ne décompte aucune visio mensuelle.':'Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant.')+'</div>')+
    '<div class="row" style="margin-top:10px;flex-wrap:wrap">'+
    (!late?'<button class="btn ghost small clientRescheduleVisio" data-id="'+next.id+'">Déplacer</button>':'')+
    '<button class="btn danger small clientCancelVisio" data-id="'+next.id+'" data-late="'+(late?'1':'0')+'">Annuler</button>'+
    (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="text-decoration:none">📹 WhatsApp</a>':'')+
    '</div></div>';
- })():'<div class="client-section-card" style="margin-top:0"><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Aucune visio réservée</strong><div class="muted tiny" style="margin-top:5px">Choisis un créneau ci-dessous.</div></div>';
+ })():'<div class="client-section-card akWowUpcoming" style="margin-top:0"><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Aucune visio réservée</strong><div class="muted tiny" style="margin-top:5px">Choisis un créneau ci-dessous.</div></div>';
  const weekButtons=[0,1,2].map(i=>'<button class="clientWeekBtn '+(clientVisioWeek===i?'on':'')+'" data-week="'+i+'">Semaine '+(i+1)+' <span class="tiny" style="opacity:.7">('+weeks[i].length+')</span></button>').join('');
  const dayButtons=dates.map(date=>{
    const d=new Date(date+'T12:00:00');
@@ -3082,7 +3132,7 @@ function renderBookingPanel(s){
  const timeButtons=selected.map(sl=>'<button class="btn ghost small bookSlot" data-start="'+esc(sl.starts_at)+'">'+fmtTime(sl.starts_at)+'</button>').join('');
  const hist=history.length?history.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join(''):'<div class="muted">Aucune visio dans l’historique.</div>';
  return nextActions+
- '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:3px">Réserver une visio</h3><div class="muted tiny">'+esc(quotaText)+' • '+esc(policy.duration_minutes||30)+' min</div></div><span class="status blue">3 semaines</span></div>'+
+ '<div class="client-section-card akWowBookingCard"><div class="row between"><div><h3 style="margin-bottom:3px">Choisis ton prochain créneau</h3><div class="muted tiny">'+esc(quotaText)+' • '+esc(policy.duration_minutes||30)+' min</div></div><span class="status blue">3 semaines</span></div>'+
  '<div class="client-week-tabs">'+weekButtons+'</div>'+
  (weekSlots.length?'<div class="client-day-strip">'+dayButtons+'</div><div class="section-title" style="margin-top:6px">Horaires disponibles</div><div class="client-time-grid">'+timeButtons+'</div>':'<div class="muted" style="padding:16px 0">Aucun créneau disponible sur cette semaine.</div>')+
  '<div class="muted tiny" style="margin-top:13px">Une annulation à moins de 24 h ou une absence reste comptabilisée dans ton quota.</div></div>'+
