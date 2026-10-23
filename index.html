@@ -3518,7 +3518,7 @@ function openPublicOfferCheckout(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
  const benefits=publicOfferBenefits(pole,name);
  const sameDraft=publicCheckoutDraft&&publicCheckoutDraft.pole===pole&&publicCheckoutDraft.name===name;
- const draft=sameDraft?publicCheckoutDraft:{pole,name,duration:3,paymentMode:'monthly',fullName:'',email:'',acceptedCgv:false,healthConsent:false,earlyStart:false};
+ const draft=sameDraft?publicCheckoutDraft:{pole,name,duration:3,paymentMode:'monthly',fullName:'',email:'',acceptedCgv:false,healthConsent:false,earlyStart:false,startMode:'asap',startDate:''};
  publicCheckoutDraft=draft;
  modal('Choisir mon accompagnement',
   '<div class="checkout-offer-head"><div class="checkout-step">Étape 1 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Tarif de référence : '+euro(base)+' / mois</div></div>'+
@@ -3531,10 +3531,22 @@ function openPublicOfferCheckout(button){
    '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="monthly" '+(draft.paymentMode!=='upfront'?'checked':'')+'><strong>Paiement mensuel</strong><div class="muted tiny" style="margin-top:4px">Prélèvement chaque mois</div></label>'+
    '<label class="checkout-choice"><input type="radio" name="checkoutPayment" value="upfront" '+(draft.paymentMode==='upfront'?'checked':'')+'><strong>Paiement comptant</strong><div class="muted tiny" style="margin-top:4px">Petite remise supplémentaire</div></label>'+
   '</div>'+
+  '<div class="section-title">Quand souhaites-tu commencer ?</div>'+
+  '<div class="checkout-options">'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutStartMode" value="asap" '+(draft.startMode!=='date'?'checked':'')+'><strong>Dès que possible</strong><div class="muted tiny">Après confirmation du paiement et selon les règles de rétractation.</div></label>'+
+   '<label class="checkout-choice"><input type="radio" name="checkoutStartMode" value="date" '+(draft.startMode==='date'?'checked':'')+'><strong>Choisir une date</strong><div class="muted tiny">Planifier le début jusqu’à 120 jours à l’avance.</div></label>'+
+  '</div>'+
+  '<div class="field" id="checkoutStartDateField" style="'+(draft.startMode==='date'?'':'display:none')+'"><label>Date de démarrage souhaitée</label>'+
+  '<input class="input" id="checkoutStartDate" type="date" min="'+localDateISO()+'" max="'+new Date(Date.parse(localDateISO()+'T12:00:00Z')+120*86400000).toISOString().slice(0,10)+'" value="'+esc(draft.startDate||'')+'">'+
+  '<div class="muted tiny">Onboarding préparé après paiement. Les échéances seront calculées à partir du démarrage confirmé.</div></div>'+
   '<div id="publicCheckoutPrice" class="checkout-price-box"></div>',
   '<button class="btn ghost" id="cancelPublicCheckout">Annuler</button><button class="btn primary" id="continuePublicCheckout">Continuer</button>');
  document.getElementById('cancelPublicCheckout').onclick=()=>{publicCheckoutDraft=null;closeModal()};
  const durationEls=[...document.querySelectorAll('input[name="checkoutDuration"]')],paymentEls=[...document.querySelectorAll('input[name="checkoutPayment"]')];
+ const startModeEls=[...document.querySelectorAll('input[name="checkoutStartMode"]')];
+ const dateField=document.getElementById('checkoutStartDateField'),dateEl=document.getElementById('checkoutStartDate');
+ startModeEls.forEach(el=>el.onchange=()=>{dateField.style.display=startModeEls.find(x=>x.checked)?.value==='date'?'block':'none'});
+
  let quoteSequence=0;
  const renderPrice=async()=>{
    const seq=++quoteSequence;
@@ -3550,19 +3562,24 @@ function openPublicOfferCheckout(button){
  document.getElementById('continuePublicCheckout').onclick=async()=>{
    const continueBtn=document.getElementById('continuePublicCheckout');
    const duration=Number(durationEls.find(x=>x.checked)?.value||3),paymentMode=paymentEls.find(x=>x.checked)?.value||'monthly';
+   const startMode=startModeEls.find(x=>x.checked)?.value||'asap';
+   const startDate=startMode==='date'?dateEl.value:'';
+   if(startMode==='date'&&(!startDate||startDate<localDateISO()||startDate>dateEl.max)){
+     alert('Choisis une date de démarrage valide dans les 120 prochains jours.');return;
+   }
    continueBtn.disabled=true;continueBtn.textContent='Vérification…';
    const p=await publicCheckoutPrice(pole,name,base,duration,paymentMode);
    continueBtn.disabled=false;continueBtn.textContent='Continuer';
-   draft.duration=duration;draft.paymentMode=paymentMode;
+   draft.duration=duration;draft.paymentMode=paymentMode;draft.startMode=startMode;draft.startDate=startDate;
    modal('Informations avant paiement',
     '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix et complète les informations qui serviront à créer ton accès AK PRIME.</div></div>'+
-    '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
+    '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Démarrage souhaité</span><strong>'+esc(startMode==='date'?fmtDate(startDate):'Dès que possible')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
     '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" value="'+esc(draft.fullName||'')+'" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" value="'+esc(draft.email||'')+'" placeholder="nom@exemple.fr"></div></div>'+
     '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
       '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> J’accepte les conditions générales de vente, dont l’engagement ferme de 3 ou 6 mois choisi ci-dessus, les modalités de paiement et les règles de résiliation anticipée. J’ai pris connaissance de la politique de confidentialité et du droit de rétractation.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
-    '</div><div class="checkout-consent-note">La preuve sera enregistrée côté serveur pour un client connecté. Aucun paiement n’est effectué à cette étape. Le démarrage avant 14 jours reste facultatif.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
+    '</div><div class="checkout-consent-note">La date demandée sera conservée avec la commande et confirmée au paiement. Un démarrage à moins de 14 jours de la commande exige une demande expresse ; sans celle-ci, « dès que possible » signifie au plus tôt 14 jours après paiement. Le démarrage de l’entraînement reste soumis à la finalisation de l’onboarding. Aucun paiement n’est effectué à cette étape.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
     '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
     '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Enregistrer ma demande (sans paiement)</button>');
    const captureDraft=()=>{
@@ -3571,7 +3588,7 @@ function openPublicOfferCheckout(button){
      draft.acceptedCgv=!!document.getElementById('checkoutAcceptCgv')?.checked;
      draft.healthConsent=!!document.getElementById('checkoutHealthConsent')?.checked;
      draft.earlyStart=!!document.getElementById('checkoutEarlyStart')?.checked;
-     draft.duration=duration;draft.paymentMode=paymentMode;
+     draft.duration=duration;draft.paymentMode=paymentMode;draft.startMode=startMode;draft.startDate=startDate;
      publicCheckoutDraft=draft;
    };
    document.getElementById('backPublicCheckout').onclick=()=>{captureDraft();openPublicOfferCheckout(button)};
@@ -3581,7 +3598,7 @@ function openPublicOfferCheckout(button){
      const acceptedCgv=document.getElementById('checkoutAcceptCgv').checked;
      const healthConsent=document.getElementById('checkoutHealthConsent').checked;
      const earlyStart=document.getElementById('checkoutEarlyStart').checked;
-     draft.fullName=fullName;draft.email=email;draft.acceptedCgv=acceptedCgv;draft.healthConsent=healthConsent;draft.earlyStart=earlyStart;draft.duration=duration;draft.paymentMode=paymentMode;publicCheckoutDraft=draft;
+     draft.fullName=fullName;draft.email=email;draft.acceptedCgv=acceptedCgv;draft.healthConsent=healthConsent;draft.earlyStart=earlyStart;draft.duration=duration;draft.paymentMode=paymentMode;draft.startMode=startMode;draft.startDate=startDate;publicCheckoutDraft=draft;
      const errorBox=document.getElementById('checkoutValidationError');
      const errors=[];
      if(fullName.length<3)errors.push('Indique ton nom et ton prénom.');
@@ -3589,6 +3606,11 @@ function openPublicOfferCheckout(button){
      if(!email||!emailEl.checkValidity())errors.push('Indique une adresse e-mail valide.');
      if(!acceptedCgv)errors.push('Confirme la prise de connaissance des documents contractuels.');
      if(!healthConsent)errors.push('Le consentement explicite au traitement des données sensibles est nécessaire pour préparer un accompagnement individualisé.');
+     if(startMode==='date'){
+       const days=Math.round((Date.parse(startDate+'T12:00:00Z')-Date.parse(localDateISO()+'T12:00:00Z'))/86400000);
+       if(!Number.isFinite(days)||days<0||days>120)errors.push('La date de démarrage doit être comprise dans les 120 prochains jours.');
+       else if(days<14&&!earlyStart)errors.push('Pour démarrer dans moins de 14 jours, coche la demande expresse de démarrage anticipé.');
+     }
      if(errors.length){
        errorBox.innerHTML='<strong>Il reste '+errors.length+' point'+(errors.length>1?'s':'')+' à compléter :</strong><br>• '+errors.map(esc).join('<br>• ');
        errorBox.classList.add('show');
@@ -3602,7 +3624,7 @@ function openPublicOfferCheckout(button){
        if(email.toLowerCase()!==String(session.user.email||'').toLowerCase())throw Error('Utilisez l’adresse e-mail de votre compte connecté');
        if(p.source!=='server'||!p.offerCode)throw Error('Le tarif sécurisé est momentanément indisponible');
        const {data:result,error:saveError}=await supa.functions.invoke('prepare-checkout-order',{body:{
-         offerCode:p.offerCode,duration,paymentMode,fullName,acceptedCgv:true,
+         offerCode:p.offerCode,duration,paymentMode,fullName,startMode,startDate:startMode==='date'?startDate:null,acceptedCgv:true,
          healthConsent,earlyStart,cgvVersion:'akprime-cgv-2026-10-20-firm-commitment',
          privacyVersion:'akprime-privacy-2026-10-20'
        }});
@@ -3610,7 +3632,7 @@ function openPublicOfferCheckout(button){
        const order=result.order;
        modal('Demande enregistrée — aucun paiement',
          '<div class="alert green"><strong>Votre acceptation contractuelle a été enregistrée.</strong><div class="tiny" style="margin-top:5px">Référence : '+esc(order.id)+'. Cette opération prépare la commande mais n’active pas votre accompagnement.</div></div>'+
-         '<div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Montant total</span><strong>'+euro(Number(order.total_cents)/100)+'</strong></div><div><span>Paiement</span><strong>Non effectué</strong></div></div>'+
+         '<div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Date souhaitée</span><strong>'+esc(startMode==='date'?fmtDate(startDate):'Dès que possible')+'</strong></div><div><span>Montant total</span><strong>'+euro(Number(order.total_cents)/100)+'</strong></div><div><span>Paiement</span><strong>Non effectué</strong></div></div>'+
          '<p class="muted tiny" style="margin-top:12px">La confirmation définitive et le paiement seront disponibles après activation du tunnel sécurisé.</p>',
          '<button class="btn primary" id="closeCheckoutInfo">Fermer</button>');
        document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
@@ -3678,6 +3700,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261022-calendar-compact-v53"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261023-start-choice-v54"></script>
 </body>
 </html>
