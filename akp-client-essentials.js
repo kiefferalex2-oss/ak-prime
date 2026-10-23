@@ -80,7 +80,6 @@
    return '<div class="client-main"><div class="client-page-head"><div>'+
      '<h2>Mon accompagnement AK PRIME</h2>'+
      '<p>Questionnaire initial, préparation mentale et prestations complémentaires selon ta formule.</p></div></div>'+
-     renderClientQuestionnaireSection(s)+
      (mental?'<div class="client-section-card" style="margin-top:13px"><h3>Préparation mentale</h3>'+
        '<p class="muted tiny">Les exercices, routines et séances sont individualisés avec ton coach. '+
        'Les notes internes du coach ne sont pas visibles dans cet espace.</p></div>':'')+
