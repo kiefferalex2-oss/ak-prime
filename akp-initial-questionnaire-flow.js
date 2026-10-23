@@ -202,7 +202,7 @@ function bindInitialVisio(s){
  wrapper.addEventListener('click',async e=>{
   const button=e.target.closest('.akInitialBookSlot');if(!button||button.disabled)return;
   const start=button.dataset.start;
-  if(!confirm('Confirmer ta visio initiale du '+fmtDateTime(start)+' ?\\nCette visio ne sera pas décomptée de ton quota mensuel ou hebdomadaire.'))return;
+  if(!confirm('Confirmer ta visio initiale du '+fmtDateTime(start)+' ?\nCette visio ne sera pas décomptée de ton quota mensuel ou hebdomadaire.'))return;
   button.disabled=true;
   const {error}=await supa.rpc('book_my_initial_visio',{p_starts_at:start});
   if(error){button.disabled=false;alert(error.message||'Ce créneau n’est plus disponible.');return}
