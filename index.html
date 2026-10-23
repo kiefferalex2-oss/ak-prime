@@ -2508,7 +2508,7 @@ function renderClientEngagementBanner(c){
  return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
 }
 function clientNavMarkup(){
- const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['checkin','☷','Bilan hebdo'],['suivi','✓','Suivi'],['passport','◇','Passeport'],['billing','€','Factures']];
+ const items=[['home','⌂','Accueil'],['visios','◷','Mes visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures']];
  const current=items.find(x=>x[0]===clientPortalView)||items[0];
  const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
  const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
@@ -2581,23 +2581,52 @@ function renderClientHome(s){
  const qDone=r?.status==='submitted';
  const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
  const renewalPending=d!==null&&d<=14&&!currentClientRenewalChoice(s);
- const engagementValue=!c.engagement_end_date?'À définir':d<0?'Échue':d===0?'Aujourd’hui':d+' j';
+ const engagementValue=!c.engagement_end_date?'À définir':d<0?'Terminée':d===0?"Aujourd’hui":d+' jours';
+ const first=c.first_name||'';
  const actionCards=[];
- if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><strong>Questionnaire initial à compléter</strong><div class="muted tiny" style="margin-top:5px">Il permet de préparer ton accompagnement et ta première visio.</div><button class="btn primary small clientGoInitial" style="margin-top:10px">Ouvrir le questionnaire</button></div>');
- if(String(c.status||'').toLowerCase()==='active'&&!week)actionCards.push('<div class="client-action-card"><strong>Bilan hebdomadaire</strong><div class="muted tiny" style="margin-top:5px">Ton retour aide à adapter la semaine suivante.</div><button class="btn ghost small clientGoFollow" style="margin-top:10px">Faire mon bilan</button></div>');
- if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card"><strong>Passeport de fin de cycle</strong><div class="muted tiny" style="margin-top:5px">Ton choix est enregistré. Tu peux aussi consulter ton évolution avant la prochaine étape.</div><button class="btn ghost small clientGoPassport" style="margin-top:10px">Voir mon Passeport</button></div>');
- return '<div class="client-main"><div class="client-hero"><div class="row between"><div><h1>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' '))+'</h1><p>'+esc(c.current_pole||'')+' — '+esc(c.current_offer||'')+'</p></div><span class="status green">'+esc(c.status==='active'?'Actif':c.status||'')+'</span></div></div>'+
+ if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Ton questionnaire initial</strong><div class="muted tiny">Complète ton profil pour préparer ton accompagnement sur mesure.</div></div><button class="btn primary small clientGoInitial">Compléter <span aria-hidden="true">↗</span></button></div>');
+ if(String(c.status||'').toLowerCase()==='active'&&!week)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton bilan de la semaine</strong><div class="muted tiny">Partage tes sensations et l’évolution de ta préparation.</div></div><button class="btn ghost small clientGoFollow">Accéder <span aria-hidden="true">↗</span></button></div>');
+ if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card good"><div class="akWowActionIcon">✓</div><div class="akWowActionCopy"><strong>Ton prochain chapitre</strong><div class="muted tiny">Ton choix pour la suite est enregistré. Retrouve tes progrès.</div></div><button class="btn ghost small clientGoPassport">Voir le Passeport <span aria-hidden="true">↗</span></button></div>');
+ const optiUrl=safeOptitrainerLink(c.optitrainer_url);
+ const waNum=normalizeWhatsAppNumber(s.appSettings?.whatsapp_number||'');
+ const firstName=[c.first_name].filter(Boolean).join(' ')||'toi';
+ const whatUrl=waNum?whatsappUrl(s.appSettings.whatsapp_number,s.appSettings.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.'):'';
+ return '<div class="client-main akWowHome">'+
+ '<section class="client-hero akWowHero">'+
+  '<div class="akWowHeroCopy">'+
+   '<span class="akWowEyebrow"><span class="akWowSpark">✦</span> TON ESPACE PERSONNEL · AK PRIME</span>'+
+   '<h1>Bonjour '+esc(firstName)+'.<span>Ta progression commence ici.</span></h1>'+
+   '<p>Une vision claire de ton accompagnement, de tes objectifs et de tes prochaines étapes.</p>'+
+   '<div class="akWowHeroPills"><span>✦ '+esc(c.current_pole||'Accompagnement')+'</span><span>'+esc(c.current_offer||'Formule personnalisée')+'</span><span class="akWowLive"><i></i>'+esc(c.status==='active'?'Suivi actif':c.status==='onboarding'?'Démarrage en cours':c.status||'')+'</span></div>'+
+   '<button class="akWowHeroCta '+(!qDone&&s.template?'clientGoInitial':'clientGoVisios')+'" type="button">'+
+      (!qDone&&s.template?'Continuer mon onboarding':'Gérer mes visios')+' <span aria-hidden="true">↗</span></button>'+
+  '</div>'+
+  '<div class="akWowHeroSide">'+
+   '<div class="akWowHeroSideTop"><span>PROCHAIN RENDEZ-VOUS</span><span class="akWowHeroSymbol">↗</span></div>'+
+   '<strong>'+esc(next?fmtDateTime(next.starts_at):'À planifier')+'</strong>'+
+   '<p>'+(next?esc((next.appointment_type==='Visio initiale'?'Visio initiale · Hors quota':'Visio de suivi')+' · '+next.duration_minutes+' min'):'Choisis ton prochain créneau avec ton coach.')+'</p>'+
+   '<button type="button" class="akWowTextLink clientGoVisios">'+(next?'Voir mes rendez-vous':'Réserver une visio')+' <span aria-hidden="true">→</span></button>'+
+  '</div>'+
+ '</section>'+
+ '<div class="akWowSectionHead akWowSectionHeadMetrics"><div><span class="akWowKicker">01 / TABLEAU DE BORD</span><h2>Ta progression en un regard</h2></div><span class="akWowSectionHint">Le meilleur reste à construire.</span></div>'+
  '<div class="client-summary-grid">'+
- '<div class="client-summary-card"><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?next.duration_minutes+' min':'Réserve depuis l’onglet Visios')+'</div></div>'+
- '<div class="client-summary-card"><div class="lab">Cycle actuel</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir')+'</div></div>'+
- '<div class="client-summary-card"><div class="lab">Bilan hebdo</div><div class="value">'+(week?(week.reviewed_at?'Traité':'Envoyé'):'À faire')+'</div><div class="sub">'+(week?(week.reviewed_at?'Retour coach disponible':'En attente du coach'):'À compléter cette semaine')+'</div></div>'+
- '<div class="client-summary-card"><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">◷</div><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?esc(next.duration_minutes+' min · '+(next.appointment_type==='Visio initiale'?'Hors quota':'Avec ton coach')):'Depuis l’onglet Visios')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">↗</div><div class="lab">Cycle actuel</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir ensemble')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">◎</div><div class="lab">Bilan hebdomadaire</div><div class="value">'+(week?(week.reviewed_at?'Traité':'Envoyé'):'À faire')+'</div><div class="sub">'+(week?(week.reviewed_at?'Retour du coach disponible':'En cours de traitement'):'Tes ressentis comptent')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">⌁</div><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
  '</div>'+
  renderClientRenewalCard(s)+
- (actionCards.length?'<div class="section-title">À faire</div><div class="grid2">'+actionCards.join('')+'</div>':renewalPending?'':'<div class="alert green" style="margin-top:13px"><strong>Tout est à jour.</strong><div class="tiny" style="margin-top:4px">Aucune action urgente dans ton espace AK PRIME.</div></div>')+
- '<div class="client-home-actions">'+
- (safeOptitrainerLink(c.optitrainer_url)?'<button class="btn primary" id="clientOpti">Ouvrir mon entraînement Optitrainer</button>':'<div class="client-action-card"><strong>Optitrainer</strong><div class="muted tiny">Ton lien sera ajouté par le coach.</div></div>')+
- renderClientWhatsAppButton(s,c)+
+ (actionCards.length?
+  '<div class="akWowSectionHead"><div><span class="akWowKicker">02 / À TON RYTHME</span><h2>Tes prochaines étapes</h2></div><span class="akWowSectionHint">On avance ensemble.</span></div><div class="akWowTodoGrid">'+actionCards.join('')+'</div>':
+  renewalPending?'':'<div class="akWowAllClear"><span class="akWowAllClearSymbol">✓</span><div><strong>Tout est en ordre.</strong><small>Continue sur ta lancée : ton accompagnement suit son cours.</small></div></div>')+
+ '<div class="akWowSectionHead"><div><span class="akWowKicker">03 / TES OUTILS</span><h2>Tout à portée de main</h2></div><button type="button" class="akWowTextLink clientGoFollow">Mon accompagnement →</button></div>'+
+ '<div class="akWowHomeServices">'+
+ (optiUrl?
+ '<a class="akWowHomeService akWowHomeServiceOpti" href="'+esc(optiUrl)+'" target="_blank" rel="noopener noreferrer"><span class="akWowServiceIcon">O</span><div><strong>Optitrainer</strong><small>Ta programmation et tes séances</small></div><span class="akWowArrow">↗</span></a>':
+ '<div class="akWowHomeService akWowHomeServiceDisabled"><span class="akWowServiceIcon">O</span><div><strong>Optitrainer</strong><small>Lien bientôt disponible</small></div><span class="akWowArrow">·</span></div>')+
+ (whatUrl?
+ '<a class="akWowHomeService akWowHomeServiceWa" href="'+esc(whatUrl)+'" target="_blank" rel="noopener noreferrer"><span class="akWowServiceIcon">W</span><div><strong>Échanger avec Alex</strong><small>WhatsApp · messages et vidéos</small></div><span class="akWowArrow">↗</span></a>':
+ '<div class="akWowHomeService akWowHomeServiceDisabled"><span class="akWowServiceIcon">W</span><div><strong>WhatsApp</strong><small>Contact bientôt disponible</small></div><span class="akWowArrow">·</span></div>')+
  '</div>'+
  '<div class="client-section-card client-passport-preview"><div class="row between"><div><h3 style="margin-bottom:3px">Mon Passeport AK PRIME</h3><div class="muted tiny">Progression, cycle, tests et dates importantes sont regroupés ici.</div></div><button class="btn ghost small clientGoPassport">Ouvrir</button></div>'+
   '<div class="client-passport-preview-grid"><div><span>Cycle actuel</span><strong>'+esc(cycle?.title||'À définir')+'</strong><div class="client-mini-progress"><i style="width:'+cycleProgressPct({start:isoDate(cycle?.start_date),end:isoDate(cycle?.end_date)})+'%"></i></div><small>'+cycleProgressPct({start:isoDate(cycle?.start_date),end:isoDate(cycle?.end_date)})+' % du cycle</small></div>'+
@@ -2606,7 +2635,6 @@ function renderClientHome(s){
  '</div>'+
  '</div>';
 }
-
 function renderClientBilling(s){
  const invoices=(s.invoices||[]).slice().sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date)));
  const rows=invoices.length?invoices.map(i=>'<div class="client-section-card"><div class="row between"><div><div class="muted tiny">FACTURE</div><h3 style="margin:4px 0">'+esc(i.invoice_number)+'</h3><div class="muted tiny">Émise le '+fmtDate(i.issue_date)+' • prestation du '+fmtDate(i.service_date)+'</div></div><div style="text-align:right"><div style="font-size:19px;font-weight:900">'+centsMoney(i.amount_incl_tax_cents)+'</div><span class="status '+invoiceStatusTone(i.payment_status)+'">'+esc(invoiceStatusLabel(i.payment_status))+'</span></div></div><button class="btn ghost small clientPrintInvoice" data-id="'+i.id+'" style="margin-top:12px">Imprimer / enregistrer en PDF</button></div>').join(''):'<div class="client-section-card"><h3>Mes factures</h3><div class="muted">Aucune facture disponible pour le moment.</div></div>';
@@ -2656,10 +2684,11 @@ function renderClientPortal(){
  }else{
    main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal"><div class="client-top"><div class="client-brand"><span class="client-brand-mark">AK</span><span>AK PRIME<small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.getElementById('root').innerHTML='<div class="client-portal'+(clientPortalView==='passport'?'':' ak-wow')+'"><div class="client-top"><div class="client-brand"><span class="client-brand-mark">AK</span><span>AK PRIME<small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
+ document.querySelectorAll('.clientGoVisios').forEach(b=>b.onclick=()=>{clientPortalView='visios';renderClientPortal()});
  document.querySelectorAll('.clientGoCheckin').forEach(b=>b.onclick=()=>{clientPortalView='checkin';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
  document.querySelectorAll('.clientPrintInvoice').forEach(b=>b.onclick=()=>printInvoice(b.dataset.id));
