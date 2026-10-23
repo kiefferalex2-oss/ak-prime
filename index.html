@@ -830,7 +830,22 @@ async function loadSupabaseData(){
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
  db.clients=cr.map(x=>{
-   const ws=work[x.id]||{}, cy=(cycles[x.id]||[])[0]||{}, q=(questions[x.id]||[])[0]||{}, ob=onboard[x.id]||{};
+   const ws=work[x.id]||{}, cy=(cycles[x.id]||[])[0]||{}, ob=onboard[x.id]||{};
+   // Toujours afficher le questionnaire de la formule ACTUELLE. Un ancien
+   // questionnaire transmis pour une autre formule n'est pas une validation.
+   const questionnaireCode=x.current_pole==='Performance'
+     ? 'performance_'+String(x.current_offer||'').toLowerCase()
+     : x.current_pole==='Forme & Santé'
+       ? (/renfor/i.test(x.current_offer||'')?'forme_renforce':'forme_standard')
+       : x.current_pole==='Mental'
+         ? (/sportif/i.test(x.current_offer||'')?'mental_sportif':'mental_particulier') : '';
+   const questionnaireRows=questions[x.id]||[];
+   const currentQuestionnaire=questionnaireRows.find(r=>
+     r.questionnaire_version===2 &&
+     String(r.questionnaire_type||'').endsWith('__'+questionnaireCode));
+   const hasOfferSpecificResponse=questionnaireRows.some(r=>r.questionnaire_version===2);
+   const q=currentQuestionnaire||(!x.is_test&&!hasOfferSpecificResponse
+     ? questionnaireRows[0]||{} : {});
    return {
      id:x.id,name:[x.first_name,x.last_name==='-'?'':x.last_name].filter(Boolean).join(' '),email:x.email||'',phone:x.phone||'',
      authUserId:x.auth_user_id||'',accountProfile:x.auth_user_id?pr.find(p=>p.id===x.auth_user_id)||null:null,
@@ -1150,7 +1165,7 @@ async function refreshClientNotificationData(){
  const id=clientPortalState.client.id;
  const [clientRes,responseRes,checkRes,apptRes,readsRes,renewalChoiceRes,invoiceRes]=await Promise.all([
    supa.from('clients').select('*').eq('id',id).single(),
-   supa.from('questionnaire_responses').select('*').eq('client_id',id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
+   supa.from('questionnaire_responses').select('*').eq('client_id',id).eq('questionnaire_type',clientPortalState.template?.template_key||'').eq('questionnaire_version',clientPortalState.template?.version||1).maybeSingle(),
    supa.from('checkins').select('*').eq('client_id',id).order('week_date',{ascending:false}),
    supa.from('appointments').select('*').eq('client_id',id).order('starts_at',{ascending:true}),
    supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
@@ -3704,6 +3719,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261023-onboarding-and-macros-v58"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261023-onboarding-and-macros-v59"></script>
 </body>
 </html>
