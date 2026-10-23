@@ -124,7 +124,7 @@
    '<div style="margin-top:12px">'+offerSpecificBlocks(c)+'</div></details>';
  }
  function questionnaireSection(c){
-  const requested=/^\\d{4}-\\d{2}-\\d{2}$/.test(c.questionnaire?.preferred_start_date||'')
+  const requested=/^\d{4}-\d{2}-\d{2}$/.test(c.questionnaire?.preferred_start_date||'')
     ?c.questionnaire.preferred_start_date:'';
   const startStatus=requested?
    '<div class="alert blue" style="margin-bottom:13px"><strong>Date de début souhaitée par le client : '+esc(fmtDate(requested))+'</strong>'+
