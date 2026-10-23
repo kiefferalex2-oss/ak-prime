@@ -70,6 +70,12 @@
          '<div class="client-summary-card"><div class="lab">'+l+'</div><div class="value">'+
          safe(item[k]??'—')+'</div><div class="sub">'+u+'</div></div>').join('')+'</div>'+
      (item.notes?'<div class="muted tiny" style="white-space:pre-wrap;margin:10px 0">'+safe(item.notes)+'</div>':'')+
+     [['food_guidance','Mes recommandations alimentaires'],
+       ['meal_timing','Mes apports autour des séances'],
+       ['hydration','Hydratation et récupération']].filter(([k])=>String(item[k]||'').trim())
+       .map(([k,label])=>'<section style="margin:14px 0;padding:13px 16px;background:#f7fafc;border:1px solid #e0e9ef;border-radius:10px">'+
+         '<h4 style="margin:0 0 7px;color:#25445d">'+label+'</h4>'+
+         '<div style="white-space:pre-wrap;line-height:1.65;font-size:13px">'+safe(item[k])+'</div></section>').join('')+
      (item.pdf_path?'<button class="btn ghost" id="akDownloadMacro">Consulter les recommandations alimentaires (PDF)</button>':'')+
      '<div class="muted tiny" style="margin-top:8px">Repères journaliers individualisés · communiqués par ton coach AK PRIME.</div></div>';
  }
