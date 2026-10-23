@@ -706,6 +706,38 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .public-site .public-offer-card .public-offer-headline{line-height:1.65}
 .public-site #offres .public-section-head h2{max-width:1050px}
 
+
+/* AK PRIME — accès entraînement & échanges : deux tuiles lisibles et compactes */
+.akClientTrainingCard{padding:21px 23px 18px!important;margin-top:13px;overflow:hidden}
+.akClientTrainingCard .akTrainingHeader h3{font-size:17px;margin:0 0 5px;letter-spacing:-.015em;color:#18314a}
+.akClientTrainingCard .akTrainingHeader p{margin:0;color:#718198;font-size:12px;line-height:1.55}
+.akClientTrainingCard .akTrainingServices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.akClientTrainingCard .akTrainingService{min-width:0;min-height:83px;display:flex;align-items:center;gap:13px;border:1px solid #e0e7ef;border-radius:14px;padding:15px 16px;background:#fbfcff;color:#1a2b3f;text-decoration:none;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .15s ease}
+.akClientTrainingCard a.akTrainingService:hover{border-color:#a9bdd2;background:#f5f9fd;box-shadow:0 5px 15px rgba(30,55,83,.06);transform:translateY(-1px)}
+.akClientTrainingCard a.akTrainingService:focus-visible{outline:3px solid #92b7dd;outline-offset:3px}
+.akClientTrainingCard .akTrainingMark{display:grid;place-items:center;width:43px;height:43px;border-radius:12px;flex:0 0 43px;font-weight:850;font-size:17px;letter-spacing:-.02em}
+.akClientTrainingCard .akTrainingMarkOpti{background:#e9f0f7;color:#244d71}
+.akClientTrainingCard .akTrainingMarkWhatsApp{background:#e6f5ec;color:#28734a}
+.akClientTrainingCard .akTrainingServiceCopy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.akClientTrainingCard .akTrainingServiceCopy strong{font-size:13px;font-weight:850;color:#1b3248;line-height:1.25}
+.akClientTrainingCard .akTrainingServiceCopy small{font-size:11px;font-weight:450;color:#718296;line-height:1.4}
+.akClientTrainingCard .akTrainingServiceAction{flex:0 0 auto;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#2c5b80}
+.akClientTrainingCard .akTrainingServiceWhatsApp .akTrainingServiceAction{color:#30744f}
+.akClientTrainingCard .akTrainingServiceAction span{font-size:16px;line-height:1}
+.akClientTrainingCard .akTrainingServiceInactive{background:#f8fafc;border-style:dashed}
+.akClientTrainingCard .akTrainingPending{font-size:10px;color:#8392a3;white-space:nowrap}
+.akClientTrainingCard .akTrainingFootnote{margin:14px 0 0;font-size:10px;color:#8894a3;line-height:1.5}
+@media(max-width:780px){
+ .akClientTrainingCard{padding:18px!important}
+ .akClientTrainingCard .akTrainingServices{grid-template-columns:1fr;gap:10px;margin-top:15px}
+ .akClientTrainingCard .akTrainingService{min-height:75px;padding:12px}
+}
+@media(max-width:380px){
+ .akClientTrainingCard .akTrainingService{gap:9px}
+ .akClientTrainingCard .akTrainingMark{width:37px;height:37px;flex-basis:37px}
+ .akClientTrainingCard .akTrainingServiceAction{font-size:10px}
+}
+
 </style>
 </head>
 <body>
