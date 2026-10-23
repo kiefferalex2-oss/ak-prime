@@ -2035,7 +2035,7 @@ function printContractEvidence(o){
  const p=window.open('','_blank');
  if(!p){alert('Autorisez les fenêtres contextuelles pour enregistrer le PDF.');return;}
  const field=(k,v)=>'<tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">'+esc(k)+'</th><td style="padding:7px;border-bottom:1px solid #ddd">'+esc(String(v??'—'))+'</td></tr>';
- const rows=[['Référence',o.id],['Client',o.full_name],['E-mail',o.email],['Offre',o.offer_code],['Engagement',o.commitment_months+' mois'],['Règlement',o.payment_mode],['Total',euro(Number(o.total_cents)/100)],['Version des CGV',o.cgv_version],['Acceptation',o.cgv_accepted_at],['Démarrage anticipé',o.early_start_requested?'Oui':'Non'],['Demande anticipée le',o.early_start_requested_at],['Consentement santé',o.health_consent?'Oui':'Non'],['Version confidentialité',o.privacy_version],['Statut',o.status]].map(x=>field(...x)).join('');
+ const rows=[['Référence',o.id],['Client',o.full_name],['E-mail',o.email],['Offre',o.offer_code],['Engagement',o.commitment_months+' mois'],['Démarrage demandé',o.start_mode==='date'?fmtDate(o.requested_start_date):'Dès que possible'],['Démarrage confirmé',o.confirmed_start_date?fmtDate(o.confirmed_start_date):'En attente du paiement'],['Règlement',o.payment_mode],['Total',euro(Number(o.total_cents)/100)],['Version des CGV',o.cgv_version],['Acceptation',o.cgv_accepted_at],['Démarrage anticipé',o.early_start_requested?'Oui':'Non'],['Demande anticipée le',o.early_start_requested_at],['Consentement santé',o.health_consent?'Oui':'Non'],['Version confidentialité',o.privacy_version],['Statut',o.status]].map(x=>field(...x)).join('');
  p.document.write('<!doctype html><html lang="fr"><meta charset="utf-8"><title>AK PRIME — Preuve '+esc(o.id)+'</title><style>body{font-family:Arial,sans-serif;padding:35px;color:#19283c}h1{font-size:24px}table{width:100%;border-collapse:collapse}small{color:#667085}</style><h1>AK PRIME — Récapitulatif de preuve contractuelle</h1><small>Document de lecture. Conservez aussi le JSON original pour le contrôle et le réimport.</small><table>'+rows+'</table><p><small>Document généré pour archivage privé, sans certification de signature électronique.</small></p></html>');
  p.document.close();p.focus();setTimeout(()=>p.print(),400);
 }
@@ -3704,6 +3704,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261023-start-choice-v54"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261023-start-choice-v55"></script>
 </body>
 </html>
