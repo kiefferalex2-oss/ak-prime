@@ -2975,7 +2975,6 @@ function openClientRenewalChoice(){
 function renderClientHome(s){
  const c=s.client,cycle=s.cycle,r=s.response;
  const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
- const friday=currentWeekFriday(),week=(s.checkins||[]).find(x=>String(x.week_date).slice(0,10)===friday);
  const qDone=r?.status==='submitted';
  const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
  const renewalPending=d!==null&&d<=14&&!currentClientRenewalChoice(s);
@@ -2983,7 +2982,7 @@ function renderClientHome(s){
  const first=c.first_name||'';
  const actionCards=[];
  if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Ton questionnaire initial</strong><div class="muted tiny">Complète ton profil pour préparer ton accompagnement sur mesure.</div></div><button class="btn primary small clientGoInitial">Compléter <span aria-hidden="true">↗</span></button></div>');
- if(String(c.status||'').toLowerCase()==='active'&&!week)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton bilan de la semaine</strong><div class="muted tiny">Partage tes sensations et l’évolution de ta préparation.</div></div><button class="btn ghost small clientGoFollow">Accéder <span aria-hidden="true">↗</span></button></div>');
+ if(!next)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton prochain rendez-vous</strong><div class="muted tiny">Un temps d’échange pour faire le point et avancer.</div></div><button class="btn ghost small clientGoVisios">Choisir un créneau <span aria-hidden="true">↗</span></button></div>');
  if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card good"><div class="akWowActionIcon">✓</div><div class="akWowActionCopy"><strong>Ton prochain chapitre</strong><div class="muted tiny">Ton choix pour la suite est enregistré. Retrouve tes progrès.</div></div><button class="btn ghost small clientGoPassport">Voir le Passeport <span aria-hidden="true">↗</span></button></div>');
  const optiUrl=safeOptitrainerLink(c.optitrainer_url);
  const waNum=normalizeWhatsAppNumber(s.appSettings?.whatsapp_number||'');
@@ -3009,8 +3008,8 @@ function renderClientHome(s){
  '<div class="akWowSectionHead akWowSectionHeadMetrics"><div><span class="akWowKicker">01 / TABLEAU DE BORD</span><h2>Ta progression en un regard</h2></div><span class="akWowSectionHint">Le meilleur reste à construire.</span></div>'+
  '<div class="client-summary-grid">'+
  '<div class="client-summary-card"><div class="akWowMetricIcon">◷</div><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?esc(next.duration_minutes+' min · '+(next.appointment_type==='Visio initiale'?'Hors quota':'Avec ton coach')):'Depuis l’onglet Visios')+'</div></div>'+
- '<div class="client-summary-card"><div class="akWowMetricIcon">↗</div><div class="lab">Cycle actuel</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir ensemble')+'</div></div>'+
- '<div class="client-summary-card"><div class="akWowMetricIcon">◎</div><div class="lab">Bilan hebdomadaire</div><div class="value">'+(week?(week.reviewed_at?'Traité':'Envoyé'):'À faire')+'</div><div class="sub">'+(week?(week.reviewed_at?'Retour du coach disponible':'En cours de traitement'):'Tes ressentis comptent')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">↗</div><div class="lab">Ton programme</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir ensemble')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">◎</div><div class="lab">Suivi quotidien</div><div class="value">Optitrainer</div><div class="sub">Séances, charge et état de forme</div></div>'+
  '<div class="client-summary-card"><div class="akWowMetricIcon">⌁</div><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
  '</div>'+
  renderClientRenewalCard(s)+
