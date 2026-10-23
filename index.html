@@ -2113,7 +2113,7 @@ function bind(){
  document.querySelectorAll('.deleteException').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_exceptions').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Indisponibilité retirée');render()});
  document.querySelectorAll('.cancelAppointment').forEach(b=>b.onclick=async()=>{if(!confirm('Annuler cette visio ? Le créneau sera immédiatement libéré.'))return;const a=(db.appointments||[]).find(x=>x.id===b.dataset.id);const {error}=await supa.from('appointments').update({status:'cancelled',cancelled_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);if(a)await supa.from('appointment_events').insert({appointment_id:a.id,client_id:a.client_id,event_type:'cancelled',old_starts_at:a.starts_at,detail:'Visio annulée par le coach.'});await loadSupabaseData();toast('Visio annulée');render()});
  document.querySelectorAll('.coachCompleteVisio').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('appointments').update({status:'completed',completed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio marquée réalisée');render()});
- document.querySelectorAll('.coachNoShowVisio').forEach(b=>b.onclick=async()=>{if(!confirm('Marquer le client absent ? Cette visio restera comptabilisée dans son quota.'))return;const {error}=await supa.from('appointments').update({status:'no_show'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Absence enregistrée');render()});
+ document.querySelectorAll('.coachNoShowVisio').forEach(b=>b.onclick=async()=>{if(!confirm('Marquer le client absent ? '+((db.appointments||[]).find(a=>a.id===b.dataset.id)?.appointment_type==='Visio initiale'?'La visio initiale reste hors quota.':'Cette visio restera comptabilisée dans son quota.')))return;const {error}=await supa.from('appointments').update({status:'no_show'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Absence enregistrée');render()});
  const cs=document.getElementById('clientSearch');if(cs)cs.oninput=e=>{state.search=e.target.value;render()};
  const sf=document.getElementById('statusFilter');if(sf){sf.value=state.status;sf.onchange=e=>{state.status=e.target.value;render()}}
  const pf=document.getElementById('poleFilter');if(pf){pf.value=state.pole;pf.onchange=e=>{state.pole=e.target.value;render()}}
@@ -2621,8 +2621,8 @@ function renderBookingPanel(s){
  const selected=clientVisioDay?byDate[clientVisioDay]||[]:[];
  const nextActions=next?(()=>{
    const h=hoursUntil(next.starts_at),late=h<24;
-   return '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">'+fmtDateTime(next.starts_at)+'</strong><div class="muted tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
-   (late?'<div class="alert" style="margin-top:10px"><div class="tiny">À moins de 24 h, le déplacement automatique est fermé. Une annulation reste comptabilisée dans ton quota.</div></div>':'<div class="muted tiny" style="margin-top:9px">Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant.</div>')+
+   return '<div class="client-section-card" style="margin-top:0"><div class="row between"><div><div class="muted tiny">'+(next.appointment_type==='Visio initiale'?'VISIO INITIALE · HORS QUOTA':'PROCHAINE VISIO')+'</div><strong style="font-size:18px">'+fmtDateTime(next.starts_at)+'</strong><div class="muted tiny" style="margin-top:4px">'+next.duration_minutes+' min • '+esc(appointmentStatusLabel(next.status))+'</div></div><span class="status '+(late?'amber':'green')+'">'+(late?'Moins de 24 h':'Modifiable')+'</span></div>'+
+   (late?'<div class="alert" style="margin-top:10px"><div class="tiny">'+(next.appointment_type==='Visio initiale'?'À moins de 24 h, contacte ton coach pour déplacer la visio initiale. Elle reste hors quota.':'À moins de 24 h, le déplacement automatique est fermé. Une annulation reste comptabilisée dans ton quota.')+'</div></div>':'<div class="muted tiny" style="margin-top:9px">'+(next.appointment_type==='Visio initiale'?'Tu peux déplacer cette visio initiale jusqu’à 24 h avant. Elle ne décompte aucune visio mensuelle.':'Tu peux déplacer ou annuler sans perdre cette visio jusqu’à 24 h avant.')+'</div>')+
    '<div class="row" style="margin-top:10px;flex-wrap:wrap">'+
    (!late?'<button class="btn ghost small clientRescheduleVisio" data-id="'+next.id+'">Déplacer</button>':'')+
    '<button class="btn danger small clientCancelVisio" data-id="'+next.id+'" data-late="'+(late?'1':'0')+'">Annuler</button>'+
@@ -2663,8 +2663,10 @@ function bindBookingButtons(){
 
 async function openClientCancelVisio(id,isLate){
  const a=(clientPortalState?.appointments||[]).find(x=>x.id===id);if(!a)return;
+ const initial=a.appointment_type==='Visio initiale';
  modal('Annuler la visio',
-   '<div class="alert '+(isLate?'':'blue')+'"><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="tiny" style="margin-top:5px">'+(isLate?'Cette annulation a lieu à moins de 24 h : la visio restera comptabilisée dans ton quota.':'Cette annulation a lieu à plus de 24 h : le créneau sera libéré et la visio ne comptera plus dans ton quota.')+'</div></div>'+
+   '<div class="alert '+(isLate?'':'blue')+'"><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="tiny" style="margin-top:5px">'+(initial?(isLate?'Cette visio initiale ne compte pas dans ton quota. À moins de 24 h, toute nouvelle réservation nécessite de contacter ton coach.':'Cette visio initiale ne compte pas dans ton quota. Tu pourras réserver un autre créneau initial après annulation.'):
+   isLate?'Cette annulation a lieu à moins de 24 h : la visio restera comptabilisée dans ton quota.':'Cette annulation a lieu à plus de 24 h : le créneau sera libéré et la visio ne comptera plus dans ton quota.')+'</div></div>'+
    '<div class="field"><label>Motif facultatif</label><textarea id="clientCancelReason" class="textarea" placeholder="Tu peux préciser la raison si tu le souhaites."></textarea></div>',
    '<button class="btn ghost" id="cancelM">Garder la visio</button><button class="btn danger" id="saveM">Confirmer l’annulation</button>');
  document.getElementById('cancelM').onclick=closeModal;
@@ -2673,7 +2675,9 @@ async function openClientCancelVisio(id,isLate){
    const {data,error}=await supa.rpc('cancel_my_appointment',{p_appointment_id:id,p_reason:reason||null});
    if(error)return alert(error.message);
    closeModal();await refreshClientBookingData();
-   alert(data==='cancelled_late'?'Visio annulée. Elle reste comptabilisée car l’annulation intervient à moins de 24 h.':'Visio annulée. Ton quota a été libéré.');
+   alert(initial?
+     (data==='cancelled_late'?'Visio initiale annulée. Elle reste hors quota. Contacte ton coach pour une autre date.':'Visio initiale annulée. Tu peux choisir un nouveau créneau depuis ton questionnaire, sans toucher au quota.'):
+     (data==='cancelled_late'?'Visio annulée. Elle reste comptabilisée car l’annulation intervient à moins de 24 h.':'Visio annulée. Ton quota a été libéré.'));
  };
 }
 async function openClientRescheduleVisio(id){
