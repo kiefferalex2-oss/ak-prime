@@ -189,6 +189,9 @@
    const nowKey=key(new Date());
    const statuses=new Set(['scheduled','confirmed','completed','cancelled_late','no_show']);
    const used=(portal.appointments||[]).filter(a=>{
+     // Les visios initiales sont incluses en plus de la formule et ne
+     // consomment jamais les visios mensuelles ou hebdomadaires.
+     if(a.appointment_type==='Visio initiale')return false;
      if(!statuses.has(a.status)||!a.starts_at)return false;
      const d=new Date(a.starts_at);
      return Number.isFinite(d.getTime())&&key(d)===nowKey;
@@ -196,7 +199,7 @@
    const remaining=Math.max(0,quota-used);
    const periodLabel=period==='week'?'semaine':'mois';
    const summary='<div class="client-section-card" style="margin-bottom:13px">'+
-     '<strong>Visios du '+periodLabel+' : '+used+' / '+quota+'</strong>'+
+     '<strong>Visios du '+periodLabel+' : '+used+' / '+quota+' utilisée(s)</strong>'+
      '<div class="muted tiny" style="margin-top:5px">'+remaining+
      ' disponible(s) pour la période en cours. Les absences et annulations tardives comptent dans le quota.</div>'+
      '</div>';
