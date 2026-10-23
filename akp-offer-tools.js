@@ -361,12 +361,12 @@
    const macros=rights.groups['AK PRIME']?.some(x=>x.toLowerCase().includes('macro'))||false;
    const publishedMacro=macros&&(db.offerEntries||[]).some(e=>
       e.client_id===c.id&&e.tool_type==='macro_budget'&&e.client_visible&&
-      !!e.details?.pdf_path&&!e.archived_at);
+      Number(e.details?.kcal)>0&&!e.archived_at);
    const metrics=[
      ...(c.pole!=='Mental'?[['Optitrainer',optiConfigured?'Lien renseigné':'Lien à renseigner',optiConfigured]]:[]),
      ['Compte client',portalConfigured?'Accès autorisé':'Accès non autorisé',portalConfigured],
      ...(hasVideoReviews(c)?[['WhatsApp',videoConfigured?'Numéro renseigné':'Numéro manquant',videoConfigured]]:[]),
-     ...(macros?[['Budget macro PDF',publishedMacro?'Publié au client':'À préparer / publier',publishedMacro]]:[])
+     ...(macros?[['Budget macronutritionnel',publishedMacro?'Publié au client':'À préparer / publier',publishedMacro]]:[])
    ];
    return '<div class="page-title"><div><h1>Prestations de la formule</h1>'+
       '<p>Contenu prévu pour '+esc(c.name)+' • '+esc(rights.label)+'. '+
@@ -447,7 +447,7 @@
        (archived?' • Archivé':'')+'</span></summary>'+
        '<div style="margin-top:9px">'+lines+'</div>'+
        (type==='macro_budget'?
-          '<div class="tiny" style="margin-top:9px"><strong>PDF :</strong> '+(x.details?.pdf_path?'Joint et sécurisé':'À ajouter')+
+          '<div class="tiny" style="margin-top:9px"><strong>Recommandations PDF :</strong> '+(x.details?.pdf_path?'Jointes':'Facultatives')+
           ' • <strong>Accès client :</strong> '+(x.client_visible?'Publié':'Brouillon')+'</div>':'')+
        '<div class="row" style="margin-top:12px;gap:9px">'+
        (type==='macro_budget'&&x.details?.pdf_path?
@@ -514,9 +514,9 @@
     '<div class="field"><label>Intitulé</label><input id="offerEntryTitle" class="input" maxlength="180" value="'+esc(row?.title||spec.label)+'"></div></div>'+
     '<div class="grid2">'+spec.fields.map(([key,label,kind])=>fieldHtml(key,label,kind,details[key])).join('')+'</div>'+
     (type==='macro_budget'?'<div class="alert blue tiny">Repère : protéines et glucides = 4 kcal/g ; lipides = 9 kcal/g. Objectifs journaliers sans menus détaillés.</div>'+
-     '<div class="field" style="margin-top:12px"><label>Fichier PDF du budget macro (5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
-     '<label class="check"><input id="offerMacroPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Rendre ce budget et son PDF accessibles au client</label>'+
-     (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Sans PDF joint, le budget reste un brouillon privé.</div>'):''),
+     '<div class="field" style="margin-top:12px"><label>PDF de recommandations alimentaires (facultatif, 5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
+     '<label class="check"><input id="offerMacroPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Publier les objectifs de calories et macronutriments dans l’espace client</label>'+
+     (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Les valeurs peuvent être publiées seules. Le PDF sert uniquement de recommandations complémentaires.</div>'):''),
 
     '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Enregistrer</button>');
    document.getElementById('cancelM').onclick=closeModal;
@@ -549,7 +549,6 @@
      const publish=macro&&!!document.getElementById('offerMacroPublish')?.checked;
      if(pdf&&(pdf.size>5242880||pdf.size===0||!(/\.pdf$/i.test(pdf.name)&&pdf.type==='application/pdf')))
        return alert('Sélectionne un PDF valide de 5 Mo maximum.');
-     if(publish&&!pdf&&!row?.details?.pdf_path)return alert('Joins d’abord un PDF pour publier le budget.');
      const save=document.getElementById('saveM');save.disabled=true;
      let uploadedPath='';
      try{
@@ -570,7 +569,7 @@
           client_visible:publish,created_by:authUser.id});
        if(res.error)throw Error(res.error.message);
        closeModal();await loadSupabaseData();render();
-       toast(macro?(publish?'Budget macro et PDF publiés au client.':'Budget enregistré en brouillon.'):'Outil enregistré dans Supabase.');
+       toast(macro?(publish?'Objectifs nutritionnels publiés au client.':'Budget enregistré en brouillon.'):'Outil enregistré dans Supabase.');
      }catch(e){
        if(uploadedPath)await supa.storage.from('akprime-macro-pdfs').remove([uploadedPath]);
        alert('Enregistrement impossible : '+e.message);save.disabled=false
