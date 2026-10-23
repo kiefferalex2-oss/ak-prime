@@ -199,7 +199,7 @@
    const remaining=Math.max(0,quota-used);
    const periodLabel=period==='week'?'semaine':'mois';
    const summary='<div class="client-section-card" style="margin-bottom:13px">'+
-     '<strong>Visios du '+periodLabel+' : '+used+' / '+quota+' utilisée(s)</strong>'+
+     '<strong>Visios du '+periodLabel+' : '+used+' utilisée'+(used===1?'':'s')+' sur '+quota+'</strong>'+
      '<div class="muted tiny" style="margin-top:5px">'+remaining+
      ' disponible(s) pour la période en cours. Les absences et annulations tardives comptent dans le quota.</div>'+
      '</div>';
