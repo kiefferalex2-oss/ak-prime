@@ -177,7 +177,7 @@ function standalone(s){
  // La date déjà renseignée lors de la commande est proposée si elle est à venir,
  // sans écraser une préférence enregistrée dans un brouillon existant.
  const stored=s.response?.answers||{};
- const dateFromOrder=/^\\d{4}-\\d{2}-\\d{2}$/.test(c.start_date||'') &&
+ const dateFromOrder=/^\d{4}-\d{2}-\d{2}$/.test(c.start_date||'') &&
    c.start_date>=localDateISO()?c.start_date:'';
  const answers={...stored,preferred_start_date:stored.preferred_start_date??dateFromOrder};
  const html='<div class="akIntroPage"><div class="akIntroLayout">'+
@@ -291,7 +291,7 @@ saveClientQuestionnaire=async function(...args){
    const el=document.querySelector('[data-key="preferred_start_date"]');
    const date=el?.value||'',today=localDateISO();
    const upper=new Date(Date.parse(today+'T12:00:00Z')+120*86400000).toISOString().slice(0,10);
-   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||date<today||date>upper){
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date<today||date>upper){
      alert('Choisis une date de début comprise entre aujourd’hui et les 120 prochains jours.');
      el?.focus();
      return;
