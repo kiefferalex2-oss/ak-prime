@@ -323,7 +323,7 @@ function standalone(s){
     const {data,error}=await supa.rpc('change_my_test_offer',{p_offer_code:next});
     if(error||!data?.length)throw Error(error?.message||'Changement impossible');
     await enterClientPortal(authUser,authProfile);
-    toast('Nouvelle formule test appliquée : '+labels[next]);
+    toast('Formule TEST '+labels[next]+' : nouvelle visio initiale à réserver (ancienne réservation annulée dans la simulation).');
    }catch(e){btn.disabled=false;alert('Impossible de changer de formule : '+e.message);}
  });
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
