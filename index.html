@@ -738,6 +738,329 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akClientTrainingCard .akTrainingServiceAction{font-size:10px}
 }
 
+
+/* ===============================================================
+   AK PRIME — CLIENT EXPERIENCE V2 / 2026
+   Scopé à .ak-wow : le Passeport et tout le back-office sont exclus.
+   =============================================================== */
+.ak-wow{
+ --ak-ink:#101d30;--ak-navy:#0b1829;--ak-blue:#173650;
+ --ak-gold:#d8ab61;--ak-sand:#f7e8c8;--ak-steel:#58738d;
+ --ak-soft:#eaf0f7;--ak-edge:#dce5ef;
+ --ak-glow:0 20px 55px rgba(14,40,65,.09);
+ position:relative;isolation:isolate;min-height:100vh;overflow-x:clip;
+ background:
+  radial-gradient(ellipse 44% 360px at 88% 135px,rgba(222,187,124,.23),transparent 83%),
+  radial-gradient(ellipse 40% 560px at 0 510px,rgba(123,171,214,.15),transparent 84%),
+  linear-gradient(180deg,#eef3f9 0%,#f7f9fc 56%,#edf2f8 100%);
+ color:var(--ak-ink);
+}
+.ak-wow .client-top{
+ min-height:88px;padding:14px clamp(16px,3vw,48px);
+ display:flex;align-items:center;gap:24px;
+ border-bottom:1px solid rgba(236,204,146,.16);
+ background:linear-gradient(110deg,#081525 0%,#0e2338 48%,#142c40 100%);
+ box-shadow:0 15px 35px rgba(8,24,41,.13);
+}
+.ak-wow .client-brand{font-size:16px;letter-spacing:.14em;gap:12px;color:#fff;white-space:nowrap}
+.ak-wow .client-brand-mark{
+ width:46px;height:46px;border-radius:14px;
+ background:linear-gradient(140deg,#ffe3a2,#d9a650 65%,#a77a37);
+ box-shadow:0 8px 28px rgba(215,170,96,.25),inset 0 1px 0 rgba(255,255,255,.42);
+ color:#101f2d;font-size:13px;
+}
+.ak-wow .client-brand small{color:#c5ad84;font-size:8px;letter-spacing:.22em;margin-top:5px}
+.ak-wow .client-nav{border:1px solid rgba(255,255,255,.09);background:rgba(4,12,22,.28);padding:5px;gap:4px;border-radius:100px}
+.ak-wow .client-nav button{
+ padding:11px 13px;border-radius:100px;font-size:11px;font-weight:740;letter-spacing:.005em;color:#b9cbda;
+}
+.ak-wow .client-nav button span{font-size:15px;color:#9db2c3}
+.ak-wow .client-nav button.on{
+ background:linear-gradient(135deg,#f4d79a,#d6a557);border-color:transparent;color:#1c2734;
+ box-shadow:0 5px 20px rgba(207,158,78,.24);
+}
+.ak-wow .client-nav button.on span{color:#1b2937}
+.ak-wow .client-nav button:not(.on):hover{color:#fff;background:rgba(255,255,255,.11)}
+.ak-wow .client-top-actions{margin-left:auto;gap:11px}
+.ak-wow .client-user-mini{border-left:1px solid rgba(255,255,255,.13);padding-left:16px;max-width:155px}
+.ak-wow .client-user-mini strong{font-size:11px;color:#f8f6f0}
+.ak-wow .client-user-mini span{font-size:10px;color:#bfa57d}
+.ak-wow .client-top .notification-bell{
+ width:43px;height:43px;border:1px solid rgba(235,206,153,.2);border-radius:14px;
+ background:rgba(255,255,255,.07);color:#f6e3c3;
+}
+.ak-wow .client-top .btn.ghost{
+ border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
+ color:#e6edf3;padding:11px 15px;border-radius:14px;font-size:11px;
+}
+.ak-wow .client-top .btn.ghost:hover{background:rgba(255,255,255,.14)}
+.ak-wow .client-top button:focus-visible{outline:2px solid #f4d08e;outline-offset:3px}
+
+.ak-wow .client-main{max-width:1340px;padding:35px clamp(18px,3vw,42px) 100px}
+.ak-wow .client-page-head{
+ position:relative;isolation:isolate;overflow:hidden;align-items:center;
+ padding:30px 34px;min-height:147px;margin:0 0 21px;border-radius:25px;
+ background:linear-gradient(117deg,#0a1a2b,#153c57 73%,#1f4359);
+ box-shadow:0 20px 50px rgba(11,35,56,.19);border:1px solid rgba(230,198,139,.17);
+}
+.ak-wow .client-page-head:before{
+ content:"";position:absolute;right:-90px;top:-220px;width:560px;height:500px;pointer-events:none;z-index:-1;
+ border-radius:50%;border:1px solid rgba(255,226,173,.22);
+ box-shadow:0 0 0 64px rgba(255,226,173,.035),0 0 0 128px rgba(255,226,173,.026);
+}
+.ak-wow .client-page-head:after{
+ content:"ESPACE PERSONNEL • AK PRIME";position:absolute;left:34px;top:21px;
+ color:#efc681;font-size:9px;font-weight:900;letter-spacing:.20em;
+}
+.ak-wow .client-page-head h2{font-size:clamp(27px,3vw,39px);font-weight:880;letter-spacing:-.042em;color:#fff;margin:18px 0 7px}
+.ak-wow .client-page-head p{font-size:13px;color:#b9cede;line-height:1.6;margin:0}
+.ak-wow .client-page-head .status.green{background:rgba(74,201,149,.15);color:#a0f0cb;border:1px solid rgba(121,232,186,.28)}
+.ak-wow .client-page-head .status.blue{background:rgba(236,193,112,.12);color:#ffe1a7;border:1px solid rgba(236,193,112,.26)}
+
+.ak-wow .client-hero.akWowHero{
+ position:relative;isolation:isolate;overflow:hidden;display:grid;
+ grid-template-columns:minmax(0,1.5fr) minmax(265px,.72fr);align-items:stretch;gap:32px;
+ min-height:314px;padding:clamp(27px,3.8vw,48px);margin-bottom:28px;
+ background:
+ radial-gradient(ellipse 60% 150% at 90% 25%,rgba(205,161,89,.22),transparent 78%),
+ linear-gradient(118deg,#081828 0%,#12314a 66%,#0e253b 100%);
+ border:1px solid rgba(242,216,173,.2);border-radius:31px;
+ box-shadow:0 25px 70px rgba(6,27,48,.25),inset 0 1px 0 rgba(255,255,255,.08);
+ color:#fff;
+}
+.ak-wow .akWowHero:before{
+ content:"";z-index:-1;position:absolute;right:-130px;top:-235px;width:700px;height:700px;
+ border-radius:50%;border:1px solid rgba(238,203,146,.18);pointer-events:none;
+ box-shadow:0 0 0 70px rgba(222,181,112,.028),0 0 0 145px rgba(219,183,130,.026),0 0 0 224px rgba(218,183,127,.018);
+}
+.ak-wow .akWowHero:after{content:"✦";position:absolute;top:25px;right:36px;color:rgba(240,204,137,.32);font-size:26px;pointer-events:none}
+.ak-wow .akWowHeroCopy{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.ak-wow .akWowEyebrow{display:flex;align-items:center;gap:8px;color:#e7be78;font-size:10px;font-weight:850;letter-spacing:.18em}
+.ak-wow .akWowSpark{font-size:17px;line-height:1}
+.ak-wow .akWowHero h1{font-size:clamp(35px,4.1vw,58px);line-height:1.08;letter-spacing:-.05em;font-weight:900;margin:24px 0 14px;max-width:690px;color:#fff}
+.ak-wow .akWowHero h1 span{display:block;color:#e1bd80}
+.ak-wow .akWowHeroCopy>p{font-size:13px;line-height:1.7;color:#c0d2e1;max-width:540px;margin:0 0 18px}
+.ak-wow .akWowHeroPills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 23px}
+.ak-wow .akWowHeroPills>span{
+ display:inline-flex;align-items:center;gap:6px;font-size:10px;color:#e2ecf2;font-weight:720;
+ border:1px solid rgba(239,231,214,.20);border-radius:999px;background:rgba(255,255,255,.055);
+ padding:7px 12px;
+}
+.ak-wow .akWowHeroPills .akWowLive{border-color:rgba(113,225,166,.25);color:#b2f1d0;background:rgba(48,135,97,.14)}
+.ak-wow .akWowLive i{width:7px;height:7px;border-radius:50%;background:#79e6ae;box-shadow:0 0 0 4px rgba(88,214,146,.12)}
+.ak-wow .akWowHeroCta{
+ display:inline-flex;align-items:center;gap:22px;justify-content:space-between;
+ border:0;border-radius:14px;padding:14px 19px;background:linear-gradient(125deg,#ffdfa1,#d9aa61);
+ color:#18283a;box-shadow:0 10px 25px rgba(226,171,86,.24);
+ font-weight:880;font-size:12px;cursor:pointer;transition:transform .18s,box-shadow .18s;
+}
+.ak-wow .akWowHeroCta:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(226,171,86,.32)}
+.ak-wow .akWowHeroCta span{font-size:18px;font-weight:600}
+.ak-wow .akWowHeroSide{
+ align-self:center;position:relative;padding:24px 23px;min-height:214px;
+ display:flex;flex-direction:column;justify-content:space-between;gap:13px;
+ background:linear-gradient(155deg,rgba(249,252,255,.15),rgba(255,255,255,.055));
+ border:1px solid rgba(255,244,221,.22);border-radius:24px;
+ backdrop-filter:blur(15px);box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+}
+.ak-wow .akWowHeroSideTop{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#efce93;font-size:10px;font-weight:850;letter-spacing:.13em}
+.ak-wow .akWowHeroSymbol{display:grid;place-items:center;border:1px solid rgba(255,255,255,.19);border-radius:11px;width:30px;height:30px;font-size:18px}
+.ak-wow .akWowHeroSide strong{font-size:clamp(18px,2.1vw,25px);line-height:1.35;color:#fff;font-weight:880;letter-spacing:-.025em}
+.ak-wow .akWowHeroSide p{font-size:11px;color:#b8cbdb;margin:0;line-height:1.6}
+.ak-wow .akWowTextLink{font-size:11px;font-weight:850;text-decoration:none;display:inline-flex;align-items:center;gap:11px;border:0;background:none;color:#c48d3e;cursor:pointer;padding:4px 0}
+.ak-wow .akWowHeroSide .akWowTextLink{color:#f2d7a8;align-self:flex-start}
+.ak-wow .akWowTextLink:hover{color:#a56f28}
+.ak-wow .akWowHeroSide .akWowTextLink:hover{color:#fff}
+.ak-wow .akWowSectionHead{margin:29px 0 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ak-wow .akWowSectionHeadMetrics{margin-top:10px}
+.ak-wow .akWowKicker{font-size:10px;letter-spacing:.16em;font-weight:900;color:#b68a4b}
+.ak-wow .akWowSectionHead h2{font-size:clamp(19px,2vw,25px);letter-spacing:-.034em;color:#1a2f43;margin:6px 0 0;font-weight:870}
+.ak-wow .akWowSectionHint{font-size:11px;color:#7e91a5;font-weight:640}
+.ak-wow .akWowHome .client-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.ak-wow .akWowHome .client-summary-card{
+ min-width:0;min-height:169px;padding:19px 20px;border:1px solid #e0e6ee;border-radius:21px;
+ position:relative;overflow:hidden;
+ background:linear-gradient(142deg,#ffffff 0%,#f9fbfe 100%);
+ box-shadow:0 10px 30px rgba(16,49,77,.055);
+ transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.ak-wow .akWowHome .client-summary-card:hover{transform:translateY(-3px);box-shadow:0 17px 35px rgba(15,42,66,.11);border-color:#c7d7e6}
+.ak-wow .akWowHome .client-summary-card:before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:3px;background:linear-gradient(90deg,#d5a257,#f9e5bd,transparent)}
+.ak-wow .akWowMetricIcon{display:grid;place-items:center;width:33px;height:33px;border-radius:11px;background:#eaf0f7;color:#315875;margin-bottom:14px;font-size:18px}
+.ak-wow .akWowHome .client-summary-card:nth-child(2) .akWowMetricIcon{background:#f9eeda;color:#99743b}
+.ak-wow .akWowHome .client-summary-card:nth-child(3) .akWowMetricIcon{background:#e8f7ee;color:#277d59}
+.ak-wow .akWowHome .client-summary-card .lab{font-size:10px;letter-spacing:.1em;color:#75879a;font-weight:850}
+.ak-wow .akWowHome .client-summary-card .value{font-size:clamp(15px,1.5vw,21px);font-weight:850;line-height:1.25;color:#14283a;margin-top:8px;overflow-wrap:anywhere;letter-spacing:-.028em}
+.ak-wow .akWowHome .client-summary-card .sub{font-size:11px;line-height:1.5;color:#73889b;margin-top:7px}
+.ak-wow .akWowTodoGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ak-wow .akWowTodoGrid .client-action-card{
+ padding:21px 20px;border-radius:21px;min-width:0;
+ border:1px solid #dbe5ef;background:#fff;box-shadow:0 11px 32px rgba(18,49,79,.06);
+ display:grid;grid-template-columns:42px 1fr;align-items:start;column-gap:15px;row-gap:12px;
+}
+.ak-wow .akWowTodoGrid .client-action-card.urgent{background:linear-gradient(120deg,#fffaf1,#fff);border-color:#efdcc0}
+.ak-wow .akWowActionIcon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#172f47;color:#f0d09d;font-size:13px;font-weight:900}
+.ak-wow .akWowActionCopy{min-width:0}
+.ak-wow .akWowActionCopy strong{font-size:15px;color:#1b3046}
+.ak-wow .akWowActionCopy .muted{margin-top:6px;font-size:11px;line-height:1.6}
+.ak-wow .akWowTodoGrid .client-action-card .btn{grid-column:2;justify-self:start;margin:0!important}
+.ak-wow .btn.primary{background:linear-gradient(130deg,#183c58,#245d7e);border-radius:12px;color:#fff;box-shadow:0 6px 18px rgba(29,78,113,.18)}
+.ak-wow .btn.primary:hover{background:#13334d;box-shadow:0 10px 21px rgba(29,78,113,.2)}
+.ak-wow .btn.ghost{border-radius:12px;border-color:#d6e0e9;background:#fdfefe;color:#2c526e}
+.ak-wow .btn.ghost:hover{background:#f2f7fc;border-color:#adc5d8}
+.ak-wow .akWowAllClear{
+ display:flex;align-items:center;gap:14px;padding:17px 20px;margin-top:22px;border-radius:19px;
+ border:1px solid #cbe4d6;background:linear-gradient(110deg,#f0fbf5,#fff);
+}
+.ak-wow .akWowAllClearSymbol{width:37px;height:37px;flex:0 0 37px;border-radius:12px;background:#d8f3e5;color:#16774d;display:grid;place-items:center;font-weight:900}
+.ak-wow .akWowAllClear strong{font-size:13px;display:block;color:#1c6244}.ak-wow .akWowAllClear small{display:block;font-size:11px;color:#6b8d7b;margin-top:4px}
+.ak-wow .akWowHomeServices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ak-wow .akWowHomeService{
+ display:flex;align-items:center;gap:15px;min-width:0;min-height:94px;
+ padding:20px;border-radius:20px;border:1px solid #dde7ef;background:#fff;
+ color:#20344a;text-decoration:none;box-shadow:0 10px 26px rgba(16,43,70,.065);
+ transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.ak-wow a.akWowHomeService:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(14,42,68,.12);border-color:#b8cce0}
+.ak-wow .akWowServiceIcon{display:grid;place-items:center;width:52px;height:52px;flex:0 0 52px;border-radius:16px;background:#e6f0fa;color:#275a83;font-size:22px;font-weight:920}
+.ak-wow .akWowHomeServiceWa .akWowServiceIcon{background:#e2f6eb;color:#258355}
+.ak-wow .akWowHomeService>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ak-wow .akWowHomeService strong{font-size:15px;color:#1b3045}
+.ak-wow .akWowHomeService small{font-size:11px;color:#7e8da0}
+.ak-wow .akWowArrow{margin-left:auto;font-size:22px;color:#3d759e}
+.ak-wow .akWowHomeServiceWa .akWowArrow{color:#30885c}
+.ak-wow .akWowHomeServiceDisabled{opacity:.7;border-style:dashed}
+
+.ak-wow .client-section-card:not(.client-passport-preview){
+ border-radius:22px;padding:clamp(18px,2vw,26px);border:1px solid #dde6f0;
+ background:linear-gradient(145deg,#fff,#fdfefe);
+ box-shadow:0 14px 37px rgba(19,53,82,.065);margin-top:17px;
+}
+.ak-wow .client-section-card:not(.client-passport-preview)>h3{font-size:17px;color:#1b354a;letter-spacing:-.018em;margin-bottom:12px}
+.ak-wow .client-section-card .muted{color:#718399;line-height:1.55}
+.ak-wow .client-section-card .item{border:1px solid #e1e9f0;background:#f7fafd;border-radius:13px}
+.ak-wow .client-section-card .item:hover{background:#fff}
+.ak-wow .client-section-card .section-title{color:#9e753f;font-size:10px;letter-spacing:.13em}
+.ak-wow .client-section-card .btn{font-weight:800}
+.ak-wow .client-engagement{border-radius:21px;margin-top:19px;padding:20px;background:linear-gradient(115deg,#fff,#f8fbff)}
+.ak-wow .client-page-head+.client-section-card{margin-top:0}
+.ak-wow .client-collapsed{
+ border:1px solid #dfe7ef;border-radius:18px;background:#fff;padding:18px 21px;
+ box-shadow:0 12px 33px rgba(19,53,82,.05);
+}
+.ak-wow .client-collapsed summary{font-size:13px;font-weight:850;color:#264962}
+.ak-wow .client-collapsed[open]{border-color:#c7d8e7}
+.ak-wow .client-collapsed .item{background:#f8fafd}
+.ak-wow .alert{border-radius:15px;padding:14px 17px;font-size:12px;line-height:1.6}
+.ak-wow .alert.green{background:#f0fbf5;border-color:#bee2cb}
+.ak-wow .alert.blue{background:#edf6fd;border-color:#c0d8e9}
+.ak-wow .status.blue{color:#346384;background:#e4f1f9}
+.ak-wow .status.green{color:#157550;background:#e4f8ed}
+.ak-wow .status.amber{color:#976319;background:#fff0d6}
+.ak-wow .field label{font-size:11px;font-weight:840;color:#5d7590}
+.ak-wow .input,.ak-wow .select,.ak-wow .textarea{
+ border:1px solid #dbe5ef;border-radius:12px;padding:12px 13px;background:#fbfdff;
+ color:#17334b;font-size:13px;
+}
+.ak-wow .input:focus,.ak-wow .select:focus,.ak-wow .textarea:focus{outline:0;border-color:#bba06b;box-shadow:0 0 0 4px rgba(213,173,107,.16);background:#fff}
+.ak-wow .client-week-tabs{gap:9px;padding:2px 0 12px;margin:19px 0 10px}
+.ak-wow .client-week-tabs button{
+ border-radius:13px;padding:12px 18px;border:1px solid #dde6ee;background:#f4f8fc;
+ color:#54708a;font-weight:850;font-size:11px;
+}
+.ak-wow .client-week-tabs button.on{background:#183b55;color:#fff;border-color:#183b55;box-shadow:0 7px 19px rgba(25,60,85,.15)}
+.ak-wow .client-day-strip{gap:10px;padding:7px 0 14px}
+.ak-wow .client-day-btn{
+ min-width:99px;border-radius:16px;background:#f8fafc;border:1px solid #e1e9f0;
+ padding:16px 12px;color:#32506b;
+}
+.ak-wow .client-day-btn strong{font-size:14px;color:inherit}
+.ak-wow .client-day-btn span{font-size:11px;line-height:1.6}
+.ak-wow .client-day-btn.on{background:linear-gradient(145deg,#153951,#275c76);color:#fff;border-color:#244e67;box-shadow:0 9px 22px rgba(25,62,91,.17)}
+.ak-wow .client-time-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin:12px 0 14px}
+.ak-wow .client-time-grid .btn{
+ background:#fff;border:1px solid #c8d8e6;border-radius:13px;padding:13px 8px;
+ font-weight:840;color:#214d70;
+}
+.ak-wow .client-time-grid .btn:hover{background:#173a53;color:#fff;border-color:#173a53}
+.ak-wow .questionnaire-done{background:linear-gradient(120deg,#ebfaf2,#fff);border:1px solid #bfe4cf;border-radius:17px;padding:18px}
+.ak-wow .questionnaire-done .checkmark{background:#d0f4e2;color:#177f50}
+.ak-wow .questionnaire-answer{background:#f6f9fd;border-radius:13px;padding:14px;border-color:#e3eaf2}
+.ak-wow .qblock{background:#fff;border:1px solid #e0e8ef;border-radius:15px;padding:17px}
+.ak-wow .qblock label.qtitle{font-size:13px;color:#183b56}
+.ak-wow .qform{gap:12px}
+.ak-wow .choices{gap:10px}
+.ak-wow .choice{padding:9px;background:#f9fbfd;border-radius:9px;border:1px solid #e4eaf0}
+.ak-wow .portal-actions{background:rgba(240,245,250,.95);padding:16px;border-radius:15px;box-shadow:0 -4px 25px rgba(23,50,76,.07)}
+.ak-wow .notification-bell:focus-visible,
+.ak-wow .client-section-card button:focus-visible,
+.ak-wow .client-section-card a:focus-visible{outline:3px solid rgba(209,170,106,.65);outline-offset:3px}
+/* Existing training tiles: stronger visual hierarchy */
+.ak-wow .akClientTrainingCard .akTrainingServices{gap:14px}
+.ak-wow .akClientTrainingCard .akTrainingService{
+ border-radius:19px;min-height:98px;padding:20px;
+ box-shadow:0 7px 22px rgba(28,62,90,.055);
+}
+.ak-wow .akClientTrainingCard .akTrainingMark{width:48px;height:48px;flex-basis:48px;border-radius:15px}
+.ak-wow .akClientTrainingCard .akTrainingServiceCopy strong{font-size:15px}
+.ak-wow .akClientTrainingCard .akTrainingServiceCopy small{font-size:11px}
+.ak-wow .akClientTrainingCard .akTrainingFootnote{margin-top:15px;color:#8c9bab}
+@media(max-width:1180px){
+ .ak-wow .client-top{gap:12px;padding:14px 20px}
+ .ak-wow .client-nav button{font-size:10px;padding:10px 9px}
+ .ak-wow .client-nav button span{font-size:12px}
+ .ak-wow .client-user-mini{display:none}
+}
+@media(max-width:960px){
+ .ak-wow .akWowHero{grid-template-columns:1fr;gap:25px}
+ .ak-wow .akWowHeroSide{min-height:160px}
+ .ak-wow .akWowHome .client-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ak-wow .client-time-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:780px){
+ .ak-wow .client-top{min-height:70px;padding:12px 14px}
+ .ak-wow .client-main{padding:19px 14px 66px}
+ .ak-wow .client-mobile-menu-toggle{background:rgba(255,255,255,.08);border:1px solid rgba(228,192,122,.27);color:#f4e9d5;border-radius:13px;padding:11px 12px}
+ .ak-wow .client-mobile-menu{background:#0b2034;border:1px solid rgba(225,189,124,.2);border-radius:17px;box-shadow:0 25px 55px rgba(7,22,39,.32)}
+ .ak-wow .client-mobile-menu button{border-radius:10px}
+ .ak-wow .client-mobile-menu button.on{background:#e2b66b}
+ .ak-wow .client-page-head{min-height:143px;padding:35px 21px 23px;border-radius:22px}
+ .ak-wow .client-page-head:after{left:21px;top:17px}
+ .ak-wow .client-page-head h2{font-size:28px}
+ .ak-wow .client-hero.akWowHero{padding:27px 24px;border-radius:25px;min-height:0}
+ .ak-wow .akWowHero h1{font-size:clamp(31px,6.2vw,43px)}
+ .ak-wow .akWowHomeServices{grid-template-columns:1fr}
+ .ak-wow .akWowTodoGrid{grid-template-columns:1fr}
+ .ak-wow .client-time-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .ak-wow .client-top .client-brand{font-size:12px;gap:8px}
+ .ak-wow .client-top .client-brand-mark{width:35px;height:35px;border-radius:11px}
+ .ak-wow .client-top .client-brand small{font-size:6px}
+ .ak-wow .client-top .btn.ghost{font-size:10px;padding:8px 9px}
+ .ak-wow .client-top .notification-bell{width:36px;height:36px}
+ .ak-wow .client-hero.akWowHero{padding:25px 21px}
+ .ak-wow .akWowHero h1{font-size:34px;letter-spacing:-.048em}
+ .ak-wow .akWowHeroSide{padding:19px}
+ .ak-wow .akWowHome .client-summary-grid{grid-template-columns:1fr 1fr;gap:10px}
+ .ak-wow .akWowHome .client-summary-card{padding:14px;min-height:149px}
+ .ak-wow .akWowMetricIcon{width:28px;height:28px;margin-bottom:10px;font-size:15px}
+ .ak-wow .akWowHome .client-summary-card .value{font-size:16px}
+ .ak-wow .akWowHome .client-summary-card .lab{font-size:9px}
+ .ak-wow .akWowHome .client-summary-card .sub{font-size:10px}
+ .ak-wow .akWowSectionHead h2{font-size:21px}
+ .ak-wow .akWowSectionHint{display:none}
+ .ak-wow .client-time-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .ak-wow .client-time-grid .btn{font-size:11px;padding:12px 4px}
+}
+@media(max-width:365px){
+ .ak-wow .akWowHome .client-summary-grid{grid-template-columns:1fr}
+ .ak-wow .client-top .client-brand>span:last-child{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .ak-wow *, .ak-wow *:before, .ak-wow *:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
 </style>
 </head>
 <body>
