@@ -55,6 +55,12 @@ const EXTRA={
   q('mental_sport_routine','As-tu déjà une routine de performance ou de retour au calme ?','textarea',false,'Préparation mentale'),
   q('mental_sport_calendar','Quelles sont tes principales échéances sportives à venir ?','textarea',false,'Objectifs')]
 };
+// Question commune aux sept formules : la demande du client ne modifie pas
+// automatiquement la date contractuelle, qui doit être confirmée par le coach.
+const START_QUESTION=q('preferred_start_date',
+ 'À quelle date souhaites-tu commencer ton accompagnement ?',
+ 'date',true,'Démarrage');
+QUESTION_LABELS[START_QUESTION.key]=START_QUESTION.label;
 Object.assign(QUESTION_LABELS,Object.fromEntries(Object.values(EXTRA).flat().map(x=>[x.key,x.label])));
 const LEGAL=[
  q('ak_cgv_ack','Je confirme avoir consulté les conditions générales de vente et compris les modalités de l’accompagnement. Sur un compte TEST, cette confirmation est une simulation et ne constitue pas une commande payante.','consent',true,'Confirmations'),
@@ -97,6 +103,9 @@ style.textContent=[
  '.akIntroLegal .qblock{padding:8px 0;border-bottom:1px solid #e8eef1}',
  '.akIntroLegal .qblock:last-child{border-bottom:0}',
  '.akIntroLegalLinks{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 13px}',
+ '.akIntroStartHelp{font-size:12px;line-height:1.65;color:#576f85;padding:13px 22px 0;margin:0}',
+ '.akIntroSection .qblock:has([data-key="preferred_start_date"]){grid-column:1 / -1;max-width:420px}',
+ '@media(max-width:680px){.akIntroStartHelp{padding:12px 14px 0}}',
  '.akIntroLegalLinks button{background:#f7fafc;color:#29536c;border:1px solid #d8e5ec;border-radius:8px;font-size:11px;padding:8px 11px;font-weight:850;cursor:pointer}',
  '.akIntroActions{background:#fff;border-radius:12px;border:1px solid #dee7ed;padding:16px 22px;display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:10px}',
  '.akIntroInfo{font-size:12px;line-height:1.6;color:#73889c;margin-right:auto;max-width:410px}',
@@ -111,11 +120,12 @@ function groupQuestions(template,answers){
   if(!groups.has(group))groups.set(group,[]);
   groups.get(group).push(question);
  });
- const order=['Identité et contact','Profil et expérience','Pratique et organisation','Objectifs',
+ const order=['Identité et contact','Démarrage','Profil et expérience','Pratique et organisation','Objectifs',
   'Préparation mentale','Santé et précautions','Récupération & bien-être','Sommeil','Nutrition','Organisation','Complément de formule','Confirmations'];
  return [...groups].sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0])).map(([name,qs])=>
   '<section class="akIntroSection"><h2>'+esc(name)+'</h2>'+
   '<div class="'+(name==='Confirmations'?'akIntroLegal':'akIntroFields')+'">'+
+  (name==='Démarrage'?'<p class="akIntroStartHelp">Choisis la date souhaitée pour commencer ton accompagnement. Ton coach vérifiera la possibilité de ce démarrage et te confirmera la date effective. Une date déjà fixée dans une commande ou un contrat ne change pas automatiquement.</p>':'')+
   (name==='Confirmations'?'<div class="akIntroLegalLinks">'+
     '<button type="button" data-ak-legal="cgv">Lire les CGV</button>'+
     '<button type="button" data-ak-legal="privacy">Lire la confidentialité</button>'+
@@ -163,7 +173,13 @@ async function exitInitialQuestionnaire(event){
  renderClientPortal();
 }
 function standalone(s){
- const c=s.client,t=s.template,received=s.response?.status==='submitted',answers=s.response?.answers||{};
+ const c=s.client,t=s.template,received=s.response?.status==='submitted';
+ // La date déjà renseignée lors de la commande est proposée si elle est à venir,
+ // sans écraser une préférence enregistrée dans un brouillon existant.
+ const stored=s.response?.answers||{};
+ const dateFromOrder=/^\\d{4}-\\d{2}-\\d{2}$/.test(c.start_date||'') &&
+   c.start_date>=localDateISO()?c.start_date:'';
+ const answers={...stored,preferred_start_date:stored.preferred_start_date??dateFromOrder};
  const html='<div class="akIntroPage"><div class="akIntroLayout">'+
   '<div class="akIntroTop"><div class="akIntroBrand">AK PRIME <span style="font-size:10px;color:#8798a8">/ QUESTIONNAIRE INITIAL</span></div>'+
   '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
@@ -183,7 +199,7 @@ function standalone(s){
    renderQuestionnaireAnswers(t,answers)+
    '<button class="btn primary" style="margin-top:18px" id="akIntroContinue">Retour à mon espace</button></div>':
   '<form id="clientQuestionnaire" class="qform">'+groupQuestions(t,answers)+
-   '<div class="akIntroActions"><div class="akIntroInfo">Tu peux conserver un brouillon et revenir plus tard. L’envoi final communique tes réponses au coach. La date de début a été choisie lors de la commande, pas dans ce questionnaire.</div>'+
+   '<div class="akIntroActions"><div class="akIntroInfo">Tu peux conserver un brouillon et revenir plus tard. L’envoi final communique tes réponses et ta date de démarrage souhaitée au coach.</div>'+
    '<button class="btn ghost" type="button" id="saveQuestionnaireDraft">Enregistrer mon brouillon</button>'+
    '<button class="btn ghost" type="button" id="akIntroLeave">Enregistrer et quitter</button>'+
    '<button class="btn primary" type="button" id="submitQuestionnaire">Envoyer au coach</button></div></form>')+
@@ -207,6 +223,14 @@ function standalone(s){
  });
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
+ const startPicker=document.querySelector('[data-key="preferred_start_date"]');
+ if(startPicker){
+   const today=localDateISO();
+   const maxDate=new Date(Date.parse(today+'T12:00:00Z')+120*86400000).toISOString().slice(0,10);
+   startPicker.min=today;
+   startPicker.max=maxDate;
+   startPicker.setAttribute('aria-label','Date de début souhaitée pour mon accompagnement');
+ }
  document.querySelectorAll('[data-ak-legal]').forEach(b=>b.onclick=()=>openPublicLegal(b.dataset.akLegal));
 }
 const oldEnter=enterClientPortal;
@@ -221,6 +245,7 @@ enterClientPortal=async function(...args){
   description:'Questionnaire personnalisé : '+(labels[code]||code),
   questions:[
    ...base.questions.map(x=>({...x,group:baseGroup(x)})),
+   START_QUESTION,
    ...EXTRA[code],
    ...LEGAL
   ]};
@@ -261,6 +286,17 @@ clientNavMarkup=function(...args){
 const originalSave=saveClientQuestionnaire;
 saveClientQuestionnaire=async function(...args){
  const wasSubmitting=args[0]==='submitted';
+ // Validation explicite de la plage des dates, au-delà du simple champ obligatoire.
+ if(wasSubmitting&&clientPortalState?.akInitialReady){
+   const el=document.querySelector('[data-key="preferred_start_date"]');
+   const date=el?.value||'',today=localDateISO();
+   const upper=new Date(Date.parse(today+'T12:00:00Z')+120*86400000).toISOString().slice(0,10);
+   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||date<today||date>upper){
+     alert('Choisis une date de début comprise entre aujourd’hui et les 120 prochains jours.');
+     el?.focus();
+     return;
+   }
+ }
  await originalSave.apply(this,args);
  if(wasSubmitting&&clientPortalState?.response?.status==='submitted'){
   clientPortalView='home';renderClientPortal();
