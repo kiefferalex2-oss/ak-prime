@@ -127,7 +127,8 @@
   return '<div class="card panel" style="margin-bottom:14px">'+
    '<div class="akQHeader"><div><h2 style="font-size:18px;margin:0">Préparation de la visio initiale</h2>'+
    '<p class="muted tiny" style="margin:6px 0 12px">Toutes les réponses et les questions à poser sont regroupées ici, en menus déroulants.</p></div>'+
-   '<span class="status blue">Privé coach</span></div>'+
+   '<div class="row" style="gap:8px;flex-wrap:wrap"><span class="status blue">Privé coach</span>'+
+   '<button type="button" class="btn ghost small akViewQuestionnaireAck" data-client="'+esc(c.id)+'">Confirmations légales</button></div></div>'+
    '<div class="akQTwoColumns">'+questionnaireMarkup(c)+flaggedSide(c)+'</div>'+
    initialVisioNotes(c)+'</div>';
  }
@@ -186,6 +187,46 @@
   item.open=true;
   item.scrollIntoView({behavior:'smooth',block:'center'});
   item.querySelector('.akFocusInput')?.focus({preventScroll:true});
+ },true);
+
+ // Justificatifs datés et générés côté serveur. Le contrat de commande est
+ // distinct de ces confirmations du questionnaire initial.
+ document.addEventListener('click',async event=>{
+  const button=event.target.closest?.('.akViewQuestionnaireAck');
+  if(!button)return;
+  event.preventDefault();
+  const clientId=button.dataset.client;
+  if(!clientId||!['owner','coach'].includes(authProfile?.role))return;
+  button.disabled=true;
+  try{
+   const {data,error}=await supa.from('questionnaire_legal_acknowledgments')
+    .select('id,client_id,response_id,accepted_by,questionnaire_type,offer_code,cgv_version,privacy_version,health_data_consent,acknowledged_at')
+    .eq('client_id',clientId).order('acknowledged_at',{ascending:false}).limit(30);
+   if(error)throw Error(error.message);
+   const receipts=data||[];
+   const rows=receipts.map(r=>'<div class="item" style="margin:8px 0"><strong>'+
+    esc(fmtDateTime(r.acknowledged_at))+'</strong><div class="muted tiny">'+
+    esc(r.offer_code)+' · CGV '+esc(r.cgv_version)+' · Confidentialité '+esc(r.privacy_version)+
+    '</div><div class="muted tiny">Consentement explicite aux données sensibles : '+
+    (r.health_data_consent?'Oui':'Non')+' · Référence : '+esc(r.id)+'</div></div>').join('');
+   modal('Justificatifs du questionnaire initial',
+    '<p class="muted tiny">Ces confirmations sont enregistrées automatiquement avec la date, le compte client et les versions des documents. Elles ne remplacent pas la preuve de commande ni le paiement.</p>'+
+    (receipts.length?'<div class="list">'+rows+'</div>':
+    '<div class="alert">Aucune confirmation enregistrée : le questionnaire initial de nouvelle génération n’a pas encore été soumis.</div>'),
+    '<button class="btn ghost" id="akAckClose">Fermer</button>'+
+    (receipts.length?'<button class="btn primary" id="akAckExport">Exporter les justificatifs (JSON)</button>':''));
+   document.getElementById('akAckClose').onclick=closeModal;
+   document.getElementById('akAckExport')?.addEventListener('click',()=>{
+    const payload={exported_at:new Date().toISOString(),client_id:clientId,
+      purpose:'AK PRIME - confirmations questionnaire initial',receipts};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='akprime-consentements-questionnaire-'+clientId.slice(0,8)+'.json';
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),500);
+   });
+  }catch(error){alert('Lecture des confirmations impossible : '+(error?.message||'Erreur inconnue'));}
+  finally{if(button.isConnected)button.disabled=false;}
  },true);
  window.AKP_QUESTIONNAIRE_UX_READY=true;
 })();
