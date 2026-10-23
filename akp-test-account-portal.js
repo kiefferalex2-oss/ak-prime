@@ -40,6 +40,17 @@ function insertOwnerAction(){
  btn.id='akMakeLinkedTestClient';btn.textContent='+ Compte client TEST avec connexion';
  toolbar.appendChild(btn);
  btn.onclick=openTestCreation;
+ if(!toolbar.querySelector('#akRefreshTestClients')){
+  const refresh=document.createElement('button');
+  refresh.type='button';refresh.className='btn ghost small';
+  refresh.id='akRefreshTestClients';refresh.textContent='↻ Actualiser les dossiers';
+  toolbar.appendChild(refresh);
+  refresh.onclick=async()=>{
+   refresh.disabled=true;
+   try{await loadSupabaseData();render();toast('Dossiers actualisés depuis Supabase.')}
+   catch(e){refresh.disabled=false;alert('Actualisation impossible : '+e.message)}
+  };
+ }
 }
 const originalRender=render;
 render=function(...args){
@@ -110,8 +121,20 @@ renderClientPortal=function(...args){
   '<p>Explore les différentes formules et vérifie ton suivi. Chaque modification est enregistrée dans ce dossier test et visible par le coach.</p>'+
   '<div class="akTestPortalControls"><label for="akDemoSwitchOffer" class="muted tiny">Formule simulée</label>'+
    '<select class="select" id="akDemoSwitchOffer">'+options(testOfferCode(c))+'</select>'+
-   '<button type="button" class="btn primary small" id="akDemoApplyOffer">Appliquer cette formule</button></div>';
+   '<button type="button" class="btn primary small" id="akDemoApplyOffer">Appliquer cette formule</button>'+
+   '<button type="button" class="btn ghost small" id="akDemoRefreshClient">↻ Actualiser mes données</button></div>';
  main.prepend(banner);
+ const refresh=banner.querySelector('#akDemoRefreshClient');
+ refresh.onclick=async()=>{
+  refresh.disabled=true;
+  try{
+   const previousView=clientPortalView;
+   await enterClientPortal(authUser,authProfile);
+   clientPortalView=previousView;
+   renderClientPortal();
+   toast('Données actualisées depuis le dossier coach.');
+  }catch(err){refresh.disabled=false;alert('Actualisation indisponible : '+(err?.message||'Erreur'))}
+ };
  const btn=banner.querySelector('#akDemoApplyOffer');
  btn.onclick=async()=>{
   const offerCode=banner.querySelector('#akDemoSwitchOffer').value;
