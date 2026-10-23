@@ -66,7 +66,7 @@ function openTestCreation(){
    '<div class="field" style="margin-top:13px"><label>Nom de démonstration</label>'+
     '<input class="input" id="akTestAccountName" value="Client Test AK PRIME" maxlength="100"></div>'+
    '<div class="field"><label>Formule au premier démarrage</label><select class="select" id="akTestAccountOffer">'+options()+'</select></div>'+
-   '<p class="muted tiny">Tu pourras modifier la formule librement depuis son espace client. Le changement se répercutera dans le back-office, sans modifier les factures ni les contrats.</p>',
+   '<p class="muted tiny">Tu pourras modifier la formule librement depuis son espace client. Chaque changement remet à zéro la visio initiale du compte TEST en conservant son historique, sans modifier les factures ni les contrats.</p>',
   '<button class="btn ghost" id="akTestCancel">Annuler</button>'+
   '<button class="btn primary" id="akTestConfirm">Créer et générer les identifiants</button>');
  document.getElementById('akTestCancel').onclick=closeModal;
@@ -118,7 +118,7 @@ renderClientPortal=function(...args){
  if(main.querySelector('#akClientDemoBanner'))return result;
  const banner=document.createElement('div');banner.className='akTestPortalBand';banner.id='akClientDemoBanner';
  banner.innerHTML='<div class="akTestPortalTitle"><strong>Compte de démonstration AK PRIME</strong><span class="akTestPill">MODE TEST · AUCUN PAIEMENT</span></div>'+
-  '<p>Explore les différentes formules et vérifie ton suivi. Chaque modification est enregistrée dans ce dossier test et visible par le coach.</p>'+
+  '<p>Explore les différentes formules et vérifie ton suivi. À chaque changement de formule TEST, l’ancienne visio initiale est annulée dans la simulation et tu peux en réserver une nouvelle. Les factures et contrats ne changent pas.</p>'+
   '<div class="akTestPortalControls"><label for="akDemoSwitchOffer" class="muted tiny">Formule simulée</label>'+
    '<select class="select" id="akDemoSwitchOffer">'+options(testOfferCode(c))+'</select>'+
    '<button type="button" class="btn primary small" id="akDemoApplyOffer">Appliquer cette formule</button>'+
@@ -147,7 +147,7 @@ renderClientPortal=function(...args){
    await enterClientPortal(authUser,authProfile);
    clientPortalView=previousView;
    renderClientPortal();
-   toast('Formule de démonstration mise à jour. Le back-office voit le nouveau choix.');
+   toast('Formule TEST modifiée : l’ancienne visio initiale a été réinitialisée. Tu peux en réserver une nouvelle dans le questionnaire.');
   }catch(err){
    btn.disabled=false;btn.textContent='Appliquer cette formule';
    alert('Impossible de modifier la formule test : '+(err?.message||'Erreur.'));
