@@ -83,6 +83,11 @@
     info:'Évaluation planifiée · '+(p.phase||'À préciser'),clientId:p.client_id,
     key:'assessment-'+p.id,tab:'passport',passportPage:'cycle'}));
   for(const c of clients){
+   if(c.start&&c.status==='Onboarding')add({
+      date:toIso(c.start),group:'Démarrage',label:'Début de suivi prévu',
+      info:'Onboarding à terminer et programmation à préparer avant le démarrage.',
+      clientId:c.id,key:'start-'+c.id+'-'+toIso(c.start),tab:'onboarding'
+   });
    if(c.end)add({date:toIso(c.end),group:'Engagement',label:'Fin d’engagement / renouvellement',
      info:'Consulter le renouvellement du dossier administratif',clientId:c.id,
      key:'engagement-'+c.id,tab:'admin'});
@@ -103,7 +108,7 @@
    add({date:toIso(t.due_date),group:'Action',label:t.title||'Action de suivi',
     info:t.details||t.description||'Action à préparer',clientId:t.client_id,
     key:'task-'+t.id,tab:'visio_notes'}));
-  const order={'Évaluation':0,'Visio':1,'Action':2,'Jalon':3,'Engagement':4};
+  const order={'Démarrage':0,'Évaluation':1,'Visio':2,'Action':3,'Jalon':4,'Engagement':5};
   return events.sort((a,b)=>a.date.localeCompare(b.date)||(order[a.group]??9)-(order[b.group]??9)||
    a.clientName.localeCompare(b.clientName,'fr'));
  }
@@ -113,7 +118,7 @@
  }
  function groupedDay(dayEvents){
   if(!dayEvents.length)return '<p class="akCalV2Empty">Aucun événement pour cette date.</p>';
-  const groups=['Évaluation','Visio','Action','Jalon','Engagement'];
+  const groups=['Démarrage','Évaluation','Visio','Action','Jalon','Engagement'];
   return groups.filter(g=>dayEvents.some(e=>e.group===g)).map(g=>{
    const items=dayEvents.filter(e=>e.group===g),first=items.slice(0,5),other=items.slice(5);
    return '<details class="akCalV2Group" '+(items.length<=5?'open':'')+'><summary>'+
@@ -241,6 +246,7 @@
  function getEvent(key){return eventList().find(e=>e.key===key)}
  function openDetails(event){
   const hint={
+   'Démarrage':'Date prévue après paiement. Le suivi démarre lorsque l’onboarding est finalisé et que cette date est atteinte.',
    'Jalon':'Le jalon est un repère du parcours. Le Passeport permet de consulter sa chronologie.',
    'Évaluation':'Cette évaluation est planifiée. Son résultat n’est pas encore enregistré.',
    'Visio':'Rendez-vous planifié. Les notes sont disponibles dans le suivi du dossier.',
@@ -248,6 +254,7 @@
    'Action':'Action de suivi enregistrée après un échange avec le client.'
   }[event.group]||'';
   const go={
+   'Démarrage':'Ouvrir l’onboarding du client',
    Jalon:'Voir la chronologie du client',
    'Évaluation':'Voir le cycle du client',
    Visio:'Voir les notes de visio',
@@ -289,5 +296,20 @@
   if(!section?.matches?.('.akCalV2Acc'))return;
   openSections.set(section.dataset.akCalSection,section.open);
  },true);
+ const originalNotifications=coachNotifications;
+ coachNotifications=function(){
+  const base=originalNotifications();
+  const today=dateToday(),soon=addDays(today,7);
+  const keys=new Set((db.notificationReads||[]).map(x=>x.notification_key));
+  const starts=(db.clients||[]).filter(c=>c.status==='Onboarding'&&!c.archivedAt&&
+   c.start&&c.start>=today&&c.start<=soon).map(c=>{
+    const key='coach:scheduled-start:'+c.id+':'+c.start;
+    return {key,title:'Démarrage à préparer — '+c.name,
+     detail:'Début prévu le '+fmtDate(c.start)+' · terminer l’onboarding et préparer la programmation',
+     target:'client',clientId:c.id,tab:'onboarding',priority:7,read:keys.has(key)};
+   });
+  return [...starts,...base].sort((a,b)=>Number(!!a.read)-Number(!!b.read)||
+    (b.priority||0)-(a.priority||0));
+ };
  window.AKP_CALENDAR_COMPACT_READY=true;
 })();
