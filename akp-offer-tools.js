@@ -33,7 +33,10 @@
   macro_budget:{label:'Budget macronutritionnel',hint:'Objectifs journaliers personnalisés, sans menus alimentaires.',fields:[
    ['kcal','Objectif calorique (kcal / jour)','number'],['protein','Protéines (g / jour)','number'],
    ['carbs','Glucides (g / jour)','number'],['fats','Lipides (g / jour)','number'],
-   ['notes','Justification et ajustements','textarea']]},
+   ['notes','Justification et ajustements','textarea'],
+    ['food_guidance','Recommandations alimentaires à transmettre au client','textarea'],
+    ['meal_timing','Répartition des prises et apports autour des séances','textarea'],
+    ['hydration','Hydratation et repères de récupération','textarea']]},
   lifestyle:{label:'Habitudes de vie et activité',hint:'Objectifs concrets de santé, régularité et activité physique.',fields:[
    ['objective','Objectif','textarea'],['habit','Habitude à travailler','textarea'],
    ['constraints','Contraintes','textarea'],['actions','Actions prévues','textarea']]},
@@ -435,6 +438,41 @@
      '<div style="margin-top:10px">'+chips+'</div></div>';
    return intro+original;
  };
+ function printMacroGuide(c,row){
+   // Fiche entièrement générée depuis les champs coach : aucun fichier stocké.
+   const d=row?.details||{};
+   const topics=[
+     ['Recommandations alimentaires',d.food_guidance],
+     ['Répartition autour des séances',d.meal_timing],
+     ['Hydratation et récupération',d.hydration]
+   ].filter(([_,value])=>String(value||'').trim());
+   if(!topics.length){alert('Renseigne au moins une recommandation dans le budget macro.');return;}
+   const win=window.open('','_blank');
+   if(!win){alert('Autorise la fenêtre de prévisualisation pour imprimer la fiche.');return;}
+   const summary=[['Énergie',d.kcal,'kcal / jour'],['Protéines',d.protein,'g / jour'],
+     ['Glucides',d.carbs,'g / jour'],['Lipides',d.fats,'g / jour']].map(([label,value,unit])=>
+     '<div class="macro"><small>'+esc(label)+'</small><strong>'+esc(value??'—')+
+     '</strong><span>'+esc(unit)+'</span></div>').join('');
+   const sections=topics.map(([label,value])=>'<section><h2>'+esc(label)+
+     '</h2><p>'+esc(value)+'</p></section>').join('');
+   win.document.open();win.document.write('<!doctype html><html lang="fr"><head><meta charset="utf-8">'+
+     '<title>AK PRIME — Recommandations alimentaires</title><style>'+
+     'body{font:14px/1.6 Arial,sans-serif;color:#163247;max-width:780px;margin:40px auto;padding:0 24px}'+
+     'header{border-bottom:3px solid #bc975d;padding-bottom:16px;margin-bottom:24px}'+
+     'h1{margin:8px 0;font-size:28px}h2{font-size:17px;margin-bottom:8px}'+
+     'section{border-bottom:1px solid #dde5eb;padding:12px 0}section p{white-space:pre-wrap}'+
+     '.budget{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}'+
+     '.macro{border:1px solid #dce4ec;padding:14px;min-width:120px;flex:1;display:grid}'+
+     '.macro strong{font-size:22px}.macro small,.macro span{color:#596c7e}'+
+     'footer{font-size:11px;color:#76899a;margin-top:30px}@media print{body{margin:12mm auto}}'+
+     '</style></head><body><header><b>AK PRIME</b><h1>Recommandations alimentaires</h1>'+
+     '<div>'+esc(c.name||'Client')+' · '+esc(fmtDate(row.entry_date))+'</div></header>'+
+     '<div class="budget">'+summary+'</div>'+sections+
+     (d.notes?'<section><h2>Repères et ajustements</h2><p>'+esc(d.notes)+'</p></section>':'')+
+     '<footer>Conseils généraux individualisés, sans prescription de menu ni prise en charge médicale.</footer>'+
+     '</body></html>');win.document.close();
+   win.addEventListener('load',()=>{win.focus();win.print()},{once:true});
+ }
  function entryList(c,type,archived=false){
    const rows=(db.offerEntries||[]).filter(x=>x.client_id===c.id&&x.tool_type===type&&!!x.archived_at===archived);
    if(!rows.length)return '<div class="muted tiny">'+(archived?'Aucune archive.':'Aucun enregistrement pour le moment.')+'</div>';
@@ -451,7 +489,9 @@
           ' • <strong>Accès client :</strong> '+(x.client_visible?'Publié':'Brouillon')+'</div>':'')+
        '<div class="row" style="margin-top:12px;gap:9px">'+
        (type==='macro_budget'&&x.details?.pdf_path?
-         '<button class="btn ghost small offerMacroPdf" data-id="'+esc(x.id)+'">Ouvrir le PDF</button>':'')+
+         '<button class="btn ghost small offerMacroPdf" data-id="'+esc(x.id)+'">Ouvrir le PDF externe</button>':'')+
+       (type==='macro_budget'&&[x.details?.food_guidance,x.details?.meal_timing,x.details?.hydration].some(Boolean)?
+         '<button type="button" class="btn ghost small offerMacroPrint" data-id="'+esc(x.id)+'">Fiche conseils / PDF</button>':'')+
        (archived?'<button class="btn ghost small offerToolRestore" data-id="'+esc(x.id)+'">Restaurer</button>':
         '<button class="btn ghost small offerToolEdit" data-id="'+esc(x.id)+'">Modifier</button>'+
         '<button class="btn ghost small offerToolArchive" data-id="'+esc(x.id)+'">Archiver</button>')+
@@ -501,7 +541,7 @@
  }
  function fieldHtml(key,label,kind,old){
    const id='offerField_'+key,v=String(old===null||old===undefined?'':old),base='class="input" id="'+id+'"';
-   if(kind==='textarea')return '<div class="field"><label>'+esc(label)+'</label><textarea class="textarea" id="'+id+'" maxlength="2500" rows="3">'+esc(v)+'</textarea></div>';
+   if(kind==='textarea')return '<div class="field" '+(['food_guidance','meal_timing','hydration'].includes(key)?'style="grid-column:1 / -1"':'')+'><label>'+esc(label)+'</label><textarea class="textarea" id="'+id+'" maxlength="2500" rows="4">'+esc(v)+'</textarea></div>';
    const attrs=kind==='number'?'type="number" step="0.1" min="0" max="10000"':kind==='time'?'type="time"':kind==='url'?'type="url" maxlength="500"':'type="text" maxlength="500"';
    return '<div class="field"><label>'+esc(label)+'</label><input '+base+' '+attrs+' value="'+esc(v)+'"></div>';
  }
@@ -514,7 +554,8 @@
     '<div class="field"><label>Intitulé</label><input id="offerEntryTitle" class="input" maxlength="180" value="'+esc(row?.title||spec.label)+'"></div></div>'+
     '<div class="grid2">'+spec.fields.map(([key,label,kind])=>fieldHtml(key,label,kind,details[key])).join('')+'</div>'+
     (type==='macro_budget'?'<div class="alert blue tiny">Repère : protéines et glucides = 4 kcal/g ; lipides = 9 kcal/g. Objectifs journaliers sans menus détaillés.</div>'+
-     '<div class="field" style="margin-top:12px"><label>PDF de recommandations alimentaires (facultatif, 5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
+     '<div class="muted tiny" style="margin:8px 0">Les recommandations saisies ci-dessus apparaissent directement dans l’espace client une fois publiées. Une version imprimable peut également être enregistrée en PDF depuis le dossier coach, sans pièce jointe obligatoire.</div>'+
+     '<div class="field" style="margin-top:12px"><label>PDF externe de recommandations (facultatif, 5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
      '<label class="check"><input id="offerMacroPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Publier les objectifs de calories et macronutriments dans l’espace client</label>'+
      (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Les valeurs peuvent être publiées seules. Le PDF sert uniquement de recommandations complémentaires.</div>'):''),
 
@@ -617,7 +658,13 @@
    const add=e.target.closest('.offerToolAdd'),edit=e.target.closest('.offerToolEdit');
    const archive=e.target.closest('.offerToolArchive'),restore=e.target.closest('.offerToolRestore');
    const pdfButton=e.target.closest('.offerMacroPdf');
+   const printButton=e.target.closest('.offerMacroPrint');
    const c=currentClient();
+   if(printButton){
+     const row=(db.offerEntries||[]).find(x=>x.id===printButton.dataset.id&&x.client_id===c.id);
+     if(row)printMacroGuide(c,row);
+     return;
+   }
    if(pdfButton){
      const row=(db.offerEntries||[]).find(x=>x.id===pdfButton.dataset.id&&x.client_id===c.id);
      if(!row?.details?.pdf_path)return alert('Aucun PDF joint.');
