@@ -126,7 +126,12 @@ function standalone(s){
  const c=s.client,t=s.template,received=s.response?.status==='submitted',answers=s.response?.answers||{};
  const html='<div class="akIntroPage"><div class="akIntroLayout">'+
   '<div class="akIntroTop"><div class="akIntroBrand">AK PRIME <span style="font-size:10px;color:#8798a8">/ QUESTIONNAIRE INITIAL</span></div>'+
-  '<button class="btn ghost small" id="akIntroLogout">Déconnexion</button></div>'+
+  '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
+  (c.is_test?'<span style="font-size:10px;font-weight:850;color:#9f7944">COMPTE TEST · SANS PAIEMENT</span>'+
+   '<select class="select" id="akIntroDemoOffer" aria-label="Offre à tester">'+
+   Object.keys(labels).map(key=>'<option value="'+key+'" '+(key===offerCode(c)?'selected':'')+'>'+esc(labels[key])+'</option>').join('')+'</select>'+
+   '<button type="button" class="btn ghost small" id="akIntroChangeOffer">Changer de formule test</button>':'')+
+   '<button class="btn ghost small" id="akIntroLogout">Déconnexion</button></div></div>'+
   '<header class="akIntroHero"><small>PRÉPARATION PERSONNALISÉE</small>'+
   '<h1>'+esc(received?'Ton questionnaire initial':'Préparons ton accompagnement')+'</h1>'+
   '<p>'+esc(labels[offerCode(c)]||c.current_pole)+' · '+
@@ -144,6 +149,18 @@ function standalone(s){
  document.getElementById('root').innerHTML=html;
  document.getElementById('akIntroLogout').onclick=async()=>{await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';showAuth();};
  document.getElementById('akIntroContinue')?.addEventListener('click',()=>{clientPortalView='home';renderClientPortal()});
+ document.getElementById('akIntroChangeOffer')?.addEventListener('click',async()=>{
+   const btn=document.getElementById('akIntroChangeOffer');
+   const next=document.getElementById('akIntroDemoOffer')?.value;
+   if(!next||next===offerCode(clientPortalState.client))return;
+   btn.disabled=true;
+   try{
+    const {data,error}=await supa.rpc('change_my_test_offer',{p_offer_code:next});
+    if(error||!data?.length)throw Error(error?.message||'Changement impossible');
+    await enterClientPortal(authUser,authProfile);
+    toast('Nouvelle formule test appliquée : '+labels[next]);
+   }catch(e){btn.disabled=false;alert('Impossible de changer de formule : '+e.message);}
+ });
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.querySelectorAll('[data-ak-legal]').forEach(b=>b.onclick=()=>openPublicLegal(b.dataset.akLegal));
@@ -193,6 +210,7 @@ clientNavMarkup=function(...args){
   '" data-view="onboarding"><span>▤</span>Questionnaire</button>';
  output.top=output.top.replace(/<\/div>$/,action+'</div>');
  output.mobile=output.mobile.replace(/<\/div>$/,action+'</div>');
+
  return output;
 };
 const originalSave=saveClientQuestionnaire;
