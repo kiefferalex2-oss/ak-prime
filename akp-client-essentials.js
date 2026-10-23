@@ -91,13 +91,14 @@
        'Les notes internes du coach ne sont pas visibles dans cet espace.</p></div>':'')+
      macroPanel(s)+sleepForm(s)+
      (s.akExtrasError?'<div class="alert" style="margin-top:12px">Certains outils sont temporairement indisponibles : '+safe(s.akExtrasError)+'</div>':'')+
-     '<div class="client-section-card" style="margin-top:13px"><h3>Mon entraînement et mes échanges</h3>'+
-       '<p class="muted tiny">Programmation, séances, charge et état de forme : Optitrainer. '+ 
-       'Si ta formule prévoit des analyses vidéo, envoie les vidéos de tes mouvements directement sur WhatsApp. '+ 
+     '<div class="client-section-card akClientTrainingCard" style="margin-top:13px"><h3>Mon entraînement et mes échanges</h3>'+
+       '<p class="muted tiny" style="margin:0 0 12px;line-height:1.65">Programmation, séances, charge et état de forme : Optitrainer. '+
+       'Si ta formule prévoit des analyses vidéo, envoie les vidéos de tes mouvements directement sur WhatsApp. '+
        'AK PRIME n’héberge pas les fichiers vidéo.</p>'+
-       (s.client.optitrainer_url?'<button class="btn primary" id="clientOpti">Ouvrir Optitrainer</button>':
-        '<div class="muted tiny">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
-       renderClientWhatsAppButton(s,s.client)+'</div></div>';
+       (s.client.optitrainer_url?'':'<div class="muted tiny" style="line-height:1.55">Ton lien Optitrainer sera ajouté par ton coach.</div>')+
+       '<div class="akTrainingActions" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;clear:both;margin-top:18px">'+
+       (s.client.optitrainer_url?'<button class="btn primary" id="clientOpti" type="button">Ouvrir Optitrainer</button>':'')+
+       renderClientWhatsAppButton(s,s.client)+'</div></div></div>';
  };
  const originalClientHome=renderClientHome;
  renderClientHome=function(s){
