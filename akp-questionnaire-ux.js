@@ -27,6 +27,8 @@
  ].join('\n');
  const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
  const groups=[
+  ['Nutrition',/nutrition|repas|apports?|calori|macros?|alimenta|p\d_nutrition|fs_renforce_food|fs_renforce_weight/],
+  ['Sommeil & récupération',/sommeil|sleep|fatigue|récupération|recuperation|energy|énergie|wake/],
   ['Profil & coordonnées',/nom|pr[eé]nom|adresse|e.?mail|t[eé]l[eé]phone|naissance|contact|ville|profession/],
   ['Pratique sportive',/club|structure|sport|niveau|poste|discipline|comp[eé]tition|entra[iî]nement|saison|[eé]quipe|experience|exp[eé]rience/],
   ['Objectifs & échéances',/objectif|motivation|projet|[eé]ch[eé]ance|date importante|attente|performance recherch[eé]e/],
