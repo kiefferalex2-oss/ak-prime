@@ -470,8 +470,8 @@
      '<div class="budget">'+summary+'</div>'+sections+
      (d.notes?'<section><h2>Repères et ajustements</h2><p>'+esc(d.notes)+'</p></section>':'')+
      '<footer>Conseils généraux individualisés, sans prescription de menu ni prise en charge médicale.</footer>'+
-     '</body></html>');win.document.close();
-   win.addEventListener('load',()=>{win.focus();win.print()},{once:true});
+     '</body></html>');win.addEventListener('load',()=>{win.focus();win.print()},{once:true});
+   win.document.close();
  }
  function entryList(c,type,archived=false){
    const rows=(db.offerEntries||[]).filter(x=>x.client_id===c.id&&x.tool_type===type&&!!x.archived_at===archived);
