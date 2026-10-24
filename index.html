@@ -1136,6 +1136,59 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .ak-wow .client-mobile-menu button span{display:inline-block;width:22px;text-align:center}
 }
 
+
+/* Agenda de sommeil quotidien : validation, reveils intra-nocturnes, historique */
+.ak-wow .akSleepCard{padding:25px!important}
+.ak-wow .akSleepHeader{gap:13px;align-items:start;flex-wrap:wrap;margin-bottom:18px}
+.ak-wow .akSleepHeader h3{font-size:19px;letter-spacing:-.025em;margin:0 0 7px}
+.ak-wow .akSleepHeader p{max-width:660px;margin:0;line-height:1.6}
+.ak-wow .akSleepToday{display:flex;gap:7px;flex-direction:column;padding:16px 19px;border-radius:15px;background:linear-gradient(115deg,#f0f6fc,#fff);border:1px solid #dce8f2;margin-bottom:18px}
+.ak-wow .akSleepToday span{font-size:10px;font-weight:850;letter-spacing:.13em;color:#a57b45}
+.ak-wow .akSleepToday strong{font-size:18px;color:#1e3d57;letter-spacing:-.025em}
+.ak-wow .akSleepToday small{font-size:11px;color:#70869a;line-height:1.5}
+.ak-wow .akSleepCompleted{display:flex;align-items:flex-start;gap:15px;padding:19px;border-radius:17px;border:1px solid #bfdfcb;background:linear-gradient(105deg,#eefaf3,#fff);margin:10px 0 17px}
+.ak-wow .akSleepCompletedIcon{display:grid;place-items:center;flex:0 0 43px;height:43px;border-radius:14px;background:#d5f2e1;color:#1b774e;font-size:21px;font-weight:900}
+.ak-wow .akSleepCompleted strong{font-size:14px;color:#1d6444;line-height:1.5}
+.ak-wow .akSleepCompleted p{font-size:12px;color:#416b57;line-height:1.6;margin:5px 0}
+.ak-wow .akSleepCompleted small{display:block;font-size:11px;color:#658673;line-height:1.5;margin-top:7px}
+.ak-wow .akSleepEntryForm{border-radius:17px;background:#fff;padding:19px;border:1px solid #e1e9f0}
+.ak-wow .akSleepEntryForm .grid2{gap:13px 17px}
+.ak-wow .akSleepEntryForm .field{margin:0;min-width:0}
+.ak-wow .akSleepEntryForm .field label{display:block;margin:0 0 8px}
+.ak-wow .akSleepEntryForm .input[readonly]{background:#edf3f8;color:#667d92;cursor:default}
+.ak-wow .akSleepEntryForm .textarea{min-height:90px}
+.ak-wow #akSaveSleep{margin-top:17px;padding:13px 19px}
+.ak-wow .akSleepWakeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.ak-wow .akSleepWakeItem{padding:15px;border-radius:14px;border:1px solid #dae5ed;background:#f6f9fc;min-width:0}
+.ak-wow .akSleepWakeNumber{margin:0 0 12px;color:#ab7f48;font-weight:850;font-size:11px;letter-spacing:.04em}
+.ak-wow .akSleepWakeItem .grid2{gap:10px}
+.ak-wow .akSleepEditBanner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;color:#214c6e;margin-bottom:17px;padding:12px 14px;background:#f5f8fc;border-radius:12px}
+.ak-wow .akSleepHistory{margin-top:17px;background:#f8fafc;border:1px solid #e0e8f0;border-radius:15px;overflow:hidden}
+.ak-wow .akSleepHistory summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 17px;cursor:pointer;color:#23445f;font-size:13px;font-weight:850;list-style:none}
+.ak-wow .akSleepHistory summary::-webkit-details-marker{display:none}
+.ak-wow .akSleepHistory summary:before{content:"▸";color:#b48b52;margin-right:8px}
+.ak-wow .akSleepHistory[open] summary:before{content:"▾"}
+.ak-wow .akSleepHistory summary span{font-size:11px;color:#748ba0;font-weight:600;margin-left:auto}
+.ak-wow .akSleepHistory .list{padding:0 13px 13px;max-height:450px;overflow:auto}
+.ak-wow .akSleepHistoryRow{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:8px;padding:13px!important}
+.ak-wow .akSleepHistoryRow>div{min-width:0}
+.ak-wow .akSleepHistoryRow .muted{margin-top:5px;overflow-wrap:anywhere}
+.ak-wow .akSleepHistoryRow button{white-space:nowrap;flex:0 0 auto}
+@media(max-width:760px){
+ .ak-wow .akSleepCard{padding:18px!important}
+ .ak-wow .akSleepEntryForm{padding:14px}
+ .ak-wow .akSleepWakeGrid{grid-template-columns:1fr}
+ .ak-wow .akSleepHistoryRow{align-items:flex-start}
+ .ak-wow .akSleepHistoryRow button{margin-top:3px}
+}
+@media(max-width:490px){
+ .ak-wow .akSleepCompleted{padding:15px;gap:11px}
+ .ak-wow .akSleepCompletedIcon{height:33px;flex-basis:33px;border-radius:11px}
+ .ak-wow .akSleepEntryForm .grid2{grid-template-columns:1fr}
+ .ak-wow .akSleepWakeItem .grid2{grid-template-columns:1fr}
+ .ak-wow .akSleepHistory summary span{font-size:10px}
+}
+
 </style>
 </head>
 <body>
