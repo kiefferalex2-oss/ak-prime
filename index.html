@@ -4380,19 +4380,69 @@ function akOfferFullEntitlements(pole,name){
 }
 function akOfferQuickBenefits(pole,name){
  const rights=akpOfferRights(pole,name),groups=Object.entries(rights?.groups||{});
- const items=[];
+ const entries=[];
  for(const [key,benefits] of groups){
   if(!benefits?.length)continue;
-  const title=key==='Optitrainer'?'Entraînement et suivi':key==='WhatsApp'?'Analyse vidéo':key==='AK PRIME'?'Outils AK PRIME':'Échanges et visios';
-  if(pole==='Mental'&&key==='AK PRIME'&&benefits.length>2){
-   items.push({title:'Objectifs et outils mentaux',lines:benefits.slice(0,2)});
-   items.push({title:'Mise en pratique',lines:benefits.slice(2,4)});
-  }else items.push({title,lines:benefits.slice(0,2)});
+  const heading=key==='Optitrainer'?'Programmation et suivi':
+    key==='WhatsApp'?'Analyse technique':
+    key==='AK PRIME'?(pole==='Mental'?'Outils de préparation mentale':'Passeport et mesures'):'Échanges et visios';
+  const text=key==='Optitrainer'?'Un programme adapté à ton profil et à la charge d’entraînement.':
+    key==='WhatsApp'?'Des retours vidéo pour améliorer l’exécution et la technique.':
+    key==='AK PRIME'?(pole==='Mental'?'Des exercices et routines à mettre en pratique entre les échanges.':'Des repères pour visualiser tes tests, tes cycles et ta progression.'):
+    'Des rendez-vous pour faire le point et faire évoluer ton accompagnement.';
+  entries.push({heading,text});
  }
- if(!items.length)return '';
- return '<div class="akReadBenefitGrid">'+items.slice(0,4).map((entry,i)=>
-  '<div class="akReadBenefitCard"><span class="akReadBenefitNo">0'+(i+1)+'</span>'+
-  '<h4>'+esc(entry.title)+'</h4><ul>'+entry.lines.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'
+ if(!entries.length)return '';
+ return '<div class="akEditorialBenefits">'+entries.slice(0,4).map((entry,i)=>
+   '<div class="akEditorialBenefit"><span class="akEditorialIndex">'+String(i+1).padStart(2,'0')+'</span>'+
+   '<div><strong>'+esc(entry.heading)+'</strong><p>'+esc(entry.text)+'</p></div></div>'
+ ).join('')+'</div>';
+}
+function akOfferKeyFacts(pole,name,performance){
+ const source={
+  'Forme & Santé|Standard':[['PROGRAMME','Individualisé'],['ANALYSE VIDÉO','Jusqu’à 1 / mois'],['VISIO','1 × 30 min / mois']],
+  'Forme & Santé|Renforcé':[['ADAPTATION','Hebdomadaire'],['ANALYSE VIDÉO','Jusqu’à 1 / semaine'],['VISIO','2 × 30 min / mois']],
+  'Mental|Particulier':[['OBJECTIF','Habiletés mentales'],['OUTILS','Exercices et routines'],['VISIO','Jusqu’à 1 × 45 min / semaine']],
+  'Mental|Sportif':[['CONTEXTE','Entraînement et compétition'],['OUTILS','Routines et recentrage'],['VISIO','Jusqu’à 1 × 45 min / semaine']]
+ };
+ const facts=performance||source[pole+'|'+name]||[];
+ return '<div class="akEditorialFacts">'+facts.map(([label,value])=>
+  '<div><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>'
+ ).join('')+'</div>';
+}
+function akOfferSteps(pole,name,performanceSteps){
+ let steps=performanceSteps;
+ if(!steps){
+  steps=pole==='Mental'?[
+   ['01','On fait le point','Un échange initial pour comprendre tes besoins et définir tes objectifs.'],
+   ['02','Tu mets en pratique','Des exercices et routines adaptés à ton contexte entre les séances.'],
+   ['03','On fait évoluer','Les retours des visios orientent les étapes suivantes.']
+  ]:[
+   ['01','On définit ton cadre','Objectifs, habitudes, niveau actuel et contraintes.'],
+   ['02','Tu suis ton programme','Des séances adaptées à ton rythme et à ton matériel.'],
+   ['03','On suit tes progrès','Un bilan régulier permet de vérifier l’évolution et d’adapter selon l’offre.']
+  ];
+ }
+ return '<ol class="akEditorialSteps">'+steps.map(w=>
+  '<li><span>'+esc(w[0])+'</span><div><strong>'+esc(w[1])+'</strong><p>'+esc(w[2])+'</p></div></li>'
+ ).join('')+'</ol>';
+}
+function akOfferSection(kicker,title,description,body,extra=''){
+ return '<section class="akEditorialSection '+extra+'">'+
+   '<div class="akEditorialHeading"><span>'+esc(kicker)+'</span><h3>'+esc(title)+'</h3>'+
+   (description?'<p>'+esc(description)+'</p>':'')+'</div>'+
+   '<div class="akEditorialContent">'+body+'</div></section>';
+}
+function akOfferCompareOverview(tier){
+ const items=[
+  ['P1','Un cadre structuré','Les corrections interviennent principalement en cas de problème signalé.'],
+  ['P2','Un suivi qui s’adapte','La charge et le bien-être orientent les ajustements hebdomadaires.'],
+  ['P3','Un suivi plus rapproché','Sommeil complet, récupération dédiée et ajustements sous 48 h si nécessaire.']
+ ];
+ return '<div class="akEditorialCompare">'+items.map(([id,title,desc])=>
+  '<div class="akEditorialCompareRow '+(tier===id?'active':'')+'">'+
+  '<span class="akEditorialCompareTier">'+esc(id)+'</span><div><strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p></div>'+
+  (tier===id?'<span class="akEditorialChoice">TA FORMULE</span>':'')+'</div>'
  ).join('')+'</div>';
 }
 function akOfferDisclosure(label,content,summary=''){
