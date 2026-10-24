@@ -4775,25 +4775,6 @@ function akOfferDemoTeaser(pole,name){
     '<span class="akDemoTeaserAction"><span class="akDemoOpenText">Ouvrir la démo ↗</span><span class="akDemoCloseText">Fermer la démo ×</span></span>'+
    '</summary><div class="akDemoStage">'+akOfferDemoMarkup(pole,name)+'</div></details>';
 }
-function akPerfComparisonTable(tier,rows){
- const col={P1:1,P2:2,P3:3}[tier];
- return '<div class="perf-compare-wrap"><table class="perf-compare"><thead><tr><th>Critère</th>'+
-  [1,2,3].map(i=>'<th class="'+(col===i?'current':'')+'">P'+i+(col===i?'<span class="perf-current-pill">CHOISI</span>':'')+'</th>').join('')+
-  '</tr></thead><tbody>'+
-  rows.map(r=>'<tr><td>'+esc(r[0])+'</td>'+[1,2,3].map(i=>'<td class="'+(col===i?'current':'')+'">'+esc(r[i])+'</td>').join('')+'</tr>').join('')+
-  '</tbody></table></div>';
-}
-function akPerfCriteriaMobile(tier,rows){
- return '<div class="akOfferCriteriaMobile" aria-label="Comparatif complet des offres Performance">'+rows.map(r=>
-   '<section class="akOfferCriterion"><div class="akOfferCriterionTitle">'+esc(r[0])+'</div>'+
-   '<div class="akOfferCriterionContent">'+[1,2,3].map(j=>
-    '<div class="akOfferCriterionTier '+(('P'+j)===tier?'active':'')+'"><strong>P'+j+'</strong><p>'+esc(r[j])+'</p></div>'
-   ).join('')+'</div></section>'
- ).join('')+'</div>';
-}
-
-// Un seul comparatif exhaustif par pôle : même contenu pour chaque formule,
-// seule la colonne de l'offre consultée change de mise en valeur.
 function akOfferComparisonData(pole){
  if(pole==='Performance')return {
   labels:['P1 Essentiel','P2 Avancé','P3 Premium'],
@@ -4994,48 +4975,6 @@ function performanceOfferLanding(name,price){
   }
  };
  const d=rows[tier];if(!d)return '';
- const compare=[
-  ['Adaptation de la charge',
-   'Correction en cas de douleur, gêne ou difficulté importante signalée ; pas d’ajustement systématique selon la forme.',
-   'Volume, intensité ou contenu révisés chaque semaine en fonction de la charge sRPE et du questionnaire Hooper.',
-   'Charge et séances ajustées sous 48 h si l’état de forme, le sommeil ou le contexte sportif le nécessitent.'],
-  ['Données utilisées',
-   'Charge sRPE et retours signalés par le sportif ; pas de questionnaire régulier d’état de forme.',
-   'Charge sRPE et Hooper hebdomadaire : fatigue, stress, sommeil perçu et douleurs musculaires.',
-   'Charge sRPE, Hooper, état de forme rapproché et agenda de sommeil détaillé.'],
-  ['Sommeil',
-   'Pas d’agenda ni d’analyse de sommeil spécifique.',
-   'Sommeil perçu renseigné dans le questionnaire Hooper.',
-   'Agenda de sommeil : durée, qualité et régularité ; pris en compte dans les ajustements.'],
-  ['Analyses vidéo',
-   'Jusqu’à 2 analyses techniques par mois via WhatsApp.',
-   '1 analyse par semaine sur les mouvements prioritaires via WhatsApp.',
-   'Analyses des mouvements utiles selon les besoins via WhatsApp, sans quota fixe.'],
-  ['Échauffement',
-   'Échauffement prévu dans la programmation, sans individualisation spécifique incluse.',
-   'Échauffement individualisé via les exercices Optitrainer.',
-   'Échauffement individualisé via les exercices Optitrainer.'],
-  ['Récupération',
-   'Correction du programme lorsqu’un problème est signalé.',
-   'Allègement de la programmation si nécessaire, sans séance de récupération supplémentaire.',
-   'Séance de récupération dédiée si nécessaire, en plus des adaptations de charge.'],
-  ['Nutrition',
-   'Aucun budget calorique ou macros inclus.',
-   'Aucun budget calorique ou macros inclus.',
-   'Budget calorique et macronutriments personnalisés, sans menus alimentaires.'],
-  ['Cycle menstruel',
-   'Pas de prise en compte spécifique incluse.',
-   'Prise en compte lorsque pertinent et sur la base des informations communiquées.',
-   'Prise en compte lorsque pertinent et sur la base des informations communiquées.'],
-  ['Visios',
-   '1 visio de 30 minutes par mois.',
-   '2 visios de 30 minutes par mois.',
-   'Jusqu’à 1 visio de 30 minutes par semaine.'],
-  ['Retests physiques',
-   'Retest à 6 semaines.',
-   'Retest à 6 semaines.',
-   'Retest à 6 semaines, puis réévaluations selon les besoins.']
- ];
  return '<div class="perf-detail akReadableOffer akEditorialOffer akPreciseOffer">'+
    '<section class="perf-hero akEditorialHero">'+
     '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><div class="eyebrow">PÔLE PERFORMANCE</div>'+
@@ -5044,16 +4983,7 @@ function performanceOfferLanding(name,price){
     akOfferKeyFacts('Performance',tier,d.kpis)+
    '</section>'+
    akOfferPlatforms('Performance',tier)+
-   akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
-     'Les services, fréquences et modalités prévus dans Performance '+tier+'.',
-     akOfferIncludedNow('Performance',tier)+
-     akOfferDisclosure('Toutes les modalités de la formule',akOfferFullEntitlements('Performance',tier),
-       'Le détail des prestations par outil et canal de communication'))+
-   akOfferSection('02 / LES DIFFÉRENCES','Compare les prestations P1, P2 et P3',
-     'Concrètement : ce qui est ajusté, à quelle fréquence et à partir de quelles données.',
-     '<div class="akOfferCompareDesktop">'+akPerfComparisonTable(tier,compare)+'</div>'+
-     akPerfCriteriaMobile(tier,compare))+
-
+   akOfferSingleComparison('Performance',tier)+
    '<section class="akPreciseHow">'+
      akOfferDisclosure('Comment se déroule le suivi ?',
        '<div class="akPreciseHowInner">'+akOfferSteps('Performance',tier,d.week)+
@@ -5089,11 +5019,7 @@ function openPublicOfferDetails(button){
     akOfferKeyFacts(pole,name)+
    '</section>'+
    akOfferPlatforms(pole,name)+
-   akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
-    'Les prestations prévues dans '+pole+' — '+name+'.',
-    akOfferIncludedNow(pole,name)+
-    akOfferDisclosure('Toutes les modalités de la formule',akOfferFullEntitlements(pole,name),
-      'Le détail des prestations et outils'))+
+   akOfferSingleComparison(pole,name)+
    '<section class="akPreciseHow">'+
     akOfferDisclosure('Comment se déroule cet accompagnement ?',
      '<div class="akPreciseHowInner">'+akOfferSteps(pole,name)+
