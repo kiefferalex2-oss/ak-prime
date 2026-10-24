@@ -4215,6 +4215,67 @@ function bindAkOfferDemo(pole,name){
  shell.addEventListener('change',event=>{event.preventDefault();event.stopImmediatePropagation();},true);
 }
 
+/* Parcours de lecture public : synthèse d'abord, informations complètes sur demande. */
+function akOfferFullEntitlements(pole,name){
+ const rights=akpOfferRights(pole,name);
+ if(!rights?.groups)return '<ul class="akReadAllList">'+publicOfferBenefits(pole,name).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+ return '<div class="akReadFullGrid">'+Object.entries(rights.groups).map(([group,items])=>
+  '<section class="akReadFullGroup"><h4>'+esc(group==='AK PRIME'?'Passeport et outils AK PRIME':group==='WhatsApp'?'Analyses et échanges vidéo':group==='Optitrainer'?'Programmation et suivi':'Visios')+'</h4>'+
+  '<ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>'
+ ).join('')+'</div>';
+}
+function akOfferQuickBenefits(pole,name){
+ const rights=akpOfferRights(pole,name),groups=Object.entries(rights?.groups||{});
+ const items=[];
+ for(const [key,benefits] of groups){
+  if(!benefits?.length)continue;
+  const title=key==='Optitrainer'?'Entraînement et suivi':key==='WhatsApp'?'Analyse vidéo':key==='AK PRIME'?'Outils AK PRIME':'Échanges et visios';
+  if(pole==='Mental'&&key==='AK PRIME'&&benefits.length>2){
+   items.push({title:'Objectifs et outils mentaux',lines:benefits.slice(0,2)});
+   items.push({title:'Mise en pratique',lines:benefits.slice(2,4)});
+  }else items.push({title,lines:benefits.slice(0,2)});
+ }
+ if(!items.length)return '';
+ return '<div class="akReadBenefitGrid">'+items.slice(0,4).map((entry,i)=>
+  '<div class="akReadBenefitCard"><span class="akReadBenefitNo">0'+(i+1)+'</span>'+
+  '<h4>'+esc(entry.title)+'</h4><ul>'+entry.lines.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'
+ ).join('')+'</div>';
+}
+function akOfferDisclosure(label,content,summary=''){
+ return '<details class="akReadFold"><summary><span><strong>'+esc(label)+'</strong>'+
+   (summary?'<small>'+esc(summary)+'</small>':'')+'</span><b aria-hidden="true">⌄</b></summary>'+
+   '<div class="akReadFoldBody">'+content+'</div></details>';
+}
+function akOfferDemoTeaser(pole,name){
+ return '<details class="akDemoDisclosure"><summary class="akDemoTeaser">'+
+    '<span class="akDemoMiniScreen" aria-hidden="true"><span class="akDemoMiniTop"><i></i><i></i><i></i></span>'+
+       '<span class="akDemoMiniBars"><i></i><i></i><i></i></span><span class="akDemoMiniLine"></span></span>'+
+    '<span class="akDemoTeaserCopy"><small>APERÇU INTERACTIF · 5 MOIS DE SUIVI FICTIF</small>'+
+       '<strong>Explore ton espace client AK PRIME</strong>'+
+       '<span>Accueil, rendez-vous, accompagnement, Passeport et progression : découvre le rendu de cette formule.</span></span>'+
+    '<span class="akDemoTeaserAction"><span class="akDemoOpenText">Ouvrir la démo ↗</span><span class="akDemoCloseText">Fermer la démo ×</span></span>'+
+   '</summary><div class="akDemoStage">'+akOfferDemoMarkup(pole,name)+'</div></details>';
+}
+function akPerfComparisonTable(tier,rows){
+ const col={P1:1,P2:2,P3:3}[tier];
+ return '<div class="perf-compare-wrap"><table class="perf-compare"><thead><tr><th>Critère</th>'+
+  [1,2,3].map(i=>'<th class="'+(col===i?'current':'')+'">P'+i+(col===i?'<span class="perf-current-pill">CHOISI</span>':'')+'</th>').join('')+
+  '</tr></thead><tbody>'+
+  rows.map(r=>'<tr><td>'+esc(r[0])+'</td>'+[1,2,3].map(i=>'<td class="'+(col===i?'current':'')+'">'+esc(r[i])+'</td>').join('')+'</tr>').join('')+
+  '</tbody></table></div>';
+}
+function akPerfMobileComparison(tier,rows){
+ const interesting=['Adaptation','Analyse vidéo','Visios'];
+ return '<div class="akReadTierGrid">'+[1,2,3].map(i=>
+  '<div class="akReadTier '+('P'+i===tier?'selected':'')+'"><div class="akReadTierHead"><strong>P'+i+'</strong>'+
+  (('P'+i)===tier?'<small>OFFRE CONSULTÉE</small>':'')+'</div>'+
+  interesting.map(key=>{
+   const line=rows.find(r=>r[0]===key);
+   return line?'<div><span>'+esc(key)+'</span><b>'+esc(line[i])+'</b></div>':'';
+  }).join('')+'</div>'
+ ).join('')+'</div>';
+}
+
 function performanceOfferLanding(name,price){
  const tier=String(name||'').toUpperCase();
  const rows={
@@ -4269,21 +4330,34 @@ function performanceOfferLanding(name,price){
   ['Retest','À 6 semaines','À 6 semaines','À 6 semaines + selon besoins']
  ];
  const col={P1:1,P2:2,P3:3}[tier];
- return '<div class="perf-detail">'+
-  '<section class="perf-hero"><div class="perf-hero-top"><div><div class="eyebrow">PÔLE PERFORMANCE</div><h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div><div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
+ const shortCompare=compare.filter(r=>['Adaptation','Bien-être','Analyse vidéo','Récupération','Nutrition','Visios'].includes(r[0]));
+ const common=['Programmation physique personnalisée','Suivi de charge sRPE et bilan hebdomadaire','Passeport AK PRIME et retest à 6 semaines'];
+ return '<div class="perf-detail akReadableOffer">'+
+  '<section class="perf-hero"><div class="perf-hero-top"><div><div class="eyebrow">PÔLE PERFORMANCE</div>'+
+   '<h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div>'+
+   '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
    '<div class="perf-kpis">'+d.kpis.map(k=>'<div class="perf-kpi"><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>').join('')+'</div>'+
   '</section>'+
-  '<section class="perf-section"><div class="perf-section-head"><div><h3>Concrètement, comment se passe le suivi ?</h3><p>Une lecture rapide d’une semaine-type.</p></div></div><div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div></section>'+
-  akOfferDemoMarkup('Performance',tier)+
-  '<section class="perf-example"><div class="perf-example-tag"><b>Exemple</b><strong>Dans une vraie semaine</strong></div><div class="perf-example-copy">'+esc(d.example)+'</div></section>'+
-  '<section class="perf-section"><div class="perf-section-head"><div><h3>Pourquoi choisir '+esc(tier)+' ?</h3><p>'+esc(d.difference)+'</p></div></div>'+
-   '<div class="perf-full-grid"><div class="perf-full-list"><h4>Inclus dans cette formule</h4><ul>'+publicOfferBenefits('Performance',tier).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
-   '<div class="perf-full-list"><h4>Ce que tu retrouves dans tous les niveaux</h4><ul><li>Programmation physique individualisée selon sport, calendrier, niveau et matériel.</li><li>Tests réalisables à distance lorsque pertinents.</li><li>Suivi de charge sRPE et check-in hebdomadaire.</li><li>Optitrainer + Passeport AK PRIME.</li><li>Retest à 6 semaines.</li></ul></div></div>'+
+  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Comment se passe le suivi ?</h3>'+
+   '<p>Quatre étapes pour comprendre le fonctionnement de la formule.</p></div></div>'+
+   '<div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div>'+
+   akOfferDisclosure('Voir un exemple concret', '<p class="akReadExampleText">'+esc(d.example)+'</p>','Une situation du quotidien, avec les adaptations possibles')+
   '</section>'+
-  '<section class="perf-section"><div class="perf-section-head"><div><h3>P1, P2 ou P3 : où est la vraie différence ?</h3><p>Le niveau sélectionné est surligné.</p></div></div><div class="perf-compare-wrap"><table class="perf-compare"><thead><tr><th>Critère</th><th class="'+(col===1?'current':'')+'">P1'+(col===1?'<span class="perf-current-pill">CHOISI</span>':'')+'</th><th class="'+(col===2?'current':'')+'">P2'+(col===2?'<span class="perf-current-pill">CHOISI</span>':'')+'</th><th class="'+(col===3?'current':'')+'">P3'+(col===3?'<span class="perf-current-pill">CHOISI</span>':'')+'</th></tr></thead><tbody>'+
-    compare.map(r=>'<tr><td>'+esc(r[0])+'</td>'+[1,2,3].map(i=>'<td class="'+(col===i?'current':'')+'">'+esc(r[i])+'</td>').join('')+'</tr>').join('')+
-   '</tbody></table></div></section>'+
-  '<div class="perf-note">Les exemples illustrent le fonctionnement du suivi. Les décisions restent individualisées selon les données réellement disponibles, le contexte sportif et les besoins observés.</div>'+
+  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Ce que comprend '+esc(tier)+'</h3>'+
+   '<p>'+esc(d.difference)+'</p></div></div>'+
+   akOfferQuickBenefits('Performance',tier)+
+   akOfferDisclosure('Voir toutes les prestations incluses',akOfferFullEntitlements('Performance',tier),
+      'Liste complète des outils, prestations et fréquences de suivi')+
+  '</section>'+
+  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Comparer P1, P2 et P3</h3>'+
+   '<p>Les différences essentielles, sans parcourir tout le catalogue.</p></div></div>'+
+   '<div class="akReadCompareDesktop">'+akPerfComparisonTable(tier,shortCompare)+'</div>'+
+   akPerfMobileComparison(tier,compare)+
+   akOfferDisclosure('Voir la comparaison complète',akPerfComparisonTable(tier,compare),
+      'Les 10 critères, avec la formule consultée mise en évidence')+
+  '</section>'+
+  akOfferDemoTeaser('Performance',tier)+
+  '<p class="perf-note">Prestations et exemples présentés à titre explicatif. Chaque accompagnement est adapté aux données disponibles et aux besoins du sportif.</p>'+
  '</div>';
 }
 
