@@ -4068,39 +4068,44 @@ const AKP_OFFER_RIGHTS=Object.freeze({
  "mental|particulier": {
   "label": "Préparation mentale — Particulier",
   "summary": [
-   "Stress, émotions, confiance, concentration et routines personnalisées",
-   "Séances mentales et exercices entre les visios ; jusqu’à une visio de 45 min/semaine"
+   "Un travail mental individualisé autour de tes objectifs et des situations de ta vie quotidienne",
+   "Exercices et routines ajustés au fil des retours ; jusqu’à 1 visio de 45 min par semaine"
   ],
   "groups": {
    "AK PRIME": [
-    "Questionnaire initial de préparation mentale",
-    "Espace de séances mentales, exercices à réaliser entre les séances et routines adaptées",
-    "Respiration, recentrage, gestion des émotions, confiance, estime de soi, résilience, concentration et imagerie",
-    "Historique des séances et du parcours dans le dossier client"
+    "Questionnaire initial : besoins, situations de vie, objectifs et contraintes",
+    "Choix des habiletés et outils mentaux en fonction de tes besoins, sans programme de thèmes imposés",
+    "Exercices, routines personnalisées et mises en situation entre les visios",
+    "Débrief des situations vécues et évolution progressive des outils dans le temps",
+    "Historique des séances, exercices et routines dans l’espace client"
    ],
    "Visios": [
     "Visio initiale de 45 minutes",
-    "Jusqu’à 1 visio de 45 minutes par semaine"
+    "Jusqu’à 1 visio de 45 minutes par semaine, au rythme des besoins et des objectifs"
    ]
   }
  },
  "mental|sportif": {
   "label": "Préparation mentale — Sportif",
   "summary": [
-   "Routines de compétition, pression, recentrage et outils mentaux spécifiques au sport",
-   "Séances et débriefs sportifs ; jusqu’à une visio de 45 min/semaine"
+   "Un accompagnement mental intégré aux entraînements, aux matchs et à la saison sportive",
+   "Routines quotidiennes et avant/pendant/après-match ; contenu et rythme adaptés au calendrier sportif"
   ],
   "groups": {
    "AK PRIME": [
-    "Questionnaire initial de préparation mentale",
-    "Espace de séances mentales, exercices entre les séances et routines personnalisées",
-    "Gestion du stress et des émotions, confiance, concentration, respiration et imagerie",
-    "Routines avant l’entraînement et la compétition, gestion de la pression, mot-clé individuel et recentrage après erreur",
-    "Imagerie sportive, double tâche et débriefs d’entraînement ou de compétition"
+    "Questionnaire initial : discipline, niveau, rôle, calendrier sportif, objectifs et situations prioritaires",
+    "Plan de travail mental évolutif selon la saison : préparation, compétition, récupération et périodes de transition",
+    "Routines courtes et personnalisées à pratiquer au quotidien, ainsi qu’avant et pendant les entraînements",
+    "Avant-match : routine de préparation, activation, objectifs de performance et scénarios de compétition",
+    "Pendant le match : outils autonomes de recentrage après erreur, temps faibles, pression, interruptions ou changements de situation",
+    "Après-match : débrief structuré, recul sur la performance, apprentissages et récupération mentale",
+    "Exercices appliqués à la discipline : imagerie, attention, dialogue interne, prise de décision ou double tâche selon les besoins",
+    "Ajustement des routines et du contenu des séances selon les retours de terrain, les échéances et la progression",
+    "Historique des séances, routines et exercices pour suivre les évolutions dans le temps"
    ],
    "Visios": [
     "Visio initiale de 45 minutes",
-    "Jusqu’à 1 visio de 45 minutes par semaine"
+    "Jusqu’à 1 visio de 45 minutes par semaine ; rendez-vous répartis selon les matchs, les phases de saison et les besoins, dans cette limite"
    ]
   }
  }
@@ -4183,8 +4188,8 @@ function renderPublicSite(){
  '</div></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Préparation mentale</h3><p>Deux accompagnements selon votre contexte : quotidien ou performance sportive.</p></div></div>'+
   '<div class="public-offers">'+
- publicOfferCard('Mental','Particulier','199','Mental','Développez vos ressources mentales pour mieux vivre les situations importantes du quotidien.','Vous souhaitez travailler le stress, les émotions, la confiance, l’estime de soi, la résilience, la concentration ou le recentrage.',['Questionnaire initial','Visio initiale de 45 min','Jusqu’à 1 visio de 45 min / semaine','Gestion du stress et des émotions','Respiration et recentrage','Confiance, estime de soi et résilience','Imagerie mentale et exercices de concentration','Routines adaptées aux situations rencontrées','Exercices à mettre en pratique entre les visios'],'PARTICULIER = développement des habiletés mentales générales, sans contexte sportif spécifique.')+
- publicOfferCard('Mental','Sportif','249','Mental sportif','Développez des stratégies mentales utiles à l’entraînement, avant, pendant et après la compétition.','Vous souhaitez construire des outils mentaux utilisables avant, pendant et après la performance.',['Tout le contenu Particulier','Jusqu’à 1 visio de 45 min / semaine','Routine pré-entraînement / pré-compétition','Gestion de la pression et des moments importants','Stratégie de recentrage après une erreur','Mot-clé individuel','Imagerie appliquée aux situations sportives','Concentration en double tâche','Débrief des entraînements / compétitions importantes'],'SPORTIF = le travail mental est contextualisé à l’entraînement, à la compétition et aux situations de performance.',true)+
+ publicOfferCard('Mental','Particulier','199','Mental','Un accompagnement personnalisé pour progresser face aux situations concrètes de ton quotidien.','Tu veux développer tes ressources mentales selon tes objectifs et tes difficultés propres.',['Questionnaire initial et objectifs personnalisés','Exercices et routines applicables au quotidien','Retour sur les situations vécues et évolution des outils','Jusqu’à 1 visio de 45 min / semaine'],'PARTICULIER = une progression adaptée aux besoins de la vie quotidienne, sans parcours standardisé.')+
+ publicOfferCard('Mental','Sportif','249','Mental sportif','Un suivi mental qui évolue avec tes entraînements, tes matchs et les temps forts de ta saison.','Tu veux intégrer la préparation mentale à ta pratique et adapter ton travail selon ton calendrier sportif.',['Bilan du calendrier, des objectifs et des moments clés','Routines quotidiennes et à l’entraînement','Préparation avant-match, stratégies pendant le match','Débriefs après-match et ajustements au fil de la saison','Visios positionnées selon les échéances, jusqu’à 1 × 45 min / semaine'],'SPORTIF = un travail appliqué sur le terrain, avant, pendant et après les compétitions, et évolutif selon la saison.',true)+
  '</div></div>'+
  '</div></section>'+
  '</div></section>'+
@@ -4306,8 +4311,8 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
   'Renforcé':{label:'Renforcé',summary:'Un accompagnement croisant charge et état de forme, avec ajustements hebdomadaires.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Questionnaire hebdomadaire d’état de forme (sommeil, fatigue, stress)','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
  };
  const mental={
-  Particulier:{label:'Particulier',summary:'Développer vos habiletés mentales dans les situations du quotidien.',points:['Échange et questionnaire initial','Objectifs et exercices personnalisés','Motivation, émotions et résilience','Confiance, attention et routines','Jusqu’à 1 visio de 45 min / semaine']},
-  Sportif:{label:'Sportif',summary:'Mobiliser vos ressources mentales à l’entraînement et en compétition, quel que soit votre niveau.',points:['Socle des habiletés mentales générales','Routines intégrées aux entraînements habituels','Préparation mentale avant et pendant la compétition','Débrief et récupération mentale après compétition','Pression, erreurs, recentrage et mot-clé','Exercices adaptés à votre discipline','Jusqu’à 1 visio de 45 min / semaine']}
+  Particulier:{label:'Particulier',summary:'Un suivi centré sur tes propres objectifs et tes situations de vie.',points:['Questionnaire et objectifs individuels','Routines et exercices selon les besoins','Débrief des situations vécues','Progression et outils réévalués au fil des séances','Jusqu’à 1 visio de 45 min / semaine']},
+  Sportif:{label:'Sportif',summary:'La préparation mentale intégrée à ta saison et à chaque temps de la compétition.',points:['Calendrier sportif et situations prioritaires','Routines quotidiennes et en entraînement','Préparation avant-match','Outils autonomes pendant le match','Débrief et récupération mentale après-match','Séances ajustées selon échéances et progression','Jusqu’à 1 visio de 45 min / semaine']}
  };
  const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
   if(details){const rights=akpOfferItems(pole,name);if(rights)details.points=rights;}
@@ -4362,12 +4367,12 @@ function openPublicPoleDetails(key){
   },
   mental:{
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
-   intro:'Des habiletés mentales et des outils concrets pour le quotidien ou la pratique sportive, à tout niveau.',
-   forWho:['Toute personne souhaitant mieux se connaître, développer ses ressources et avancer vers ses objectifs','Personne traversant des changements, des défis personnels ou des situations exigeantes','Sportif débutant, amateur ou confirmé souhaitant renforcer ses habiletés mentales à l’entraînement et en compétition'], 
-   work:['Connaissance de soi, motivation, objectifs et engagement dans la durée','Gestion des émotions, pression, activation et récupération mentale','Confiance, estime de soi, dialogue interne, attention et concentration','Résilience, gestion des erreurs et adaptation face aux difficultés','Respiration, imagerie mentale, routines et stratégies de recentrage','En contexte sportif : routines et exercices intégrés aux entraînements habituels, préparation avant et pendant la compétition, débrief et récupération mentale après, prise de décision, mot-clé et double tâche'], 
-   flow:[['01','Faire le point','Identifier vos besoins, votre contexte et vos priorités.'],['02','Définir les objectifs','Choisir ensemble les habiletés mentales à développer.'],['03','Mettre en pratique','Expérimenter des outils adaptés entre les échanges.'],['04','Faire évoluer','Analyser les retours et transférer les acquis dans votre quotidien ou votre pratique sportive.']],
-   note:'L’accompagnement Particulier développe les habiletés mentales dans la vie quotidienne ; la formule Sportif applique également ce travail à l’entraînement et à la compétition, quel que soit votre niveau. Il ne s’agit ni d’une psychothérapie ni d’une prise en charge de troubles psychiques.',
-   offers:[['Mental','Particulier',199,'Habiletés mentales générales + jusqu’à 1 visio de 45 min/semaine.',false],['Mental','Sportif',249,'Habiletés mentales et routines intégrées aux entraînements, avant, pendant et après la compétition.',true]]
+   intro:'Deux suivis personnalisés : l’un pour les enjeux du quotidien, l’autre intégré à l’entraînement, à la compétition et au calendrier de la saison.',
+   forWho:['Personne qui souhaite progresser sur des situations personnelles, professionnelles ou relationnelles','Personne qui recherche des outils mentaux concrets, choisis selon ses objectifs et non à partir d’une liste imposée','Sportif débutant, amateur ou confirmé souhaitant préparer, vivre et analyser ses entraînements et compétitions'],
+   work:['Définir les priorités individuelles, choisir les outils utiles puis les faire évoluer au fil du suivi','Particulier : routines, mises en situation et débriefs adaptés aux défis de la vie quotidienne','Sportif : construire des routines quotidiennes, ainsi que des routines avant et pendant les entraînements','Sportif : préparer les matchs, établir des stratégies autonomes pendant le jeu et débriefer après la compétition','Sportif : organiser le travail mental selon le calendrier, les périodes de charge et les échéances importantes','Selon les besoins : activation, régulation émotionnelle, attention, confiance, dialogue interne, imagerie, prise de décision ou recentrage'],
+   flow:[['01','Comprendre','Identifier le contexte, les situations prioritaires et les objectifs.'],['02','Organiser','Définir les outils et le rythme du travail ; pour le sportif, tenir compte du calendrier.'],['03','Mettre en pratique','Tester les routines dans le quotidien ou aux entraînements et matchs.'],['04','Faire évoluer','Débriefer, modifier les exercices et adapter la progression aux retours et aux échéances.']],
+   note:'Les habiletés travaillées dépendent des besoins de chacun : tous les thèmes ne sont pas systématiquement abordés. En Sportif, les routines de match sont réalisées par le sportif lui-même sur le terrain ; il ne s’agit pas d’une présence du coach pendant le match. Les visios restent limitées à une par semaine maximum et peuvent être réparties selon les échéances. Cet accompagnement ne remplace pas une psychothérapie ni une prise en charge de troubles psychiques.',
+   offers:[['Mental','Particulier',199,'Objectifs individuels, exercices quotidiens et réévaluations selon les retours.',false],['Mental','Sportif',249,'Routines entraînement/match, débriefs et séances adaptées au calendrier sportif.',true]]
   }
  };
  const x=configs[key];if(!x)return;
@@ -4418,15 +4423,15 @@ function publicOfferDetailData(pole,name){
   },
   'mental|particulier':{
    title:'Préparation mentale — Particulier',
-   promise:'Un accompagnement régulier pour travailler des habiletés mentales concrètes dans les situations qui te posent problème.',
-   diff:'Le travail est centré sur tes objectifs personnels : stress, émotions, confiance, concentration, routines, imagerie et maintien des habitudes.',
-   example:'Une situation te déclenche régulièrement du stress. On construit une routine de respiration/recentrage, tu la testes entre deux visios puis on ajuste selon ce qui fonctionne réellement.'
+   promise:'Un suivi mental adapté à tes objectifs personnels et aux situations que tu rencontres dans la vie quotidienne.',
+   diff:'On choisit les exercices et les routines selon tes besoins, puis on les fait évoluer au fil de tes retours et des situations vécues.',
+   example:'Tu souhaites être plus à l’aise dans une situation récurrente. On construit un outil que tu testes dans ton quotidien, puis on le réajuste à partir de ton expérience.'
   },
   'mental|sportif':{
    title:'Préparation mentale — Sportif',
-   promise:'Les mêmes fondamentaux, directement transférés à l’entraînement, au match et aux moments de pression.',
-   diff:'La formule Sportif contextualise le travail : routine pré-performance, réaction à l’erreur, mot-clé, imagerie sportive, double tâche et débrief compétition.',
-   example:'Après une erreur en match, tu as tendance à rester bloqué dessus. On construit un protocole court de recentrage avec respiration et mot-clé, puis on le teste et on le débriefe sur les compétitions suivantes.'
+   promise:'Un plan mental qui suit ta saison : entraînements, avant-match, outils pendant la compétition et débrief après-match.',
+   diff:'Au-delà des outils personnalisés, on structure leur utilisation au quotidien et sur le terrain ; le contenu et le rythme des séances mentales évoluent avec le calendrier sportif, sans dépasser le plafond de visios prévu.',
+   example:'La semaine d’un match important, on priorise une routine pré-match et des stratégies de recentrage en jeu. Après la rencontre, on débriefe les moments clés pour modifier les exercices avant les prochains matchs.'
   }
  };
  return map[key]||null;
@@ -4445,7 +4450,7 @@ function akOfferDemoConfiguration(pole,name){
   'forme & santé|standard':{label:'Forme & Santé · Standard',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Remise en forme',quota:1,period:'month',minutes:30,video:'1 vidéo / mois',goal:'Reprendre durablement',sleep:false,macros:false,mental:false},
   'forme & santé|renforcé':{label:'Forme & Santé · Renforcé',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Condition physique',quota:2,period:'month',minutes:30,video:'1 vidéo / semaine',goal:'Progression et habitudes durables',sleep:false,macros:true,mental:false},
   'mental|particulier':{label:'Préparation mentale · Particulier',first:'Léa',last:'Moreau',sport:'',level:'Accompagnement individuel',specialty:'Confiance et émotions',quota:1,period:'week',minutes:45,video:'Exercices et routines',goal:'Stress et confiance en soi',sleep:false,macros:false,mental:true},
-  'mental|sportif':{label:'Préparation mentale · Sportif',first:'Noah',last:'Bernard',sport:'Basketball',level:'National',specialty:'Meneur',quota:1,period:'week',minutes:45,video:'Routines de compétition',goal:'Concentration et pression du match',sleep:false,macros:false,mental:true}
+  'mental|sportif':{label:'Préparation mentale · Sportif',first:'Noah',last:'Bernard',sport:'Basketball',level:'National',specialty:'Meneur',quota:1,period:'week',minutes:45,video:'Routines de compétition',goal:'Routines avant, pendant et après-match',sleep:false,macros:false,mental:true}
  };
  return specs[key]||null;
 }
@@ -4760,20 +4765,23 @@ function akOfferConcreteItems(pole,name){
    'Passeport AK PRIME : tests, cycles, résultats et progression.'
   ],
   'mental|particulier':[
-   'Questionnaire initial pour identifier les situations difficiles et les objectifs.',
-   'Travail sur stress, émotions, confiance, concentration et estime de soi.',
-   'Respiration, recentrage, imagerie et routines individualisées.',
-   'Exercices concrets à réaliser entre les séances, avec débriefs.',
+   'Questionnaire initial pour préciser tes objectifs et les situations du quotidien à travailler.',
+   'Outils mentaux et routines choisis selon tes besoins : aucun thème imposé.',
+   'Mises en pratique entre les visios, avec débriefs et ajustements progressifs.',
    'Visio initiale de 45 minutes, puis jusqu’à 1 visio de 45 minutes par semaine.',
-   'Historique des séances et du parcours accessible dans AK PRIME.'
+   'Historique des séances, exercices et routines dans AK PRIME.'
   ],
   'mental|sportif':[
-   'Questionnaire initial adapté au sport et au contexte de compétition.',
-   'Travail sur pression, confiance, concentration et gestion des erreurs.',
-   'Routines de compétition, respiration, recentrage et mot-clé individuel.',
-   'Imagerie, double tâche et exercices entre les séances avec débriefs.',
-   'Visio initiale de 45 minutes, puis jusqu’à 1 visio de 45 minutes par semaine.',
-   'Historique du suivi mental et des séances dans AK PRIME.'
+   'Questionnaire initial : discipline, calendrier, rôle, objectifs et moments de compétition prioritaires.',
+   'Plan de préparation mentale évolutif selon les périodes et échéances sportives.',
+   'Routines quotidiennes, ainsi qu’avant et pendant les entraînements.',
+   'Avant-match : préparation, activation, routine et objectifs concrets.',
+   'Pendant le match : outils de recentrage autonomes, gestion des erreurs et des temps faibles.',
+   'Après-match : débrief, récupération mentale et adaptation des outils pour la suite.',
+   'Exercices sportifs personnalisés : imagerie, dialogue interne, attention ou double tâche selon les besoins.',
+   'Contenu et fréquence des séances mentales réajustés au fil du calendrier et des retours.',
+   'Visio initiale de 45 minutes, puis jusqu’à 1 visio de 45 minutes par semaine, réparties selon les échéances.',
+   'Historique des routines, séances et exercices dans AK PRIME.'
   ]
  };
  return offers[key]||publicOfferBenefits(pole,name);
@@ -4793,8 +4801,8 @@ function akOfferCardHighlights(pole,name){
   'performance|p3':['Adaptation de charge sous 48 h si nécessaire','Agenda sommeil et budget de macronutriments','Jusqu’à 1 visio de 30 min / semaine'],
   'forme & santé|standard':['Programme individualisé et charge sRPE','Correction si gêne ou difficulté signalée','1 vidéo / mois · 1 visio de 30 min / mois'],
   'forme & santé|renforcé':['Charge et état de forme suivis chaque semaine','Adaptation hebdomadaire de la programmation','Jusqu’à 1 vidéo / semaine · 2 visios / mois'],
-  'mental|particulier':['Gestion du stress, confiance et émotions','Exercices et routines entre les visios','Jusqu’à 1 visio de 45 min / semaine'],
-  'mental|sportif':['Pression, routines de compétition et recentrage','Imagerie, concentration et gestion des erreurs','Jusqu’à 1 visio de 45 min / semaine']
+  'mental|particulier':['Objectifs et situations de vie','Exercices et routines adaptés aux retours','Jusqu’à 1 visio de 45 min / semaine'],
+  'mental|sportif':['Avant, pendant et après les matchs','Routines quotidiennes, entraînements et débriefs','Suivi organisé selon le calendrier sportif']
  };
  return map[(pole+'|'+name).toLowerCase()]||publicOfferPreview(pole,name);
 }
@@ -4836,8 +4844,8 @@ function akOfferKeyFacts(pole,name,performance){
  const source={
   'Forme & Santé|Standard':[['PROGRAMME','Individualisé'],['ANALYSE VIDÉO','Jusqu’à 1 / mois'],['VISIO','1 × 30 min / mois']],
   'Forme & Santé|Renforcé':[['ADAPTATION','Hebdomadaire'],['ANALYSE VIDÉO','Jusqu’à 1 / semaine'],['VISIO','2 × 30 min / mois']],
-  'Mental|Particulier':[['OBJECTIF','Habiletés mentales'],['OUTILS','Exercices et routines'],['VISIO','Jusqu’à 1 × 45 min / semaine']],
-  'Mental|Sportif':[['CONTEXTE','Entraînement et compétition'],['OUTILS','Routines et recentrage'],['VISIO','Jusqu’à 1 × 45 min / semaine']]
+  'Mental|Particulier':[['CADRE','Situations de vie'],['SUIVI','Exercices et évolution'],['VISIO','Jusqu’à 1 × 45 min / semaine']],
+  'Mental|Sportif':[['CONTEXTE','Entraînements et matchs'],['MÉTHODE','Avant · pendant · après'],['RYTHME','Selon calendrier sportif']]
  };
  const facts=performance||source[pole+'|'+name]||[];
  return '<div class="akEditorialFacts">'+facts.map(([label,value])=>
@@ -4972,32 +4980,41 @@ function akOfferComparisonData(pole){
   names:['Particulier','Sportif'],
   rows:[
    ['Questionnaire initial',
-    yes('Inclus','Contexte du quotidien'),
-    yes('Inclus','Contexte sportif')],
-   ['Objectifs travaillés',
-    yes('Stress & confiance','Émotions, estime de soi, résilience'),
-    yes('Pression & performance','Confiance, émotions, erreurs')],
-   ['Respiration & recentrage',
-    yes('Outils personnalisés','Situations du quotidien'),
-    yes('Mot-clé & recentrage','Entraînement et compétition')],
-   ['Routines & imagerie',
-    yes('Routines personnelles','Imagerie et attention'),
-    yes('Routines de compétition','Imagerie sportive et double tâche')],
-   ['Exercices entre séances',
-    yes('Exercices personnalisés','Mise en pratique au quotidien'),
-    yes('Exercices personnalisés','Transfert sur le terrain')],
-   ['Débriefs & progression',
-    yes('Retours sur les exercices','Adaptations selon les situations'),
-    yes('Débriefs sportifs','Entraînements et compétitions')],
+    yes('Personnalisé','Objectifs et situations du quotidien'),
+    yes('Personnalisé','Discipline, saison et échéances')],
+   ['Travail mental',
+    yes('Selon tes besoins','Aucun thème imposé'),
+    yes('Selon tes besoins','Transfert dans les situations sportives')],
+   ['Routines régulières',
+    yes('Vie quotidienne','Habitudes et situations réelles'),
+    yes('Quotidien + entraînement','Intégrées à la pratique sportive')],
+   ['Avant entraînement / match',
+    no(),
+    yes('Préparation ciblée','Activation, objectifs et routine')],
+   ['Pendant entraînement / match',
+    no(),
+    yes('Stratégies autonomes','Recentrage, erreurs, temps faibles')],
+   ['Après entraînement / match',
+    no(),
+    yes('Débrief & récupération','Bilan et apprentissages concrets')],
+   ['Calendrier sportif',
+    no(),
+    yes('Pris en compte','Séances organisées autour des échéances')],
+   ['Fréquence des exercices',
+    yes('Adaptée aux besoins','Selon les situations à travailler'),
+    yes('Évolutive','Selon matchs, entraînements et phases de saison')],
+   ['Évolution du suivi',
+    yes('Progression individualisée','Outils revus selon les retours'),
+    yes('Progression contextualisée','Routines revues après les compétitions')],
    ['Visio initiale',
     yes('1 × 45 min'),
     yes('1 × 45 min')],
    ['Visios de suivi',
     yes('Jusqu’à 1 × 45 min / semaine'),
-    yes('Jusqu’à 1 × 45 min / semaine')],
+    yes('Jusqu’à 1 × 45 min / semaine','Positionnées selon les échéances')],
    ['Espace client AK PRIME',
-    yes('Séances & exercices','Routines et historique'),
-    yes('Séances & exercices','Routines sportives et historique')]
+    yes('Séances et exercices','Routines et historique'),
+    yes('Séances et exercices','Routines sportives et historique')]
   ]
  };
  return null;
