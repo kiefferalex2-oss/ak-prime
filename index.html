@@ -3995,6 +3995,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
    "Optitrainer": [
     "Programmation individualisée selon le sport, le calendrier, le matériel et les objectifs",
     "Suivi de charge d’entraînement sRPE",
+    "Échauffement individualisé selon le sport, les objectifs et la séance, dans Optitrainer",
     "Corrections lorsque surviennent une gêne, douleur, problème physique ou difficulté importante ; pas d’ajustement systématique selon la forme"
    ],
    "WhatsApp": [
@@ -4176,8 +4177,8 @@ function renderPublicSite(){
  '</div></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Performance & Réathlétisation</h3><p>Préparation physique ou retour progressif au sport après une blessure : trois niveaux de suivi adaptés à votre objectif.</p></div></div>'+
   '<div class="public-offers">'+
- publicOfferCard('Performance','P1','149','Essentiel','Une préparation physique ou une réathlétisation sur mesure, avec des repères clairs pour mesurer vos progrès.','Vous souhaitez un plan individualisé et mesuré, avec une bonne autonomie entre les bilans.',['Programmation selon sport, calendrier, niveau et matériel','Tests réalisables à distance selon les besoins','Analyse technique vidéo : jusqu’à 2 vidéos / mois','Suivi de charge sRPE + check-in hebdomadaire','Retest systématique à 6 semaines','Modification uniquement en cas de retour négatif, douleur, gêne, problème physique ou difficulté importante','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],'P1 ne modifie pas le programme selon l’état de forme quotidien : tant que tout va bien, la planification suit son cours.')+
- publicOfferCard('Performance','P2','199','Avancé','Votre préparation physique ou votre réathlétisation évolue chaque semaine selon vos séances, votre état de forme et votre contexte.','Vous souhaitez que la semaine suivante soit adaptée à votre charge et à votre bien-être.',['Tout le contenu P1','Analyse technique vidéo hebdomadaire des mouvements prioritaires, regroupée dans un envoi','Questionnaire Hooper : fatigue, stress, sommeil perçu et douleurs musculaires','Ajustement hebdomadaire selon charge + Hooper + contexte sportif','Échauffement individualisé','Gestion des phases de récupération par allègement de la programmation, sans séance supplémentaire dédiée','Prise en compte du cycle menstruel chez les femmes pour contextualiser symptômes, bien-être et charge','2 visios de 30 min / mois','Retest à 6 semaines'],'P2 = pilotage de la semaine. Hooper, charge et contexte servent à décider chaque semaine des ajustements à apporter.',true)+
+ publicOfferCard('Performance','P1','149','Essentiel','Une préparation physique ou une réathlétisation sur mesure, avec des repères clairs pour mesurer vos progrès.','Vous souhaitez un plan individualisé et mesuré, avec une bonne autonomie entre les bilans.',['Programmation selon sport, calendrier, niveau et matériel','Tests réalisables à distance selon les besoins','Analyse technique vidéo : jusqu’à 2 vidéos / mois','Suivi de charge sRPE + check-in hebdomadaire','Échauffement individualisé','Retest systématique à 6 semaines','Modification uniquement en cas de retour négatif, douleur, gêne, problème physique ou difficulté importante','1 visio de 30 min / mois','Optitrainer + Passeport AK PRIME'],'P1 ne modifie pas le programme selon l’état de forme quotidien : tant que tout va bien, la planification suit son cours.')+
+ publicOfferCard('Performance','P2','199','Avancé','Votre préparation physique ou votre réathlétisation évolue chaque semaine selon vos séances, votre état de forme et votre contexte.','Vous souhaitez que la semaine suivante soit adaptée à votre charge et à votre bien-être.',['Tout le contenu P1','Analyse technique vidéo hebdomadaire des mouvements prioritaires, regroupée dans un envoi','Questionnaire Hooper : fatigue, stress, sommeil perçu et douleurs musculaires','Ajustement hebdomadaire selon charge + Hooper + contexte sportif','Gestion des phases de récupération par allègement de la programmation, sans séance supplémentaire dédiée','Prise en compte du cycle menstruel chez les femmes pour contextualiser symptômes, bien-être et charge','2 visios de 30 min / mois','Retest à 6 semaines'],'P2 = pilotage de la semaine. Hooper, charge et contexte servent à décider chaque semaine des ajustements à apporter.',true)+
  publicOfferCard('Performance','P3','299','Premium','Un suivi rapproché pour ajuster votre préparation physique ou votre retour au sport lorsque votre état de forme le nécessite.','Vous souhaitez une prise en charge plus réactive de la fatigue, du sommeil, de la récupération et des périodes exigeantes.',['Tout le contenu P2','Analyse technique vidéo des mouvements utiles issus des séances, selon les besoins','Suivi complet du sommeil : durée, qualité perçue, régularité et évolution','Budget calorique et macronutriments adapté aux besoins sportifs, sans menus','Ajustement de la programmation sous 48 h lorsque l’état de forme le nécessite','Séances de récupération dédiées ajoutées lorsque nécessaire','Suivi rapproché des périodes de forte charge et des compétitions','Prise en compte du cycle menstruel chez les femmes','Jusqu’à 1 visio de 30 min / semaine','Retest à 6 semaines puis réévaluations selon les besoins'],'P3 = pilotage rapproché. Le sommeil et l’état de forme sont suivis plus finement, avec une capacité d’ajustement sous 48 h et de vraies séances de récupération dédiées.')+
  '</div></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Préparation mentale</h3><p>Deux accompagnements selon votre contexte : quotidien ou performance sportive.</p></div></div>'+
@@ -4296,8 +4297,8 @@ function openPublicLogin(message='',isError=false){
 function poleOfferMini(pole,name,price,subtitle,featured=false){
  price=publicCatalogPrice(pole,name,price);
  const perf={
-  P1:{label:'Essentiel',summary:'Une programmation individualisée avec un suivi régulier.',points:['Programmation adaptée à votre discipline','Suivi de charge (sRPE)','2 analyses vidéo / mois','Réévaluation à 6 semaines','1 visio / mois']},
-  P2:{label:'Avancé',summary:'Un suivi plus précis, avec des adaptations chaque semaine.',points:['Tout le contenu P1','Analyse vidéo hebdomadaire','Questionnaire de bien-être (Hooper)','Ajustements hebdomadaires','Échauffement individualisé','Prise en compte du cycle menstruel','2 visios / mois']},
+  P1:{label:'Essentiel',summary:'Une programmation individualisée avec un suivi régulier.',points:['Programmation adaptée à votre discipline','Suivi de charge (sRPE)','Échauffement individualisé','2 analyses vidéo / mois','Réévaluation à 6 semaines','1 visio / mois']},
+  P2:{label:'Avancé',summary:'Un suivi plus précis, avec des adaptations chaque semaine.',points:['Tout le contenu P1','Analyse vidéo hebdomadaire','Questionnaire de bien-être (Hooper)','Ajustements hebdomadaires','Prise en compte du cycle menstruel','2 visios / mois']},
   P3:{label:'Premium',summary:'Un accompagnement rapproché, avec une gestion approfondie de votre état de forme.',points:['Tout le contenu P2','Analyses vidéo selon vos besoins','Suivi complet du sommeil','Ajustements sous 48 h','Récupération dédiée','Repères nutritionnels personnalisés (macros)']}
  };
  const forme={
@@ -4348,7 +4349,7 @@ function openPublicPoleDetails(key){
    work:['Programmation de la force et des qualités neuromusculaires','Planification des charges et organisation des cycles d’entraînement','Tests de terrain réalisables à distance : force estimée, saut, vitesse, changements de direction, VMA/VMI selon le contexte','Analyse vidéo des mouvements et suivi de charge interne (sRPE)','Suivi de l’état de forme, de la récupération et du sommeil selon la formule','Repères nutritionnels personnalisés : estimation des besoins énergétiques et répartition des macronutriments selon la formule','Prise en compte du cycle menstruel et des symptômes rapportés pour guider les ajustements réguliers selon la formule'], 
    flow:[['01','Évaluer','Questionnaire, contexte sportif et tests réalisables à distance.'],['02','Planifier','Construire le cycle selon sport, calendrier et contraintes.'],['03','Suivre','sRPE, retours et Hooper à partir de P2.'],['04','Adapter','Du correctif en P1 au pilotage sous 48 h en P3.']],
    note:'Les tests et outils sont sélectionnés en fonction du sport, du matériel et des conditions de réalisation à distance. La réathlétisation intervient en complément de la prise en charge médicale ou kinésithérapique lorsque celle-ci est nécessaire.',
-   offers:[['Performance','P1',149,'Programme + sRPE + 2 vidéos/mois + retest S6 + 1 visio/mois.',false],['Performance','P2',199,'P1 + analyse vidéo hebdo + Hooper + ajustement hebdo + échauffement + cycle + 2 visios/mois.',true],['Performance','P3',299,'P2 + vidéo selon besoins + sommeil complet + macros + ajustement sous 48 h + récupération dédiée.',false]]
+   offers:[['Performance','P1',149,'Programme + sRPE + 2 vidéos/mois + retest S6 + 1 visio/mois.',false],['Performance','P2',199,'P1 + analyse vidéo hebdo + Hooper + ajustement hebdo + cycle + 2 visios/mois.',true],['Performance','P3',299,'P2 + vidéo selon besoins + sommeil complet + macros + ajustement sous 48 h + récupération dédiée.',false]]
   },
   forme:{
    label:'PÔLE FORME & SANTÉ',title:'Forme & Santé',
@@ -4406,7 +4407,7 @@ function publicOfferDetailData(pole,name){
   'performance|p2':{
    title:'Performance — P2',
    promise:'Le niveau où la charge et le bien-être commencent à piloter réellement la semaine suivante.',
-   diff:'P2 ajoute Hooper, l’analyse vidéo hebdomadaire des priorités, l’échauffement individualisé et un ajustement hebdomadaire de la programmation.',
+   diff:'P2 ajoute Hooper, l’analyse vidéo hebdomadaire des priorités et un ajustement hebdomadaire de la programmation.',
    example:'Après un match chargé, ton sRPE monte et ton Hooper montre plus de fatigue et de courbatures. La semaine suivante peut être allégée, réorganisée et accompagnée d’un échauffement adapté.'
   },
   'performance|p3':{
@@ -4713,6 +4714,7 @@ function akOfferConcreteItems(pole,name){
   'performance|p1':[
    'Programme individualisé accessible sur Optitrainer selon ton sport, tes objectifs, ton calendrier et ton matériel.',
    'Charge de chaque séance suivie avec la méthode sRPE.',
+   'Échauffement individualisé selon la séance, tes objectifs et ton sport.',
    'Programmation corrigée si tu signales une douleur, une gêne ou une difficulté importante.',
    'Jusqu’à 2 analyses techniques vidéo par mois via WhatsApp.',
    '1 visio de 30 minutes par mois.',
@@ -4910,7 +4912,7 @@ function akOfferComparisonData(pole){
     yes('1 / semaine','WhatsApp'),
     yes('Selon les besoins','WhatsApp · sans quota fixe')],
    ['Échauffement & récupération',
-    yes('Échauffement prévu','Correction si gêne'),
+    yes('Échauffement individualisé','Correction si gêne'),
     yes('Échauffement individualisé','Allègement si nécessaire'),
     yes('Échauffement individualisé','Récupération dédiée si besoin · techniques mentales utiles')],
    ['Nutrition',
