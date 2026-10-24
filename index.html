@@ -4554,7 +4554,7 @@ function akOfferConcreteItems(pole,name){
  const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
  const offers={
   'performance|p1':[
-   'Programme individualisé selon ton sport, tes objectifs, ton calendrier et ton matériel.',
+   'Programme individualisé accessible sur Optitrainer selon ton sport, tes objectifs, ton calendrier et ton matériel.',
    'Charge de chaque séance suivie avec la méthode sRPE.',
    'Programmation corrigée si tu signales une douleur, une gêne ou une difficulté importante.',
    'Jusqu’à 2 analyses techniques vidéo par mois via WhatsApp.',
@@ -4563,7 +4563,7 @@ function akOfferConcreteItems(pole,name){
    'Passeport AK PRIME : cycles, résultats et progression.'
   ],
   'performance|p2':[
-   'Programme individualisé selon sport, calendrier, objectifs et matériel.',
+   'Programme individualisé accessible sur Optitrainer selon sport, calendrier, objectifs et matériel.',
    'Charge sRPE et questionnaire Hooper : fatigue, stress, sommeil perçu et douleurs musculaires.',
    'Adaptation hebdomadaire du volume, de l’intensité ou du contenu selon charge et Hooper.',
    'Échauffement individualisé ; récupération gérée en allégeant la programmation si nécessaire.',
@@ -4573,7 +4573,7 @@ function akOfferConcreteItems(pole,name){
    'Prise en compte du cycle menstruel lorsque pertinent.'
   ],
   'performance|p3':[
-   'Programme individualisé et suivi de charge sRPE.',
+   'Séances et programme individualisé accessibles sur Optitrainer, avec suivi de charge sRPE.',
    'Hooper, état de forme rapproché et agenda détaillé du sommeil (durée, qualité, régularité).',
    'Ajustement de la charge sous 48 h si la fatigue, le sommeil ou le contexte le justifient.',
    'Échauffement individualisé et séances de récupération dédiées si nécessaire.',
@@ -4584,7 +4584,7 @@ function akOfferConcreteItems(pole,name){
    'Prise en compte du cycle menstruel lorsque pertinent.'
   ],
   'forme & santé|standard':[
-   'Programme individualisé selon tes objectifs, ton matériel et tes contraintes.',
+   'Séances et programme individualisé accessibles sur Optitrainer selon tes objectifs, ton matériel et tes contraintes.',
    'Suivi hebdomadaire de la charge sRPE.',
    'Corrections du programme si tu signales une gêne, une douleur ou une difficulté.',
    'Jusqu’à 1 analyse technique vidéo par mois via WhatsApp.',
@@ -4592,7 +4592,7 @@ function akOfferConcreteItems(pole,name){
    'Passeport AK PRIME : tests, cycles, résultats et progression.'
   ],
   'forme & santé|renforcé':[
-   'Programme individualisé selon tes objectifs, ton matériel et tes contraintes.',
+   'Séances et programme individualisé accessibles sur Optitrainer selon tes objectifs, ton matériel et tes contraintes.',
    'Suivi hebdomadaire de la charge sRPE et de l’état de forme (fatigue, stress, récupération, sommeil perçu).',
    'Adaptation de la programmation chaque semaine selon la charge et l’état de forme.',
    'Jusqu’à 1 analyse technique vidéo par semaine via WhatsApp.',
@@ -4640,6 +4640,39 @@ function akOfferCardHighlights(pole,name){
  return map[(pole+'|'+name).toLowerCase()]||publicOfferPreview(pole,name);
 }
 
+// Explication explicite des accès : programmation chez Optitrainer, suivi chez AK PRIME.
+// Le back-office est réservé au coach et ne constitue pas un accès client.
+function akOfferPlatforms(pole,name){
+ const mental=pole==='Mental';
+ const premium=pole==='Performance'&&name==='P3';
+ const advanced=(pole==='Performance'&&name==='P2')||(pole==='Forme & Santé'&&name==='Renforcé');
+ const online=mental
+  ?['Ton espace client AK PRIME','Retrouve tes séances mentales, routines, exercices entre les séances et rendez-vous.']
+  :['Ton espace client AK PRIME','Retrouve tes bilans, tes rendez-vous, ton Passeport, tes tests et tes courbes de progression.'];
+ const optiDetails=advanced
+   ?'Consulte tes séances et exercices ; ton coach ajuste la programmation selon tes retours hebdomadaires.'
+   :premium
+     ?'Consulte tes séances et exercices ; la charge peut être adaptée sous 48 h lorsque nécessaire.'
+     :'Consulte ton programme et tes séances, avec tes exercices et ton suivi de charge sRPE.';
+ const module=(num,kicker,title,detail,tag,extra='')=>
+  '<div class="akOfferPlatform '+extra+'"><div class="akOfferPlatformTop">'+
+  '<span>'+esc(num)+'</span><small>'+esc(kicker)+'</small></div>'+
+  '<strong>'+esc(title)+'</strong><p>'+esc(detail)+'</p>'+
+  '<span class="akOfferPlatformTag">'+esc(tag)+'</span></div>';
+ return '<section class="akOfferPlatforms" aria-label="Tes outils et espaces de suivi">'+
+   '<div class="akOfferPlatformsTitle"><span class="akOfferPlatformsEyebrow">OUTILS ET ACCÈS</span>'+
+   '<h3>'+(mental?'Ton espace AK PRIME et le suivi du coach':'Tes entraînements et ton suivi, accessibles en ligne')+'</h3>'+
+   '<p>'+(mental?'Un espace personnel pour ton travail mental, avec un back-office réservé à ton coach.':
+     'Les séances d’entraînement sont accessibles sur Optitrainer ; AK PRIME centralise le suivi et la progression.')+'</p></div>'+
+   '<div class="akOfferPlatformsGrid '+(mental?'akOfferPlatformsTwo':'')+'">'+
+   (mental?'':module('01','PROGRAMMATION','Optitrainer',optiDetails,'Tes entraînements'))+
+   module(mental?'01':'02','ESPACE CLIENT','AK PRIME',online[1],'Ton espace personnel','akOfferPlatformClient')+
+   module(mental?'02':'03','BACK-OFFICE COACH','AK PRIME',
+     mental?'Ton coach prépare et suit les exercices, séances, visios et évolutions de ton accompagnement.':
+      'Ton coach centralise les dossiers, les mesures, les tests, les échéances et les adaptations de ton suivi.',
+     'Réservé à ton coach','akOfferPlatformCoach')+
+   '</div></section>';
+}
 function akOfferKeyFacts(pole,name,performance){
  const source={
   'Forme & Santé|Standard':[['PROGRAMME','Individualisé'],['ANALYSE VIDÉO','Jusqu’à 1 / mois'],['VISIO','1 × 30 min / mois']],
