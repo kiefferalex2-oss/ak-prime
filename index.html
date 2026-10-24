@@ -4057,6 +4057,69 @@ function akOfferDemoState(pole,name){
   meal_timing:'Adapter les apports à l’horaire des séances et à la récupération.',
   hydration:'Hydratation répartie dans la journée et adaptée à la pratique.'
  };
+ // Démonstration du Passeport : profil et mesures réalistes sur cinq mois,
+ // partagés par les vraies vues client (aucune donnée persistée).
+ const athlete=cfg.sport==='Handball';
+ const demoDates=[-145,-116,-87,-58,-29,-2].map(akOfferDemoDay);
+ const demoWeights=athlete?[83.2,82.8,82.5,82.2,82,82]:[74.6,73.7,72.8,71.9,71.1,70.5];
+ const demoFat=athlete?[17.8,17.2,16.5,16.0,15.4,14.9]:[32.5,31.2,30.4,29.2,28.3,27.3];
+ const demoLean=athlete?[68.4,68.6,68.9,69.0,69.4,69.8]:[50.4,50.7,50.7,50.9,51.0,51.3];
+ const demoWeightHistory=cfg.mental?[]:demoDates.map((date,i)=>({
+  date,kg:demoWeights[i],fat_pct:demoFat[i],lean_kg:demoLean[i],
+  notes:'Simulation · mesure de composition corporelle réalisée selon le même protocole'
+ }));
+ state.akPassportProfile={
+  profile_overrides:cfg.mental?{
+   main_goal:cfg.goal,goal_detail:'Développer des outils concrets et transférables dans les situations importantes.',
+   context:cfg.sport?'Compétition, pression, attention et gestion des erreurs.':'Prise de parole, stress et confiance dans les situations exigeantes.',
+   difficult_situations:cfg.sport?'Fin de match serrée et erreur avant action décisive.':'Prise de parole et anticipation des échéances.',
+   deadline:akOfferDemoDay(28),previous_mental_prep:'Respiration et routines de concentration.',
+   mental_tools:'Mot-clé personnel, respiration contrôlée et routine courte.',
+   availability:'Deux créneaux de travail individuel par semaine.',
+   training_experience:'Suivi fictif illustrant cinq mois de travail.'
+  }:{
+   sport:cfg.sport,position:cfg.specialty,level:cfg.level,
+   main_goal:cfg.goal,
+   goal_detail:athlete?'Augmenter la puissance des membres inférieurs, renforcer les appuis et mieux tolérer les semaines de compétition.':'Améliorer la composition corporelle et la condition physique avec une pratique durable.',
+   training_experience:athlete?'7 ans de pratique en compétition.':'18 mois de pratique régulière.',
+   current_week:athlete?'3 entraînements collectifs, 2 séances physiques et 1 match.':'3 séances de renforcement, 1 séance cardio et marche active.',
+   current_activity:athlete?'Handball N2, poste arrière.':'Musculation et marche.',
+   previous_pp:'Planification progressive et réévaluation régulière des qualités physiques.',
+   liked_exercises:athlete?'Squat, sauts, tirage horizontal.':'Squat goblet, vélo, soulevé de terre avec haltères.',
+   disliked_exercises:'Séances très longues sans récupération adaptée.',
+   well_tolerated:'Force sous-maximale et progression technique maîtrisée.',
+   poorly_tolerated:'Volumes de pliométrie trop rapprochés.',
+   availability:athlete?'Semaine organisée autour des entraînements et du match.':'Soirées et week-end selon planning.',
+   equipment:athlete?'Salle de musculation, haltères et terrain.':'Salle de sport équipée.',
+   injury_history:'Aucun antécédent limitant déclaré dans cette simulation.',
+   current_pain:'Aucune gêne actuelle signalée.',
+   expectations:'Suivre objectivement les progrès et adapter le travail au fil des cycles.'
+  },
+  reference_stats:cfg.mental?{}:{
+   weekly_load:athlete?1360:890,
+   hooper_mean:(name==='P1'||name==='Standard')?null:(athlete?12:11),
+   period_start:akOfferDemoDay(-28),period_end:akOfferDemoDay(-1),
+   source:'Simulation : relevés de charge hebdomadaires Optitrainer',
+   notes:'Référence fictive consolidée sur quatre semaines ; charge exprimée en unités arbitraires (sRPE × durée).'
+  },
+  weight_history:demoWeightHistory,
+  nutrition_history:cfg.macros?[
+   {date:akOfferDemoDay(-119),kcal:athlete?2650:2200,protein:athlete?145:115,carbs:athlete?335:265,fats:75,notes:'Bilan initial fictif'},
+   {date:akOfferDemoDay(-61),kcal:athlete?2700:2250,protein:athlete?150:120,carbs:athlete?345:270,fats:75,notes:'Réajustement fictif après retest'},
+   {date:akOfferDemoDay(-7),kcal:athlete?2750:2250,protein:athlete?150:125,carbs:athlete?355:270,fats:75,notes:'Budget actuel de démonstration'}
+  ]:[],
+  sleep_reference:cfg.sleep?{hours:7.5,quality:4,notes:'Référence fictive sur les 30 dernières nuits.'}:{}
+ };
+ state.response.answers={...state.response.answers,...state.akPassportProfile.profile_overrides};
+ // Historiques de récupération suffisamment étoffés pour la formule Premium.
+ if(cfg.sleep)state.akSleepRows=Array.from({length:30},(_,i)=>{
+  const h=[7.5,7.8,7.1,8.0,7.4,6.9,7.7][i%7],awakenings=i%6===0?2:1;
+  return {id:'demo-sleep-30-'+i,sleep_date:akOfferDemoDay(-30+i),
+   duration_hours:h,quality:h<7.2?3:h>=7.7?5:4,
+   bedtime:'23:10',wakeup:'07:00',awakenings_count:awakenings,
+   awakenings:awakenings===2?[{time:'02:40',minutes:8},{time:'05:35',minutes:5}]:[{time:'03:15',minutes:4}],
+   notes:h<7.2?'Nuit écourtée, récupération à surveiller.':'Récupération satisfaisante.'};
+ }).reverse();
  return state;
 }
 function akOfferDemoScreen(s,view){
