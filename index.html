@@ -1905,12 +1905,25 @@ function passportModelFromCoach(c){
    tests:passportTestRows(c.tests),events:passportEventRows(c.events),checkins:c.checkins||[],appointments:passportAppointmentRows(appts),
    observations:{decisions:c.decisions||'',visio:c.visioNotes||'',privateNote:c.privateNote||''}};
 }
+// Présentation fictive de prochaine visio : jamais de réservation en base.
+function akTestVirtualVisio(s){
+ if(!s?.client?.is_test)return null;
+ return (s.events||[]).filter(e=>e.event_type==='demo_visio').map(e=>{
+   const match=String(e.detail||'').match(/DEMO_VISIO_AT=([^;\s]+)/);
+   if(!match)return null;
+   const starts_at=match[1],value=Date.parse(starts_at);
+   return Number.isFinite(value)&&value>Date.now()?{
+    id:'demo-'+e.id,starts_at,duration_minutes:30,status:'demo',is_demo:true,
+    appointment_type:'Visio de suivi (simulation)',notes:'Aperçu fictif non réservé.'
+   }:null;
+ }).filter(Boolean).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at))[0]||null;
+}
 function passportModelFromClient(s){
  const c=s.client||{},cy=s.cycle||{};
  const name=[c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ');
  return {name,initials:initials(name),pole:c.current_pole||'',offer:c.current_offer||'',sport:c.current_sport||'',specialty:c.position_or_specialty||'',level:c.level||'',start:isoDate(c.start_date),end:isoDate(c.engagement_end_date),status:c.status||'',
    cycle:{title:cy.title||'',start:isoDate(cy.start_date),end:isoDate(cy.end_date),priorities:cy.priorities||'',vigilance:cy.vigilance||''},
-   tests:passportTestRows(s.tests),events:passportEventRows(s.events),checkins:s.checkins||[],appointments:passportAppointmentRows(s.appointments),
+   tests:passportTestRows(s.tests),events:passportEventRows(s.events),checkins:s.checkins||[],appointments:[...passportAppointmentRows(s.appointments),...(akTestVirtualVisio(s)?[akTestVirtualVisio(s)]:[])],
    observations:{decisions:'',visio:'',privateNote:''}};
 }
 function passportTestGroups(tests){
@@ -2974,7 +2987,7 @@ function openClientRenewalChoice(){
 }
 function renderClientHome(s){
  const c=s.client,cycle=s.cycle,r=s.response;
- const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date());
+ const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date())||akTestVirtualVisio(s);
  const qDone=r?.status==='submitted';
  const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
  const renewalPending=d!==null&&d<=14&&!currentClientRenewalChoice(s);
@@ -2982,7 +2995,7 @@ function renderClientHome(s){
  const first=c.first_name||'';
  const actionCards=[];
  if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Ton questionnaire initial</strong><div class="muted tiny">Complète ton profil pour préparer ton accompagnement sur mesure.</div></div><button class="btn primary small clientGoInitial">Compléter <span aria-hidden="true">↗</span></button></div>');
- if(!next)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton prochain rendez-vous</strong><div class="muted tiny">Un temps d’échange pour faire le point et avancer.</div></div><button class="btn ghost small clientGoVisios">Choisir un créneau <span aria-hidden="true">↗</span></button></div>');
+ if(!next||next.is_demo)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton prochain rendez-vous</strong><div class="muted tiny">Un temps d’échange pour faire le point et avancer.</div></div><button class="btn ghost small clientGoVisios">Choisir un créneau <span aria-hidden="true">↗</span></button></div>');
  if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card good"><div class="akWowActionIcon">✓</div><div class="akWowActionCopy"><strong>Ton prochain chapitre</strong><div class="muted tiny">Ton choix pour la suite est enregistré. Retrouve tes progrès.</div></div><button class="btn ghost small clientGoPassport">Voir le Passeport <span aria-hidden="true">↗</span></button></div>');
  const optiUrl=safeOptitrainerLink(c.optitrainer_url);
  const waNum=normalizeWhatsAppNumber(s.appSettings?.whatsapp_number||'');
@@ -2999,15 +3012,15 @@ function renderClientHome(s){
       (!qDone&&s.template?'Continuer mon onboarding':'Gérer mes visios')+' <span aria-hidden="true">↗</span></button>'+
   '</div>'+
   '<div class="akWowHeroSide">'+
-   '<div class="akWowHeroSideTop"><span>PROCHAIN RENDEZ-VOUS</span><span class="akWowHeroSymbol">↗</span></div>'+
+   '<div class="akWowHeroSideTop"><span>'+(next?.is_demo?'APERÇU VISIO · DÉMO':'PROCHAIN RENDEZ-VOUS')+'</span><span class="akWowHeroSymbol">↗</span></div>'+
    '<strong>'+esc(next?fmtDateTime(next.starts_at):'À planifier')+'</strong>'+
-   '<p>'+(next?esc((next.appointment_type==='Visio initiale'?'Visio initiale · Hors quota':'Visio de suivi')+' · '+next.duration_minutes+' min'):'Choisis ton prochain créneau avec ton coach.')+'</p>'+
+   '<p>'+(next?(next.is_demo?'Exemple non réservé · hors quota':esc((next.appointment_type==='Visio initiale'?'Visio initiale · Hors quota':'Visio de suivi')+' · '+next.duration_minutes+' min')):'Choisis ton prochain créneau avec ton coach.')+'</p>'+
    '<button type="button" class="akWowTextLink clientGoVisios">'+(next?'Voir mes rendez-vous':'Réserver une visio')+' <span aria-hidden="true">→</span></button>'+
   '</div>'+
  '</section>'+
  '<div class="akWowSectionHead akWowSectionHeadMetrics"><div><span class="akWowKicker">01 / TABLEAU DE BORD</span><h2>Ta progression en un regard</h2></div><span class="akWowSectionHint">Le meilleur reste à construire.</span></div>'+
  '<div class="client-summary-grid">'+
- '<div class="client-summary-card"><div class="akWowMetricIcon">◷</div><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?esc(next.duration_minutes+' min · '+(next.appointment_type==='Visio initiale'?'Hors quota':'Avec ton coach')):'Depuis l’onglet Visios')+'</div></div>'+
+ '<div class="client-summary-card"><div class="akWowMetricIcon">◷</div><div class="lab">Prochaine visio</div><div class="value">'+(next?fmtDateTime(next.starts_at):'À planifier')+'</div><div class="sub">'+(next?(next.is_demo?'Aperçu fictif · non réservé':esc(next.duration_minutes+' min · '+(next.appointment_type==='Visio initiale'?'Hors quota':'Avec ton coach'))):'Depuis l’onglet Visios')+'</div></div>'+
  '<div class="client-summary-card"><div class="akWowMetricIcon">↗</div><div class="lab">Ton programme</div><div class="value">'+esc(cycle?.title||'À venir')+'</div><div class="sub">'+esc(cycle?.priorities||'Priorités à définir ensemble')+'</div></div>'+
  '<div class="client-summary-card"><div class="akWowMetricIcon">◎</div><div class="lab">Suivi quotidien</div><div class="value">Optitrainer</div><div class="sub">Séances, charge et état de forme</div></div>'+
  '<div class="client-summary-card"><div class="akWowMetricIcon">⌁</div><div class="lab">Fin d’engagement</div><div class="value">'+esc(engagementValue)+'</div><div class="sub">'+fmtDate(isoDate(c.engagement_end_date))+'</div></div>'+
@@ -3116,6 +3129,7 @@ function renderBookingPanel(s){
  const all=(s.appointments||[]).slice().sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const future=all.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>new Date());
  const next=future[0];
+ const preview=!next?akTestVirtualVisio(s):null;
  const history=all.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)||new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,10);
  const slots=(s.availableSlots||[]).slice();
  const policy=s.bookingPolicy||{};
@@ -3145,7 +3159,8 @@ function renderBookingPanel(s){
    '<button class="btn danger small clientCancelVisio" data-id="'+next.id+'" data-late="'+(late?'1':'0')+'">Annuler</button>'+
    (normalizeWhatsAppNumber(s.appSettings?.whatsapp_number)?'<a class="btn primary small" href="'+esc(whatsappUrl(s.appSettings.whatsapp_number,'Bonjour Alex, je suis prêt(e) pour notre visio AK PRIME du '+fmtDateTime(next.starts_at)+'.'))+'" target="_blank" rel="noopener" style="text-decoration:none">📹 WhatsApp</a>':'')+
    '</div></div>';
- })():'<div class="client-section-card akWowUpcoming" style="margin-top:0"><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Aucune visio réservée</strong><div class="muted tiny" style="margin-top:5px">Choisis un créneau ci-dessous.</div></div>';
+ })():(preview?'<div class="client-section-card akWowUpcoming" style="margin-top:0"><div class="muted tiny">APERÇU FICTIF · VISIO NON RÉSERVÉE</div><strong style="font-size:18px">'+fmtDateTime(preview.starts_at)+'</strong><div class="muted tiny" style="margin-top:6px">Simulation de suivi P3, 30 min. Aucun vrai créneau bloqué ni quota consommé.</div><div class="muted tiny" style="margin-top:8px">Réservation réelle possible avec les créneaux ci-dessous.</div></div>':
+'<div class="client-section-card akWowUpcoming" style="margin-top:0"><div class="muted tiny">PROCHAINE VISIO</div><strong style="font-size:18px">Aucune visio réservée</strong><div class="muted tiny" style="margin-top:5px">Choisis un créneau ci-dessous.</div></div>');
  const weekButtons=[0,1,2].map(i=>'<button class="clientWeekBtn '+(clientVisioWeek===i?'on':'')+'" data-week="'+i+'">Semaine '+(i+1)+' <span class="tiny" style="opacity:.7">('+weeks[i].length+')</span></button>').join('');
  const dayButtons=dates.map(date=>{
    const d=new Date(date+'T12:00:00');
