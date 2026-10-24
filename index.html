@@ -4001,7 +4001,8 @@ function akOfferDemoState(pole,name){
   starts_at:akOfferDemoDay(offset)+'T16:30:00Z',duration_minutes:cfg.minutes,
   status,notes:'Consultation fictive · aperçu public',created_at:akOfferDemoDay(offset-2)+'T10:00:00Z'
  });
- const appointments=[-123,-95,-66,-38,-17].map((n,i)=>demoAppointment(n,'completed',i));
+ const pastSessions=cfg.period==='month'&&cfg.quota===1?[-133,-105,-77,-49,-35]:[-123,-95,-66,-38,-17];
+ const appointments=pastSessions.map((n,i)=>demoAppointment(n,'completed',i));
  appointments.push(demoAppointment(6,'scheduled',6));
  const availableSlots=[3,5,8,10,12,16,18].flatMap((n,i)=>
   [0,1].map((part)=>({
