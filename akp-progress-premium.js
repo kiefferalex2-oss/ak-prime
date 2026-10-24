@@ -90,6 +90,32 @@
  '.akProg2Table tr:nth-child(even) td{background:#fafcfe}',
  '.akProg2Table td b{color:#1a3045;font-size:12px}.akProg2Table td small{color:#91a0ad;font-size:10px}',
  '.akProg2Table th:nth-child(1){width:17%}.akProg2Table th:nth-child(2){width:18%}.akProg2Table th:nth-child(3){width:30%}.akProg2Table th:nth-child(4){width:35%}',
+ '.akBodySection{padding:22px;margin-bottom:20px}',
+ '.akBodySummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:0 0 15px}',
+ '.akBodyStat{border:1px solid #e4eaf0;background:#f8fafc;border-radius:12px;padding:15px;min-width:0}',
+ '.akBodyStat:first-child{background:#fcf9f3;border-color:#ebddc7}',
+ '.akBodyStat>span{display:block;font-size:10px;font-weight:850;letter-spacing:.09em;color:#8090a0;text-transform:uppercase}',
+ '.akBodyStat>strong{font-size:clamp(20px,2.5vw,27px);display:block;font-weight:900;letter-spacing:-.035em;color:#19354b;margin:9px 0 5px}',
+ '.akBodyStat>small{font-size:11px;color:#73879a;line-height:1.5;display:block}',
+ '.akBodyCharts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}',
+ '.akBodyChartCard{border:1px solid #e3e9ee;border-radius:12px;background:#fcfdfe;padding:16px;min-width:0}',
+ '.akBodyChartCard>div:first-child{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}',
+ '.akBodyChartCard h4{font-size:14px;color:#1a364b;font-weight:850;margin:0}',
+ '.akBodyChartCard small{color:#8898a6;font-size:10px;white-space:nowrap}',
+ '.akBodySvg{display:block;width:100%;height:auto;margin-top:7px;overflow:visible}',
+ '.akBodySvg .akBodyGrid{stroke:#e7edf1;stroke-width:1}',
+ '.akBodySvg .akBodyAxis{fill:#8192a2;font-size:12px;font-weight:700}',
+ '.akBodySvg .akBodyValue{fill:#243e54;font-size:12px;font-weight:800}',
+ '.akBodyEmpty{padding:38px 12px;color:#8292a2;text-align:center;font-size:12px;line-height:1.55}',
+ '.akBodyDisclaimer{font-size:11px;line-height:1.55;color:#8292a2;margin:12px 0 0}',
+ '.akBodyHistory{margin-top:15px}',
+ '.akBodyHistory .akProg2Table th{width:auto}',
+ '.akBodyHistory .akProg2Table th:nth-child(1){width:15%}',
+ '.akBodyHistory .akProg2Table th:nth-child(2),.akBodyHistory .akProg2Table th:nth-child(3),.akBodyHistory .akProg2Table th:nth-child(4){width:19%}',
+ '.akBodyHistory .akProg2Table th:nth-child(5){width:28%}',
+ '@media(max-width:780px){.akBodyCharts{grid-template-columns:1fr}}',
+ '@media(max-width:540px){.akBodySection{padding:15px}.akBodyChartCard{padding:13px}.akBodySummary{gap:8px}.akBodyStat{padding:12px}.akBodyStat>strong{font-size:20px}.akBodyHistory .akProg2Table{min-width:670px}}',
+ '@media print{.akBodyChartCard,.akBodyStat{break-inside:avoid}.akBodyHistory details .akProg2HistoryFoldBody{display:block!important}}',
  '.akProg2Empty{padding:25px;text-align:center;color:#8493a2;font-size:12px;line-height:1.6}',
  '@media(max-width:1000px){.akProg2Cards{grid-template-columns:repeat(3,minmax(0,1fr))}}',
  '@media(max-width:750px){.akProg2Cards{grid-template-columns:repeat(2,minmax(0,1fr))}.akProg2FocusTop{padding:18px}.akProg2Facts{padding:0 18px 18px}.akProg2ChartBox{margin:0 18px}.akProg2History{padding:20px 18px}.akProg2HeadCount{padding:9px 12px}}',
@@ -103,6 +129,107 @@
  const unit=r=>r.unit||'';
  const val=r=>String(r.value??r.num??'');
  const labelDate=d=>fmtDate(d);
+ const validBodyNumber=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));
+ function bodyMeasurements(model){
+   const history=Array.isArray(model?.akPassportProfile?.weight_history)?model.akPassportProfile.weight_history:[];
+   const byDate=new Map();
+   for(const point of history){
+     const day=String(point?.date||'').slice(0,10);
+     if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(Date.parse(day+'T12:00:00Z')))continue;
+     const weight=validBodyNumber(point.kg)&&Number(point.kg)>0&&Number(point.kg)<500?Number(point.kg):null;
+     const fat=validBodyNumber(point.fat_pct)&&Number(point.fat_pct)>=0&&Number(point.fat_pct)<=100?Number(point.fat_pct):null;
+     const lean=validBodyNumber(point.lean_kg)&&Number(point.lean_kg)>0?Number(point.lean_kg):null;
+     if(weight===null&&fat===null&&lean===null)continue;
+     byDate.set(day,{date:day,kg:weight,fat_pct:fat,lean_kg:lean,notes:String(point.notes||'')});
+   }
+   return Array.from(byDate.values()).sort((a,b)=>a.date.localeCompare(b.date));
+ }
+ const bodyFormat=(x)=>Number(x).toLocaleString('fr-FR',{maximumFractionDigits:1});
+ function bodySeries(rows,key){
+   return rows.filter(r=>r[key]!==null).map(r=>({date:r.date,value:r[key]}));
+ }
+ function bodyChart(data,label,unit,color){
+   if(!data.length)return '<div class="akBodyEmpty">Aucune mesure renseignée.<br>Les valeurs apparaîtront après la saisie du coach.</div>';
+   const W=760,H=255,L=54,R=28,T=36,B=44,plotW=W-L-R,plotH=H-T-B;
+   const values=data.map(r=>r.value),lo=Math.min(...values),hi=Math.max(...values);
+   const rough=Math.max((hi-lo)/4,1);
+   const base=Math.pow(10,Math.floor(Math.log10(rough)));
+   const step=([1,2,5,10].map(x=>x*base).find(x=>x>=rough)||10*base);
+   let min=Math.floor((lo-.3*step)/step)*step,max=Math.ceil((hi+.3*step)/step)*step;
+   if(max<=min){min-=step;max+=step;}
+   const span=max-min;
+   const dates=data.map(r=>Date.parse(r.date+'T12:00:00Z'));
+   const start=Math.min(...dates),end=Math.max(...dates);
+   const points=data.map((r,i)=>({
+     x:L+(start===end?plotW/2:(dates[i]-start)/(end-start)*plotW),
+     y:T+(max-r.value)/span*plotH,r
+   }));
+   const xy=v=>v.toFixed(2);
+   const grid=[];
+   for(let tick=min;tick<=max+step*.001;tick+=step){
+     const y=T+(max-tick)/span*plotH;
+     grid.push('<g><line class="akBodyGrid" x1="'+L+'" y1="'+xy(y)+'" x2="'+(W-R)+'" y2="'+xy(y)+'"/>'+
+       '<text class="akBodyAxis" x="'+(L-12)+'" y="'+xy(y+4)+'" text-anchor="end">'+esc(bodyFormat(tick))+'</text></g>');
+   }
+   const coords=points.map(p=>xy(p.x)+','+xy(p.y)).join(' ');
+   const paint='<polyline fill="none" stroke="'+color+'" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="'+coords+'"/>';
+   const dots=points.map((p,i)=>{
+     const display=data.length<=8||i===0||i===data.length-1;
+     return '<g><circle cx="'+xy(p.x)+'" cy="'+xy(p.y)+'" r="4.4" fill="#fff" stroke="'+color+'" stroke-width="3">'+
+       '<title>'+esc(label+' : '+bodyFormat(p.r.value)+' '+unit+' · '+labelDate(p.r.date))+'</title></circle>'+
+       (display?'<text class="akBodyValue" x="'+xy(p.x)+'" y="'+xy(Math.max(p.y-13,16))+'" text-anchor="middle">'+esc(bodyFormat(p.r.value))+'</text>':'')+
+       '</g>';
+   }).join('');
+   const dateTicks=[0,Math.floor((points.length-1)/2),points.length-1];
+   const xLabels=[...new Set(dateTicks)].map(i=>{
+     const p=points[i];return '<text class="akBodyAxis" x="'+xy(p.x)+'" y="'+(H-12)+'" text-anchor="'+(i===0?'start':i===points.length-1?'end':'middle')+'">'+esc(labelDate(p.r.date))+'</text>';
+   }).join('');
+   return '<svg class="akBodySvg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc('Évolution du '+label+' en '+unit+' sur '+data.length+' mesure(s)')+'">'+
+      grid.join('')+paint+dots+xLabels+'</svg>';
+ }
+ function bodyKpi(title,data,unit,deltaUnit){
+   const first=data[0],last=data[data.length-1];
+   const current=last?bodyFormat(last.value)+' '+unit:'—';
+   const delta=data.length>=2?Math.round((last.value-first.value)*10)/10:null;
+   const evolution=delta===null?'Première mesure à renseigner':
+     (delta===0?'Stable':(delta>0?'+':'')+bodyFormat(delta)+' '+deltaUnit+' depuis le début');
+   const date=last?' · '+labelDate(last.date):'';
+   return '<div class="akBodyStat"><span>'+esc(title)+'</span><strong>'+esc(current)+'</strong>'+
+     '<small>'+esc(evolution+date)+'</small></div>';
+ }
+ function bodyProgress(model){
+   const pole=String(model?.pole||'').toLowerCase();
+   if(!pole.includes('performance')&&!pole.includes('forme'))return '';
+   const rows=bodyMeasurements(model),weights=bodySeries(rows,'kg'),fat=bodySeries(rows,'fat_pct');
+   const history=rows.slice().reverse().map(p=>'<tr>'+
+     '<td>'+esc(labelDate(p.date))+'</td>'+
+     '<td><b>'+esc(p.kg===null?'—':bodyFormat(p.kg)+' kg')+'</b></td>'+
+     '<td><b>'+esc(p.fat_pct===null?'—':bodyFormat(p.fat_pct)+' %')+'</b></td>'+
+     '<td>'+esc(p.lean_kg===null?'—':bodyFormat(p.lean_kg)+' kg')+'</td>'+
+     '<td>'+esc(p.notes||'—')+'</td></tr>').join('');
+   const hist='<div class="akBodyHistory"><details class="akProg2HistoryFold">'+
+     '<summary><span class="akProg2HistoryFoldTitle"><span class="akProg2HistoryFoldIcon" aria-hidden="true">≡</span>'+
+      '<span><strong>Historique des mesures corporelles</strong><small>Poids, %MG et masse maigre, par date</small></span></span>'+
+      '<span class="akProg2HistoryFoldCount">'+rows.length+' mesure'+(rows.length>1?'s':'')+
+       '<span class="akProg2HistoryFoldArrow" aria-hidden="true">⌄</span></span></summary>'+
+     '<div class="akProg2HistoryFoldBody"><div class="akProg2TableWrap">'+
+     '<table class="akProg2Table"><thead><tr><th>Date</th><th>Poids</th><th>MG</th><th>Masse maigre</th><th>Contexte</th></tr></thead>'+
+      '<tbody>'+(history||'<tr><td colspan="5">Aucune mesure corporelle enregistrée.</td></tr>')+'</tbody></table></div></div></details></div>';
+   return '<section class="akProg2Box akBodySection">'+
+     '<div class="akProg2TitleRow"><div><small>01 / COMPOSITION CORPORELLE</small>'+
+     '<h3>Évolution du poids et de la masse grasse</h3>'+
+     '<p>Mesures datées du sportif : historique identique dans les espaces coach et client.</p></div></div>'+
+     '<div class="akBodySummary">'+
+     bodyKpi('Poids actuel',weights,'kg','kg')+
+     bodyKpi('Masse grasse actuelle',fat,'%','points')+'</div>'+
+     '<div class="akBodyCharts">'+
+     '<div class="akBodyChartCard"><div><h4>Évolution du poids</h4><small>kg</small></div>'+
+      bodyChart(weights,'poids','kg','#b98c47')+'</div>'+
+     '<div class="akBodyChartCard"><div><h4>Évolution du % de masse grasse</h4><small>%MG</small></div>'+
+      bodyChart(fat,'pourcentage de masse grasse','%','#4c7d91')+'</div></div>'+
+     '<p class="akBodyDisclaimer">Le pourcentage de masse grasse est affiché uniquement s’il a été mesuré et saisi. Aucune estimation automatique n’est effectuée.</p>'+
+     hist+'</section>';
+ }
  function directionFor(group){
    const better=testLibraryItem(group.name)?.better||'neutral';
    return better==='lower'?'lower':better==='higher'?'higher':'neutral';
@@ -214,12 +341,12 @@
  passportLineChart=function(group){return chart(group);};
 
  passportProgressPage=function(model){
-   const groups=passportTestGroups(model.tests),selected=passportSelectedGroup(groups);
+   const groups=passportTestGroups(model.tests),selected=passportSelectedGroup(groups),composition=bodyProgress(model);
    if(!selected)return '<div class="akp-page akProg2">'+
      '<div class="akProg2Head"><div><span class="akProg2Eyebrow">PROGRESSION</span>'+
      '<h2>Les performances, en perspective.</h2>'+
      '<p>Les résultats apparaîtront ici dès les premières évaluations.</p></div></div>'+
-     '<div class="akProg2Box akProg2Empty">Aucune mesure numérique enregistrée.</div></div>';
+     composition+'<div class="akProg2Box akProg2Empty">Aucun résultat de test physique enregistré.</div></div>';
    const d=passportMetricDelta(selected),tone=toneFor(d),progress=growthFor(d);
    const rows=selected.rows,first=rows[0],last=rows[rows.length-1];
    const direction=directionFor(selected);
@@ -247,7 +374,7 @@
        '<td>'+esc(r.context||'—')+'</td><td>'+esc(r.note||'—')+'</td></tr>';
    }).join('');
    const compare='<section class="akProg2Box">'+
-     '<div class="akProg2TitleRow"><div><small>01 / VUE COMPARATIVE</small><h3>Tous les tests</h3>'+
+     '<div class="akProg2TitleRow"><div><small>02 / VUE COMPARATIVE</small><h3>Tous les tests</h3>'+
        '<p>Sélectionne un test pour afficher sa courbe et l’historique de ses mesures.</p></div>'+
      '<div class="akProg2Legend"><span><i class="up"></i>Progression</span>'+
        '<span><i></i>Référence</span><span><i class="down"></i>Vigilance</span></div></div>'+
@@ -255,7 +382,7 @@
    const sense=direction==='lower'?'Plus bas = mieux':
      direction==='higher'?'Plus haut = mieux':'Sens de progression non défini';
    const focus='<section class="akProg2Box akProg2Focus">'+
-      '<div class="akProg2FocusTop"><div><span class="akProg2FocusEyebrow">02 / TEST SÉLECTIONNÉ</span>'+
+      '<div class="akProg2FocusTop"><div><span class="akProg2FocusEyebrow">03 / TEST SÉLECTIONNÉ</span>'+
         '<h3>'+esc(selected.name)+'</h3><p>'+esc(measureWord(rows.length))+
         ' enregistrée'+(rows.length>1?'s':'')+' · '+esc(statusFor(d))+
         '</p></div><div class="akProg2FocusProgress '+tone+'">'+
@@ -285,7 +412,7 @@
        '<h2>Une lecture claire de chaque progrès.</h2>'+
        '<p>Tous les repères restent accessibles. Choisis un test pour comparer ses mesures dans le temps.</p>'+
       '</div><div class="akProg2HeadCount"><b>'+groups.length+'</b><span>Repères<br/>suivis</span></div></div>'+
-     compare+focus+'</div>';
+     composition+compare+focus+'</div>';
  };
  window.AKP_PASSPORT_PROGRESSION_READY=true;
 })();
