@@ -1580,6 +1580,58 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akPreciseHowInner .akEditorialSteps{grid-template-columns:1fr}
 }
 
+
+/* Présentation forte des outils : accès client / Optitrainer / back-office coach. */
+.akOfferPlatforms{margin:20px 0 6px;padding:24px 26px;border:1px solid #dce6ef;background:#f8fafc;border-radius:18px}
+.akOfferPlatformsTitle{max-width:780px;margin-bottom:18px}
+.akOfferPlatformsEyebrow{display:block;color:#a77c40;letter-spacing:.13em;font-size:10px;font-weight:900;margin-bottom:7px}
+.akOfferPlatformsTitle h3{font-size:clamp(19px,2.15vw,24px);color:#18334a;font-weight:900;line-height:1.3;margin:0 0 8px;letter-spacing:-.03em}
+.akOfferPlatformsTitle p{font-size:12px;line-height:1.65;color:#637b91;margin:0}
+.akOfferPlatformsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.akOfferPlatformsGrid.akOfferPlatformsTwo{grid-template-columns:repeat(2,minmax(0,1fr))}
+.akOfferPlatform{border:1px solid #dfe8f0;background:#fff;border-radius:13px;padding:16px;display:flex;flex-direction:column;min-height:196px;min-width:0}
+.akOfferPlatformTop{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.akOfferPlatformTop>span{width:25px;height:25px;border-radius:7px;display:grid;place-items:center;color:#aa8148;background:#f8f2e7;font-size:10px;font-weight:900}
+.akOfferPlatformTop small{color:#8192a1;font-size:9px;letter-spacing:.08em;font-weight:900}
+.akOfferPlatform>strong{display:block;font-size:17px;line-height:1.25;letter-spacing:-.025em;font-weight:900;color:#19374d}
+.akOfferPlatform>p{font-size:11px;line-height:1.6;color:#667c90;margin:9px 0 16px;flex:1}
+.akOfferPlatformTag{display:inline-flex;align-self:flex-start;font-size:10px;font-weight:850;background:#f2f5f8;padding:7px 10px;border-radius:7px;color:#546f86}
+.akOfferPlatformClient{border-color:#d6b57a;background:#fffdf8}
+.akOfferPlatformClient>.akOfferPlatformTag{background:#f5ebd9;color:#8c6832}
+.akOfferPlatformCoach{background:linear-gradient(145deg,#0e2134,#1a3a55);border-color:#1c3b55}
+.akOfferPlatformCoach .akOfferPlatformTop>span{background:rgba(226,191,126,.14);color:#eacb91}
+.akOfferPlatformCoach .akOfferPlatformTop small{color:#dbbd83}
+.akOfferPlatformCoach>strong{color:#fff}
+.akOfferPlatformCoach>p{color:#bdcedd}
+.akOfferPlatformCoach .akOfferPlatformTag{background:rgba(255,255,255,.1);color:#e9eef4}
+.akOfferCriterionTitle{padding:13px 15px;border-bottom:1px solid #e5eaf1;font-size:13px;font-weight:900;color:#18384f;background:#f5f8fb}
+.akOfferCriterionContent{padding:5px 14px 13px}
+.akOfferCriterionTier{grid-template-columns:35px minmax(0,1fr);gap:10px}
+.akPreciseOffer .akOfferCriteriaMobile .akOfferCriterion{overflow:visible}
+.akPreciseOffer .akOfferCriteriaMobile .akOfferCriterionTitle{border-radius:10px 10px 0 0}
+.akPreciseOffer .akOfferCriteriaMobile .akOfferCriterion:first-child{margin-top:0}
+@media(max-width:900px){
+ .akOfferPlatforms{padding:20px}
+ .akOfferPlatformsGrid{grid-template-columns:1fr 1fr}
+ .akOfferPlatformCoach{grid-column:1/-1}
+ .akOfferPlatformsTwo .akOfferPlatformCoach{grid-column:auto}
+ .akOfferPlatform{min-height:175px}
+}
+@media(max-width:600px){
+ .akOfferPlatforms{margin:15px 0 5px;padding:17px 14px}
+ .akOfferPlatformsTitle{margin-bottom:14px}
+ .akOfferPlatformsTitle h3{font-size:19px}
+ .akOfferPlatformsTitle p{font-size:11px}
+ .akOfferPlatformsGrid,.akOfferPlatformsGrid.akOfferPlatformsTwo{grid-template-columns:1fr;gap:9px}
+ .akOfferPlatformCoach,.akOfferPlatformsTwo .akOfferPlatformCoach{grid-column:auto}
+ .akOfferPlatform{min-height:0;padding:15px}
+ .akOfferPlatformTop{margin-bottom:9px}
+ .akOfferPlatform>strong{font-size:16px}
+ .akOfferPlatform>p{margin:7px 0 10px}
+ .akOfferCriterionTitle{font-size:13px}
+ .akOfferCriterionTier p{font-size:11px;line-height:1.5}
+}
+
 </style>
 </head>
 <body>
@@ -4666,8 +4718,8 @@ function akOfferPlatforms(pole,name){
      'Les séances d’entraînement sont accessibles sur Optitrainer ; AK PRIME centralise le suivi et la progression.')+'</p></div>'+
    '<div class="akOfferPlatformsGrid '+(mental?'akOfferPlatformsTwo':'')+'">'+
    (mental?'':module('01','PROGRAMMATION','Optitrainer',optiDetails,'Tes entraînements'))+
-   module(mental?'01':'02','ESPACE CLIENT','AK PRIME',online[1],'Ton espace personnel','akOfferPlatformClient')+
-   module(mental?'02':'03','BACK-OFFICE COACH','AK PRIME',
+   module(mental?'01':'02','ESPACE CLIENT','Espace client AK PRIME',online[1],'Ton espace personnel','akOfferPlatformClient')+
+   module(mental?'02':'03','OUTIL PROFESSIONNEL','Back-office AK PRIME',
      mental?'Ton coach prépare et suit les exercices, séances, visios et évolutions de ton accompagnement.':
       'Ton coach centralise les dossiers, les mesures, les tests, les échéances et les adaptations de ton suivi.',
      'Réservé à ton coach','akOfferPlatformCoach')+
