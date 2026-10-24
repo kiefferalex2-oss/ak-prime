@@ -4792,6 +4792,167 @@ function akPerfCriteriaMobile(tier,rows){
  ).join('')+'</div>';
 }
 
+// Un seul comparatif exhaustif par pôle : même contenu pour chaque formule,
+// seule la colonne de l'offre consultée change de mise en valeur.
+function akOfferComparisonData(pole){
+ if(pole==='Performance')return {
+  labels:['P1 Essentiel','P2 Avancé','P3 Premium'],
+  names:['P1','P2','P3'],
+  rows:[
+   ['Programme et séances sur Optitrainer',
+    'Programme individualisé selon sport, calendrier, objectifs et matériel. Séances accessibles sur Optitrainer.',
+    'Programme individualisé selon sport, calendrier, objectifs et matériel. Séances accessibles sur Optitrainer.',
+    'Programme individualisé, séances et exercices accessibles sur Optitrainer.'],
+   ['Charge d’entraînement',
+    'Charge sRPE suivie après les séances.',
+    'Charge sRPE utilisée dans le bilan hebdomadaire.',
+    'Charge sRPE analysée avec l’état de forme pour guider les adaptations.'],
+   ['Ajustement de la programmation',
+    'Correction si douleur, gêne ou difficulté importante signalée, sans adaptation systématique selon la forme.',
+    'Ajustement chaque semaine du volume, de l’intensité ou du contenu selon la sRPE et le Hooper.',
+    'Ajustement sous 48 h si la fatigue, le sommeil ou le contexte sportif le justifient.'],
+   ['État de forme',
+    'Retours remontés en cas de difficulté ; pas de questionnaire Hooper régulier.',
+    'Questionnaire Hooper : fatigue, stress, sommeil perçu et douleurs musculaires, analysé chaque semaine.',
+    'Questionnaire Hooper et état de forme suivis de façon rapprochée pour adapter la charge si nécessaire.'],
+   ['Sommeil',
+    'Pas de suivi spécifique du sommeil.',
+    'Sommeil perçu renseigné dans le questionnaire Hooper.',
+    'Agenda détaillé dans AK PRIME : durée, qualité et régularité, utilisé pour les adaptations.'],
+   ['Échauffement',
+    'Échauffement prévu avec la programmation, sans individualisation spécifique incluse.',
+    'Échauffement individualisé via Optitrainer.',
+    'Échauffement individualisé via Optitrainer.'],
+   ['Récupération',
+    'Correction de la programmation si un problème est signalé.',
+    'Allègement de la programmation si nécessaire ; pas de séance dédiée supplémentaire.',
+    'Séance de récupération dédiée si nécessaire, en plus de l’ajustement de la charge.'],
+   ['Analyses vidéo',
+    'Jusqu’à 2 analyses techniques par mois via WhatsApp.',
+    '1 analyse par semaine des mouvements prioritaires via WhatsApp.',
+    'Analyses des mouvements utiles via WhatsApp selon les besoins, sans quota fixe.'],
+   ['Nutrition',
+    'Pas de budget nutritionnel inclus.',
+    'Pas de budget nutritionnel inclus.',
+    'Budget calorique et macronutriments personnalisé dans AK PRIME, sans menus alimentaires.'],
+   ['Cycle menstruel',
+    'Pas de prise en compte spécifique incluse.',
+    'Prise en compte lorsque pertinent, selon les informations communiquées.',
+    'Prise en compte lorsque pertinent, selon les informations communiquées.'],
+   ['Techniques mentales intégrées',
+    'Non incluses dans cette formule.',
+    'Non incluses dans cette formule.',
+    'Techniques mentales utiles à la préparation sportive, selon les besoins, sans module mental dédié.'],
+   ['Visios de suivi',
+    '1 visio de 30 minutes par mois.',
+    '2 visios de 30 minutes par mois.',
+    'Jusqu’à 1 visio de 30 minutes par semaine.'],
+   ['Tests et retests physiques',
+    'Tests adaptés au distanciel et retest à 6 semaines.',
+    'Tests adaptés au distanciel et retest à 6 semaines.',
+    'Retest à 6 semaines, puis réévaluations supplémentaires selon les besoins.'],
+   ['Espace client AK PRIME',
+    'Questionnaire initial, Passeport, cycles, résultats de tests et courbes de progression.',
+    'Questionnaire initial, Passeport, cycles, résultats de tests et courbes de progression.',
+    'Questionnaire initial, Passeport, progression, agenda sommeil et budget de macronutriments.']
+  ]
+ };
+ if(pole==='Forme & Santé')return {
+  labels:['Standard','Renforcé'],names:['Standard','Renforcé'],
+  rows:[
+   ['Programme et séances sur Optitrainer',
+    'Programme individualisé selon les objectifs, le matériel et les contraintes ; séances sur Optitrainer.',
+    'Programme individualisé selon les objectifs, le matériel et les contraintes ; séances sur Optitrainer.'],
+   ['Suivi de la charge',
+    'Charge sRPE suivie chaque semaine.',
+    'Charge sRPE suivie chaque semaine, utilisée pour adapter la programmation.'],
+   ['Questionnaire d’état de forme',
+    'Pas de questionnaire régulier d’état de forme.',
+    'Chaque semaine : fatigue, stress, récupération et sommeil perçu.'],
+   ['Adaptation de la programmation',
+    'Correction si une gêne, une douleur ou une difficulté est signalée.',
+    'Adaptation hebdomadaire selon la charge sRPE et les réponses sur l’état de forme.'],
+   ['Sommeil',
+    'Pas de suivi spécifique du sommeil.',
+    'Sommeil perçu pris en compte chaque semaine, sans agenda quotidien AK PRIME.'],
+   ['Analyses vidéo',
+    'Jusqu’à 1 analyse technique par mois via WhatsApp.',
+    'Jusqu’à 1 analyse technique par semaine via WhatsApp.'],
+   ['Budget nutritionnel',
+    'Pas de budget calorique ni de macros inclus.',
+    'Budget calorique et macronutriments personnalisés dans AK PRIME, sans menus.'],
+   ['Visios de suivi',
+    '1 visio de 30 minutes par mois.',
+    '2 visios de 30 minutes par mois.'],
+   ['Questionnaire initial',
+    'Questionnaire initial pour définir les objectifs et les contraintes.',
+    'Questionnaire initial pour définir les objectifs et les contraintes.'],
+   ['Espace client AK PRIME',
+    'Passeport : tests, cycles, progression et historique.',
+    'Passeport : tests, cycles, progression, historique et budget nutritionnel.']
+  ]
+ };
+ if(pole==='Mental')return {
+  labels:['Particulier','Sportif'],names:['Particulier','Sportif'],
+  rows:[
+   ['Contexte de l’accompagnement',
+    'Situations du quotidien, du travail et de la vie personnelle.',
+    'Entraînement, compétition et situations spécifiques au sport.'],
+   ['Questionnaire initial',
+    'Questionnaire de préparation mentale adapté aux difficultés du quotidien.',
+    'Questionnaire de préparation mentale adapté au contexte sportif.'],
+   ['Objectifs travaillés',
+    'Stress, émotions, confiance, estime de soi, concentration et résilience.',
+    'Pression, confiance, concentration, émotions et gestion des erreurs en compétition.'],
+   ['Respiration et recentrage',
+    'Respiration et recentrage pour les situations exigeantes du quotidien.',
+    'Respiration, mot-clé individuel et recentrage après erreur ou sous pression.'],
+   ['Routines et techniques',
+    'Routines personnalisées, imagerie et outils mentaux adaptés aux situations de vie.',
+    'Routines avant entraînement ou compétition, imagerie sportive et double tâche.'],
+   ['Exercices entre les séances',
+    'Exercices à réaliser dans les situations quotidiennes, avec consignes personnalisées.',
+    'Exercices à réaliser entre les séances et mises en pratique sportives.'],
+   ['Débriefs et progression',
+    'Retour sur les exercices, leur mise en pratique et l’évolution des situations travaillées.',
+    'Débriefs d’entraînement et de compétition, gestion des erreurs et progression.'],
+   ['Visio initiale',
+    '1 visio initiale de 45 minutes.',
+    '1 visio initiale de 45 minutes.'],
+   ['Visios de suivi',
+    'Jusqu’à 1 visio de 45 minutes par semaine.',
+    'Jusqu’à 1 visio de 45 minutes par semaine.'],
+   ['Espace client AK PRIME',
+    'Séances mentales, exercices, routines, rendez-vous et historique du suivi.',
+    'Séances mentales, exercices, routines sportives, rendez-vous et historique du suivi.']
+  ]
+ };
+ return null;
+}
+function akOfferSingleComparison(pole,name){
+ const data=akOfferComparisonData(pole);if(!data)return '';
+ const active=data.names.findIndex(n=>String(n).toLowerCase()===String(name||'').toLowerCase());
+ const cols=data.names.length;
+ const heads=data.labels.map((label,i)=>
+  '<th scope="col" class="'+(i===active?'akMatrixSelected':'')+'">'+esc(label)+
+    (i===active?'<span class="akMatrixChosen">OFFRE CONSULTÉE</span>':'')+'</th>').join('');
+ const rowHtml=data.rows.map(([criterion,...values])=>'<tr><th scope="row">'+esc(criterion)+'</th>'+
+   values.map((v,i)=>'<td class="'+(i===active?'akMatrixSelected':'')+'">'+esc(v)+'</td>').join('')+'</tr>').join('');
+ const mobile=data.rows.map(([criterion,...values])=>
+  '<section class="akMatrixMobileCriterion"><h4>'+esc(criterion)+'</h4>'+
+   values.map((v,i)=>'<div class="akMatrixMobileOffer '+(i===active?'akMatrixSelected':'')+'">'+
+    '<strong>'+esc(data.labels[i])+(i===active?' <span>CHOISIE</span>':'')+'</strong><p>'+esc(v)+'</p></div>').join('')+'</section>').join('');
+ return akOfferSection('01 / COMPARATIF COMPLET',
+  pole==='Performance'?'Tout ce qui est inclus dans P1, P2 et P3':
+    pole==='Forme & Santé'?'Toutes les prestations : Standard ou Renforcé':
+      'Toutes les prestations : Particulier ou Sportif',
+  'Chaque ligne précise la prestation réellement incluse, sa fréquence et ses limites. La formule consultée est mise en évidence.',
+  '<div class="akMatrixDesktop"><table class="akMatrixTable akMatrix'+cols+'">'+
+  '<thead><tr><th scope="col">Prestations</th>'+heads+'</tr></thead>'+
+  '<tbody>'+rowHtml+'</tbody></table></div>'+
+  '<div class="akMatrixMobile">'+mobile+'</div>',
+  'akComparisonOnly');
+}
 function performanceOfferLanding(name,price){
  const tier=String(name||'').toUpperCase();
  const rows={
