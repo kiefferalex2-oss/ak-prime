@@ -5089,12 +5089,6 @@ function performanceOfferLanding(name,price){
    '</section>'+
    akOfferPlatforms('Performance',tier)+
    akOfferSingleComparison('Performance',tier)+
-   '<section class="akPreciseHow">'+
-     akOfferDisclosure('Comment se déroule le suivi ?',
-       '<div class="akPreciseHowInner">'+akOfferSteps('Performance',tier,d.week)+
-       '<p class="akReadExampleText"><strong>Exemple :</strong> '+esc(d.example)+'</p></div>',
-       '4 étapes et une situation concrète')+
-   '</section>'+
    akOfferDemoTeaser('Performance',tier)+
    '<p class="perf-note">Les données et exemples sont indicatifs ; les ajustements prévus par l’offre sont adaptés à la situation du sportif.</p>'+
   '</div>';
@@ -5125,11 +5119,6 @@ function openPublicOfferDetails(button){
    '</section>'+
    akOfferPlatforms(pole,name)+
    akOfferSingleComparison(pole,name)+
-   '<section class="akPreciseHow">'+
-    akOfferDisclosure('Comment se déroule cet accompagnement ?',
-     '<div class="akPreciseHowInner">'+akOfferSteps(pole,name)+
-     '<p class="akReadExampleText"><strong>Exemple :</strong> '+esc(d.example)+'</p></div>',
-     'Les étapes et un exemple concret')+'</section>'+
    akOfferDemoTeaser(pole,name)+
    '<p class="perf-note">L’accompagnement est adapté aux objectifs et aux données disponibles, dans le cadre des prestations indiquées.</p>'+
   '</div>',
