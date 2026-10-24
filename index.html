@@ -4732,13 +4732,14 @@ function akPerfComparisonTable(tier,rows){
   '</tbody></table></div>';
 }
 function akPerfCriteriaMobile(tier,rows){
- return '<div class="akOfferCriteriaMobile">'+rows.map((r,i)=>
-   '<details class="akOfferCriterion" '+(i===0?'open':'')+'><summary><span>'+esc(r[0])+'</span><span aria-hidden="true">⌄</span></summary>'+
+ return '<div class="akOfferCriteriaMobile" aria-label="Comparatif complet des offres Performance">'+rows.map(r=>
+   '<section class="akOfferCriterion"><div class="akOfferCriterionTitle">'+esc(r[0])+'</div>'+
    '<div class="akOfferCriterionContent">'+[1,2,3].map(j=>
     '<div class="akOfferCriterionTier '+(('P'+j)===tier?'active':'')+'"><strong>P'+j+'</strong><p>'+esc(r[j])+'</p></div>'
-   ).join('')+'</div></details>'
+   ).join('')+'</div></section>'
  ).join('')+'</div>';
 }
+
 function performanceOfferLanding(name,price){
  const tier=String(name||'').toUpperCase();
  const rows={
@@ -4822,7 +4823,6 @@ function performanceOfferLanding(name,price){
    'Retest à 6 semaines.',
    'Retest à 6 semaines, puis réévaluations selon les besoins.']
  ];
- const shortCompare=compare.filter(r=>['Adaptation de la charge','Données utilisées','Sommeil','Analyses vidéo','Récupération','Visios'].includes(r[0]));
  return '<div class="perf-detail akReadableOffer akEditorialOffer akPreciseOffer">'+
    '<section class="perf-hero akEditorialHero">'+
     '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><div class="eyebrow">PÔLE PERFORMANCE</div>'+
@@ -4830,6 +4830,7 @@ function performanceOfferLanding(name,price){
      '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
     akOfferKeyFacts('Performance',tier,d.kpis)+
    '</section>'+
+   akOfferPlatforms('Performance',tier)+
    akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
      'Les services, fréquences et modalités prévus dans Performance '+tier+'.',
      akOfferIncludedNow('Performance',tier)+
@@ -4837,12 +4838,9 @@ function performanceOfferLanding(name,price){
        'Le détail des prestations par outil et canal de communication'))+
    akOfferSection('02 / LES DIFFÉRENCES','Compare les prestations P1, P2 et P3',
      'Concrètement : ce qui est ajusté, à quelle fréquence et à partir de quelles données.',
-     '<div class="akOfferCompareDesktop">'+akPerfComparisonTable(tier,shortCompare)+'</div>'+
-     akPerfCriteriaMobile(tier,shortCompare)+
-     akOfferDisclosure('Comparer les 10 critères',
-       '<div class="akEditorialDetailedDesktop">'+akPerfComparisonTable(tier,compare)+'</div>'+
-       '<div class="akEditorialDetailedMobile">'+akPerfCriteriaMobile(tier,compare)+'</div>',
-       'Échauffement, récupération, nutrition, cycle menstruel et retests compris'))+
+     '<div class="akOfferCompareDesktop">'+akPerfComparisonTable(tier,compare)+'</div>'+
+     akPerfCriteriaMobile(tier,compare))+
+
    '<section class="akPreciseHow">'+
      akOfferDisclosure('Comment se déroule le suivi ?',
        '<div class="akPreciseHowInner">'+akOfferSteps('Performance',tier,d.week)+
@@ -4877,6 +4875,7 @@ function openPublicOfferDetails(button){
      '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
     akOfferKeyFacts(pole,name)+
    '</section>'+
+   akOfferPlatforms(pole,name)+
    akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
     'Les prestations prévues dans '+pole+' — '+name+'.',
     akOfferIncludedNow(pole,name)+
