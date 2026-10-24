@@ -4960,12 +4960,17 @@ function akOfferSingleComparison(pole,name){
  const data=akOfferComparisonData(pole);if(!data)return '';
  const active=data.names.findIndex(n=>String(n).toLowerCase()===String(name||'').toLowerCase());
  const cols=data.names.length;
+ const prices=data.names.map(n=>{
+  const base=offerBaseMonthlyPrice(pole,n);
+  return Number(base)>0?euro(base)+' / mois, hors remises':'Tarif à confirmer';
+ });
+ const rows=[['Tarif mensuel de base',...prices],...data.rows];
  const heads=data.labels.map((label,i)=>
   '<th scope="col" class="'+(i===active?'akMatrixSelected':'')+'">'+esc(label)+
     (i===active?'<span class="akMatrixChosen">OFFRE CONSULTÉE</span>':'')+'</th>').join('');
- const rowHtml=data.rows.map(([criterion,...values])=>'<tr><th scope="row">'+esc(criterion)+'</th>'+
+ const rowHtml=rows.map(([criterion,...values])=>'<tr><th scope="row">'+esc(criterion)+'</th>'+
    values.map((v,i)=>'<td class="'+(i===active?'akMatrixSelected':'')+'">'+esc(v)+'</td>').join('')+'</tr>').join('');
- const mobile=data.rows.map(([criterion,...values])=>
+ const mobile=rows.map(([criterion,...values])=>
   '<section class="akMatrixMobileCriterion"><h4>'+esc(criterion)+'</h4>'+
    values.map((v,i)=>'<div class="akMatrixMobileOffer '+(i===active?'akMatrixSelected':'')+'">'+
     '<strong>'+esc(data.labels[i])+(i===active?' <span>CONSULTÉE</span>':'')+'</strong><p>'+esc(v)+'</p></div>').join('')+'</section>').join('');
