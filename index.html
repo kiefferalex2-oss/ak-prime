@@ -1256,6 +1256,26 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 
 
 /* Page offre AK PRIME — lecture progressive, démonstration à la demande, responsive. */
+
+/* Navigation et validation toujours accessibles pendant la lecture. */
+.offer-landing-modal .modal-head{position:sticky;top:0;z-index:31;background:#fff}
+.offer-landing-modal .modal-foot{position:sticky;bottom:0;z-index:31;background:#fbfcfd;box-shadow:0 -5px 16px rgba(17,38,58,.045);gap:8px}
+.akReadWeekMobile{display:none}
+.akReadWeekItem{border:1px solid #e3eaf1;background:#f8fafc;border-radius:11px;overflow:hidden}
+.akReadWeekItem>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;list-style:none;padding:13px 14px}
+.akReadWeekItem>summary::-webkit-details-marker{display:none}
+.akReadWeekItem>summary span{display:flex;gap:12px;align-items:center}
+.akReadWeekItem>summary b{font-size:11px;color:#ae7a35}
+.akReadWeekItem>summary strong{font-size:12px;color:#1b3549}
+.akReadWeekItem>summary i{font-style:normal;color:#a87b3a;transition:transform .15s}
+.akReadWeekItem[open]>summary i{transform:rotate(180deg)}
+.akReadWeekItem[open]>summary{border-bottom:1px solid #e6eaf0;background:#fff}
+.akReadWeekItem>p{padding:12px 15px 14px;margin:0;color:#627487;font-size:12px;line-height:1.6}
+@media(max-width:560px){
+ .akReadWeekDesktop{display:none!important}
+ .akReadWeekMobile{display:grid;gap:7px}
+}
+
 .akReadableOffer{display:flex;flex-direction:column;gap:16px;min-width:0}
 .akReadableOffer .perf-hero{padding:24px 27px}
 .akReadableOffer .perf-hero h2{font-size:clamp(27px,3vw,36px)}
@@ -4473,7 +4493,8 @@ function performanceOfferLanding(name,price){
   '</section>'+
   '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Comment se passe le suivi ?</h3>'+
    '<p>Quatre étapes pour comprendre le fonctionnement de la formule.</p></div></div>'+
-   '<div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div>'+
+   '<div class="perf-week akReadWeekDesktop">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div>'+
+   '<div class="akReadWeekMobile">'+d.week.map((w,i)=>'<details class="akReadWeekItem" '+(i===0?'open':'')+'><summary><span><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong></span><i aria-hidden="true">⌄</i></summary><p>'+esc(w[2])+'</p></details>').join('')+'</div>'+
    akOfferDisclosure('Voir un exemple concret', '<p class="akReadExampleText">'+esc(d.example)+'</p>','Une situation du quotidien, avec les adaptations possibles')+
   '</section>'+
   '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Ce que comprend '+esc(tier)+'</h3>'+
