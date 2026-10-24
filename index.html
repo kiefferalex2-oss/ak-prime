@@ -1678,6 +1678,12 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akMatrixMobileOffer p{font-size:11px}
 }
 
+
+/* Retour ciblé depuis les cartes des pôles vers l'offre publique détaillée. */
+.public-offer-card.pole-offer-target{outline:3px solid rgba(196,152,83,.72);outline-offset:3px;box-shadow:0 12px 40px rgba(132,93,43,.16)}
+.pole-performance-modal .pole-offer-top{min-height:69px}
+.pole-performance-modal .perf-offer-card h4{font-size:29px;line-height:1.12;margin:0 0 7px}
+
 </style>
 </head>
 <body>
@@ -4272,13 +4278,33 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
  const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
   if(details){const rights=akpOfferItems(pole,name);if(rights)details.points=rights;}
  const label=details?.label||name;
+ const displayName=pole==='Performance'?label:name;
  const features=details?'<ul class="pole-offer-points">'+details.points.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<p class="pole-offer-copy">'+esc(subtitle)+'</p>';
  return '<div class="pole-offer-mini '+(featured?'featured':'')+' '+(details?'perf-offer-card':'')+'">'+
-  '<div class="pole-offer-top"><span class="pole-offer-badge">'+esc(featured?'Recommandée':'Formule')+'</span><h4>'+esc(name)+'</h4><div class="pole-offer-label">'+esc(label)+'</div></div>'+
+  '<div class="pole-offer-top"><span class="pole-offer-badge">'+esc(featured?'Recommandée':'Formule')+'</span><h4>'+esc(displayName)+'</h4></div>'+
   '<div class="price">'+esc(price)+' € <span>/ mois</span></div>'+
   (details?'<p class="pole-offer-intro">'+esc(details.summary)+'</p>':'')+
   features+
   '<button class="btn '+(featured?'primary':'ghost')+' small poleOfferSelect" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">Choisir cette formule</button></div>';
+}
+function openPublicOfferFromPole(button){
+ const pole=button.dataset.pole||'',name=button.dataset.name||'';
+ // Retrouve la même carte sur la page publique : les offres détaillées et la démo
+ // restent la source unique des informations, sans parcours de paiement immédiat.
+ const offerCard=Array.from(document.querySelectorAll('.publicOfferDetailCard'))
+   .find(card=>card.dataset.pole===pole&&card.dataset.name===name);
+ closeModal();
+ if(offerCard){
+   document.querySelectorAll('.publicOfferDetailCard.pole-offer-target')
+     .forEach(card=>card.classList.remove('pole-offer-target'));
+   offerCard.classList.add('pole-offer-target');
+   offerCard.scrollIntoView({behavior:'auto',block:'center'});
+   // La fiche s'ouvre directement, sans imposer un deuxième clic sur la carte.
+   openPublicOfferDetails(offerCard);
+ }else{
+   // Si le catalogue n'est pas monté, les informations sélectionnées restent accessibles.
+   openPublicOfferDetails(button);
+ }
 }
 function openPublicPoleDetails(key){
  const configs={
@@ -4320,7 +4346,7 @@ function openPublicPoleDetails(key){
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
  document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal','pole-'+(key==='forme'?'forme':key==='mental'?'mental':'performance')+'-modal');
  document.getElementById('closePoleDetail').onclick=closeModal;
- document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferCheckout(b));
+ document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferFromPole(b));
 }
 
 function publicOfferDetailData(pole,name){
