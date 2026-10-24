@@ -1632,6 +1632,52 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akOfferCriterionTier p{font-size:11px;line-height:1.5}
 }
 
+
+/* Tableau unique par pôle : toutes les prestations, colonne active surlignée. */
+.akComparisonOnly{border-bottom:0!important;padding-top:32px!important;padding-bottom:22px!important}
+.akComparisonOnly .akEditorialHeading{margin-bottom:20px!important}
+.akComparisonOnly .akEditorialHeading h3{font-size:clamp(22px,2.45vw,29px)!important;max-width:900px}
+.akComparisonOnly .akEditorialHeading p{font-size:12px;max-width:850px!important}
+.akMatrixDesktop{overflow-x:auto;border:1px solid #dce5ed;border-radius:14px;background:#fff;overscroll-behavior-inline:contain}
+.akMatrixTable{width:100%;min-width:870px;border-collapse:separate;border-spacing:0;table-layout:fixed;color:#264055}
+.akMatrixTable.akMatrix2{min-width:650px}
+.akMatrixTable th,.akMatrixTable td{padding:16px 15px;text-align:left;vertical-align:top;font-size:12px;line-height:1.6;border-bottom:1px solid #e7ebf0}
+.akMatrixTable thead th{font-size:13px;letter-spacing:-.01em;font-weight:900;color:#264158;background:#f2f6fa;white-space:normal;vertical-align:middle;position:sticky;top:0;z-index:2}
+.akMatrixTable th:first-child{width:20%;font-weight:850;color:#213c53}
+.akMatrixTable.akMatrix2 th:first-child{width:25%}
+.akMatrixTable td{width:auto;color:#4b6378;overflow-wrap:anywhere}
+.akMatrixTable tbody tr:nth-child(even) th:not(.akMatrixSelected),
+.akMatrixTable tbody tr:nth-child(even) td:not(.akMatrixSelected){background:#fafbfd}
+.akMatrixTable tr:last-child th,.akMatrixTable tr:last-child td{border-bottom:0}
+.akMatrixTable .akMatrixSelected{background:#fff8eb!important;border-left:1px solid #efdfc0;border-right:1px solid #efdfc0;color:#3d4c55}
+.akMatrixTable thead .akMatrixSelected{background:#f4e8d2!important;color:#6e4d23}
+.akMatrixChosen{display:block;font-size:9px;font-weight:900;letter-spacing:.07em;color:#966c34;margin-top:6px}
+.akMatrixMobile{display:none}
+.akMatrixMobileCriterion{border:1px solid #dfe6ed;border-radius:12px;overflow:hidden;background:#fff}
+.akMatrixMobileCriterion h4{margin:0;padding:12px 15px;color:#1d3a50;background:#f1f5f8;border-bottom:1px solid #e1e7ec;font-size:13px;font-weight:900}
+.akMatrixMobileOffer{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:start;padding:11px 15px;border-bottom:1px solid #ebeff3}
+.akMatrixMobileOffer:last-child{border-bottom:0}
+.akMatrixMobileOffer strong{color:#29445a;font-size:11px;font-weight:900;line-height:1.4}
+.akMatrixMobileOffer strong span{display:block;color:#976a34;font-size:9px;line-height:1.5;margin-top:3px;letter-spacing:.045em}
+.akMatrixMobileOffer p{margin:0;color:#596d7e;font-size:11px;line-height:1.6}
+.akMatrixMobileOffer.akMatrixSelected{background:#fff8ec;border-left:3px solid #bc9054;padding-left:12px}
+.akMatrixMobileOffer.akMatrixSelected strong{color:#956a34}
+@media(max-width:850px){
+ .akComparisonOnly{padding-top:25px!important}
+ .akMatrixDesktop{display:none}
+ .akMatrixMobile{display:grid;gap:11px}
+}
+@media(max-width:600px){
+ .akComparisonOnly{padding:23px 0 16px!important}
+ .akComparisonOnly .akEditorialHeading h3{font-size:21px!important}
+ .akMatrixMobile{gap:9px}
+ .akMatrixMobileCriterion h4{font-size:12px;padding:11px 12px}
+ .akMatrixMobileOffer{grid-template-columns:71px minmax(0,1fr);gap:9px;padding:11px 12px}
+ .akMatrixMobileOffer.akMatrixSelected{padding-left:9px}
+ .akMatrixMobileOffer strong{font-size:10px}
+ .akMatrixMobileOffer p{font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -4922,7 +4968,7 @@ function akOfferSingleComparison(pole,name){
  const mobile=data.rows.map(([criterion,...values])=>
   '<section class="akMatrixMobileCriterion"><h4>'+esc(criterion)+'</h4>'+
    values.map((v,i)=>'<div class="akMatrixMobileOffer '+(i===active?'akMatrixSelected':'')+'">'+
-    '<strong>'+esc(data.labels[i])+(i===active?' <span>CHOISIE</span>':'')+'</strong><p>'+esc(v)+'</p></div>').join('')+'</section>').join('');
+    '<strong>'+esc(data.labels[i])+(i===active?' <span>CONSULTÉE</span>':'')+'</strong><p>'+esc(v)+'</p></div>').join('')+'</section>').join('');
  return akOfferSection('01 / COMPARATIF COMPLET',
   pole==='Performance'?'Tout ce qui est inclus dans P1, P2 et P3':
     pole==='Forme & Santé'?'Toutes les prestations : Standard ou Renforcé':
