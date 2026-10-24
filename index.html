@@ -4649,6 +4649,14 @@ function akPerfComparisonTable(tier,rows){
   rows.map(r=>'<tr><td>'+esc(r[0])+'</td>'+[1,2,3].map(i=>'<td class="'+(col===i?'current':'')+'">'+esc(r[i])+'</td>').join('')+'</tr>').join('')+
   '</tbody></table></div>';
 }
+function akPerfCriteriaMobile(tier,rows){
+ return '<div class="akOfferCriteriaMobile">'+rows.map((r,i)=>
+   '<details class="akOfferCriterion" '+(i===0?'open':'')+'><summary><span>'+esc(r[0])+'</span><span aria-hidden="true">⌄</span></summary>'+
+   '<div class="akOfferCriterionContent">'+[1,2,3].map(j=>
+    '<div class="akOfferCriterionTier '+(('P'+j)===tier?'active':'')+'"><strong>P'+j+'</strong><p>'+esc(r[j])+'</p></div>'
+   ).join('')+'</div></details>'
+ ).join('')+'</div>';
+}
 function akPerfMobileComparison(tier,rows,full=false){
  const interesting=full?rows.map(r=>r[0]):['Adaptation','Analyse vidéo','Visios'];
  return '<div class="akReadTierGrid">'+[1,2,3].map(i=>
@@ -4703,44 +4711,76 @@ function performanceOfferLanding(name,price){
  };
  const d=rows[tier];if(!d)return '';
  const compare=[
-  ['Adaptation','Si problème / retour négatif','Hebdomadaire','Sous 48 h si nécessaire'],
-  ['Bien-être','Retours utiles','Hooper','Hooper + état de forme rapproché'],
-  ['Sommeil','Pas de pilotage spécifique','Sommeil perçu via Hooper','Suivi complet du sommeil'],
-  ['Analyse vidéo','2 vidéos / mois','Hebdomadaire sur priorités','Selon les mouvements utiles / besoins'],
-  ['Échauffement','Selon la programmation','Individualisé','Individualisé + suivi rapproché'],
-  ['Récupération','Correction si problème','Allègement de la programmation','Séance dédiée si nécessaire'],
-  ['Nutrition','—','—','Budget calorique / macros'],
-  ['Cycle menstruel','—','Pris en compte','Pris en compte'],
-  ['Visios','1 × 30 min / mois','2 × 30 min / mois','Jusqu’à 1 × 30 min / semaine'],
-  ['Retest','À 6 semaines','À 6 semaines','À 6 semaines + selon besoins']
+  ['Adaptation de la charge',
+   'Correction en cas de douleur, gêne ou difficulté importante signalée ; pas d’ajustement systématique selon la forme.',
+   'Volume, intensité ou contenu révisés chaque semaine en fonction de la charge sRPE et du questionnaire Hooper.',
+   'Charge et séances ajustées sous 48 h si l’état de forme, le sommeil ou le contexte sportif le nécessitent.'],
+  ['Données utilisées',
+   'Charge sRPE et retours signalés par le sportif ; pas de questionnaire régulier d’état de forme.',
+   'Charge sRPE et Hooper hebdomadaire : fatigue, stress, sommeil perçu et douleurs musculaires.',
+   'Charge sRPE, Hooper, état de forme rapproché et agenda de sommeil détaillé.'],
+  ['Sommeil',
+   'Pas d’agenda ni d’analyse de sommeil spécifique.',
+   'Sommeil perçu renseigné dans le questionnaire Hooper.',
+   'Agenda de sommeil : durée, qualité et régularité ; pris en compte dans les ajustements.'],
+  ['Analyses vidéo',
+   'Jusqu’à 2 analyses techniques par mois via WhatsApp.',
+   '1 analyse par semaine sur les mouvements prioritaires via WhatsApp.',
+   'Analyses des mouvements utiles selon les besoins via WhatsApp, sans quota fixe.'],
+  ['Échauffement',
+   'Échauffement prévu dans la programmation, sans individualisation spécifique incluse.',
+   'Échauffement individualisé via les exercices Optitrainer.',
+   'Échauffement individualisé via les exercices Optitrainer.'],
+  ['Récupération',
+   'Correction du programme lorsqu’un problème est signalé.',
+   'Allègement de la programmation si nécessaire, sans séance de récupération supplémentaire.',
+   'Séance de récupération dédiée si nécessaire, en plus des adaptations de charge.'],
+  ['Nutrition',
+   'Aucun budget calorique ou macros inclus.',
+   'Aucun budget calorique ou macros inclus.',
+   'Budget calorique et macronutriments personnalisés, sans menus alimentaires.'],
+  ['Cycle menstruel',
+   'Pas de prise en compte spécifique incluse.',
+   'Prise en compte lorsque pertinent et sur la base des informations communiquées.',
+   'Prise en compte lorsque pertinent et sur la base des informations communiquées.'],
+  ['Visios',
+   '1 visio de 30 minutes par mois.',
+   '2 visios de 30 minutes par mois.',
+   'Jusqu’à 1 visio de 30 minutes par semaine.'],
+  ['Retests physiques',
+   'Retest à 6 semaines.',
+   'Retest à 6 semaines.',
+   'Retest à 6 semaines, puis réévaluations selon les besoins.']
  ];
- const col={P1:1,P2:2,P3:3}[tier];
- return '<div class="perf-detail akReadableOffer akEditorialOffer">'+
+ const shortCompare=compare.filter(r=>['Adaptation de la charge','Données utilisées','Sommeil','Analyses vidéo','Récupération','Visios'].includes(r[0]));
+ return '<div class="perf-detail akReadableOffer akEditorialOffer akPreciseOffer">'+
    '<section class="perf-hero akEditorialHero">'+
     '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><div class="eyebrow">PÔLE PERFORMANCE</div>'+
      '<h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div>'+
      '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
     akOfferKeyFacts('Performance',tier,d.kpis)+
    '</section>'+
-   akOfferSection('01 / LE FONCTIONNEMENT','Un suivi clair, semaine après semaine',
-     'Quatre étapes pour comprendre comment la formule t’accompagne.',
-     akOfferSteps('Performance',tier,d.week)+
-     akOfferDisclosure('Voir une situation concrète','<p class="akReadExampleText">'+esc(d.example)+'</p>',
-       'Un exemple d’ajustement selon les retours du sportif'))+
-   akOfferSection('02 / LES PRESTATIONS','Tout ce qui fait ton accompagnement',
-     d.difference,
-     akOfferQuickBenefits('Performance',tier)+
-     akOfferDisclosure('Consulter le détail des prestations',akOfferFullEntitlements('Performance',tier),
-       'Toutes les modalités et fréquences, sans rien masquer'))+
-   akOfferSection('03 / COMPARER','Quelle différence entre P1, P2 et P3 ?',
-     'Trois niveaux de suivi. Voici ce qui change réellement.',
-     akOfferCompareOverview(tier)+
-     akOfferDisclosure('Voir le comparatif complet',
+   akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
+     'Les services, fréquences et modalités prévus dans Performance '+tier+'.',
+     akOfferIncludedNow('Performance',tier)+
+     akOfferDisclosure('Toutes les modalités de la formule',akOfferFullEntitlements('Performance',tier),
+       'Le détail des prestations par outil et canal de communication'))+
+   akOfferSection('02 / LES DIFFÉRENCES','Compare les prestations P1, P2 et P3',
+     'Concrètement : ce qui est ajusté, à quelle fréquence et à partir de quelles données.',
+     '<div class="akOfferCompareDesktop">'+akPerfComparisonTable(tier,shortCompare)+'</div>'+
+     akPerfCriteriaMobile(tier,shortCompare)+
+     akOfferDisclosure('Comparer les 10 critères',
        '<div class="akEditorialDetailedDesktop">'+akPerfComparisonTable(tier,compare)+'</div>'+
-       '<div class="akEditorialDetailedMobile">'+akPerfMobileComparison(tier,compare,true)+'</div>',
-       'Adaptations, bien-être, sommeil, nutrition, visios et retests'))+
+       '<div class="akEditorialDetailedMobile">'+akPerfCriteriaMobile(tier,compare)+'</div>',
+       'Échauffement, récupération, nutrition, cycle menstruel et retests compris'))+
+   '<section class="akPreciseHow">'+
+     akOfferDisclosure('Comment se déroule le suivi ?',
+       '<div class="akPreciseHowInner">'+akOfferSteps('Performance',tier,d.week)+
+       '<p class="akReadExampleText"><strong>Exemple :</strong> '+esc(d.example)+'</p></div>',
+       '4 étapes et une situation concrète')+
+   '</section>'+
    akOfferDemoTeaser('Performance',tier)+
-   '<p class="perf-note">Les exemples illustrent les possibilités du suivi. Chaque accompagnement est individualisé selon le contexte et les données disponibles.</p>'+
+   '<p class="perf-note">Les données et exemples sont indicatifs ; les ajustements prévus par l’offre sont adaptés à la situation du sportif.</p>'+
   '</div>';
 }
 
@@ -4760,25 +4800,25 @@ function openPublicOfferDetails(button){
  const benefits=publicOfferBenefits(pole,name);
  if(!d)return;
  modal(d.title,
-  '<div class="akReadableOffer akEditorialOffer akEditorialOther">'+
+  '<div class="akReadableOffer akEditorialOffer akEditorialOther akPreciseOffer">'+
    '<section class="akEditorialHero akEditorialHeroOther">'+
     '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><span class="eyebrow">'+esc(pole)+'</span>'+
      '<h2>'+esc(name)+'</h2><p>'+esc(d.promise)+'</p></div>'+
      '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
     akOfferKeyFacts(pole,name)+
    '</section>'+
-   akOfferSection('01 / LE FONCTIONNEMENT','Un accompagnement qui suit ton rythme',
-    'Un parcours construit autour de tes objectifs.',
-    akOfferSteps(pole,name)+
-    akOfferDisclosure('Voir un exemple concret','<p class="akReadExampleText">'+esc(d.example)+'</p>',
-     'Une situation représentative du suivi'))+
-   akOfferSection('02 / LES PRESTATIONS','Ce que tu retrouves dans ton offre',
-    d.diff,
-    akOfferQuickBenefits(pole,name)+
-    akOfferDisclosure('Consulter le détail des prestations',akOfferFullEntitlements(pole,name),
-      'Toutes les modalités et fréquences, sans rien masquer'))+
+   akOfferSection('01 / INCLUS DANS LA FORMULE','Voici précisément ce que tu obtiens',
+    'Les prestations prévues dans '+pole+' — '+name+'.',
+    akOfferIncludedNow(pole,name)+
+    akOfferDisclosure('Toutes les modalités de la formule',akOfferFullEntitlements(pole,name),
+      'Le détail des prestations et outils'))+
+   '<section class="akPreciseHow">'+
+    akOfferDisclosure('Comment se déroule cet accompagnement ?',
+     '<div class="akPreciseHowInner">'+akOfferSteps(pole,name)+
+     '<p class="akReadExampleText"><strong>Exemple :</strong> '+esc(d.example)+'</p></div>',
+     'Les étapes et un exemple concret')+'</section>'+
    akOfferDemoTeaser(pole,name)+
-   '<p class="perf-note">Les exemples restent indicatifs : ton accompagnement est personnalisé selon ta situation et tes besoins.</p>'+
+   '<p class="perf-note">L’accompagnement est adapté aux objectifs et aux données disponibles, dans le cadre des prestations indiquées.</p>'+
   '</div>',
   '<button class="btn ghost" id="closeOfferDetail">Retour</button><button class="btn primary" id="chooseFromOfferDetail">Choisir cette offre</button>');
  document.getElementById('closeOfferDetail').onclick=closeModal;
