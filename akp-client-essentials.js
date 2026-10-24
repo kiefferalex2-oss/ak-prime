@@ -17,6 +17,7 @@
   return n+' réveil'+(n===1?'':'s')+' nocturne'+(n===1?'':'s')+(items.length?' · '+items.join(', '):'');
  }
  function awakeningFields(count,entries=[]){
+  if(count===''||count===null||count===undefined)return '<div class="muted tiny" style="margin-top:7px">Sélectionne le nombre de réveils nocturnes, même si tu n’en as eu aucun.</div>';
   const n=Math.max(0,Math.min(12,Number(count)||0));
   if(!n)return '<div class="muted tiny" style="margin-top:7px">Aucun réveil signalé.</div>';
   return '<div class="akSleepWakeGrid">'+Array.from({length:n},(_,i)=>{
@@ -29,7 +30,7 @@
   }).join('')+'</div>';
  }
  function sleepInputs(day,record=null){
-  const isEdit=!!record,n=record?.awakenings_count??0;
+  const isEdit=!!record,n=record?.awakenings_count??'';
   return '<div id="akSleepEntryForm" class="akSleepEntryForm">'+
     (isEdit?'<div class="akSleepEditBanner"><strong>Correction du '+safe(fmtDate(day))+'</strong><button class="btn ghost small" type="button" id="akCancelSleepEdit">Annuler</button></div>':'')+
     '<div class="grid2">'+
@@ -40,7 +41,8 @@
     '<div class="field"><label for="akSleepQuality">Qualité ressentie</label><select id="akSleepQuality" class="select" required><option value="">Choisis une note</option>'+
     [1,2,3,4,5].map(i=>'<option value="'+i+'" '+(Number(record?.quality)===i?'selected':'')+'>'+i+' / 5</option>').join('')+'</select></div>'+
     '<div class="field"><label for="akSleepAwakeningsCount">Nombre de réveils intra-nocturnes</label><select id="akSleepAwakeningsCount" class="select">'+
-    Array.from({length:13},(_,i)=>'<option value="'+i+'" '+(Number(n)===i?'selected':'')+'>'+i+(i===0?' — aucun':'')+'</option>').join('')+
+    '<option value="" '+(n===''?'selected':'')+'>Sélectionne le nombre</option>'+ 
+    Array.from({length:13},(_,i)=>'<option value="'+i+'" '+(n!==''&&Number(n)===i?'selected':'')+'>'+i+(i===0?' — aucun':'')+'</option>').join('')+
     '</select></div></div>'+
     '<div id="akSleepAwakeningFields" aria-live="polite">'+awakeningFields(n,sleepWakeEntries(record))+'</div>'+
     '<div class="field" style="margin-top:16px"><label for="akSleepNotes">Observations (facultatif)</label>'+
@@ -243,7 +245,9 @@
   if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(hours)||hours<=0||hours>24||
    !Number.isInteger(quality)||quality<1||quality>5)return alert('Date, durée et qualité du sommeil requises.');
   if(notes.length>1200)return alert('Observations trop longues.');
-  const count=Number(val('akSleepAwakeningsCount'));
+  const countRaw=val('akSleepAwakeningsCount');
+  if(countRaw==='')return alert('Indique le nombre de réveils nocturnes, même si c’est zéro.');
+  const count=Number(countRaw);
   if(!Number.isInteger(count)||count<0||count>12)return alert('Indique le nombre de réveils nocturnes, entre 0 et 12.');
   const awakeningRows=Array.from(document.querySelectorAll('#akSleepAwakeningFields .akAwakeningEntry'));
   if(awakeningRows.length!==count)return alert('Le détail des réveils est incomplet.');
