@@ -51,7 +51,6 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .modal-wrap{position:fixed;inset:0;background:rgba(9,20,33,.58);display:grid;place-items:center;z-index:100;padding:20px}.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.25)}.modal-head,.modal-foot{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.modal-foot{border-top:1px solid var(--line);border-bottom:0}.modal-body{padding:18px 20px}.x{border:0;background:transparent;font-size:22px;cursor:pointer}
 .backup{display:flex;gap:8px;flex-wrap:wrap}
 .toast{position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:11px 14px;border-radius:10px;box-shadow:var(--shadow);z-index:110;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}
-.demo-banner{background:#fff4d8;color:#895d00;border-bottom:1px solid #efd38f;padding:8px 16px;text-align:center;font-size:12px;font-weight:750}
 
 /* Passeport AK PRIME premium */
 .premium-passport{background:radial-gradient(circle at 78% 0,#1d1b18 0,#0b121a 31%,#071018 76%);color:#edf2f7;border:1px solid #29333d;border-radius:20px;padding:20px;box-shadow:0 26px 70px rgba(0,0,0,.24);overflow:hidden}
@@ -166,7 +165,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 .public-access{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}.public-access-card{background:#fff;border:1px solid #e1e7ef;border-radius:18px;padding:21px}.public-access-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #edf0f4}.public-access-row:last-child{border-bottom:0}.public-access-row .bubble{width:31px;height:31px;border-radius:50%;background:#edf2ff;color:#2f66f6;display:grid;place-items:center;font-weight:900;flex:0 0 auto}.public-access-row strong{display:block;font-size:13px}.public-access-row div div{font-size:12px;color:#667085;margin-top:3px;line-height:1.45}
 .public-faq{display:grid;grid-template-columns:1fr 1fr;gap:10px}.public-faq details{background:#fff;border:1px solid #e1e7ef;border-radius:13px;padding:15px}.public-faq summary{font-weight:850;cursor:pointer}.public-faq p{font-size:13px;color:#667085;line-height:1.55;margin:10px 0 0}
 .public-footer{padding:28px 18px;background:#07101a;color:#8494a6}.public-footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:11px}.public-footer-links{display:flex;gap:12px;flex-wrap:wrap}.public-footer-links button{border:0;background:transparent;color:#aebdcd;padding:0;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.public-footer-links button:hover{color:#fff}
-.legal-draft{border:1px solid #efcf8e;background:#fff9ed;color:#7a5513;border-radius:12px;padding:12px 13px;font-size:12px;line-height:1.5;margin-bottom:14px}.legal-doc h3{margin:18px 0 7px;font-size:15px}.legal-doc h3:first-of-type{margin-top:0}.legal-doc p,.legal-doc li{font-size:12px;color:#475467;line-height:1.6}.legal-doc ul{padding-left:19px}.legal-placeholder{display:inline-block;background:#fff4d8;color:#7a5513;border:1px solid #efcf8e;border-radius:6px;padding:1px 5px;font-weight:800}.legal-action{border:1px solid #d8e0eb;background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px}.legal-action strong{display:block;font-size:13px}.legal-action p{margin:5px 0 0}
+.legal-doc h3{margin:18px 0 7px;font-size:15px}.legal-doc h3:first-of-type{margin-top:0}.legal-doc p,.legal-doc li{font-size:12px;color:#475467;line-height:1.6}.legal-doc ul{padding-left:19px}.legal-placeholder{display:inline-block;background:#fff4d8;color:#7a5513;border:1px solid #efcf8e;border-radius:6px;padding:1px 5px;font-weight:800}.legal-action{border:1px solid #d8e0eb;background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px}.legal-action strong{display:block;font-size:13px}.legal-action p{margin:5px 0 0}
 .public-login-note{border:1px solid #d9e0ea;background:#f8fafc;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.45;margin-top:10px}
 .checkout-offer-head{background:linear-gradient(145deg,#0d1827,#183252);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px}
 .checkout-offer-head .tiny{color:#b9c6d5}.checkout-offer-head h3{margin:5px 0 2px;font-size:22px}
@@ -1720,7 +1719,6 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 </style>
 </head>
 <body>
-<div class="demo-banner">BÊTA PRIVÉE — Supabase est connecté. Les dossiers sont persistants ; les droits du futur portail client restent à tester avant données de santé réelles.</div>
 <div id="root"></div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
@@ -4207,18 +4205,27 @@ function renderPublicSite(){
  '<details><summary>Dans quels cas puis-je être remboursé ?</summary><p>Un remboursement ou une régularisation peut intervenir notamment en cas de rétractation légale, de trop-perçu, de prestations non fournies ouvrant droit à restitution ou selon les termes d’une résiliation amiable écrite. Le seul changement d’avis ne donne pas automatiquement droit au remboursement des mensualités d’un engagement ferme. Un décompte détaillé vous sera communiqué. Si vous avez demandé à commencer pendant les 14 jours de rétractation, la partie des services effectivement fournis peut rester due dans les conditions légales.</p></details>'+
  '<details><summary>Comment accéder à mon espace personnel ?</summary><p>Après validation de votre souscription, vous recevrez les instructions d’activation de votre compte AK PRIME. L’accès à Optitrainer sera organisé séparément lorsque votre formule prévoit des programmes d’entraînement.</p></details>'+
  '</div></div></section>'+
- '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME — Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
+ '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME — Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
  '</div>';
 }
 
 function legalPlaceholder(label){return '<span class="legal-placeholder">'+esc(label)+'</span>'}
+// Compléter uniquement après signature d'une convention avec un médiateur référencé, compétent pour l'activité AK PRIME.
+const AKP_MEDIATOR={name:'',address:'',website:''};
+function akpMediatorDetails(){
+ const m=AKP_MEDIATOR;
+ if(m.name&&m.address&&/^https:\/\//.test(m.website)){
+  return '<p><strong>Médiateur désigné :</strong> '+esc(m.name)+'.<br>Adresse : '+esc(m.address)+'.<br>Site internet : <a href="'+esc(m.website)+'" target="_blank" rel="noopener noreferrer">'+esc(m.website)+'</a>.</p>';
+ }
+ return '<p>La désignation du médiateur de la consommation est en cours. Ses coordonnées seront publiées ici dès la conclusion de la convention d’adhésion, avant toute souscription payante.</p>';
+}
 function openPublicLegal(type){
- const common='<div class="legal-draft"><strong>Informations juridiques AK PRIME.</strong> Le site est public mais les paiements réels ne sont pas encore activés. Les dernières mentions dépendant de l’immatriculation définitive et du médiateur seront complétées avant l’ouverture commerciale.</div>';
+ const common='';
  const docs={
   mentions:{
    title:'Mentions légales',
    body:common+'<div class="legal-doc">'+
-    '<h3>Éditeur du site</h3><p><strong>Alex Kieffer, entrepreneur individuel (micro-entrepreneur), nom commercial AK PRIME</strong>.<br>Adresse professionnelle : 9 rue des Italiens, 74200 Thonon-les-Bains, France.<br>SIREN / SIRET : '+legalPlaceholder('à compléter avec les identifiants définitifs')+'.<br>E-mail : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.<br>Téléphone professionnel : '+legalPlaceholder('à créer avant ouverture commerciale')+'.</p>'+
+    '<h3>Éditeur du site</h3><p><strong>Alex Kieffer, entrepreneur individuel (micro-entrepreneur), nom commercial AK PRIME</strong>.<br>Adresse professionnelle : 9 rue des Italiens, 74200 Thonon-les-Bains, France.<br>SIREN : 131 577 009.<br>SIRET : 131 577 009 00015.<br>E-mail : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.<br>Téléphone professionnel : '+legalPlaceholder('à créer avant ouverture commerciale')+'.</p>'+
     '<h3>Responsable de la publication</h3><p>Alex Kieffer.</p>'+
     '<h3>Activité</h3><p>Coaching sportif, préparation physique et préparation mentale non clinique, à distance et en présentiel. L’activité d’encadrement sportif est exercée dans le cadre des qualifications et de la carte professionnelle détenues par l’exploitant.</p>'+
     '<h3>Hébergement</h3><p>Le site est hébergé par <strong>Netlify, Inc.</strong>, 101 2nd Street, San Francisco, CA 94105, États-Unis. Contact : <a href="mailto:support@netlify.com">support@netlify.com</a>.</p>'+
@@ -4242,9 +4249,16 @@ function openPublicLegal(type){
     '<h3>9 quater. Remboursements et régularisations</h3><p>En cas de rétractation légale, de trop-perçu, d’inexécution donnant lieu à restitution ou de résiliation amiable, les sommes à conserver ou à rembourser sont déterminées selon les dispositions légales et, le cas échéant, l’accord de résiliation écrit. Aucun remboursement automatique des échéances correspondant à un contrat ferme n’est promis en cas de simple changement d’avis sans accord de résiliation. Toute régularisation est accompagnée d’un décompte détaillé des montants versés, des prestations et sommes dues et du solde à restituer. Les demandes peuvent être adressées à contact@akprime.fr.</p>'+
     '<h3>10. Suspension et inexécution</h3><p>En cas d’échec de paiement, de rejet d’une échéance ou d’inexécution d’une obligation essentielle, AK PRIME peut suspendre l’accès aux prestations concernées après information du client, sans préjudice des droits impératifs du consommateur. Toute situation particulière peut faire l’objet d’un échange écrit avec AK PRIME.</p>'+
     '<h3>11. Données personnelles</h3><p>Les traitements de données nécessaires à la relation contractuelle et à l’accompagnement sont détaillés dans la Politique de confidentialité. Les données sensibles, lorsqu’elles sont nécessaires au suivi, font l’objet d’une information spécifique et d’un recueil de consentement approprié.</p>'+
-    '<h3>12. Réclamations et médiation de la consommation</h3><p>Toute réclamation doit d’abord être adressée à <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>. Si le litige n’est pas résolu directement, le consommateur pourra saisir gratuitement le médiateur de la consommation désigné par AK PRIME. Médiateur : '+legalPlaceholder('à contractualiser puis renseigner avant la première vente')+'.</p>'+
+    '<h3>12. Réclamations et médiation de la consommation</h3><p>Toute réclamation doit d’abord être adressée par écrit à <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>. Si le litige n’est pas résolu à l’amiable, le consommateur pourra saisir gratuitement le médiateur de la consommation désigné par AK PRIME, dans les conditions légales.</p>'+akpMediatorDetails()+
     '<h3>13. Droit applicable</h3><p>Les contrats conclus avec des consommateurs en France sont soumis au droit français, sous réserve des dispositions protectrices impératives dont bénéficie le consommateur.</p>'+
    '</div>'
+  },
+  mediation:{
+   title:'Réclamations et médiation de la consommation',
+   body:'<div class="legal-doc">'+
+    '<h3>Contacter AK PRIME</h3><p>Pour toute difficulté liée à un accompagnement, adressez une réclamation écrite à <a href="mailto:contact@akprime.fr">contact@akprime.fr</a> afin de rechercher une solution amiable.</p>'+
+    '<h3>Recours à la médiation</h3><p>Si votre réclamation n’aboutit pas, vous pouvez solliciter gratuitement le médiateur de la consommation désigné par AK PRIME, dans les conditions prévues par le Code de la consommation.</p>'+akpMediatorDetails()+
+    '</div>'
   },
   privacy:{
    title:'Politique de confidentialité',
@@ -5272,7 +5286,7 @@ function openPublicOfferCheckout(button){
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
     '</div><div class="checkout-consent-note">La date demandée sera conservée avec la commande et confirmée au paiement. Un démarrage à moins de 14 jours de la commande exige une demande expresse ; sans celle-ci, « dès que possible » signifie au plus tôt 14 jours après paiement. Le démarrage de l’entraînement reste soumis à la finalisation de l’onboarding. Aucun paiement n’est effectué à cette étape.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
-    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Quand Stripe sera branché, l’e-mail saisi ici sera transmis au paiement sécurisé. Après validation du paiement, il servira à préparer automatiquement le compte et le dossier client AK PRIME.</div></div>',
+    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">Cette étape enregistre une demande, sans paiement. Les conditions définitives vous seront communiquées avant toute souscription payante.</div></div>',
     '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">Enregistrer ma demande (sans paiement)</button>');
    const captureDraft=()=>{
      draft.fullName=document.getElementById('checkoutFullName')?.value?.trim()||'';
