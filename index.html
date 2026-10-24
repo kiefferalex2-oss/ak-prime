@@ -3878,6 +3878,187 @@ function publicOfferDetailData(pole,name){
  return map[key]||null;
 }
 
+
+/* Démonstrations publiques : données de démonstration en mémoire seulement.
+   Les écrans sont rendus par les mêmes fonctions que le portail client réel.
+   Aucun accès Supabase, authentification, réservation ni PDF n'est exécuté. */
+function akOfferDemoConfiguration(pole,name){
+ const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
+ const specs={
+  'performance|p1':{label:'Performance · Essentiel P1',first:'Thomas',last:'Martin',sport:'Handball',level:'N2',specialty:'Arrière',quota:1,period:'month',minutes:30,video:'2 vidéos / mois',goal:'Force, détente et agilité',sleep:false,macros:false,mental:false},
+  'performance|p2':{label:'Performance · Avancé P2',first:'Thomas',last:'Martin',sport:'Handball',level:'N2',specialty:'Arrière',quota:2,period:'month',minutes:30,video:'Analyse hebdomadaire',goal:'Charge, Hooper et explosivité',sleep:false,macros:false,mental:false},
+  'performance|p3':{label:'Performance · Premium P3',first:'Thomas',last:'Martin',sport:'Handball',level:'N2',specialty:'Arrière',quota:1,period:'week',minutes:30,video:'Vidéo selon besoins',goal:'Puissance, sommeil et récupération',sleep:true,macros:true,mental:false},
+  'forme & santé|standard':{label:'Forme & Santé · Standard',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Remise en forme',quota:1,period:'month',minutes:30,video:'1 vidéo / mois',goal:'Reprendre durablement',sleep:false,macros:false,mental:false},
+  'forme & santé|renforcé':{label:'Forme & Santé · Renforcé',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Condition physique',quota:2,period:'month',minutes:30,video:'1 vidéo / semaine',goal:'Progression et habitudes durables',sleep:false,macros:true,mental:false},
+  'mental|particulier':{label:'Préparation mentale · Particulier',first:'Léa',last:'Moreau',sport:'',level:'Accompagnement individuel',specialty:'Confiance et émotions',quota:1,period:'week',minutes:45,video:'Exercices et routines',goal:'Stress et confiance en soi',sleep:false,macros:false,mental:true},
+  'mental|sportif':{label:'Préparation mentale · Sportif',first:'Noah',last:'Bernard',sport:'Basketball',level:'National',specialty:'Meneur',quota:1,period:'week',minutes:45,video:'Routines de compétition',goal:'Concentration et pression du match',sleep:false,macros:false,mental:true}
+ };
+ return specs[key]||null;
+}
+function akOfferDemoDay(offset){
+ const d=new Date(Date.now()+offset*86400000);
+ return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+}
+function akOfferDemoState(pole,name){
+ const cfg=akOfferDemoConfiguration(pole,name);if(!cfg)return null;
+ const past=[-136,-103,-70,-37,-8];
+ const measures=cfg.mental?[
+  ['Confiance (auto-note)','/10',[4.8,5.6,6.2,7.1,7.9]],
+  ['Concentration (auto-note)','/10',[5,5.4,6.5,7.1,8.1]]
+ ]:cfg.sport==='Handball'?[
+  ['CMJ','cm',[28.2,29.8,31.1,33,34.5]],
+  ['VMA','km/h',[13.4,13.7,14.1,14.7,15.1]],
+  ['1RM estimée','kg',[83,90,98,105,111]],
+  ['Illinois','s',[19.5,19.1,18.7,18.35,18.1]]
+ ]:[
+  ['Squat 5RM','kg',[38,42,47,51,55]],
+  ['Test marche 6 min','m',[520,545,560,575,595]],
+  ['Gainage','s',[50,61,74,85,98]]
+ ];
+ const tests=measures.flatMap(([test_name,unit,values])=>past.map((offset,i)=>({
+  test_name,performed_at:akOfferDemoDay(offset)+'T11:00:00Z',
+  result_value:values[i],unit,context:'Exemple fictif · phase '+(i+1),
+  coach_interpretation:'Progression illustrée, protocole constant.'
+ })));
+ const timeline=past.map((offset,i)=>({
+  event_date:akOfferDemoDay(offset),event_type:i?'retest':'initial',
+  title:i?'Retest '+i+' · évolution du cycle':'Bilan initial · objectifs et repères',
+  detail:i?'Évaluation comparative de la phase '+(i+1)+'.':'Définition des objectifs et des mesures de référence.'
+ }));
+ timeline.unshift({event_date:akOfferDemoDay(-3),event_type:'milestone',
+  title:cfg.mental?'Routine mentale mieux maîtrisée':'Nouveau palier de progression',
+  detail:cfg.mental?'Recentrage et confiance en progression.':'Tests et régularité en progrès sur les cinq mois.'});
+ timeline.unshift({event_date:akOfferDemoDay(16),event_type:'retest',
+  title:cfg.mental?'Prochaine réévaluation des routines':'Prochain retest · bilan de cycle',
+  detail:cfg.mental?'Bilan du niveau de confiance et des exercices.':'Réévaluation comparative des qualités suivies.'});
+ const demoAppointment=(offset,status,i)=>({
+  id:'demo-session-'+i,client_id:'public-demo',appointment_type:i===0?'Visio initiale':'Visio de suivi',
+  starts_at:akOfferDemoDay(offset)+'T16:30:00Z',duration_minutes:cfg.minutes,
+  status,notes:'Consultation fictive · aperçu public',created_at:akOfferDemoDay(offset-2)+'T10:00:00Z'
+ });
+ const appointments=[-123,-95,-66,-38,-17].map((n,i)=>demoAppointment(n,'completed',i));
+ appointments.push(demoAppointment(6,'scheduled',6));
+ const availableSlots=[3,5,8,10,12,16,18].flatMap((n,i)=>
+  [0,1].map((part)=>({
+   starts_at:akOfferDemoDay(n)+'T'+(part?'17:30':'16:30')+':00Z',
+   ends_at:akOfferDemoDay(n)+'T'+(part?'18:15':'17:15')+':00Z'
+  }))
+ );
+ const start=akOfferDemoDay(-145),end=akOfferDemoDay(82),current=akOfferDemoDay(-15);
+ const state={
+  client:{id:'public-demo',first_name:cfg.first,last_name:cfg.last,is_test:false,
+   current_pole:pole,current_offer:name,current_sport:cfg.sport,position_or_specialty:cfg.specialty,
+   level:cfg.level,status:'active',start_date:start,engagement_end_date:end,
+   optitrainer_url:cfg.mental?null:'https://www.optitrainer.fr/'},
+  cycle:{title:cfg.mental?'Cycle 05 · Ressources mentales':'Cycle 05 · '+cfg.goal,
+   start_date:current,end_date:akOfferDemoDay(26),
+   priorities:cfg.mental?'Routines de recentrage, confiance et transfert en situation.':
+    'Consolider les acquis, gérer la charge et préparer le prochain bilan.',
+   vigilance:cfg.mental?'Prendre le temps d’évaluer chaque routine.':'Vigilance sur la récupération et l’équilibre des sollicitations.'},
+  tests,events:timeline,appointments,availableSlots,
+  bookingPolicy:{quota_count:cfg.quota,quota_period:cfg.period,duration_minutes:cfg.minutes},
+  checkins:[-21,-14,-7].map((n,i)=>({
+   id:'demo-checkin-'+i,week_date:akOfferDemoDay(n),overall_week:'Bonnes sensations, confiance en hausse.',
+   missed_sessions:'Aucune',exercise_problem:'Aucun',pain_or_discomfort:'Rien à signaler',
+   next_week_constraints:'Organisation habituelle',coach_feedback:'Bonne évolution : on consolide les acquis.',
+   reviewed_at:akOfferDemoDay(n+2)+'T10:00:00Z'
+  })),
+  response:{status:'submitted',submitted_at:akOfferDemoDay(-142)+'T11:00:00Z',
+   answers:{full_name:cfg.first+' '+cfg.last}},
+  template:{questions:[{key:'full_name',label:'Nom et prénom'}]},
+  appSettings:{whatsapp_number:'0600000000',whatsapp_default_message:'Bonjour, message de démonstration.'},
+  renewalChoices:[],invoices:[],notificationReads:[],
+  akSleepRows:cfg.sleep?[-3,-2,-1,0].map((n,i)=>({
+    id:'demo-sleep-'+i,sleep_date:akOfferDemoDay(n),duration_hours:[7.25,7.75,6.75,7.5][i],
+    quality:[4,5,3,4][i],bedtime:'23:10',wakeup:'07:00',
+    awakenings_count:i===2?2:1,awakenings:i===2?[{time:'02:40',minutes:12},{time:'05:35',minutes:5}]:[{time:'03:15',minutes:4}],
+    notes:i===2?'Nuit courte après déplacement.':'Récupération satisfaisante.'
+   })).reverse():[]
+ };
+ if(cfg.macros)state.akMacro={
+  title:'Budget personnalisé · accompagnement '+name,entry_date:akOfferDemoDay(-7),
+  kcal:cfg.sport==='Handball'?2750:2250,protein:150,carbs:cfg.sport==='Handball'?355:270,fats:75,
+  notes:'Repères fictifs individualisés à titre d’exemple. Ce ne sont pas des recommandations pour vous.',
+  food_guidance:'Organisation régulière des repas, protéines réparties et alimentation variée.',
+  meal_timing:'Adapter les apports à l’horaire des séances et à la récupération.',
+  hydration:'Hydratation répartie dans la journée et adaptée à la pratique.'
+ };
+ return state;
+}
+function akOfferDemoScreen(s,view){
+ if(view==='visios')return renderClientVisios(s);
+ if(view==='suivi')return renderClientSuivi(s);
+ if(view==='checkin')return '<div class="client-main akWowCheckinPage"><div class="client-page-head"><div><h2>Ton bilan de la semaine.</h2><p>Retours et ajustements individualisés dans ton espace.</p></div></div>'+renderClientWeeklyCheckin(s)+'</div>';
+ if(view==='passport'){
+  return '<div class="client-main premium-client-main"><div class="pp-actions"><span class="status blue">Exemple fictif · lecture seule</span></div>'+
+   renderPremiumPassport(passportModelFromClient(s))+'</div>';
+ }
+ if(view==='billing')return renderClientBilling(s);
+ return renderClientHome(s);
+}
+function akOfferDemoMarkup(pole,name){
+ const cfg=akOfferDemoConfiguration(pole,name);
+ if(!cfg)return '';
+ const state=akOfferDemoState(pole,name);
+ const items=[['home','⌂','Accueil'],['visios','◷','Visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures']];
+ return '<section class="akOfferDemoSection">'+
+  '<div class="akOfferDemoIntro"><div><span class="akWowKicker">DÉMONSTRATION INTERACTIVE</span>'+
+   '<h3>Explore ton futur espace AK PRIME</h3>'+
+   '<p>Le véritable design du portail, avec cinq mois d’exemples adaptés à <strong>'+esc(cfg.label)+'</strong>. Clique sur les onglets pour le découvrir.</p></div>'+
+   '<span class="akOfferDemoReadonly">Données fictives · lecture seule</span></div>'+
+  '<div class="akOfferDemoShell client-portal ak-wow true-client-demo" data-demo-offer="'+esc(pole+'|'+name)+'">'+
+   '<div class="client-top"><div class="client-brand"><span class="client-brand-mark">AK</span><span>AK PRIME<small>ESPACE CLIENT</small></span></div>'+
+    '<nav class="client-nav akOfferDemoNav" aria-label="Navigation de la démonstration">'+
+     items.map(([view,icon,label])=>'<button type="button" class="akOfferDemoTab '+(view==='home'?'on':'')+'" data-demo-view="'+view+'" aria-current="'+(view==='home'?'page':'false')+'"><span>'+icon+'</span>'+label+'</button>').join('')+
+    '</nav>'+
+    '<div class="client-user-mini"><strong>'+esc(cfg.first+' '+cfg.last)+'</strong><span>'+esc(cfg.label)+'</span></div>'+
+   '</div>'+
+   '<div class="akOfferDemoReadonlyStrip">APERÇU CLIENT · '+esc(cfg.label)+' · 5 MOIS DE SUIVI FICTIF · AUCUNE ACTION RÉELLE</div>'+
+   '<div class="akOfferDemoBody">'+akOfferDemoScreen(state,'home')+'</div>'+
+  '</div>'+
+  '<div class="akOfferDemoFoot"><span>✦ Le Passeport et les modules visibles correspondent à l’espace réel ; les données sont fictives et aucune action n’est enregistrée.</span></div>'+
+ '</section>';
+}
+function bindAkOfferDemo(pole,name){
+ const shell=document.querySelector('.akOfferDemoShell');if(!shell)return;
+ const state=akOfferDemoState(pole,name),body=shell.querySelector('.akOfferDemoBody');
+ if(!state||!body)return;
+ function setView(view){
+  if(!['home','visios','checkin','suivi','passport','billing'].includes(view))return;
+  if(view==='passport')passportBookPage='overview';
+  shell.classList.toggle('akOfferDemoPassport',view==='passport');
+  shell.classList.toggle('ak-wow',view!=='passport');
+  shell.querySelectorAll('.akOfferDemoTab').forEach(b=>{
+   const selected=b.dataset.demoView===view;
+   b.classList.toggle('on',selected);b.setAttribute('aria-current',selected?'page':'false');
+  });
+  body.innerHTML=akOfferDemoScreen(state,view);
+  body.dataset.demoView=view;
+  body.scrollIntoView({block:'nearest',behavior:'auto'});
+ }
+ shell.addEventListener('click',function(event){
+  const tab=event.target.closest('.akOfferDemoTab');
+  const action=event.target.closest('.clientGoPassport,.clientGoFollow,.clientGoVisios,.clientGoCheckin');
+  const subTab=event.target.closest('.passportBookTab');
+  if(tab||action||subTab){
+   event.preventDefault();event.stopPropagation();
+   if(subTab){passportBookPage=subTab.dataset.passportPage||'overview';body.innerHTML=akOfferDemoScreen(state,'passport');return;}
+   const view=tab?.dataset.demoView||(action?.classList.contains('clientGoPassport')?'passport':
+    action?.classList.contains('clientGoVisios')?'visios':
+    action?.classList.contains('clientGoCheckin')?'checkin':'suivi');
+   setView(view);return;
+  }
+  // Toute action interactive interne, y compris URL et formulaire, reste fictive.
+  if(event.target.closest('button,a,input,select,textarea')){
+   event.preventDefault();event.stopImmediatePropagation();
+   const hint=shell.querySelector('.akOfferDemoReadonlyStrip');
+   if(hint){hint.textContent='DÉMONSTRATION EN LECTURE SEULE · AUCUNE RÉSERVATION, SAISIE, FACTURE OU CONNEXION RÉELLE';}
+  }
+ },true);
+ shell.addEventListener('submit',event=>{event.preventDefault();event.stopImmediatePropagation();},true);
+ shell.addEventListener('change',event=>{event.preventDefault();event.stopImmediatePropagation();},true);
+}
+
 function performanceDemoConfig(tier){
  tier=String(tier||'P1').toUpperCase();
  return {
