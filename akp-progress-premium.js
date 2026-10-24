@@ -230,20 +230,48 @@
      '<p class="akBodyDisclaimer">Le pourcentage de masse grasse est affiché uniquement s’il a été mesuré et saisi. Aucune estimation automatique n’est effectuée.</p>'+
      hist+'</section>';
  }
+ // Le suivi corporel est consultable avec les tests, sans l'assimiler à un test de performance.
+ function progressGroups(model){
+   const groups=passportTestGroups(model.tests);
+   const history=bodyMeasurements(model);
+   for(const spec of [
+     {name:'Poids',key:'kg',unit:'kg'},
+     {name:'Masse grasse (%MG)',key:'fat_pct',unit:'%'}
+   ]){
+     const series=bodySeries(history,spec.key);
+     if(!series.length)continue;
+     groups.push({
+       name:spec.name,unit:spec.unit,bodyMeasure:true,bodyKey:spec.key,
+       rows:series.map(row=>{
+         const source=history.find(x=>x.date===row.date);
+         return {name:spec.name,date:row.date,value:row.value,num:row.value,unit:spec.unit,
+           context:'Mesure corporelle',note:source?.notes||'',isBody:true};
+       })
+     });
+   }
+   return groups;
+ }
  function directionFor(group){
+   if(group?.bodyMeasure)return 'neutral';
    const better=testLibraryItem(group.name)?.better||'neutral';
    return better==='lower'?'lower':better==='higher'?'higher':'neutral';
  }
  const measureWord=n=>n+' mesure'+(n>1?'s':'');
  function toneFor(d){return d?.improved===true?'up':d?.improved===false?'down':'neutral';}
- function growthFor(d){
+ function growthFor(d,group){
+   if(group?.bodyMeasure){
+     if(!d||d.count<2)return '1re mesure';
+     const delta=Math.round((d.current-d.initial)*10)/10;
+     return (delta>0?'+':'')+bodyFormat(delta)+(group.bodyKey==='fat_pct'?' pts':' kg');
+   }
    const percent=sportPerformancePct(d);
    if(d?.count>=2&&Number.isFinite(percent)){
      return passportSigned(percent)+' %';
    }
    return 'Référence';
  }
- function statusFor(d){
+ function statusFor(d,group){
+   if(group?.bodyMeasure)return 'Mesure corporelle';
    return d?.improved===true?'Progression':d?.improved===false?'À surveiller':
      (d?.count>=2&&Math.abs(d.raw||0)<1e-9?'Stable':'Référence');
  }
@@ -341,28 +369,31 @@
  passportLineChart=function(group){return chart(group);};
 
  passportProgressPage=function(model){
-   const groups=passportTestGroups(model.tests),selected=passportSelectedGroup(groups),composition=bodyProgress(model);
+   const groups=progressGroups(model),selected=passportSelectedGroup(groups);
    if(!selected)return '<div class="akp-page akProg2">'+
      '<div class="akProg2Head"><div><span class="akProg2Eyebrow">PROGRESSION</span>'+
      '<h2>Les performances, en perspective.</h2>'+
      '<p>Les résultats apparaîtront ici dès les premières évaluations.</p></div></div>'+
-     composition+'<div class="akProg2Box akProg2Empty">Aucun résultat de test physique enregistré.</div></div>';
-   const d=passportMetricDelta(selected),tone=toneFor(d),progress=growthFor(d);
+     '<div class="akProg2Box akProg2Empty">Aucun test ni mesure corporelle enregistré.</div></div>';
+   const d=passportMetricDelta(selected),tone=selected.bodyMeasure?'neutral':toneFor(d),progress=growthFor(d,selected);
    const rows=selected.rows,first=rows[0],last=rows[rows.length-1];
    const direction=directionFor(selected);
    const best=direction==='neutral'?null:passportGroupBest(selected);
    const mainCard=(g)=>{
-     const m=passportMetricDelta(g),t=toneFor(m),latest=g.rows[g.rows.length-1];
+     const m=passportMetricDelta(g),t=g.bodyMeasure?'neutral':toneFor(m),latest=g.rows[g.rows.length-1];
      const selectedCard=normalizeTestName(g.name)===normalizeTestName(selected.name);
      return '<button type="button" class="akProg2Card passportMetricBtn '+(selectedCard?'selected':'')+
        '" aria-pressed="'+(selectedCard?'true':'false')+'" data-test-key="'+esc(normalizeTestName(g.name))+'">'+
        '<div class="akProg2CardTop"><strong>'+esc(g.name)+'</strong><small>'+measureWord(g.rows.length)+'</small></div>'+
        '<div class="akProg2CardValue">'+esc(val(latest))+' <em>'+esc(unit(latest)||g.unit||'')+'</em></div>'+
-       '<div class="akProg2CardBottom"><span class="akProg2Chip '+t+'">'+esc(growthFor(m))+'</span>'+
+       '<div class="akProg2CardBottom"><span class="akProg2Chip '+t+'">'+esc(growthFor(m,g))+'</span>'+
        (selectedCard?'<span class="akProg2Selected">SÉLECTIONNÉ ✓</span>':'<span class="akProg2Selected">Voir le détail ↗</span>')+
        '</div></button>';
    };
-   const factBest=best?kpi('Meilleur',best,labelDate(rowDates(best))):
+   const factBest=selected.bodyMeasure?
+      '<div class="akProg2Fact"><span>Évolution totale</span><strong>'+esc(growthFor(d,selected))+'</strong>'+
+       '<small>Écart entre la première et la dernière mesure</small></div>':
+      best?kpi('Meilleur',best,labelDate(rowDates(best))):
       '<div class="akProg2Fact"><span>Meilleur</span><strong>—</strong>'+
         '<small>Sens de performance non défini pour ce test</small></div>';
    const history=rows.slice().reverse().map((r,i)=>{
@@ -374,19 +405,20 @@
        '<td>'+esc(r.context||'—')+'</td><td>'+esc(r.note||'—')+'</td></tr>';
    }).join('');
    const compare='<section class="akProg2Box">'+
-     '<div class="akProg2TitleRow"><div><small>02 / VUE COMPARATIVE</small><h3>Tous les tests</h3>'+
-       '<p>Sélectionne un test pour afficher sa courbe et l’historique de ses mesures.</p></div>'+
+     '<div class="akProg2TitleRow"><div><small>01 / VUE COMPARATIVE</small><h3>Tous les tests et mesures</h3>'+
+       '<p>Sélectionne un test ou une mesure corporelle pour afficher sa courbe et son historique.</p></div>'+
      '<div class="akProg2Legend"><span><i class="up"></i>Progression</span>'+
        '<span><i></i>Référence</span><span><i class="down"></i>Vigilance</span></div></div>'+
      '<div class="akProg2Cards">'+groups.map(mainCard).join('')+'</div></section>';
-   const sense=direction==='lower'?'Plus bas = mieux':
+   const sense=selected.bodyMeasure?'Évolution descriptive, sans interprétation automatique':
+     direction==='lower'?'Plus bas = mieux':
      direction==='higher'?'Plus haut = mieux':'Sens de progression non défini';
    const focus='<section class="akProg2Box akProg2Focus">'+
-      '<div class="akProg2FocusTop"><div><span class="akProg2FocusEyebrow">03 / TEST SÉLECTIONNÉ</span>'+
+      '<div class="akProg2FocusTop"><div><span class="akProg2FocusEyebrow">02 / '+(selected.bodyMeasure?'MESURE SÉLECTIONNÉE':'TEST SÉLECTIONNÉ')+'</span>'+
         '<h3>'+esc(selected.name)+'</h3><p>'+esc(measureWord(rows.length))+
-        ' enregistrée'+(rows.length>1?'s':'')+' · '+esc(statusFor(d))+
+        ' enregistrée'+(rows.length>1?'s':'')+' · '+esc(statusFor(d,selected))+
         '</p></div><div class="akProg2FocusProgress '+tone+'">'+
-         '<span>ÉVOLUTION PERFORMANCE</span><strong>'+esc(progress)+'</strong></div></div>'+
+         '<span>'+(selected.bodyMeasure?'ÉVOLUTION MESURÉE':'ÉVOLUTION PERFORMANCE')+'</span><strong>'+esc(progress)+'</strong></div></div>'+
       '<div class="akProg2Facts">'+
         kpi('Initial',first,labelDate(rowDates(first)))+
         kpi('Actuel',last,labelDate(rowDates(last)))+
@@ -394,7 +426,7 @@
         '<div class="akProg2Fact"><span>Nombre de mesures</span><strong>'+rows.length+'</strong>'+
            '<small>Enregistrées dans le Passeport</small></div></div>'+
       '<div class="akProg2ChartBox"><div class="akProg2ChartHeader"><div>'+
-        '<strong>Courbe des résultats</strong><small>Valeurs réelles du test, en '+esc(unit(last)||selected.unit||'unité renseignée')+
+        '<strong>'+(selected.bodyMeasure?'Évolution corporelle':'Courbe des résultats')+'</strong><small>Mesures enregistrées en '+esc(unit(last)||selected.unit||'unité renseignée')+
         '</small></div><span class="akProg2ChartDirection">'+esc(sense)+'</span></div>'+
         passportLineChart(selected)+'</div>'+
       '<div class="akProg2History"><details class="akProg2HistoryFold">'+
@@ -409,10 +441,10 @@
      '</section>';
    return '<div class="akp-page akProg2">'+
      '<div class="akProg2Head"><div><span class="akProg2Eyebrow">PROGRESSION / ANALYSE</span>'+
-       '<h2>Une lecture claire de chaque progrès.</h2>'+
-       '<p>Tous les repères restent accessibles. Choisis un test pour comparer ses mesures dans le temps.</p>'+
+       '<h2>Une lecture claire de chaque évolution.</h2>'+
+       '<p>Tests, poids et masse grasse : sélectionne un indicateur pour retrouver sa courbe et ses mesures datées.</p>'+
       '</div><div class="akProg2HeadCount"><b>'+groups.length+'</b><span>Repères<br/>suivis</span></div></div>'+
-     composition+compare+focus+'</div>';
+     compare+focus+'</div>';
  };
  window.AKP_PASSPORT_PROGRESSION_READY=true;
 })();
