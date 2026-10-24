@@ -4211,7 +4211,7 @@ function performanceOfferLanding(name,price){
    '<div class="perf-kpis">'+d.kpis.map(k=>'<div class="perf-kpi"><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>').join('')+'</div>'+
   '</section>'+
   '<section class="perf-section"><div class="perf-section-head"><div><h3>Concrètement, comment se passe le suivi ?</h3><p>Une lecture rapide d’une semaine-type.</p></div></div><div class="perf-week">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div></section>'+
-  performanceDemoMarkup(tier)+
+  akOfferDemoMarkup('Performance',tier)+
   '<section class="perf-example"><div class="perf-example-tag"><b>Exemple</b><strong>Dans une vraie semaine</strong></div><div class="perf-example-copy">'+esc(d.example)+'</div></section>'+
   '<section class="perf-section"><div class="perf-section-head"><div><h3>Pourquoi choisir '+esc(tier)+' ?</h3><p>'+esc(d.difference)+'</p></div></div>'+
    '<div class="perf-full-grid"><div class="perf-full-list"><h4>Inclus dans cette formule</h4><ul>'+publicOfferBenefits('Performance',tier).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
@@ -4233,7 +4233,7 @@ function openPublicOfferDetails(button){
    document.querySelector('.modal')?.classList.add('offer-landing-modal');
    document.getElementById('closeOfferDetail').onclick=closeModal;
    document.getElementById('chooseFromOfferDetail').onclick=()=>openPublicOfferCheckout(button);
-   bindPerformanceDemo(name);
+   bindAkOfferDemo(pole,name);
    return;
  }
  const d=publicOfferDetailData(pole,name);
@@ -4246,10 +4246,13 @@ function openPublicOfferDetails(button){
    '<div><div class="offer-detail-box"><h4>Pour comprendre la formule</h4><p style="margin:0;color:#596778;font-size:12px;line-height:1.6">'+esc(d.diff)+'</p></div>'+
    '<div class="offer-detail-example"><strong>Exemple concret</strong><p>'+esc(d.example)+'</p></div></div>'+
   '</div>'+
+  akOfferDemoMarkup(pole,name)+
   '<div class="offer-detail-diff"><strong>À retenir :</strong> les exemples servent à montrer comment le suivi peut se traduire concrètement. Les décisions restent individualisées selon ton contexte, tes données et les besoins réellement observés.</div>',
   '<button class="btn ghost" id="closeOfferDetail">Retour</button><button class="btn primary" id="chooseFromOfferDetail">Choisir cette offre</button>');
  document.getElementById('closeOfferDetail').onclick=closeModal;
  document.getElementById('chooseFromOfferDetail').onclick=()=>openPublicOfferCheckout(button);
+ document.querySelector('.modal')?.classList.add('offer-landing-modal');
+ bindAkOfferDemo(pole,name);
 }
 
 function publicOfferBenefits(pole,name){
