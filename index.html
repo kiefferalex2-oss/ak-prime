@@ -4534,35 +4534,31 @@ function performanceOfferLanding(name,price){
   ['Retest','À 6 semaines','À 6 semaines','À 6 semaines + selon besoins']
  ];
  const col={P1:1,P2:2,P3:3}[tier];
- const shortCompare=compare.filter(r=>['Adaptation','Bien-être','Analyse vidéo','Récupération','Nutrition','Visios'].includes(r[0]));
- return '<div class="perf-detail akReadableOffer">'+
-  '<section class="perf-hero"><div class="perf-hero-top"><div><div class="eyebrow">PÔLE PERFORMANCE</div>'+
-   '<h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div>'+
-   '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
-   '<div class="perf-kpis">'+d.kpis.map(k=>'<div class="perf-kpi"><b>'+esc(k[0])+'</b><span>'+esc(k[1])+'</span></div>').join('')+'</div>'+
-  '</section>'+
-  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Comment se passe le suivi ?</h3>'+
-   '<p>Quatre étapes pour comprendre le fonctionnement de la formule.</p></div></div>'+
-   '<div class="perf-week akReadWeekDesktop">'+d.week.map(w=>'<div class="perf-week-step"><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong><span>'+esc(w[2])+'</span></div>').join('')+'</div>'+
-   '<div class="akReadWeekMobile">'+d.week.map((w,i)=>'<details class="akReadWeekItem" '+(i===0?'open':'')+'><summary><span><b>'+esc(w[0])+'</b><strong>'+esc(w[1])+'</strong></span><i aria-hidden="true">⌄</i></summary><p>'+esc(w[2])+'</p></details>').join('')+'</div>'+
-   akOfferDisclosure('Voir un exemple concret', '<p class="akReadExampleText">'+esc(d.example)+'</p>','Une situation du quotidien, avec les adaptations possibles')+
-  '</section>'+
-  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Ce que comprend '+esc(tier)+'</h3>'+
-   '<p>'+esc(d.difference)+'</p></div></div>'+
-   akOfferQuickBenefits('Performance',tier)+
-   akOfferDisclosure('Voir toutes les prestations incluses',akOfferFullEntitlements('Performance',tier),
-      'Liste complète des outils, prestations et fréquences de suivi')+
-  '</section>'+
-  '<section class="perf-section akReadSection"><div class="perf-section-head"><div><h3>Comparer P1, P2 et P3</h3>'+
-   '<p>Les différences essentielles, sans parcourir tout le catalogue.</p></div></div>'+
-   '<div class="akReadCompareDesktop">'+akPerfComparisonTable(tier,shortCompare)+'</div>'+
-   akPerfMobileComparison(tier,compare)+
-   akOfferDisclosure('Voir la comparaison complète',akPerfComparisonTable(tier,compare),
-      'Les 10 critères, avec la formule consultée mise en évidence')+
-  '</section>'+
-  akOfferDemoTeaser('Performance',tier)+
-  '<p class="perf-note">Prestations et exemples présentés à titre explicatif. Chaque accompagnement est adapté aux données disponibles et aux besoins du sportif.</p>'+
- '</div>';
+ return '<div class="perf-detail akReadableOffer akEditorialOffer">'+
+   '<section class="perf-hero akEditorialHero">'+
+    '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><div class="eyebrow">PÔLE PERFORMANCE</div>'+
+     '<h2>Performance '+esc(tier)+'</h2><p>'+esc(d.promise)+'</p></div>'+
+     '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
+    akOfferKeyFacts('Performance',tier,d.kpis)+
+   '</section>'+
+   akOfferSection('01 / LE FONCTIONNEMENT','Un suivi clair, semaine après semaine',
+     'Quatre étapes pour comprendre comment la formule t’accompagne.',
+     akOfferSteps('Performance',tier,d.week)+
+     akOfferDisclosure('Voir une situation concrète','<p class="akReadExampleText">'+esc(d.example)+'</p>',
+       'Un exemple d’ajustement selon les retours du sportif'))+
+   akOfferSection('02 / LES PRESTATIONS','Tout ce qui fait ton accompagnement',
+     d.difference,
+     akOfferQuickBenefits('Performance',tier)+
+     akOfferDisclosure('Consulter le détail des prestations',akOfferFullEntitlements('Performance',tier),
+       'Toutes les modalités et fréquences, sans rien masquer'))+
+   akOfferSection('03 / COMPARER','Quelle différence entre P1, P2 et P3 ?',
+     'Trois niveaux de suivi. Voici ce qui change réellement.',
+     akOfferCompareOverview(tier)+
+     akOfferDisclosure('Voir le comparatif complet',akPerfComparisonTable(tier,compare),
+       'Adaptations, bien-être, sommeil, nutrition, visios et retests'))+
+   akOfferDemoTeaser('Performance',tier)+
+   '<p class="perf-note">Les exemples illustrent les possibilités du suivi. Chaque accompagnement est individualisé selon le contexte et les données disponibles.</p>'+
+  '</div>';
 }
 
 function openPublicOfferDetails(button){
@@ -4581,21 +4577,25 @@ function openPublicOfferDetails(button){
  const benefits=publicOfferBenefits(pole,name);
  if(!d)return;
  modal(d.title,
-  '<div class="akReadableOffer akReadOther">'+
-   '<section class="akReadOtherHero"><div><span class="akReadEyebrow">'+esc(pole)+'</span>'+
-    '<h2>'+esc(name)+'</h2><p>'+esc(d.promise)+'</p></div>'+
-    '<div class="akReadOtherPrice">'+euro(price)+'<small>par mois</small></div></section>'+
-   '<section class="perf-section akReadSection"><div class="perf-section-head"><div>'+
-    '<h3>Ce que comprend cette formule</h3><p>Les outils et les échanges qui structurent ton accompagnement.</p>'+
-    '</div></div>'+akOfferQuickBenefits(pole,name)+
-    akOfferDisclosure('Voir toutes les prestations incluses',akOfferFullEntitlements(pole,name),
-      'Le détail complet des outils, séances et échanges')+'</section>'+
-   '<section class="perf-section akReadSection"><div class="perf-section-head"><div>'+
-    '<h3>À quoi sert cet accompagnement ?</h3><p>'+esc(d.diff)+'</p></div></div>'+
-    akOfferDisclosure('Découvrir un exemple concret','<p class="akReadExampleText">'+esc(d.example)+'</p>',
-      'Une situation représentative et sa mise en pratique')+'</section>'+
+  '<div class="akReadableOffer akEditorialOffer akEditorialOther">'+
+   '<section class="akEditorialHero akEditorialHeroOther">'+
+    '<div class="perf-hero-top"><div class="akEditorialHeroCopy"><span class="eyebrow">'+esc(pole)+'</span>'+
+     '<h2>'+esc(name)+'</h2><p>'+esc(d.promise)+'</p></div>'+
+     '<div class="perf-hero-price">'+euro(price)+'<span>par mois</span></div></div>'+
+    akOfferKeyFacts(pole,name)+
+   '</section>'+
+   akOfferSection('01 / LE FONCTIONNEMENT','Un accompagnement qui suit ton rythme',
+    'Un parcours construit autour de tes objectifs.',
+    akOfferSteps(pole,name)+
+    akOfferDisclosure('Voir un exemple concret','<p class="akReadExampleText">'+esc(d.example)+'</p>',
+     'Une situation représentative du suivi'))+
+   akOfferSection('02 / LES PRESTATIONS','Ce que tu retrouves dans ton offre',
+    d.diff,
+    akOfferQuickBenefits(pole,name)+
+    akOfferDisclosure('Consulter le détail des prestations',akOfferFullEntitlements(pole,name),
+      'Toutes les modalités et fréquences, sans rien masquer'))+
    akOfferDemoTeaser(pole,name)+
-   '<p class="perf-note">Exemples donnés à titre explicatif. Le contenu est adapté au contexte et aux besoins individuels.</p>'+
+   '<p class="perf-note">Les exemples restent indicatifs : ton accompagnement est personnalisé selon ta situation et tes besoins.</p>'+
   '</div>',
   '<button class="btn ghost" id="closeOfferDetail">Retour</button><button class="btn primary" id="chooseFromOfferDetail">Choisir cette offre</button>');
  document.getElementById('closeOfferDetail').onclick=closeModal;
