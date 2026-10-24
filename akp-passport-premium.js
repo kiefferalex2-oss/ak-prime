@@ -152,7 +152,18 @@
  }
  function metrics(m){
   const r=rights(m),p=m.akPassportProfile||{},ref=p.reference_stats||{};
-  const weight=rows(p.weight_history).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+  const weightHistory=rows(p.weight_history).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const weight=weightHistory[0],firstWeight=weightHistory.slice().reverse().find(x=>valid(x.kg));
+  const lastFat=weightHistory.find(x=>valid(x.fat_pct));
+  const firstFat=weightHistory.slice().reverse().find(x=>valid(x.fat_pct));
+  const lastLean=weightHistory.find(x=>valid(x.lean_kg));
+  const firstLean=weightHistory.slice().reverse().find(x=>valid(x.lean_kg));
+  const number=v=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:1});
+  const evolution=(last,first,unit)=>{
+   if(!last||!first||last===first)return '';
+   const diff=Math.round((Number(last[unit])-Number(first[unit]))*10)/10;
+   return Number.isFinite(diff)?' · '+(diff>0?'+':'')+number(diff)+(unit==='fat_pct'?' pts':' kg')+' depuis la 1re mesure':'';
+  };
   const period=ref.period_start&&ref.period_end?fmtDate(ref.period_start)+' – '+fmtDate(ref.period_end):
    'Valeur saisie par le coach';
   let out='';
@@ -160,8 +171,12 @@
    out+=card(m,'CHARGE MOYENNE / SEMAINE',valid(ref.weekly_load)?Number(ref.weekly_load).toLocaleString('fr-FR')+' UA':'—',
      valid(ref.weekly_load)?period:'Référence à renseigner','metrics');
    if(r.hooper)out+=card(m,'HOOPER MOYEN',valid(ref.hooper_mean)?ref.hooper_mean+' / 28':'—','État de forme de référence','metrics');
-   out+=card(m,'POIDS ACTUEL',weight&&valid(weight.kg)?weight.kg+' kg':'—',
-    weight?'Mesure du '+fmtDate(weight.date):'À renseigner','weight');
+   out+=card(m,'POIDS ACTUEL',weight&&valid(weight.kg)?number(weight.kg)+' kg':'—',
+    weight&&valid(weight.kg)?'Mesure du '+fmtDate(weight.date)+evolution(weight,firstWeight,'kg'):'À renseigner','weight');
+   if(lastFat)out+=card(m,'MASSE GRASSE (%MG)',number(lastFat.fat_pct)+' %',
+    'Mesure du '+fmtDate(lastFat.date)+evolution(lastFat,firstFat,'fat_pct'),'weight');
+   if(lastLean)out+=card(m,'MASSE MAIGRE',number(lastLean.lean_kg)+' kg',
+    'Mesure du '+fmtDate(lastLean.date)+evolution(lastLean,firstLean,'lean_kg'),'weight');
    if(r.sleep){
     const cutoff=new Date();cutoff.setUTCDate(cutoff.getUTCDate()-30);
     const night=rows(m.akPassportSleep).filter(n=>n.sleep_date>=cutoff.toISOString().slice(0,10)&&valid(n.duration_hours));
