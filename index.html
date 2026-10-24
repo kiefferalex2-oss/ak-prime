@@ -1545,7 +1545,7 @@ function appointmentStatusTone(v){return v==='completed'?'green':v==='cancelled'
 function hoursUntil(v){return (new Date(v)-new Date())/3600000}
 function uid(prefix){return prefix+Math.random().toString(36).slice(2,8)}
 function initials(name){return name.split(/\\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
-function normalizeTestName(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function normalizeTestName(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
 function normalizeWhatsAppNumber(v){
  let n=String(v||'').replace(/\D/g,'');
  if(n.startsWith('00'))n=n.slice(2);
@@ -2361,7 +2361,13 @@ function bindPassportBook(){
 function renderPremiumPassport(m){
  passportActiveModel=m;
  const groups=passportTestGroups(m.tests);
- if(groups.length&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
+ const bodyHistory=Array.isArray(m.akPassportProfile?.weight_history)?m.akPassportProfile.weight_history:[];
+ const hasBodySelection=passportSelectedTestKey==='poids'
+   ?bodyHistory.some(row=>row?.kg!==null&&row?.kg!==undefined&&row.kg!==''&&Number.isFinite(Number(row.kg)))
+   :passportSelectedTestKey==='massegrassemg'
+     ?bodyHistory.some(row=>row?.fat_pct!==null&&row?.fat_pct!==undefined&&row.fat_pct!==''&&Number.isFinite(Number(row.fat_pct)))
+     :false;
+ if(groups.length&&!hasBodySelection&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
    passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
  }
  if(!['overview','profile','cycle','progress','timeline','followup'].includes(passportBookPage))passportBookPage='overview';
@@ -4177,8 +4183,21 @@ function bindAkOfferDemo(pole,name){
   const tab=event.target.closest('.akOfferDemoTab');
   const action=event.target.closest('.clientGoPassport,.clientGoFollow,.clientGoVisios,.clientGoCheckin');
   const subTab=event.target.closest('.passportBookTab');
-  if(tab||action||subTab){
-   event.preventDefault();event.stopPropagation();
+  const metric=event.target.closest('.passportMetricBtn,.passportMetricJump');
+  const passNav=event.target.closest('.passportInlineNav');
+  if(tab||action||subTab||metric||passNav){
+   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+   if(metric){
+     passportSelectedTestKey=metric.dataset.testKey||'';
+     passportBookPage='progress';
+     body.innerHTML=akOfferDemoScreen(state,'passport');
+     return;
+   }
+   if(passNav){
+     passportBookPage=passNav.dataset.passportPage||'overview';
+     body.innerHTML=akOfferDemoScreen(state,'passport');
+     return;
+   }
    if(subTab){passportBookPage=subTab.dataset.passportPage||'overview';body.innerHTML=akOfferDemoScreen(state,'passport');return;}
    const view=tab?.dataset.demoView||(action?.classList.contains('clientGoPassport')?'passport':
     action?.classList.contains('clientGoVisios')?'visios':
