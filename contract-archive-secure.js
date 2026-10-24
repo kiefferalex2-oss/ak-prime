@@ -117,7 +117,7 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261024-questionnaire-all-offers-v84';
+    script.src='./'+file+'?rev=20261024-offer-cards-navigation-v85';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
