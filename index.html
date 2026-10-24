@@ -3780,7 +3780,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
    ],
    "AK PRIME": [
     "Questionnaire initial et Passeport AK PRIME : tests, cycles, progression et historique",
-    "Budget calorique et macronutriments personnalisé, avec PDF consultable par le client, sans menus alimentaires"
+    "Budget calorique et macronutriments personnalisé dans AK PRIME, sans menus alimentaires"
    ],
    "Visios": [
     "2 visios de 30 minutes par mois"
@@ -3859,7 +3859,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
     "Questionnaire initial et Passeport AK PRIME : tests, cycles et progression",
     "Retest à 6 semaines, puis réévaluations selon les besoins",
     "Agenda de sommeil détaillé rempli par le client : durée, qualité et régularité",
-    "Budget calorique et macronutriments personnalisé au format PDF, sans menus"
+    "Budget calorique et macronutriments personnalisé dans AK PRIME, sans menus alimentaires"
    ],
    "Visios": [
     "Jusqu’à 1 visio de 30 minutes par semaine"
@@ -4614,18 +4614,6 @@ function akOfferSection(kicker,title,description,body,extra=''){
    (description?'<p>'+esc(description)+'</p>':'')+'</div>'+
    '<div class="akEditorialContent">'+body+'</div></section>';
 }
-function akOfferCompareOverview(tier){
- const items=[
-  ['P1','Un cadre structuré','Les corrections interviennent principalement en cas de problème signalé.'],
-  ['P2','Un suivi qui s’adapte','La charge et le bien-être orientent les ajustements hebdomadaires.'],
-  ['P3','Un suivi plus rapproché','Sommeil complet, récupération dédiée et ajustements sous 48 h si nécessaire.']
- ];
- return '<div class="akEditorialCompare">'+items.map(([id,title,desc])=>
-  '<div class="akEditorialCompareRow '+(tier===id?'active':'')+'">'+
-  '<span class="akEditorialCompareTier">'+esc(id)+'</span><div><strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p></div>'+
-  (tier===id?'<span class="akEditorialChoice">TA FORMULE</span>':'')+'</div>'
- ).join('')+'</div>';
-}
 function akOfferDisclosure(label,content,summary=''){
  return '<details class="akReadFold"><summary><span><strong>'+esc(label)+'</strong>'+
    (summary?'<small>'+esc(summary)+'</small>':'')+'</span><b aria-hidden="true">⌄</b></summary>'+
@@ -4657,24 +4645,12 @@ function akPerfCriteriaMobile(tier,rows){
    ).join('')+'</div></details>'
  ).join('')+'</div>';
 }
-function akPerfMobileComparison(tier,rows,full=false){
- const interesting=full?rows.map(r=>r[0]):['Adaptation','Analyse vidéo','Visios'];
- return '<div class="akReadTierGrid">'+[1,2,3].map(i=>
-  '<div class="akReadTier '+('P'+i===tier?'selected':'')+'"><div class="akReadTierHead"><strong>P'+i+'</strong>'+
-  (('P'+i)===tier?'<small>OFFRE CONSULTÉE</small>':'')+'</div>'+
-  interesting.map(key=>{
-   const line=rows.find(r=>r[0]===key);
-   return line?'<div><span>'+esc(key)+'</span><b>'+esc(line[i])+'</b></div>':'';
-  }).join('')+'</div>'
- ).join('')+'</div>';
-}
-
 function performanceOfferLanding(name,price){
  const tier=String(name||'').toUpperCase();
  const rows={
   P1:{
    promise:'Une préparation physique structurée avec planification, suivi de charge, analyse vidéo et retest à 6 semaines.',
-   kpis:[['Adaptation','Si problème important'],['Vidéo','2 vidéos / mois'],['Visio','1 × 30 min / mois'],['Réévaluation','Retest à 6 semaines']],
+   kpis:[['Charge','sRPE, correction si gêne signalée'],['Vidéo','Jusqu’à 2 analyses / mois'],['Visio','1 × 30 min / mois'],['Retest','À 6 semaines']],
    week:[
     ['01','Tu t’entraînes','Tu suis le programme et renseignes les séances / sRPE.'],
     ['02','Tu signales','Tu remontes une douleur, gêne, difficulté ou retour négatif si besoin.'],
@@ -4686,7 +4662,7 @@ function performanceOfferLanding(name,price){
   },
   P2:{
    promise:'Un pilotage hebdomadaire où la charge, le questionnaire Hooper et le contexte sportif servent à construire la semaine suivante.',
-   kpis:[['Adaptation','Chaque semaine'],['Bien-être','Questionnaire Hooper'],['Vidéo','Analyse hebdomadaire'],['Visio','2 × 30 min / mois']],
+   kpis:[['Charge','Ajustement hebdo selon sRPE + Hooper'],['Forme','Questionnaire Hooper hebdomadaire'],['Vidéo','1 analyse / semaine'],['Visios','2 × 30 min / mois']],
    week:[
     ['01','Tu renseignes','Séances, sRPE et questionnaire Hooper : fatigue, stress, sommeil perçu, douleurs musculaires.'],
     ['02','Je croise les données','Charge + Hooper + entraînements / matchs + contraintes à venir.'],
@@ -4698,7 +4674,7 @@ function performanceOfferLanding(name,price){
   },
   P3:{
    promise:'Le suivi le plus rapproché, pensé pour les périodes où sommeil, fatigue, récupération et contraintes de compétition demandent plus de réactivité.',
-   kpis:[['Adaptation','Sous 48 h si nécessaire'],['Sommeil','Suivi complet'],['Nutrition','Budget macros'],['Visio','Jusqu’à 1 / semaine']],
+   kpis:[['Charge','Ajustement sous 48 h si nécessaire'],['Sommeil','Agenda détaillé'],['Nutrition','Budget kcal et macros'],['Visios','Jusqu’à 1 × 30 min / semaine']],
    week:[
     ['01','Tu renseignes','Charge, état de forme, sommeil et contexte réel de la semaine.'],
     ['02','Je surveille les signaux utiles','Fatigue, sommeil, compétition, déplacements et récupération sont lus de façon rapprochée.'],
