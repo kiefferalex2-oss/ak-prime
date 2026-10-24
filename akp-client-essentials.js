@@ -7,7 +7,47 @@
    c?.current_pole==='Performance'&&c?.current_offer==='P3';
  const macroEligible=c=>(c?.current_pole==='Performance'&&c?.current_offer==='P3')||
    (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
- const sleepDateValue=()=>localDateISO();
+ const sleepDateValue=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const nextSleepDate=day=>new Date(Date.parse(day+'T12:00:00Z')+86400000).toISOString().slice(0,10);
+ const sleepWakeEntries=row=>Array.isArray(row?.awakenings)?row.awakenings:[];
+ function sleepWakeSummary(row){
+  if(row?.awakenings_count==null)return 'Réveils nocturnes : non renseignés';
+  const n=Number(row.awakenings_count);
+  const items=sleepWakeEntries(row).map(x=>safe(x.time)+(x.minutes==null?'':' ('+safe(x.minutes)+' min)'));
+  return n+' réveil'+(n===1?'':'s')+' nocturne'+(n===1?'':'s')+(items.length?' · '+items.join(', '):'');
+ }
+ function awakeningFields(count,entries=[]){
+  const n=Math.max(0,Math.min(12,Number(count)||0));
+  if(!n)return '<div class="muted tiny" style="margin-top:7px">Aucun réveil signalé.</div>';
+  return '<div class="akSleepWakeGrid">'+Array.from({length:n},(_,i)=>{
+   const item=entries[i]||{};
+   return '<div class="akSleepWakeItem akAwakeningEntry">'+
+    '<div class="akSleepWakeNumber">Réveil '+(i+1)+'</div><div class="grid2">'+
+    '<div class="field"><label>Heure du réveil</label><input type="time" class="input akWakeTime" required value="'+safe(String(item.time||'').slice(0,5))+'"></div>'+
+    '<div class="field"><label>Temps éveillé (min, facultatif)</label><input type="number" class="input akWakeMinutes" min="0" max="180" step="1" placeholder="Ex. 10" value="'+safe(item.minutes??'')+'"></div>'+
+    '</div></div>';
+  }).join('')+'</div>';
+ }
+ function sleepInputs(day,record=null){
+  const isEdit=!!record,n=record?.awakenings_count??0;
+  return '<div id="akSleepEntryForm" class="akSleepEntryForm">'+
+    (isEdit?'<div class="akSleepEditBanner"><strong>Correction du '+safe(fmtDate(day))+'</strong><button class="btn ghost small" type="button" id="akCancelSleepEdit">Annuler</button></div>':'')+
+    '<div class="grid2">'+
+    '<div class="field"><label for="akSleepDate">Date du réveil</label><input id="akSleepDate" type="date" class="input" readonly value="'+safe(day)+'"></div>'+
+    '<div class="field"><label for="akSleepHours">Sommeil total (heures)</label><input id="akSleepHours" type="number" class="input" step="0.25" min="0.25" max="24" required placeholder="7.5" value="'+safe(record?.duration_hours??'')+'"></div>'+
+    '<div class="field"><label for="akSleepBedtime">Heure du coucher</label><input id="akSleepBedtime" type="time" class="input" value="'+safe(String(record?.bedtime||'').slice(0,5))+'"></div>'+
+    '<div class="field"><label for="akSleepWakeup">Heure du réveil</label><input id="akSleepWakeup" type="time" class="input" value="'+safe(String(record?.wakeup||'').slice(0,5))+'"></div>'+
+    '<div class="field"><label for="akSleepQuality">Qualité ressentie</label><select id="akSleepQuality" class="select" required><option value="">Choisis une note</option>'+
+    [1,2,3,4,5].map(i=>'<option value="'+i+'" '+(Number(record?.quality)===i?'selected':'')+'>'+i+' / 5</option>').join('')+'</select></div>'+
+    '<div class="field"><label for="akSleepAwakeningsCount">Nombre de réveils intra-nocturnes</label><select id="akSleepAwakeningsCount" class="select">'+
+    Array.from({length:13},(_,i)=>'<option value="'+i+'" '+(Number(n)===i?'selected':'')+'>'+i+(i===0?' — aucun':'')+'</option>').join('')+
+    '</select></div></div>'+
+    '<div id="akSleepAwakeningFields" aria-live="polite">'+awakeningFields(n,sleepWakeEntries(record))+'</div>'+
+    '<div class="field" style="margin-top:16px"><label for="akSleepNotes">Observations (facultatif)</label>'+
+    '<textarea id="akSleepNotes" class="textarea" maxlength="1200" placeholder="Difficulté à te rendormir, stress, récupération…">'+safe(record?.notes||'')+'</textarea></div>'+
+    '<button type="button" id="akSaveSleep" class="btn primary">'+(isEdit?'Enregistrer la correction':'Enregistrer ma nuit')+'</button>'+
+    '</div>';
+ }
  const safe=(v)=>esc(String(v??''));
  const oldEnterClientPortal=enterClientPortal;
  enterClientPortal=async function(...args){
@@ -29,33 +69,30 @@
    renderClientPortal();
  };
  function sleepForm(s){
-   const c=s.client;
-   if(!sleepEligible(c))return '';
-   const rows=s.akSleepRows||[];
-   return '<div class="client-section-card" id="akSleepDiary" style="margin-top:13px">'+
-     '<div class="row between"><div><h3>Mon agenda de sommeil</h3>'+
-     '<p class="muted tiny">Indique la nuit correspondant à ta date de réveil. Ce journal est distinct des questionnaires de forme Optitrainer.</p></div>'+
-     '<span class="status blue">'+rows.length+' nuit(s)</span></div>'+
-     '<div class="grid2">'+
-       '<div class="field"><label>Date du réveil</label><input class="input" id="akSleepDate" type="date" value="'+safe(sleepDateValue())+'"></div>'+
-       '<div class="field"><label>Durée de sommeil (heures)</label><input class="input" id="akSleepHours" type="number" step="0.25" min="0.25" max="24" placeholder="7.5"></div>'+
-       '<div class="field"><label>Heure de coucher</label><input class="input" id="akSleepBedtime" type="time"></div>'+
-       '<div class="field"><label>Heure de réveil</label><input class="input" id="akSleepWakeup" type="time"></div>'+
-       '<div class="field"><label>Qualité ressentie</label><select class="select" id="akSleepQuality">'+
-         '<option value="">Sélectionne une note</option>'+
-         [1,2,3,4,5].map(n=>'<option value="'+n+'">'+n+' / 5</option>').join('')+
-       '</select></div></div>'+
-     '<div class="field"><label>Observations (facultatif)</label>'+
-       '<textarea class="textarea" id="akSleepNotes" maxlength="1200" placeholder="Réveils, perturbations, contexte..."></textarea></div>'+
-     '<button class="btn primary" id="akSaveSleep">Enregistrer ma nuit</button>'+
-     (rows.length?'<div class="section-title">Dernières nuits</div>'+
-       '<div class="list">'+rows.slice(0,14).map(x=>
-        '<div class="item row between"><div><strong>'+safe(fmtDate(x.sleep_date))+
-        '</strong><div class="muted tiny">'+safe(x.duration_hours)+' h · Qualité '+safe(x.quality)+
-        '/5'+(x.notes?' · '+safe(x.notes):'')+'</div></div>'+
-        '<button class="btn ghost small akEditSleep" data-date="'+safe(x.sleep_date)+'">Modifier</button></div>').join('')+
-        '</div>':'<div class="muted tiny" style="margin-top:10px">Aucune nuit enregistrée pour le moment.</div>')+
-     '</div>';
+  if(!sleepEligible(s.client))return '';
+  const rows=s.akSleepRows||[],today=sleepDateValue(),current=rows.find(x=>x.sleep_date===today);
+  const editDay=s.akSleepEditingDate,editing=editDay?rows.find(x=>x.sleep_date===editDay):null;
+  const completion=current?'<div class="akSleepCompleted" role="status">'+
+    '<span class="akSleepCompletedIcon">✓</span><div><strong>Ta nuit est enregistrée pour aujourd’hui.</strong>'+
+    '<p>'+safe(fmtDate(today))+' · '+safe(current.duration_hours)+' h · Qualité '+safe(current.quality)+'/5</p>'+
+    '<p>'+sleepWakeSummary(current)+'</p>'+
+    '<small>Le formulaire reviendra le '+safe(fmtDate(nextSleepDate(today)))+'. Pour corriger une saisie, utilise l’historique.</small></div></div>':
+    (editing?'':'<div class="akSleepToday"><span>NUIT DU JOUR</span><strong>'+safe(fmtDate(today))+'</strong>'+
+     '<small>Après l’enregistrement, le formulaire se ferme automatiquement.</small></div>');
+  const form=editing?sleepInputs(editDay,editing):(current?'':sleepInputs(today));
+  const history=rows.length?'<details class="akSleepHistory" '+(editing?'open':'')+'>'+
+    '<summary>Historique des nuits <span>'+rows.length+' enregistrée'+(rows.length>1?'s':'')+'</span></summary>'+
+    '<div class="list">'+rows.slice(0,30).map(x=>'<div class="item akSleepHistoryRow">'+
+      '<div><strong>'+safe(fmtDate(x.sleep_date))+'</strong>'+
+      '<div class="muted tiny">'+safe(x.duration_hours)+' h · Qualité '+safe(x.quality)+'/5</div>'+
+      '<div class="muted tiny">'+sleepWakeSummary(x)+(x.notes?' · '+safe(x.notes):'')+'</div></div>'+
+      '<button type="button" class="btn ghost small akEditSleep" data-date="'+safe(x.sleep_date)+'">Corriger</button></div>').join('')+
+    '</div></details>':'';
+  return '<section class="client-section-card akSleepCard" id="akSleepDiary" style="margin-top:13px">'+
+    '<div class="row between akSleepHeader"><div><h3>Mon agenda de sommeil</h3>'+
+    '<p class="muted tiny">Saisis la nuit correspondant à ta date de réveil. Ce journal est distinct du suivi Optitrainer.</p></div>'+
+    '<span class="status blue">'+rows.length+' nuit(s)</span></div>'+
+    completion+form+history+'</section>';
  }
  function macroPanel(s){
    if(!macroEligible(s.client))return '';
@@ -145,64 +182,112 @@
    });
    return wrapper.innerHTML;
  };
- function prefillSleep(s,day){
-   const row=(s.akSleepRows||[]).find(x=>x.sleep_date===day);
-   document.getElementById('akSleepDate').value=day;
-   document.getElementById('akSleepHours').value=row?.duration_hours||'';
-   document.getElementById('akSleepBedtime').value=String(row?.bedtime||'').slice(0,5);
-   document.getElementById('akSleepWakeup').value=String(row?.wakeup||'').slice(0,5);
-   document.getElementById('akSleepQuality').value=row?.quality||'';
-   document.getElementById('akSleepNotes').value=row?.notes||'';
- }
- document.addEventListener('change',e=>{
-   if(e.target?.id==='akSleepDate'&&clientPortalState){
-     const value=e.target.value;
-     if(value)prefillSleep(clientPortalState,value);
-   }
- },true);
- document.addEventListener('click',async e=>{
-   const edit=e.target.closest?.('.akEditSleep');
-   if(edit&&clientPortalState){
-     e.preventDefault();prefillSleep(clientPortalState,edit.dataset.date);
-     document.getElementById('akSleepDiary')?.scrollIntoView({behavior:'smooth',block:'start'});
-     return;
-   }
-   if(e.target.closest?.('#akDownloadMacro')){
-     e.preventDefault();
-     const s=clientPortalState,path=s?.akMacro?.pdf_path;
-     if(!path)return alert('Document non disponible pour le moment.');
-     // L'ouverture anticipée évite les bloqueurs de fenêtres après l'appel réseau.
-     const target=window.open('about:blank','_blank');
-     const {data,error}=await supa.storage.from('akprime-macro-pdfs').createSignedUrl(path,90);
-     if(error||!data?.signedUrl){
-       target?.close();return alert('Téléchargement impossible : '+(error?.message||'accès refusé'));
-     }
-     if(target)target.location.href=data.signedUrl;
-     else{const a=document.createElement('a');a.href=data.signedUrl;a.target='_blank';a.rel='noopener';a.click()}
-     return;
-   }
-   if(!e.target.closest?.('#akSaveSleep'))return;
-   e.preventDefault();
+ // Si la page reste ouverte après minuit, actualiser le formulaire pour
+ // la nouvelle date de réveil (Europe/Paris), sans recharger le navigateur.
+ if(!window.__akSleepDayTicker){
+  let last=sleepDateValue();
+  window.__akSleepDayTicker=setInterval(()=>{
+   const now=sleepDateValue();
+   if(now===last)return;
+   last=now;
    const s=clientPortalState;
-   if(!s?.client||!sleepEligible(s.client))return alert('Agenda indisponible pour cette offre.');
-   const get=id=>document.getElementById(id)?.value?.trim()||'';
-   const day=get('akSleepDate'),hours=Number(get('akSleepHours')),quality=Number(get('akSleepQuality'));
-   const bedtime=get('akSleepBedtime'),wakeup=get('akSleepWakeup'),notes=get('akSleepNotes');
-   if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(hours)||hours<=0||hours>24||
-     !Number.isInteger(quality)||quality<1||quality>5)return alert('Date, durée et qualité du sommeil requises.');
-   if(notes.length>1200)return alert('Observation trop longue.');
-   const button=e.target.closest('#akSaveSleep');button.disabled=true;
-   const payload={client_id:s.client.id,sleep_date:day,bedtime:bedtime||null,
-     wakeup:wakeup||null,duration_hours:hours,quality,notes};
-   try{
-     const {data,error}=await supa.from('client_sleep_diary').upsert(payload,{
-       onConflict:'client_id,sleep_date'}).select().single();
-     if(error)throw Error(error.message);
+   if(s?.client&&sleepEligible(s.client)&&clientPortalView==='suivi'){
+    s.akSleepEditingDate=null;renderClientPortal();
+   }
+  },60000);
+ }
+ document.addEventListener('change',event=>{
+  if(event.target?.id!=='akSleepAwakeningsCount')return;
+  const existing=Array.from(document.querySelectorAll('#akSleepAwakeningFields .akAwakeningEntry')).map(row=>{
+   const min=row.querySelector('.akWakeMinutes')?.value??'';
+   return {time:row.querySelector('.akWakeTime')?.value||'',minutes:min===''?null:Number(min)};
+  });
+  const target=document.getElementById('akSleepAwakeningFields');
+  if(target)target.innerHTML=awakeningFields(event.target.value,existing);
+ },true);
+ document.addEventListener('click',async event=>{
+  const s=clientPortalState,edit=event.target.closest?.('.akEditSleep');
+  if(edit&&s){
+   event.preventDefault();
+   if(!sleepEligible(s.client))return;
+   s.akSleepEditingDate=edit.dataset.date;
+   renderClientPortal();
+   document.getElementById('akSleepDiary')?.scrollIntoView({behavior:'smooth',block:'start'});
+   return;
+  }
+  if(event.target.closest?.('#akCancelSleepEdit')&&s){
+   event.preventDefault();s.akSleepEditingDate=null;renderClientPortal();return;
+  }
+  if(event.target.closest?.('#akDownloadMacro')){
+   event.preventDefault();
+   const path=s?.akMacro?.pdf_path;
+   if(!path)return alert('Document non disponible pour le moment.');
+   const target=window.open('about:blank','_blank');
+   const {data,error}=await supa.storage.from('akprime-macro-pdfs').createSignedUrl(path,90);
+   if(error||!data?.signedUrl){target?.close();return alert('Téléchargement impossible : '+(error?.message||'accès refusé'))}
+   if(target)target.location.href=data.signedUrl;
+   else{const a=document.createElement('a');a.href=data.signedUrl;a.target='_blank';a.rel='noopener';a.click()}
+   return;
+  }
+  const button=event.target.closest?.('#akSaveSleep');
+  if(!button)return;
+  event.preventDefault();
+  if(!s?.client||!sleepEligible(s.client))return alert('Agenda indisponible pour cette offre.');
+  const val=id=>document.getElementById(id)?.value?.trim()||'';
+  const day=val('akSleepDate'),hours=Number(val('akSleepHours')),quality=Number(val('akSleepQuality'));
+  const bedtime=val('akSleepBedtime'),wakeup=val('akSleepWakeup'),notes=val('akSleepNotes');
+  const today=sleepDateValue(),existing=(s.akSleepRows||[]).find(x=>x.sleep_date===day);
+  const editing=s.akSleepEditingDate===day&&!!existing;
+  if(day>today||(!editing&&day!==today))return alert('Le journal du jour s’ouvre à chaque nouvelle date de réveil.');
+  if(!editing&&existing)return alert('Cette nuit est déjà enregistrée. Utilise l’historique pour la corriger.');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(hours)||hours<=0||hours>24||
+   !Number.isInteger(quality)||quality<1||quality>5)return alert('Date, durée et qualité du sommeil requises.');
+  if(notes.length>1200)return alert('Observations trop longues.');
+  const count=Number(val('akSleepAwakeningsCount'));
+  if(!Number.isInteger(count)||count<0||count>12)return alert('Indique le nombre de réveils nocturnes, entre 0 et 12.');
+  const awakeningRows=Array.from(document.querySelectorAll('#akSleepAwakeningFields .akAwakeningEntry'));
+  if(awakeningRows.length!==count)return alert('Le détail des réveils est incomplet.');
+  const awakenings=[];
+  for(const row of awakeningRows){
+   const time=row.querySelector('.akWakeTime')?.value||'';
+   const duration=row.querySelector('.akWakeMinutes')?.value?.trim()??'';
+   const minutes=duration===''?null:Number(duration);
+   if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time))
+    return alert('Renseigne l’heure de chaque réveil intra-nocturne.');
+   if(minutes!==null&&(!Number.isInteger(minutes)||minutes<0||minutes>180))
+    return alert('La durée d’un réveil doit être comprise entre 0 et 180 minutes.');
+   awakenings.push({time,minutes});
+  }
+  if(new Set(awakenings.map(a=>a.time)).size!==awakenings.length)
+   return alert('Deux réveils ne peuvent pas avoir exactement le même horaire.');
+  const payload={client_id:s.client.id,sleep_date:day,bedtime:bedtime||null,
+    wakeup:wakeup||null,duration_hours:hours,quality,notes,
+    awakenings_count:count,awakenings};
+  button.disabled=true;
+  try{
+   const query=editing?supa.from('client_sleep_diary').update(payload).eq('id',existing.id).eq('client_id',s.client.id):
+     supa.from('client_sleep_diary').insert(payload);
+   const {data,error}=await query.select('*').single();
+   if(error)throw error;
+   s.akSleepRows=[data,...(s.akSleepRows||[]).filter(x=>x.sleep_date!==day)]
+    .sort((a,b)=>String(b.sleep_date).localeCompare(String(a.sleep_date)));
+   s.akSleepEditingDate=null;
+   renderClientPortal();
+   toast(editing?'La correction a été enregistrée.':'Ta nuit est enregistrée. À demain pour la suivante !');
+  }catch(error){
+   if(error?.code==='23505'){
+    const {data}=await supa.from('client_sleep_diary').select('*').eq('client_id',s.client.id).eq('sleep_date',day).maybeSingle();
+    if(data){
      s.akSleepRows=[data,...(s.akSleepRows||[]).filter(x=>x.sleep_date!==day)]
-       .sort((a,b)=>String(b.sleep_date).localeCompare(String(a.sleep_date)));
-     renderClientPortal();
-     alert('Ta nuit a été enregistrée dans ton espace AK PRIME.');
-   }catch(err){alert('Impossible d’enregistrer cette nuit : '+err.message);button.disabled=false}
+      .sort((a,b)=>String(b.sleep_date).localeCompare(String(a.sleep_date)));
+     s.akSleepEditingDate=null;renderClientPortal();
+    }
+    alert('Cette nuit a déjà été enregistrée sur ton compte. Elle figure maintenant dans ton historique.');
+   }else{
+    alert('Impossible d’enregistrer cette nuit : '+(error?.message||String(error)));
+    if(button.isConnected)button.disabled=false;
+   }
+  }
  },true);
  window.AKP_CLIENT_ESSENTIALS_READY=true;
 })();
