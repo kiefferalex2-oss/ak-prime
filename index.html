@@ -3902,8 +3902,8 @@ const AKP_OFFER_RIGHTS=Object.freeze({
  "performance|p3": {
   "label": "Performance — P3 Premium",
   "summary": [
-   "Pilotage rapproché et ajustements sous 48 h si l’état de forme le nécessite",
-   "Sommeil détaillé, macros en PDF, récupération dédiée et vidéos selon les besoins"
+   "Ajustement de la charge sous 48 h si la fatigue ou le sommeil le nécessite",
+   "Agenda de sommeil, budget de macronutriments, récupération dédiée si nécessaire"
   ],
   "groups": {
    "Optitrainer": [
@@ -4734,7 +4734,7 @@ function performanceOfferLanding(name,price){
    difference:'P2 n’attend plus qu’un problème apparaisse : tes données de charge et de bien-être sont analysées chaque semaine pour ajuster la programmation.'
   },
   P3:{
-   promise:'Le suivi le plus rapproché, pensé pour les périodes où sommeil, fatigue, récupération et contraintes de compétition demandent plus de réactivité.',
+   promise:'Charge d’entraînement ajustée sous 48 h si la fatigue, le sommeil ou le contexte de compétition le nécessitent, avec agenda de sommeil et récupération dédiée si besoin.',
    kpis:[['Charge','Ajustement sous 48 h si nécessaire'],['Sommeil','Agenda détaillé'],['Nutrition','Budget kcal et macros'],['Visios','Jusqu’à 1 × 30 min / semaine']],
    week:[
     ['01','Tu renseignes','Charge, état de forme, sommeil et contexte réel de la semaine.'],
@@ -5104,6 +5104,6 @@ async function initAuth(){
 
 initAuth();
 </script>
-  <script src="./contract-archive-secure.js?v=akprime-v20261024-p2-correction-v80"></script>
+  <script src="./contract-archive-secure.js?v=akprime-v20261024-offers-precise-v81"></script>
 </body>
 </html>
