@@ -1254,6 +1254,140 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akOfferDemoShell .client-main{padding:12px}
 }
 
+
+/* Page offre AK PRIME — lecture progressive, démonstration à la demande, responsive. */
+.akReadableOffer{display:flex;flex-direction:column;gap:16px;min-width:0}
+.akReadableOffer .perf-hero{padding:24px 27px}
+.akReadableOffer .perf-hero h2{font-size:clamp(27px,3vw,36px)}
+.akReadableOffer .perf-hero p{font-size:13px;line-height:1.55;max-width:690px}
+.akReadableOffer .perf-section{padding:22px}
+.akReadableOffer .perf-section-head{margin-bottom:15px}
+.akReadableOffer .perf-section-head h3{font-size:19px;line-height:1.3}
+.akReadableOffer .perf-section-head p{font-size:12px;line-height:1.65;max-width:790px;margin-top:4px}
+.akReadableOffer .perf-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.akReadBenefitGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.akReadBenefitCard{background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;padding:15px;min-width:0}
+.akReadBenefitNo{display:block;font-size:10px;font-weight:900;letter-spacing:.11em;color:#af834b;margin-bottom:8px}
+.akReadBenefitCard h4{color:#1a3147;font-size:13px;line-height:1.4;margin:0 0 10px}
+.akReadBenefitCard ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}
+.akReadBenefitCard li{position:relative;padding-left:14px;font-size:11px;line-height:1.55;color:#647589}
+.akReadBenefitCard li:before{content:"";position:absolute;left:1px;top:6px;width:5px;height:5px;border-radius:50%;background:#b58a4c}
+.akReadFold{margin-top:14px;border:1px solid #dde6ee;border-radius:12px;background:#fff;overflow:hidden}
+.akReadFold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 17px;min-height:57px;color:#1d374e}
+.akReadFold>summary::-webkit-details-marker{display:none}
+.akReadFold>summary:hover{background:#f8fafc}
+.akReadFold>summary span{min-width:0}
+.akReadFold>summary strong{display:block;font-size:12px;font-weight:850}
+.akReadFold>summary small{display:block;color:#7b8da0;font-size:11px;line-height:1.4;margin-top:4px}
+.akReadFold>summary b{flex:0 0 auto;color:#af854e;font-size:18px;transition:transform .2s}
+.akReadFold[open]>summary b{transform:rotate(180deg)}
+.akReadFold[open]>summary{background:#fafbfd;border-bottom:1px solid #e7edf3}
+.akReadFoldBody{padding:17px}
+.akReadFullGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.akReadFullGroup{background:#f9fbfd;border:1px solid #e4eaf1;border-radius:11px;padding:14px}
+.akReadFullGroup h4{margin:0 0 8px;color:#1e374d;font-size:12px}
+.akReadFullGroup ul,.akReadAllList{margin:0;padding-left:18px;color:#66778a;font-size:12px;line-height:1.65}
+.akReadFullGroup li+li{margin-top:5px}
+.akReadExampleText{font-size:12px;line-height:1.7;color:#566a7f;margin:0}
+.akReadCompareDesktop{display:block}
+.akReadableOffer .perf-compare{min-width:690px}
+.akReadableOffer .perf-compare th,.akReadableOffer .perf-compare td{font-size:11px;line-height:1.5}
+.akReadTierGrid{display:none}
+.akDemoDisclosure{border:1px solid #dce5ee;background:#fff;border-radius:16px;overflow:hidden}
+.akDemoTeaser{display:grid;grid-template-columns:135px minmax(0,1fr) auto;gap:20px;align-items:center;list-style:none;cursor:pointer;padding:19px 22px;min-height:143px}
+.akDemoTeaser::-webkit-details-marker{display:none}
+.akDemoTeaser:hover{background:#f9fbfe}
+.akDemoMiniScreen{position:relative;display:flex;flex-direction:column;gap:11px;width:135px;height:91px;border-radius:10px;background:linear-gradient(145deg,#0e2237,#1c3c59);border:5px solid #e4e9ee;padding:12px;box-shadow:0 8px 20px rgba(12,28,45,.13)}
+.akDemoMiniTop{display:flex;gap:4px}
+.akDemoMiniTop i{height:4px;width:15px;background:#c9a164;border-radius:3px}
+.akDemoMiniTop i:nth-child(2){width:23px;background:#708aa0}
+.akDemoMiniTop i:nth-child(3){width:10px;background:#708aa0}
+.akDemoMiniBars{display:flex;gap:5px;align-items:flex-end;height:30px}
+.akDemoMiniBars i{display:block;width:17px;height:55%;border-radius:4px 4px 0 0;background:#ddbd88}
+.akDemoMiniBars i:nth-child(2){height:85%;background:#e5d0a7}
+.akDemoMiniBars i:nth-child(3){height:67%;background:#9dbee0}
+.akDemoMiniLine{height:3px;border-radius:3px;background:#8ca8be;width:65%}
+.akDemoTeaserCopy{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.akDemoTeaserCopy small{font-size:9px;letter-spacing:.11em;font-weight:900;color:#b08144;line-height:1.45}
+.akDemoTeaserCopy strong{font-size:19px;color:#173249;line-height:1.3}
+.akDemoTeaserCopy>span{font-size:12px;line-height:1.55;color:#6f8395}
+.akDemoTeaserAction{white-space:nowrap;border-radius:10px;background:#17344e;color:#fff;padding:12px 15px;font-size:11px;font-weight:850}
+.akDemoCloseText,.akDemoDisclosure[open] .akDemoOpenText{display:none}
+.akDemoDisclosure[open] .akDemoCloseText{display:inline}
+.akDemoDisclosure[open]>.akDemoTeaser{border-bottom:1px solid #e3eaf1;background:#f8fafc}
+.akDemoStage{padding:8px 15px 14px}
+.akDemoStage>.akOfferDemoSection{margin:6px 0 8px}
+.akReadOtherHero{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:28px;border-radius:18px;color:#fff;background:linear-gradient(145deg,#0c1b2b,#193956)}
+.akReadOtherHero h2{font-size:clamp(26px,3.2vw,37px);color:#fff;margin:6px 0 10px}
+.akReadOtherHero p{color:#d1dbe5;font-size:13px;line-height:1.6;max-width:700px;margin:0}
+.akReadEyebrow{font-size:10px;letter-spacing:.12em;color:#edc988;font-weight:900;text-transform:uppercase}
+.akReadOtherPrice{flex:0 0 auto;font-size:30px;font-weight:900;white-space:nowrap}
+.akReadOtherPrice small{display:block;color:#b6c6d7;font-size:10px;text-align:right;margin-top:4px}
+@media(max-width:980px){
+ .akReadBenefitGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .akDemoTeaser{grid-template-columns:100px minmax(0,1fr) auto;gap:14px}
+ .akDemoMiniScreen{width:100px;height:76px}
+}
+@media(max-width:760px){
+ .offer-landing-modal{width:min(100%,740px)}
+ .akReadableOffer .perf-hero,.akReadOtherHero{padding:21px}
+ .akReadableOffer .perf-hero-top,.akReadOtherHero{display:flex;flex-direction:column;gap:12px}
+ .akReadableOffer .perf-hero-price,.akReadOtherPrice{text-align:left;font-size:26px}
+ .akReadOtherPrice small{text-align:left}
+ .akReadableOffer .perf-section{padding:16px}
+ .akReadableOffer .perf-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .akReadableOffer .perf-week{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .akReadCompareDesktop{display:none}
+ .akReadTierGrid{display:grid;grid-template-columns:1fr;gap:9px}
+ .akReadTier{border:1px solid #e1e8ef;background:#fcfdfe;border-radius:12px;padding:14px}
+ .akReadTier.selected{border-color:#d3ad72;background:#fffaf2}
+ .akReadTierHead{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:10px}
+ .akReadTierHead>strong{font-size:16px;color:#1d354b}
+ .akReadTierHead small{font-size:9px;color:#a0793e;font-weight:850}
+ .akReadTier>div:not(.akReadTierHead){display:flex;gap:15px;justify-content:space-between;padding:6px 0;border-top:1px solid #e9edf2}
+ .akReadTier>div>span{font-size:11px;color:#7b8c9d}
+ .akReadTier>div>b{font-size:11px;color:#284157;text-align:right;font-weight:750}
+ .akDemoDisclosure[open]{position:fixed;inset:0;z-index:1005;overflow-y:auto;overflow-x:hidden;border-radius:0;background:#fff;box-shadow:none;height:100dvh}
+ .akDemoDisclosure[open]>.akDemoTeaser{position:sticky;top:0;z-index:7;background:#fff;min-height:0;display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e0e7ee}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoMiniScreen,.akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserCopy>span{display:none}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserCopy strong{font-size:15px}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserCopy small{font-size:8px}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserAction{font-size:10px;padding:10px}
+ .akDemoDisclosure[open]>.akDemoStage{padding:4px 8px 24px}
+ body:has(.akDemoDisclosure[open]){overflow:hidden}
+}
+@media(max-width:560px){
+ .akReadableOffer{gap:12px}
+ .akReadableOffer .perf-hero{padding:19px}
+ .akReadableOffer .perf-hero h2{font-size:27px}
+ .akReadableOffer .perf-hero:after{font-size:90px;top:-6px}
+ .akReadableOffer .perf-hero p{font-size:12px}
+ .akReadableOffer .perf-kpis{gap:7px;margin-top:13px}
+ .akReadableOffer .perf-kpi{padding:10px;min-height:61px}
+ .akReadableOffer .perf-week{grid-template-columns:1fr;gap:7px}
+ .akReadableOffer .perf-week-step{padding:10px 12px}
+ .akReadableOffer .perf-week-step b{margin-bottom:3px}
+ .akReadableOffer .perf-week-step span{font-size:11px}
+ .akReadBenefitGrid,.akReadFullGrid{grid-template-columns:1fr}
+ .akReadBenefitCard{padding:13px}
+ .akReadBenefitCard ul{gap:4px}
+ .akReadFold>summary{padding:14px}
+ .akReadFoldBody{padding:12px}
+ .akDemoTeaser{grid-template-columns:1fr;gap:10px;padding:17px;min-height:0}
+ .akDemoMiniScreen{display:none}
+ .akDemoTeaserCopy strong{font-size:17px}
+ .akDemoTeaserAction{justify-self:start}
+ .akDemoDisclosure[open]>.akDemoTeaser{display:flex}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserAction{align-self:center;justify-self:auto}
+ .perf-section-head h3{font-size:17px}
+ .offer-landing-modal .modal-body{padding:12px}
+ .offer-landing-modal .modal-foot{flex-wrap:wrap;gap:7px;padding:12px}
+ .offer-landing-modal .modal-foot .btn{flex:1 1 auto}
+}
+@media(prefers-reduced-motion:reduce){
+ .akReadFold>summary b{transition:none}
+}
+
 </style>
 </head>
 <body>
@@ -4377,14 +4511,22 @@ function openPublicOfferDetails(button){
  const benefits=publicOfferBenefits(pole,name);
  if(!d)return;
  modal(d.title,
-  '<div class="offer-detail-hero"><div class="eyebrow">'+esc(pole)+'</div><h2>'+esc(name)+'</h2><div>'+esc(d.promise)+'</div><div class="price">'+euro(price)+' <span>/ mois</span></div></div>'+
-  '<div class="offer-detail-grid">'+
-   '<div class="offer-detail-box"><h4>Tout ce qui est inclus</h4><ul>'+benefits.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
-   '<div><div class="offer-detail-box"><h4>Pour comprendre la formule</h4><p style="margin:0;color:#596778;font-size:12px;line-height:1.6">'+esc(d.diff)+'</p></div>'+
-   '<div class="offer-detail-example"><strong>Exemple concret</strong><p>'+esc(d.example)+'</p></div></div>'+
-  '</div>'+
-  akOfferDemoMarkup(pole,name)+
-  '<div class="offer-detail-diff"><strong>À retenir :</strong> les exemples servent à montrer comment le suivi peut se traduire concrètement. Les décisions restent individualisées selon ton contexte, tes données et les besoins réellement observés.</div>',
+  '<div class="akReadableOffer akReadOther">'+
+   '<section class="akReadOtherHero"><div><span class="akReadEyebrow">'+esc(pole)+'</span>'+
+    '<h2>'+esc(name)+'</h2><p>'+esc(d.promise)+'</p></div>'+
+    '<div class="akReadOtherPrice">'+euro(price)+'<small>par mois</small></div></section>'+
+   '<section class="perf-section akReadSection"><div class="perf-section-head"><div>'+
+    '<h3>Ce que comprend cette formule</h3><p>Les outils et les échanges qui structurent ton accompagnement.</p>'+
+    '</div></div>'+akOfferQuickBenefits(pole,name)+
+    akOfferDisclosure('Voir toutes les prestations incluses',akOfferFullEntitlements(pole,name),
+      'Le détail complet des outils, séances et échanges')+'</section>'+
+   '<section class="perf-section akReadSection"><div class="perf-section-head"><div>'+
+    '<h3>À quoi sert cet accompagnement ?</h3><p>'+esc(d.diff)+'</p></div></div>'+
+    akOfferDisclosure('Découvrir un exemple concret','<p class="akReadExampleText">'+esc(d.example)+'</p>',
+      'Une situation représentative et sa mise en pratique')+'</section>'+
+   akOfferDemoTeaser(pole,name)+
+   '<p class="perf-note">Exemples donnés à titre explicatif. Le contenu est adapté au contexte et aux besoins individuels.</p>'+
+  '</div>',
   '<button class="btn ghost" id="closeOfferDetail">Retour</button><button class="btn primary" id="chooseFromOfferDetail">Choisir cette offre</button>');
  document.getElementById('closeOfferDetail').onclick=closeModal;
  document.getElementById('chooseFromOfferDetail').onclick=()=>openPublicOfferCheckout(button);
