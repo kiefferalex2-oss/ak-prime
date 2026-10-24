@@ -1408,6 +1408,117 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akReadFold>summary b{transition:none}
 }
 
+
+/* AK PRIME / fiches d'offres : direction éditoriale. La carte de démo conserve son style d'origine. */
+.akEditorialOffer{gap:0!important;max-width:1160px;margin:0 auto;color:#182f44}
+.akEditorialOffer .akEditorialHero{border-radius:18px;background:linear-gradient(116deg,#0c1c2c 0%,#162f49 100%);color:#fff;border:1px solid #18334d;padding:32px 34px 0;box-shadow:none;overflow:hidden;position:relative;margin-bottom:9px}
+.akEditorialHero:after{content:none!important}
+.akEditorialHero .perf-hero-top{display:flex;align-items:start;justify-content:space-between;gap:30px}
+.akEditorialHeroCopy{min-width:0;max-width:740px}
+.akEditorialHero .eyebrow{display:block;color:#deb874;font-weight:900;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.akEditorialHero h2{font-size:clamp(28px,3.1vw,38px);color:#fff;letter-spacing:-.035em;line-height:1.1;margin:12px 0 12px;font-weight:870}
+.akEditorialHero p{color:#c4d3e1;font-size:14px;line-height:1.65;max-width:660px;margin:0}
+.akEditorialHero .perf-hero-price{font-size:35px;line-height:1.1;white-space:nowrap;text-align:right;letter-spacing:-.03em}
+.akEditorialHero .perf-hero-price span{display:block;font-size:11px;color:#a8bad0;letter-spacing:0;margin-top:6px}
+.akEditorialFacts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:30px;border-top:1px solid rgba(255,255,255,.16)}
+.akEditorialHeroOther .akEditorialFacts{grid-template-columns:repeat(3,minmax(0,1fr))}
+.akEditorialFacts>div{padding:18px 18px 21px 0;min-width:0}
+.akEditorialFacts>div+div{border-left:1px solid rgba(255,255,255,.12);padding-left:20px}
+.akEditorialFacts small{display:block;color:#dfb979;font-size:10px;font-weight:850;letter-spacing:.08em;margin-bottom:8px}
+.akEditorialFacts strong{display:block;color:#f7fafd;font-size:13px;font-weight:800;line-height:1.45}
+.akEditorialSection{display:grid;grid-template-columns:minmax(185px,.38fr) minmax(0,.62fr);gap:34px;padding:35px 5px 38px;background:transparent;border:0;border-bottom:1px solid #e3eaf0;margin:0}
+.akEditorialHeading{min-width:0}
+.akEditorialHeading>span{font-size:10px;letter-spacing:.13em;font-weight:900;color:#a97a3c;display:block;margin-bottom:11px}
+.akEditorialHeading h3{font-size:clamp(19px,2.1vw,24px);color:#1a3449;letter-spacing:-.035em;line-height:1.23;margin:0 0 11px;font-weight:870}
+.akEditorialHeading p{font-size:12px;line-height:1.7;color:#7b8c9e;max-width:345px;margin:0}
+.akEditorialContent{min-width:0}
+.akEditorialSteps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;row-gap:0;counter-reset:none}
+.akEditorialSteps li{min-width:0;display:flex;gap:12px;padding:0 0 18px;align-items:flex-start}
+.akEditorialSteps li:nth-child(n+3){padding-top:20px;border-top:1px solid #e8eef3}
+.akEditorialSteps li>span{font-size:11px;color:#a67b41;font-weight:900;letter-spacing:.075em;background:#f8f2e8;border-radius:8px;flex:0 0 31px;height:31px;display:grid;place-items:center}
+.akEditorialSteps li>div{padding-top:1px;min-width:0}
+.akEditorialSteps strong{display:block;color:#1c3449;font-weight:850;font-size:14px;line-height:1.35}
+.akEditorialSteps p{font-size:12px;line-height:1.65;color:#687b8e;margin:6px 0 0}
+.akEditorialBenefits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;row-gap:0}
+.akEditorialBenefit{display:grid;grid-template-columns:25px minmax(0,1fr);gap:10px;align-items:start;padding:12px 0 20px}
+.akEditorialBenefit:nth-child(n+3){padding-top:20px;border-top:1px solid #e8eef3}
+.akEditorialIndex{font-size:11px;font-weight:900;color:#ae854c;letter-spacing:.075em;padding-top:2px}
+.akEditorialBenefit strong{font-size:14px;font-weight:850;color:#1b344a}
+.akEditorialBenefit p{font-size:12px;line-height:1.6;margin:6px 0 0;color:#738598}
+.akEditorialContent .akReadFold{border:0;border-top:1px solid #dce5ed;border-bottom:1px solid #dce5ed;border-radius:0;margin-top:18px;background:transparent}
+.akEditorialContent .akReadFold>summary{padding:17px 4px;min-height:64px}
+.akEditorialContent .akReadFold>summary strong{font-size:13px;color:#24425c}
+.akEditorialContent .akReadFold>summary small{font-size:11px}
+.akEditorialContent .akReadFold[open]>summary{background:transparent}
+.akEditorialContent .akReadFoldBody{padding:16px 2px 21px}
+.akEditorialContent .akReadFullGroup{background:#fbfcfd}
+.akEditorialCompare{display:grid;gap:0}
+.akEditorialCompareRow{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 16px;border-bottom:1px solid #e6edf3;border-left:3px solid transparent}
+.akEditorialCompareRow:first-child{border-top:1px solid #e6edf3}
+.akEditorialCompareRow.active{background:#fff9f0;border-left-color:#c49b5f}
+.akEditorialCompareTier{font-size:16px;letter-spacing:-.02em;font-weight:900;color:#4b6072}
+.akEditorialCompareRow.active .akEditorialCompareTier{color:#92662f}
+.akEditorialCompareRow strong{display:block;font-size:14px;color:#1e384e;font-weight:850}
+.akEditorialCompareRow p{margin:5px 0 0;color:#718497;font-size:12px;line-height:1.6}
+.akEditorialChoice{font-size:9px;letter-spacing:.075em;font-weight:900;color:#a5773d;white-space:nowrap}
+.akEditorialOffer>.akDemoDisclosure{margin-top:29px;margin-bottom:15px}
+.akEditorialOffer>.perf-note{padding:2px 7px 12px;line-height:1.6;font-size:11px;color:#8c99a7}
+.akEditorialDetailedMobile{display:none}
+.akEditorialDetailedDesktop .perf-compare-wrap{overflow:auto}
+.akEditorialDetailedDesktop .perf-compare{min-width:660px}
+.akEditorialOffer .akReadFullGrid{gap:12px}
+@media(max-width:940px){
+ .akEditorialSection{grid-template-columns:minmax(150px,.32fr) minmax(0,.68fr);gap:22px}
+ .akEditorialSteps,.akEditorialBenefits{column-gap:20px}
+ .akEditorialFacts>div{padding-right:10px}
+ .akEditorialFacts>div+div{padding-left:12px}
+}
+@media(max-width:760px){
+ .akEditorialOffer .akEditorialHero{padding:24px 24px 0}
+ .akEditorialHero .perf-hero-top{flex-direction:row;align-items:flex-start}
+ .akEditorialHero .perf-hero-price{font-size:30px}
+ .akEditorialFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .akEditorialHeroOther .akEditorialFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .akEditorialFacts>div{padding:13px 12px 15px 0!important;border-left:0!important}
+ .akEditorialFacts>div:nth-child(even){border-left:1px solid rgba(255,255,255,.13)!important;padding-left:17px!important}
+ .akEditorialFacts>div:nth-child(n+3){border-top:1px solid rgba(255,255,255,.13)}
+ .akEditorialSection{grid-template-columns:1fr;gap:18px;padding:28px 5px 30px}
+ .akEditorialHeading h3{font-size:21px}
+ .akEditorialHeading p{max-width:700px}
+ .akEditorialDetailedDesktop{display:none}
+ .akEditorialDetailedMobile{display:block}
+ .akEditorialDetailedMobile .akReadTierGrid{display:grid;grid-template-columns:1fr;gap:8px}
+ .akEditorialDetailedMobile .akReadTier>div:not(.akReadTierHead){padding:9px 0}
+ .akEditorialDetailedMobile .akReadTier{padding:15px}
+}
+@media(max-width:560px){
+ .akEditorialOffer .akEditorialHero{padding:20px 20px 0;margin-bottom:4px}
+ .akEditorialHero .perf-hero-top{display:flex;flex-direction:column;gap:13px}
+ .akEditorialHero h2{font-size:29px;margin:9px 0}
+ .akEditorialHero p{font-size:12px;line-height:1.6}
+ .akEditorialHero .perf-hero-price{font-size:27px;text-align:left;padding-bottom:0}
+ .akEditorialHero .perf-hero-price span{font-size:10px;margin-top:3px;text-align:left}
+ .akEditorialFacts{margin-top:19px}
+ .akEditorialFacts small{font-size:9px;margin-bottom:5px}
+ .akEditorialFacts strong{font-size:11px;line-height:1.45}
+ .akEditorialFacts>div:nth-child(even){padding-left:12px!important}
+ .akEditorialSection{padding:25px 1px 27px;gap:16px}
+ .akEditorialHeading>span{font-size:9px;margin-bottom:8px}
+ .akEditorialHeading h3{font-size:20px;margin-bottom:7px}
+ .akEditorialHeading p{font-size:12px}
+ .akEditorialSteps,.akEditorialBenefits{grid-template-columns:1fr}
+ .akEditorialSteps li{padding:0 0 16px}
+ .akEditorialSteps li+li{padding-top:16px;border-top:1px solid #e7edf2}
+ .akEditorialBenefits .akEditorialBenefit+ .akEditorialBenefit{padding-top:15px;border-top:1px solid #e7edf2}
+ .akEditorialBenefit{padding:0 0 15px}
+ .akEditorialCompareRow{grid-template-columns:35px minmax(0,1fr);gap:8px 12px;padding:15px 8px}
+ .akEditorialChoice{grid-column:2;font-size:9px}
+ .akEditorialCompareTier{font-size:15px}
+ .akEditorialCompareRow strong{font-size:13px}
+ .akEditorialCompareRow p{font-size:11px}
+ .akEditorialOffer>.akDemoDisclosure{margin-top:22px}
+}
+
 </style>
 </head>
 <body>
@@ -4468,8 +4579,8 @@ function akPerfComparisonTable(tier,rows){
   rows.map(r=>'<tr><td>'+esc(r[0])+'</td>'+[1,2,3].map(i=>'<td class="'+(col===i?'current':'')+'">'+esc(r[i])+'</td>').join('')+'</tr>').join('')+
   '</tbody></table></div>';
 }
-function akPerfMobileComparison(tier,rows){
- const interesting=['Adaptation','Analyse vidéo','Visios'];
+function akPerfMobileComparison(tier,rows,full=false){
+ const interesting=full?rows.map(r=>r[0]):['Adaptation','Analyse vidéo','Visios'];
  return '<div class="akReadTierGrid">'+[1,2,3].map(i=>
   '<div class="akReadTier '+('P'+i===tier?'selected':'')+'"><div class="akReadTierHead"><strong>P'+i+'</strong>'+
   (('P'+i)===tier?'<small>OFFRE CONSULTÉE</small>':'')+'</div>'+
@@ -4554,7 +4665,9 @@ function performanceOfferLanding(name,price){
    akOfferSection('03 / COMPARER','Quelle différence entre P1, P2 et P3 ?',
      'Trois niveaux de suivi. Voici ce qui change réellement.',
      akOfferCompareOverview(tier)+
-     akOfferDisclosure('Voir le comparatif complet',akPerfComparisonTable(tier,compare),
+     akOfferDisclosure('Voir le comparatif complet',
+       '<div class="akEditorialDetailedDesktop">'+akPerfComparisonTable(tier,compare)+'</div>'+
+       '<div class="akEditorialDetailedMobile">'+akPerfMobileComparison(tier,compare,true)+'</div>',
        'Adaptations, bien-être, sommeil, nutrition, visios et retests'))+
    akOfferDemoTeaser('Performance',tier)+
    '<p class="perf-note">Les exemples illustrent les possibilités du suivi. Chaque accompagnement est individualisé selon le contexte et les données disponibles.</p>'+
