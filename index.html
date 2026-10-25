@@ -107,7 +107,30 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 @media(max-width:650px){.pole-detail-grid,.pole-offer-compare,.pole-flow{grid-template-columns:1fr}}
 .public-process{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.public-process-card{border:1px solid #e1e7ef;background:#fff;border-radius:15px;padding:17px}.public-process-card b{display:block;font-size:12px;color:#b88739;margin-bottom:8px}.public-process-card strong{display:block;margin-bottom:7px}.public-process-card p{font-size:12px;color:#475467;line-height:1.5;margin:0}
 .public-offer-group{margin-top:34px}.public-offer-group-title{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:13px}.public-offer-group-title h3{margin:0;font-size:25px}.public-offer-group-title p{margin:0;color:#aebdcd;font-size:12px}
-.public-offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.public-offer-card{border:1px solid #26384c;background:linear-gradient(160deg,#101f31,#0d1827);border-radius:18px;padding:20px;display:flex;flex-direction:column;min-height:285px;position:relative;overflow:hidden;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.public-offer-card:hover{transform:translateY(-3px);border-color:#49617a;box-shadow:0 16px 38px rgba(0,0,0,.16)}.public-offer-card.featured{border-color:#b78a46;box-shadow:0 0 0 1px rgba(211,171,98,.16) inset,0 18px 50px rgba(0,0,0,.12)}.public-offer-card.featured:before{content:"CHOIX ÉQUILIBRÉ";position:absolute;right:-38px;top:22px;transform:rotate(37deg);background:#d3ab62;color:#08111d;font-size:8px;font-weight:950;letter-spacing:.08em;padding:5px 42px}.public-offer-card .tag{font-size:10px;color:#d5ad67;font-weight:950;letter-spacing:.08em;text-transform:uppercase}.public-offer-card h4{font-size:23px;margin:8px 0 3px}.public-offer-headline{color:#d7e0e9;font-size:12px;line-height:1.5;min-height:36px}.public-price{font-size:34px;font-weight:950;margin:12px 0 8px}.public-price span{font-size:12px;color:#aebdcd;font-weight:700}.public-offer-fit{border:1px solid #2d435a;background:#0c1927;border-radius:11px;padding:10px 11px;margin:6px 0 10px}.public-offer-fit b{display:block;color:#d7b46f;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}.public-offer-fit span{display:block;color:#c4cfdb;font-size:11px;line-height:1.45}.public-offer-card ul{padding-left:18px;margin:12px 0 18px;color:#bac7d4;font-size:12px;line-height:1.62}.public-offer-card li+li{margin-top:3px}.public-offer-diff{border:1px solid rgba(211,171,98,.34);background:rgba(211,171,98,.075);border-radius:12px;padding:11px 12px;margin:0 0 16px;color:#cbd5df;font-size:11px;line-height:1.5}.public-offer-diff strong{display:block;color:#e6c37f;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.public-offer-card .public-primary{margin-top:0;text-align:center}
+.public-offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.public-offer-card{border:1px solid #26384c;background:linear-gradient(160deg,#101f31,#0d1827);border-radius:18px;padding:20px;display:flex;flex-direction:column;min-height:285px;position:relative;overflow:hidden;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.public-offer-card:hover{transform:translateY(-3px);border-color:#49617a;box-shadow:0 16px 38px rgba(0,0,0,.16)}.public-offer-card.featured{border-color:#b78a46;box-shadow:0 0 0 1px rgba(211,171,98,.16) inset,0 18px 50px rgba(0,0,0,.12)}.public-offer-card.featured:before{content:"CHOIX ÉQUILIBRÉ";position:absolute;right:-38px;top:22px;transform:rotate(37deg);background:#d3ab62;color:#08111d;font-size:8px;font-weight:950;letter-spacing:.08em;padding:5px 42px}.public-offer-card .tag{font-size:10px;color:#d5ad67;font-weight:950;letter-spacing:.08em;text-transform:uppercase}.public-offer-card h4{font-size:23px;margin:8px 0 3px}.public-offer-headline{color:#d7e0e9;font-size:12px;line-height:1.5;min-height:36px}.public-price{font-size:34px;font-weight:950;margin:12px 0 8px}.public-price span{font-size:12px;color:#aebdcd;font-weight:700}.public-offer-fit{border:1px solid #2d435a;background:#0c1927;border-radius:11px;padding:10px 11px;margin:6px 0 10px}.public-offer-fit b{display:block;color:#d7b46f;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}.public-offer-fit span{display:block;color:#c4cfdb;font-size:11px;line-height:1.45}.public-offer-card ul{padding-left:18px;margin:12px 0 18px;color:#bac7d4;font-size:12px;line-height:1.62}.public-offer-card li+li{margin-top:3px}
+
+/* Cartes des offres : les écarts de prestations restent lisibles d'un coup d'œil. */
+.public-offer-card .akOfferCardTitleRow{display:flex;gap:10px;align-items:baseline;justify-content:space-between}
+.public-offer-card .akOfferCardTitleRow h4{margin:8px 0 3px}
+.akOfferCardTier{color:#e8c68c;border:1px solid rgba(211,171,98,.35);background:rgba(211,171,98,.08);border-radius:8px;padding:4px 7px;letter-spacing:.05em;font-size:10px;font-weight:900;white-space:nowrap}
+.public-offer-card .akOfferCardCompare{margin:17px 0 20px;min-width:0}
+.akOfferCardCompareHead{border-top:1px solid rgba(185,205,228,.18);padding:13px 0 9px;font-size:10px;color:#d4b171;font-weight:900;letter-spacing:.095em}
+.public-offer-card .akOfferCardMetrics{margin:0;padding:0;display:flex;flex-direction:column;min-width:0}
+.public-offer-card .akOfferCardMetric{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);align-items:start;gap:8px;border-bottom:1px solid rgba(188,208,230,.12);padding:10px 1px;min-width:0}
+.public-offer-card .akOfferCardMetric:last-child{border-bottom:0}
+.public-offer-card .akOfferCardMetric dt{margin:0;font-size:11px;line-height:1.35;color:#aebed0;font-weight:600}
+.public-offer-card .akOfferCardMetric dd{margin:0;min-width:0;text-align:left;overflow-wrap:break-word}
+.public-offer-card .akOfferCardMetric dd strong{display:block;color:#f2f6fb;font-size:12px;line-height:1.35;font-weight:850}
+.public-offer-card .akOfferCardMetric dd small{display:block;font-size:10px;line-height:1.35;margin-top:3px;color:#b7c7d8}
+.public-offer-card .akOfferCardMetricKey{background:rgba(218,176,107,.10);border:1px solid rgba(218,176,107,.2);border-radius:9px;padding:11px 9px;margin:0 0 3px}
+.public-offer-card .akOfferCardMetricKey dt{color:#e4c48c;font-weight:800}
+.public-offer-card .akOfferCardMetricKey dd strong{color:#f6d498;font-size:13px}
+.public-offer-card .public-offer-headline{min-height:54px}
+.public-offer-card:focus-visible{outline:2px solid #ebc17c;outline-offset:3px}
+@media(max-width:1100px){.public-offer-card .akOfferCardMetric{grid-template-columns:minmax(0,1fr);gap:3px}.public-offer-card .public-offer-headline{min-height:0}}
+@media(max-width:650px){.public-offer-card .akOfferCardMetric{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:8px}.public-offer-card .akOfferCardTitleRow h4{font-size:21px}.public-offer-card .public-offer-headline{min-height:0}}
+@media(max-width:350px){.public-offer-card .akOfferCardMetric{grid-template-columns:minmax(0,1fr);gap:3px}}
+.public-offer-diff{border:1px solid rgba(211,171,98,.34);background:rgba(211,171,98,.075);border-radius:12px;padding:11px 12px;margin:0 0 16px;color:#cbd5df;font-size:11px;line-height:1.5}.public-offer-diff strong{display:block;color:#e6c37f;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.public-offer-card .public-primary{margin-top:0;text-align:center}
 .public-offer-actions{display:block;margin-top:auto}
 .public-offer-detail-btn{border:1px solid #40566e;background:#132439;color:#e7edf4;border-radius:11px;padding:11px 12px;font-weight:900;font-size:11px;cursor:pointer}
 .public-offer-detail-btn:hover{border-color:#d3ab62;color:#f0cf8d}
@@ -4237,15 +4260,23 @@ function publicOfferPreview(pole,name){
 }
 function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',featured=false){
  price=publicCatalogPrice(pole,name,price);
- const preview=akOfferCardHighlights(pole,name);
  const displayName=pole==='Performance'?({P1:'Essentiel',P2:'Avancé',P3:'Premium'}[name]||name):pole==='Mental'&&name==='Sportif'?'Sportif(ve)':pole==='Mental'&&name==='Particulier'?'Particulier(e)':name;
  const eyebrow=pole==='Performance'?'PERFORMANCE & RÉATHLÉTISATION':pole==='Forme & Santé'?'FORME & SANTÉ':tag||pole;
+ const differences=akOfferCardDifferences(pole,name);
  return '<div class="public-offer-card publicOfferDetailCard '+(featured?'featured':'')+'" role="button" tabindex="0" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">'+
   '<div class="tag">'+esc(eyebrow)+'</div>'+
-  '<h4>'+esc(displayName)+'</h4>'+
+  '<div class="akOfferCardTitleRow"><h4>'+esc(displayName)+'</h4>'+
+   (pole==='Performance'?'<span class="akOfferCardTier">'+esc(name)+'</span>':'')+'</div>'+
   '<div class="public-price">'+esc(price)+' € <span>/ mois</span></div>'+
   '<div class="public-offer-headline">'+esc(headline||'')+'</div>'+
-  '<ul>'+preview.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+
+  '<div class="akOfferCardCompare" aria-label="Prestations et différences de la formule">'+
+    '<div class="akOfferCardCompareHead">À COMPARER</div>'+
+    '<dl class="akOfferCardMetrics">'+differences.map((row,i)=>
+      '<div class="akOfferCardMetric '+(i===0?'akOfferCardMetricKey':'')+'">'+
+       '<dt>'+esc(row[0])+'</dt><dd><strong>'+esc(row[1])+'</strong>'+
+       (row[2]?'<small>'+esc(row[2])+'</small>':'')+'</dd></div>'
+    ).join('')+'</dl>'+
+  '</div>'+
   '<div class="public-offer-actions"><span class="public-offer-detail-btn" style="display:block;text-align:center">Voir le détail →</span></div>'+
  '</div>';
 }
@@ -4923,17 +4954,83 @@ function akOfferIncludedNow(pole,name){
     '<li><span class="akOfferIncludedTick" aria-hidden="true">✓</span><span>'+esc(item)+'</span></li>'
    ).join('')+'</ul></div>';
 }
-function akOfferCardHighlights(pole,name){
- const map={
-  'performance|p1':['Programme individualisé + sRPE (effort × durée)','2 analyses vidéo / mois · 1 visio de 30 min / mois','Retest à 6 semaines'],
-  'performance|p2':['sRPE (effort × durée) + Hooper (fatigue, sommeil, stress)','Adaptation des séances chaque semaine','1 vidéo / semaine · 2 visios de 30 min / mois'],
-  'performance|p3':['sRPE (effort × durée) + Hooper (fatigue, sommeil, stress)','Adaptations sous 48 h · sommeil et nutrition','Jusqu’à 1 visio de 30 min / semaine'],
-  'forme & santé|standard':['Programme et sRPE (effort × durée)','Correction si gêne ou difficulté signalée','1 vidéo / mois · 1 visio de 30 min / mois'],
-  'forme & santé|renforcé':['sRPE (effort × durée) et état de forme','Adaptation hebdomadaire de la programmation','Jusqu’à 1 vidéo / semaine · 2 visios / mois'],
-  'mental|particulier':['Objectifs et situations de vie','Exercices et routines adaptés aux retours','Jusqu’à 1 visio de 45 min / semaine'],
-  'mental|sportif':['Avant, pendant et après les matchs','Routines quotidiennes, entraînements et débriefs','Suivi organisé selon le calendrier sportif']
+// Sur les cartes publiques, chaque pôle compare exactement les mêmes critères.
+// Les montants, rythmes et limites proviennent des prestations réellement proposées.
+function akOfferCardDifferences(pole,name){
+ const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
+ const groups={
+  'forme & santé':{
+   labels:['Analyse vidéo','Visios','Adaptation du programme','État de forme','Nutrition'],
+   offers:{
+    standard:[
+     ['Jusqu’à 1 / mois','Retour technique'],
+     ['1 × 30 min / mois'],
+     ['Si gêne ou difficulté','Correction si nécessaire'],
+     ['sRPE (effort × durée)','Sans questionnaire régulier'],
+     ['Non incluse']
+    ],
+    'renforcé':[
+     ['Jusqu’à 1 / semaine','Retour technique'],
+     ['2 × 30 min / mois'],
+     ['Chaque semaine','Selon charge et bien-être'],
+     ['sRPE + état de forme','Fatigue, stress, sommeil'],
+     ['Budget kcal + macros','Sans menus']
+    ]
+   }
+  },
+  'performance':{
+   labels:['Analyse vidéo','Visios','Adaptation de charge','Suivi bien-être','Récupération','Nutrition'],
+   offers:{
+    p1:[
+     ['Jusqu’à 2 / mois','Analyse technique'],
+     ['1 × 30 min / mois'],
+     ['Si surcharge ou alerte','Allègement si nécessaire'],
+     ['sRPE (effort × durée)','Retest à 6 semaines'],
+     ['Allègement de charge','Selon la fatigue'],
+     ['Non incluse']
+    ],
+    p2:[
+     ['1 / semaine','Mouvements prioritaires'],
+     ['2 × 30 min / mois'],
+     ['Chaque semaine','Selon charge et Hooper'],
+     ['sRPE + Hooper','Fatigue, sommeil, stress'],
+     ['Anticipation hebdomadaire','Charge ajustée, sans séance dédiée'],
+     ['Non incluse']
+    ],
+    p3:[
+     ['Selon les besoins','Sans quota fixe'],
+     ['Jusqu’à 1 × 30 min / semaine'],
+     ['Sous 48 h si besoin','Selon les signaux recueillis'],
+     ['Hooper + agenda sommeil','Suivi approfondi'],
+     ['Séances dédiées','Lorsque nécessaire'],
+     ['Budget kcal + macros','Sans menus']
+    ]
+   }
+  },
+  'mental':{
+   labels:['Contexte','Routines','Mise en pratique','Évolution du suivi','Visios'],
+   offers:{
+    particulier:[
+     ['Vie quotidienne','Objectifs personnels'],
+     ['Exercices personnalisés','Selon les situations vécues'],
+     ['Situations du quotidien','Mises en pratique et débriefs'],
+     ['Selon les retours','Outils réajustés dans le temps'],
+     ['Jusqu’à 1 × 45 min / semaine','Selon les besoins']
+    ],
+    sportif:[
+     ['Entraînements et matchs','Calendrier de la saison'],
+     ['Quotidien + entraînement','Préparation avant-match'],
+     ['Avant / pendant / après-match','Recentrage et débriefs'],
+     ['Selon les échéances','Routines et séances adaptées'],
+     ['Jusqu’à 1 × 45 min / semaine','Visios placées selon le calendrier']
+    ]
+   }
+  }
  };
- return map[(pole+'|'+name).toLowerCase()]||publicOfferPreview(pole,name);
+ const group=groups[String(pole||'').toLowerCase()];
+ const values=group?.offers?.[String(name||'').toLowerCase()];
+ if(!group||!values)return [];
+ return group.labels.map((label,i)=>[label,...values[i]]);
 }
 
 // Explication explicite des accès : programmation chez Optitrainer, suivi chez AK PRIME.
