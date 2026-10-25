@@ -83,8 +83,8 @@ function openTestCreation(){
    const email=data.email,password=data.password;
    await loadSupabaseData();
    state.view='clients';render();
-   modal('Compte TEST prêt — identifiants à conserver',
-    '<div class="alert green"><strong>Le compte test est prêt.</strong>'+
+   modal('Compte TEST créé : identifiants à conserver',
+    '<div class="alert green"><strong>Le compte test a bien été créé.</strong>'+
      '<div class="tiny" style="margin-top:5px">Il apparaît dans ton back-office sous le statut TEST. Aucun règlement n’a été effectué.</div></div>'+
      '<div class="muted tiny" style="margin-top:14px">Identifiant (e-mail)</div>'+
      '<div class="akDemoCredential"><code>'+esc(email)+'</code></div>'+
