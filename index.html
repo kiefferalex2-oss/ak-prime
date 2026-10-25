@@ -1854,6 +1854,27 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .public-site #apropos .ak-about-portrait{min-height:445px}
  .public-site #apropos .ak-about-portrait-inner{min-height:295px}
 }
+
+/* Passeport AK PRIME : navigation clairement interactive, également dans toutes les démos. */
+.akp-passport{container-type:inline-size}
+.akp-passport .akp-nav-help{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;background:#f5f8fc;border-top:1px solid #e6ecf3;padding:12px 20px 10px;color:#34485e}
+.akp-passport .akp-nav-help strong{display:inline-flex;align-items:center;gap:7px;color:#9a6a29;font-size:10px;font-weight:950;letter-spacing:.08em}
+.akp-passport .akp-nav-help strong:before{content:"✦";font-size:13px;color:#c79b54}
+.akp-passport .akp-nav-help span{font-size:11px;line-height:1.45;color:#445b70;font-weight:650}
+.akp-passport .akp-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:8px 20px 15px;background:#f5f8fc;border-bottom:1px solid #dfe5eb;overflow:visible}
+.akp-passport .akp-tabs .passportBookTab{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:42px;padding:9px 8px;border:1px solid #c8d5e3;border-radius:10px;background:#fff;box-shadow:0 2px 5px rgba(14,38,60,.035);color:#284058;font-size:11px;line-height:1.25;font-weight:850;white-space:normal;text-align:center;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.akp-passport .akp-tabs .passportBookTab:after{display:none}
+.akp-passport .akp-tabs .passportBookTab .akp-tab-arrow{font-size:18px;line-height:1;font-weight:600;color:#aa7a35;flex:0 0 auto}
+.akp-passport .akp-tabs .passportBookTab:hover{background:#fff9ef;color:#192e43;border-color:#c49b59;box-shadow:0 4px 13px rgba(151,102,34,.12);transform:translateY(-1px)}
+.akp-passport .akp-tabs .passportBookTab.on{background:#183249;border-color:#183249;color:#fff;box-shadow:0 4px 12px rgba(17,48,74,.16)}
+.akp-passport .akp-tabs .passportBookTab.on .akp-tab-arrow{color:#edc77f}
+.akp-passport .akp-tabs .passportBookTab.on:hover{background:#254863;border-color:#254863;color:#fff}
+.akp-passport .akp-tabs .passportBookTab:focus-visible{outline:3px solid #e9b96d;outline-offset:2px}
+@container (max-width:760px){.akp-passport .akp-tabs{grid-template-columns:repeat(3,minmax(0,1fr));padding:8px 12px 14px}.akp-passport .akp-nav-help{padding:11px 12px 8px}}
+@container (max-width:405px){.akp-passport .akp-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.akp-passport .akp-nav-help{gap:3px}.akp-passport .akp-tabs .passportBookTab{min-height:40px}}
+@media(max-width:760px){.akp-passport .akp-tabs{padding:8px 12px 14px}.akp-passport .akp-nav-help{padding:11px 12px 8px}}
+@media print{.akp-passport .akp-nav-help{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -2811,7 +2832,11 @@ function passportTopProgress(groups,limit=3){
 }
 function passportBookNav(){
  const items=[['overview','Sommaire'],['profile','Profil sportif'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
- return '<nav class="akp-tabs">'+items.map(([k,l])=>'<button class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'">'+l+'</button>').join('')+'</nav>';
+ return '<div class="akp-nav-help" role="note"><strong>6 RUBRIQUES À EXPLORER</strong><span>Choisis une rubrique ci-dessous pour découvrir son contenu.</span></div>'+
+  '<nav class="akp-tabs" aria-label="Rubriques interactives du passeport">'+items.map(([k,l])=>
+   '<button type="button" class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'" aria-pressed="'+(passportBookPage===k?'true':'false')+'">'+
+    '<span>'+l+'</span><span class="akp-tab-arrow" aria-hidden="true">›</span></button>'
+  ).join('')+'</nav>';
 }
 function passportHeader(m){
  const cs=passportCycleStats(m.cycle),next=passportNextDeadline(m);
@@ -2949,7 +2974,11 @@ function bindPassportBook(){
  const body=root.querySelector('#passportBookBody');if(!body)return;
  const rerender=()=>{
    body.innerHTML=renderPassportBookPage(passportActiveModel);
-   root.querySelectorAll('.passportBookTab').forEach(b=>b.classList.toggle('on',b.dataset.passportPage===passportBookPage));
+   root.querySelectorAll('.passportBookTab').forEach(b=>{
+     const selected=b.dataset.passportPage===passportBookPage;
+     b.classList.toggle('on',selected);
+     b.setAttribute('aria-pressed',selected?'true':'false');
+   });
    bindPassportBook();
  };
  root.querySelectorAll('.passportBookTab').forEach(b=>b.onclick=()=>{passportBookPage=b.dataset.passportPage||'overview';rerender()});
