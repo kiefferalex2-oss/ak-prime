@@ -1018,7 +1018,8 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .ak-wow .client-user-mini{display:none}
 }
 @media(max-width:960px){
- .ak-wow .akWowHero{grid-template-columns:1fr;gap:25px}
+ .ak-wow .client-hero.akWowHero{grid-template-columns:minmax(0,1fr);gap:20px}
+ .ak-wow .akWowHeroCopy,.ak-wow .akWowHeroSide{min-width:0;max-width:100%;width:100%}
  .ak-wow .akWowHeroSide{min-height:160px}
  .ak-wow .akWowHome .client-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .ak-wow .client-time-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1247,6 +1248,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akOfferDemoShell .client-main{padding:16px}
  .akOfferDemoShell .client-hero.akWowHero{grid-template-columns:1fr;gap:17px;padding:20px}
  .akOfferDemoShell .akWowHero h1{font-size:31px}
+ .akOfferDemoShell .akWowHeroCopy,.akOfferDemoShell .akWowHeroSide{min-width:0;max-width:100%;width:100%}
  .akOfferDemoShell .akWowHomeServices,.akOfferDemoShell .akWowTodoGrid{grid-template-columns:1fr}
  .akOfferDemoShell .client-page-head{padding:32px 20px 20px}
  .akOfferDemoIntro h3{font-size:20px}
@@ -1721,6 +1723,81 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akMatrixMobileOffer .akMatrixCellCopy>strong{font-size:12px}
  .akMatrixMobileOffer .akMatrixCellCopy>small{font-size:10.5px}
  .akMatrixMobileOffer .akMatrixPriceCell .akMatrixCellCopy>strong{font-size:19px}
+}
+
+
+/* Mobile client home: enforce a real single-column hero (avoid appointment overlap). */
+@media(max-width:960px){
+ .ak-wow .client-hero.akWowHero{display:grid;grid-template-columns:minmax(0,1fr);height:auto;gap:18px;align-items:stretch}
+ .ak-wow .client-hero.akWowHero .akWowHeroCopy,
+ .ak-wow .client-hero.akWowHero .akWowHeroSide{position:relative;inset:auto;grid-column:1;grid-row:auto;min-width:0;max-width:100%;width:100%;transform:none}
+ .ak-wow .client-hero.akWowHero .akWowHeroSide{align-self:stretch;margin:0}
+}
+@media(max-width:520px){
+ .ak-wow .client-hero.akWowHero{padding:23px 20px;gap:18px}
+ .ak-wow .client-hero.akWowHero h1{font-size:clamp(27px,8.3vw,34px);line-height:1.13;overflow-wrap:break-word}
+ .ak-wow .client-hero.akWowHero .akWowHeroCopy>p{line-height:1.55;font-size:13px}
+ .ak-wow .client-hero.akWowHero .akWowHeroSide{min-height:0;padding:18px;gap:12px;border-radius:17px}
+ .ak-wow .client-hero.akWowHero .akWowHeroSide strong{font-size:clamp(18px,5vw,23px);overflow-wrap:anywhere}
+ .ak-wow .client-hero.akWowHero .akWowHeroSideTop{letter-spacing:.07em;flex-wrap:wrap}
+}
+/* Mobile demo: bound every nested passport/follow-up container to the phone viewport. */
+@media(max-width:760px){
+ .akDemoDisclosure[open]>.akDemoStage{width:100%;max-width:100%;min-width:0;padding:6px 9px 26px;overflow-x:clip}
+ .akDemoDisclosure[open] .akOfferDemoSection,
+ .akDemoDisclosure[open] .akOfferDemoShell,
+ .akDemoDisclosure[open] .akOfferDemoBody,
+ .akDemoDisclosure[open] .client-main,
+ .akDemoDisclosure[open] .premium-passport,
+ .akDemoDisclosure[open] .akp-passport,
+ .akDemoDisclosure[open] .akp-body,
+ .akDemoDisclosure[open] .akp-page,
+ .akDemoDisclosure[open] .akLux,
+ .akDemoDisclosure[open] .akLuxCard,
+ .akDemoDisclosure[open] .akLuxFold,
+ .akDemoDisclosure[open] .akLuxFoldInner,
+ .akDemoDisclosure[open] .akSportMilestones,
+ .akDemoDisclosure[open] .akSportRows,
+ .akDemoDisclosure[open] .akSportRow{
+   box-sizing:border-box;max-width:100%;min-width:0;width:100%;
+ }
+ .akDemoDisclosure[open] .akOfferDemoBody,
+ .akDemoDisclosure[open] .client-main{overflow-x:clip}
+ .akDemoDisclosure[open] .akLuxCols,
+ .akDemoDisclosure[open] .akLuxHeroBody,
+ .akDemoDisclosure[open] .akLuxHeroAside,
+ .akDemoDisclosure[open] .akp-overview-main,
+ .akDemoDisclosure[open] .akp-cycle-layout,
+ .akDemoDisclosure[open] .akp-follow-layout,
+ .akDemoDisclosure[open] .akp-progress-three,
+ .akDemoDisclosure[open] .akp-snapshot-grid{
+   grid-template-columns:minmax(0,1fr);
+ }
+ .akDemoDisclosure[open] .akLuxCard{padding:14px}
+ .akDemoDisclosure[open] .akLuxFoldInner{padding:12px;overflow-x:auto}
+ .akDemoDisclosure[open] .akSportRow{
+   display:grid;grid-template-columns:38px minmax(0,1fr);gap:6px 9px;
+   padding:11px;align-items:start;
+ }
+ .akDemoDisclosure[open] .akSportRow .akSportWeek{grid-column:1;grid-row:1 / span 2;align-self:start;text-align:left}
+ .akDemoDisclosure[open] .akSportRow .akSportDate{grid-column:2;grid-row:1;min-width:0}
+ .akDemoDisclosure[open] .akSportRow .akSportContent{grid-column:2;grid-row:2;min-width:0;overflow-wrap:anywhere}
+ .akDemoDisclosure[open] .akSportRow .akSportType{grid-column:2;grid-row:3;justify-self:start;min-width:0}
+ .akDemoDisclosure[open] .akSportRow .akSportEdit{grid-column:2;grid-row:4;justify-self:start}
+ .akDemoDisclosure[open] .akSportHeading>div,
+ .akDemoDisclosure[open] .akSportTips,
+ .akDemoDisclosure[open] .akSportNext,
+ .akDemoDisclosure[open] .akSportNextItem{min-width:0;max-width:100%;overflow-wrap:anywhere}
+ .akDemoDisclosure[open] .akSportHeading h4{line-height:1.3;overflow-wrap:anywhere}
+ .akDemoDisclosure[open] .akSportNext{padding:14px}
+ .akDemoDisclosure[open] .akOfferDemoShell .client-main{padding:12px}
+}
+@media(max-width:420px){
+ .akDemoDisclosure[open]>.akDemoTeaser{padding:10px 11px;gap:8px}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserCopy strong{font-size:13px;line-height:1.25}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserCopy small{font-size:8px;letter-spacing:.04em}
+ .akDemoDisclosure[open]>.akDemoTeaser .akDemoTeaserAction{font-size:10px;padding:9px 10px;flex:0 0 auto}
+ .akDemoDisclosure[open]>.akDemoStage{padding:4px 6px 22px}
 }
 
 </style>
