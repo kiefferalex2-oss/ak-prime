@@ -4567,12 +4567,10 @@ function openPublicPoleDetails(key){
   '<div class="pole-detail-hero"><div class="eyebrow">'+esc(x.label)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.intro)+'</p></div>'+
   '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'À qui s’adresse ce pôle ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
   
-  '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>'+
-  '<div class="section-title">Formules et niveaux de suivi</div>'+'<div class="pole-offer-compare">'+x.offers.map(o=>poleOfferMini(...o)).join('')+'</div>',
+  '<div class="alert blue" style="margin-top:12px"><div class="tiny">'+esc(x.note)+'</div></div>',
   '<button class="btn ghost" id="closePoleDetail">Retour au site</button>');
  document.querySelector('#modalRoot .modal')?.classList.add('pole-performance-modal','pole-'+(key==='forme'?'forme':key==='mental'?'mental':'performance')+'-modal');
  document.getElementById('closePoleDetail').onclick=closeModal;
- document.querySelectorAll('.poleOfferSelect').forEach(b=>b.onclick=()=>openPublicOfferFromPole(b));
 }
 
 function publicOfferDetailData(pole,name){
