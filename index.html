@@ -5026,7 +5026,9 @@ function bindAkOfferDemo(pole,name){
     action?.classList.contains('clientGoCheckin')?'checkin':'suivi');
    setView(view);return;
   }
-  // Toute action interactive interne, y compris URL et formulaire, reste fictive.
+  // Seul le lien externe vers les véritables écrans officiels Optitrainer fonctionne.
+  // Les formulaires et commandes simulées restent inactifs dans la démo.
+  if(event.target.closest('a.akOptiRealLink'))return;
   if(event.target.closest('button,a,input,select,textarea')){
    event.preventDefault();event.stopImmediatePropagation();
    const hint=shell.querySelector('.akOfferDemoReadonlyStrip');
