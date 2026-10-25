@@ -230,7 +230,7 @@
  function athletePage(m){
   const r=rights(m),g=groups(m),all=stateFor(m).profile_overrides||{};
   const header='<div class="akProfHead"><div><span class="akp-label">IDENTITÉ & PROFIL</span>'+
-   '<h2>Fiche du sportif</h2><p class="akProfStatsIntro">Réponses initiales reprises automatiquement et complétées par le coach. '+
+   '<h2>Fiche de l’athlète</h2><p class="akProfStatsIntro">Réponses initiales reprises automatiquement et complétées par le coach. '+
    'Les observations restent datées lorsque nécessaire. Aucun diagnostic médical n’est déduit des réponses.</p></div>'+
    (m.akPassportRole==='coach'?'<button class="btn primary small akProfAction" data-action="profile">Modifier / compléter la fiche</button>':'')+
    '</div>';
