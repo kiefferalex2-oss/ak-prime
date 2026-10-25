@@ -4050,7 +4050,7 @@ async function saveClientQuestionnaire(statusValue){
 // Référentiel unique : fiches clients, cartes, comparatifs et page avant inscription.
 const AKP_OFFER_RIGHTS=Object.freeze({
  "forme & santé|standard": {
-  "label": "Forme & Santé — Standard",
+  "label": "Forme & Santé : Standard",
   "summary": [
    "Suivi de la charge d'entraînement via Optitrainer, sans suivi régulier de l'état de forme",
    "1 analyse vidéo par mois sur WhatsApp et 1 visio de 30 min par mois"
@@ -4073,7 +4073,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "forme & santé|renforcé": {
-  "label": "Forme & Santé — Renforcé",
+  "label": "Forme & Santé : Renforcé",
   "summary": [
    "Suivi de charge ET d’état de forme hebdomadaire dans Optitrainer",
    "Adaptations hebdomadaires, budget nutritionnel PDF et 2 visios de 30 min par mois"
@@ -4099,7 +4099,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "performance|p1": {
-  "label": "Performance — P1 Essentiel",
+  "label": "Performance : Essentiel",
   "summary": [
    "Programmation sportive individualisée et charge sRPE, sans pilotage systématique de l’état de forme",
    "2 analyses vidéo par mois via WhatsApp et retest à 6 semaines"
@@ -4124,7 +4124,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "performance|p2": {
-  "label": "Performance — P2 Avancé",
+  "label": "Performance : Avancé",
   "summary": [
    "Charge + état de forme Hooper avec ajustements hebdomadaires dans Optitrainer",
    "Analyse vidéo hebdomadaire via WhatsApp et 2 visios de 30 min par mois"
@@ -4151,7 +4151,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "performance|p3": {
-  "label": "Performance — P3 Premium",
+  "label": "Performance : Premium",
   "summary": [
    "Ajustement de la charge sous 48 h si la fatigue ou le sommeil le nécessite",
    "Agenda de sommeil, budget de macronutriments, récupération dédiée si nécessaire"
@@ -4179,7 +4179,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "mental|particulier": {
-  "label": "Préparation mentale — Particulier",
+  "label": "Préparation mentale : Particulier",
   "summary": [
    "Un travail mental individualisé autour de tes objectifs et des situations de ta vie quotidienne",
    "Exercices et routines ajustés au fil des retours ; jusqu’à 1 visio de 45 min par semaine"
@@ -4199,7 +4199,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "mental|sportif": {
-  "label": "Préparation mentale — Sportif",
+  "label": "Préparation mentale : Sportif",
   "summary": [
    "Un accompagnement mental intégré aux entraînements, aux matchs et à la saison sportive",
    "Routines quotidiennes et avant/pendant/après-match ; contenu et rythme adaptés au calendrier sportif"
@@ -4255,13 +4255,13 @@ function publicOfferFoundation(title,description,items,ladder){
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
  '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME — retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><div class="public-links"><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#offres">Offres</a><a href="#fonctionnement">Fonctionnement</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></div></div></div>'+
- '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Diplômé d’un Master STAPS EOPS · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
+ '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Master STAPS en entraînement et optimisation de la performance sportive · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
  '<div class="public-hero-visual"><img class="public-hero-portrait" src="assets/portrait-ak-prime.webp?v=2" alt="Portrait du coach AK PRIME" width="800" height="999" loading="eager" decoding="async">'+
  '<div class="public-hero-card"><div class="tag" style="color:#d5ad67;font-size:11px;font-weight:950;letter-spacing:.08em">LA MÉTHODE AK PRIME</div><h3 style="font-size:25px;margin:9px 0 6px">Standardiser la méthode, pas le client.</h3><p style="color:#aebdcd;font-size:13px;line-height:1.55">Chaque accompagnement suit un cadre clair tout en restant individualisé.</p><div class="public-method-line"><div class="public-method-step"><b>01</b>Évaluer</div><div class="public-method-step"><b>02</b>Comprendre</div><div class="public-method-step"><b>03</b>Planifier</div><div class="public-method-step"><b>04</b>Accompagner</div><div class="public-method-step"><b>05</b>Adapter</div></div></div></div></div></section>'+
  '<section class="public-section" id="methode"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">3 pôles</div><h2>Trois pôles. Des objectifs différents. Une même exigence de suivi.</h2><p>Découvrez nos trois domaines d’accompagnement et trouvez celui qui correspond à vos besoins.</p></div><div class="public-poles">'+
- '<div class="public-pole"><div class="num">01 — PERFORMANCE</div><h3>Performance</h3><p>Optimisez votre préparation physique et développez vos performances selon les exigences de votre discipline, ou bénéficiez d’un accompagnement en réathlétisation pour préparer progressivement votre retour au sport après une blessure.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="performance">Découvrir le pôle</button></div></div>'+
- '<div class="public-pole"><div class="num">02 — FORME & SANTÉ</div><h3>Forme & Santé</h3><p>Que vous débutiez, repreniez une activité après une pause ou une blessure, ou pratiquiez déjà régulièrement, profitez d’un accompagnement individualisé construit autour de vos objectifs, de votre niveau et de votre quotidien.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="forme">Découvrir le pôle</button></div></div>'+
- '<div class="public-pole"><div class="num">03 — MENTAL</div><h3>Préparation mentale</h3><p>Développez vos ressources mentales pour mieux vous connaître, surmonter les difficultés et aborder vos objectifs avec davantage de maîtrise, dans la vie quotidienne comme dans le sport, à tout niveau.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="mental">Découvrir le pôle</button></div></div>'+
+ '<div class="public-pole"><div class="num">01 · PERFORMANCE</div><h3>Performance</h3><p>Optimisez votre préparation physique et développez vos performances selon les exigences de votre discipline, ou bénéficiez d’un accompagnement en réathlétisation pour préparer progressivement votre retour au sport après une blessure.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="performance">Découvrir le pôle</button></div></div>'+
+ '<div class="public-pole"><div class="num">02 · FORME & SANTÉ</div><h3>Forme & Santé</h3><p>Que vous débutiez, repreniez une activité après une pause ou une blessure, ou pratiquiez déjà régulièrement, profitez d’un accompagnement individualisé construit autour de vos objectifs, de votre niveau et de votre quotidien.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="forme">Découvrir le pôle</button></div></div>'+
+ '<div class="public-pole"><div class="num">03 · MENTAL</div><h3>Préparation mentale</h3><p>Développez vos ressources mentales pour mieux vous connaître, surmonter les difficultés et aborder vos objectifs avec davantage de maîtrise, dans la vie quotidienne comme dans le sport, à tout niveau.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="mental">Découvrir le pôle</button></div></div>'+
  '</div></div></section>'+
  '<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
  '<div class="public-process-card"><b>01</b><strong>Choisir</strong><p>Vous sélectionnez le pôle et le niveau d’accompagnement adapté.</p></div>'+
@@ -4274,10 +4274,10 @@ function renderPublicSite(){
  '<div class="ak-about-head"><div class="kicker">Qui est derrière AK PRIME ?</div><h2>Une expertise construite sur le terrain.</h2></div>'+
  '<div class="ak-about-layout">'+
  '<div class="ak-about-visual"><div class="ak-about-portrait"><span class="ak-about-visual-tag">AK PRIME · FONDATEUR</span><div class="ak-about-portrait-inner"><img class="ak-about-founder-photo" src="assets/fondateur-ak-prime.webp" width="543" height="870" alt="Alex Kieffer, fondateur d’AK PRIME, en polo noir, les mains dans le dos" loading="lazy" decoding="async"></div><div class="ak-about-identity"><h3>Alex Kieffer</h3><p>Préparateur physique & mental · Coach sportif</p></div></div></div>'+
- '<div class="ak-about-content"><div class="ak-about-lede">Diplômé d’un Master STAPS EOPS, spécialisé dans l’entraînement et l’optimisation de la performance, j’ai développé mon expérience auprès de sportifs de différents niveaux, du pratiquant débutant jusqu’au sport professionnel.</div>'+
+ '<div class="ak-about-content"><div class="ak-about-lede">Diplômé d’un Master STAPS, mention Entraînement et optimisation de la performance sportive, j’ai développé mon expérience auprès de personnes aux profils variés, des débutant(e)s jusqu’au sport professionnel.</div>'+
  '<p class="ak-about-body">Mon parcours m’a amené à intervenir dans plusieurs disciplines, notamment le handball, le football, la boxe et l’haltérophilie.</p>'+
  '<p class="ak-about-body">Aujourd’hui, avec AK PRIME, je mets cette expérience au service d’un accompagnement individualisé, associant expertise technique, suivi rigoureux et relation humaine.</p>'+
- '<div class="ak-about-credentials"><span>Master STAPS EOPS</span><span>Carte professionnelle d’éducateur sportif</span></div>'+
+ '<div class="ak-about-credentials"><span>Master STAPS : Entraînement et optimisation de la performance sportive</span><span>Carte professionnelle d’éducateur sportif</span></div>'+
  '<div class="ak-about-summary"><h3>Un parcours multisport</h3>'+
  '<div class="ak-about-career-lines"><div><strong>Handball</strong><span>Palente Besançon (national) · Section Stendhal, championne de France UNSS 2026</span></div><div><strong>Football</strong><span>Préparation physique à Thonon Évian Grand Genève · Seconde Ligue</span></div><div><strong>Boxe & haltérophilie</strong><span>Encadrement technique et préparation physique</span></div></div>'+
  '<div class="ak-about-skill-line"><span>Évaluation & profilage physique</span><span>Planification & suivi des charges</span><span>Préparation physique & réathlétisation</span><span>Préparation mentale</span><span>Sommeil, récupération & état de forme</span><span>Nutrition : besoins & macronutriments</span><span>Prise en compte du cycle menstruel</span></div></div>'+
@@ -4310,11 +4310,11 @@ function renderPublicSite(){
  '<section class="public-section"><div class="public-section-inner public-access"><div><div class="public-section-head" style="margin-bottom:0"><div class="kicker">Espace client</div><h2>Un accès personnel ouvert après paiement.</h2><p>Après validation de votre souscription, vous recevez un e-mail pour activer votre espace personnel AK PRIME et définir votre mot de passe. Vous pourrez ensuite retrouver votre suivi et votre Passeport au même endroit.</p></div></div>'+
  '<div class="public-access-card"><div class="public-access-row"><div class="bubble">1</div><div><strong>Paiement validé</strong><div>Le nom, l’e-mail et l’offre viennent du paiement.</div></div></div><div class="public-access-row"><div class="bubble">2</div><div><strong>Compte AK PRIME préparé</strong><div>Le dossier client et son accès sont créés automatiquement.</div></div></div><div class="public-access-row"><div class="bubble">3</div><div><strong>E-mail d’activation</strong><div>Le client reçoit un lien sécurisé et choisit son mot de passe.</div></div></div><div class="public-access-row"><div class="bubble">4</div><div><strong>Accès à AK PRIME et Optitrainer</strong><div>Vous retrouvez votre suivi, vos questionnaires, vos visios et votre Passeport dans AK PRIME. Votre accès Optitrainer est également mis en place pour consulter vos programmes d’entraînement.</div></div></div></div></div></section>'+
  '<section class="public-section" style="padding-top:0" id="faq"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Questions fréquentes</div><h2>Avant de commencer</h2><p>Les réponses essentielles pour choisir votre accompagnement sereinement.</p></div><div class="public-faq">'+
- '<details><summary>Faut-il déjà être sportif ou avoir de l’expérience ?</summary><p>Non. AK PRIME accompagne les personnes qui débutent, reprennent une activité ou pratiquent déjà régulièrement, ainsi que les sportifs qui recherchent un suivi plus spécifique. Le pôle et la formule sont choisis selon vos objectifs et votre situation.</p></details>'+
+ '<details><summary>Faut-il déjà pratiquer un sport ou avoir de l’expérience ?</summary><p>Non. AK PRIME accompagne les personnes qui débutent, reprennent une activité ou pratiquent déjà régulièrement, ainsi que les personnes pratiquant un sport qui recherchent un suivi plus spécifique. Le pôle et la formule sont choisis selon vos objectifs et votre situation.</p></details>'+
  '<details><summary>Comment fonctionne l’accompagnement à distance ?</summary><p>Nous faisons le point sur vos objectifs et votre contexte, puis vous bénéficiez des prestations prévues par votre formule : programmation ou travail mental, bilans, analyses et échanges. Votre espace AK PRIME centralise votre suivi ; pour les programmes d’entraînement, un accès Optitrainer est également prévu.</p></details>'+
  '<details><summary>Ai-je besoin de matériel spécifique ?</summary><p>Pas nécessairement. Votre équipement, votre lieu de pratique et vos contraintes sont pris en compte dès le départ. Certains objectifs ou tests nécessitent toutefois du matériel ou un environnement adapté : nous le précisons avant de les mettre en place.</p></details>'+
  '<details><summary>Que comprend le Passeport AK PRIME ?</summary><p>C’est votre carnet de suivi sportif : il regroupe les informations importantes de votre parcours, les objectifs, bilans, évaluations et évolutions utiles selon votre formule. Il a aussi vocation à faciliter, avec votre accord, la transmission de votre historique à un futur coach ou club. La fonction de partage sera disponible après sa finalisation.</p></details>'+
- '<details><summary>Pourquoi ne proposez-vous pas d’abonnement de moins de 3 mois ?</summary><p>Parce qu’une progression réelle se construit dans la durée. Un mois peut suffire pour démarrer, mais reste généralement trop court — ou tout juste suffisant — pour évaluer le point de départ, installer de nouvelles habitudes, ajuster le travail et constater des progrès significatifs. Un engagement minimum de 3 mois permet un suivi cohérent, plusieurs points d’étape et une appréciation plus fiable de votre évolution. L’objectif n’est pas de promettre un résultat en 3 mois, mais de vous donner le temps de progresser dans de bonnes conditions. Un accompagnement sur 6 mois permet de poursuivre ce travail plus longtemps.</p></details>'+
+ '<details><summary>Pourquoi ne proposez-vous pas d’abonnement de moins de 3 mois ?</summary><p>Une progression réelle se construit dans la durée. Un mois permet de commencer, mais c’est souvent trop court, ou tout juste suffisant, pour installer des habitudes et constater des progrès mesurables. Trois mois laissent le temps d’évaluer le point de départ, d’ajuster le travail et de comparer les résultats. Ce suivi ne garantit pas un résultat précis, mais il donne une base plus fiable pour progresser. Sur six mois, le travail peut encore se consolider.</p></details>'+
  '<details><summary>Puis-je payer chaque mois ou régler en une seule fois ?</summary><p>Les deux modalités sont prévues. Une réduction pour le paiement comptant est envisagée. Le montant total, l’échéancier et les éventuelles remises seront présentés avant la validation de votre commande.</p></details>'+
  '<details><summary>Que se passe-t-il à la fin de mon engagement ?</summary><p>Vous pourrez choisir de poursuivre votre accompagnement ou de l’arrêter, selon les options et conditions affichées à la souscription. Aucune nouvelle durée d’engagement ne doit être imposée sans votre accord.</p></details>'+
  '<details><summary>Puis-je arrêter mon accompagnement avant la fin de l’engagement ?</summary><p>Votre engagement de 3 ou 6 mois est ferme, même si vous payez chaque mois. Après les 14 jours de rétractation, un simple changement d’avis ne met pas automatiquement fin au contrat. Vous pouvez cependant demander une résiliation amiable : nous conviendrons par écrit de la date de fin et des éventuelles conséquences financières. Vos droits légaux restent applicables et une suspension peut être envisagée en cas d’empêchement temporaire sérieux.</p></details>'+
@@ -4482,13 +4482,13 @@ function openPublicPoleDetails(key){
    forWho:['Préparation physique : force, puissance, vitesse, explosivité, endurance et changements de direction, selon les exigences de votre discipline.','Réathlétisation : restauration progressive des capacités physiques, réexposition aux contraintes sportives et préparation du retour à l’entraînement, en complément du suivi de santé lorsque nécessaire.'], 
    work:['Programmation de la force et des qualités neuromusculaires','Planification des charges et organisation des cycles d’entraînement','Tests de terrain réalisables à distance : force estimée, saut, vitesse, changements de direction, VMA/VMI selon le contexte','Analyse vidéo des mouvements et suivi de charge interne (sRPE)','Suivi de l’état de forme, de la récupération et du sommeil selon la formule','Repères nutritionnels personnalisés : estimation des besoins énergétiques et répartition des macronutriments selon la formule','Prise en compte du cycle menstruel et des symptômes rapportés pour guider les ajustements réguliers selon la formule'], 
    flow:[['01','Évaluer','Questionnaire, contexte sportif et tests réalisables à distance.'],['02','Planifier','Construire le cycle selon sport, calendrier et contraintes.'],['03','Suivre','sRPE, retours et Hooper à partir de P2.'],['04','Adapter','Du correctif en P1 au pilotage sous 48 h en P3.']],
-   note:'Les tests et outils sont sélectionnés en fonction du sport, du matériel et des conditions de réalisation à distance. La réathlétisation intervient en complément de la prise en charge médicale ou kinésithérapique lorsque celle-ci est nécessaire.',
+   note:'Les tests et outils sont choisis en fonction du sport, du matériel et des conditions de réalisation à distance. La réathlétisation intervient en complément de la prise en charge médicale ou kinésithérapique lorsque celle-ci est nécessaire.',
    offers:[['Performance','P1',149,'Programme + sRPE + 2 vidéos/mois + retest S6 + 1 visio/mois.',false],['Performance','P2',199,'P1 + analyse vidéo hebdo + Hooper + ajustement hebdo + cycle + 2 visios/mois.',true],['Performance','P3',299,'P2 + vidéo selon besoins + sommeil complet + macros + ajustement sous 48 h + récupération dédiée.',false]]
   },
   forme:{
    label:'PÔLE FORME & SANTÉ',title:'Forme & Santé',
    intro:'Un entraînement conçu autour de vos objectifs, que vous repreniez une activité ou cherchiez à aller plus loin dans une pratique déjà régulière.',
-   forWho:['Débutants et personnes reprenant l’activité après une pause ou une blessure','Pratiquants réguliers souhaitant améliorer la qualité et la cohérence de leur entraînement','Toute personne souhaitant un accompagnement correspondant à ses objectifs, ses contraintes et son expérience'],
+   forWho:['Personnes débutantes ou reprenant l’activité après une pause ou une blessure','Personnes pratiquant régulièrement une activité et souhaitant améliorer la qualité et la cohérence de leur entraînement','Toute personne souhaitant un accompagnement correspondant à ses objectifs, ses contraintes et son expérience'],
    work:['Programmation en musculation, cardio et condition physique selon vos objectifs','Progression, choix des exercices et maîtrise technique des mouvements','Analyse vidéo et bilan d’entraînement selon la formule','Suivi de l’état de forme, du sommeil et de la récupération selon la formule','Estimation des besoins énergétiques et repères de macronutriments selon la formule'],
    flow:[['01','Comprendre','Objectifs, niveau, contraintes et matériel.'],['02','Construire','Créer un programme cohérent avec le quotidien.'],['03','Suivre','Charge via Optitrainer en Standard ; charge et questionnaire d’état de forme en Renforcé.'],['04','Adapter','Correction si problème en Standard ; adaptation hebdomadaire en Renforcé.']],
    note:'Les prestations varient selon la formule. Après une blessure, le coaching accompagne la reprise d’activité et ne remplace pas une rééducation ni un suivi médical lorsqu’ils sont nécessaires.',
@@ -4497,10 +4497,10 @@ function openPublicPoleDetails(key){
   mental:{
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
    intro:'Deux suivis personnalisés : l’un pour les enjeux du quotidien, l’autre intégré à l’entraînement, à la compétition et au calendrier de la saison.',
-   forWho:['Personne qui souhaite progresser sur des situations personnelles, professionnelles ou relationnelles','Personne qui recherche des outils mentaux concrets, choisis selon ses objectifs et non à partir d’une liste imposée','Sportif débutant, amateur ou confirmé souhaitant préparer, vivre et analyser ses entraînements et compétitions'],
+   forWho:['Personne qui souhaite progresser sur des situations personnelles, professionnelles ou relationnelles','Personne qui recherche des outils mentaux concrets, choisis selon ses objectifs et non à partir d’une liste imposée','Personne pratiquant un sport, de niveau débutant à confirmé, souhaitant préparer et analyser ses entraînements et compétitions'],
    work:['Définir les priorités individuelles, choisir les outils utiles puis les faire évoluer au fil du suivi','Particulier : routines, mises en situation et débriefs adaptés aux défis de la vie quotidienne','Sportif : construire des routines quotidiennes, ainsi que des routines avant et pendant les entraînements','Sportif : préparer les matchs, établir des stratégies autonomes pendant le jeu et débriefer après la compétition','Sportif : organiser le travail mental selon le calendrier, les périodes de charge et les échéances importantes','Selon les besoins : activation, régulation émotionnelle, attention, confiance, dialogue interne, imagerie, prise de décision ou recentrage'],
-   flow:[['01','Comprendre','Identifier le contexte, les situations prioritaires et les objectifs.'],['02','Organiser','Définir les outils et le rythme du travail ; pour le sportif, tenir compte du calendrier.'],['03','Mettre en pratique','Tester les routines dans le quotidien ou aux entraînements et matchs.'],['04','Faire évoluer','Débriefer, modifier les exercices et adapter la progression aux retours et aux échéances.']],
-   note:'Les habiletés travaillées dépendent des besoins de chacun : tous les thèmes ne sont pas systématiquement abordés. En Sportif, les routines de match sont réalisées par le sportif lui-même sur le terrain ; il ne s’agit pas d’une présence du coach pendant le match. Les visios restent limitées à une par semaine maximum et peuvent être réparties selon les échéances. Cet accompagnement ne remplace pas une psychothérapie ni une prise en charge de troubles psychiques.',
+   flow:[['01','Comprendre','Identifier le contexte, les situations prioritaires et les objectifs.'],['02','Organiser','Définir les outils et le rythme du travail ; pour la personne pratiquant un sport, tenir compte du calendrier.'],['03','Mettre en pratique','Tester les routines dans le quotidien ou aux entraînements et matchs.'],['04','Faire évoluer','Débriefer, modifier les exercices et adapter la progression aux retours et aux échéances.']],
+   note:'Les habiletés travaillées dépendent des besoins de chacun : tous les thèmes ne sont pas systématiquement abordés. En Sportif, les routines de match sont utilisées de façon autonome sur le terrain ; il ne s’agit pas d’une présence du coach pendant le match. Les visios restent limitées à une par semaine maximum et peuvent être réparties selon les échéances. Cet accompagnement ne remplace pas une psychothérapie ni une prise en charge de troubles psychiques.',
    offers:[['Mental','Particulier',199,'Objectifs individuels, exercices quotidiens et réévaluations selon les retours.',false],['Mental','Sportif',249,'Routines entraînement/match, débriefs et séances adaptées au calendrier sportif.',true]]
   }
  };
@@ -4521,43 +4521,43 @@ function publicOfferDetailData(pole,name){
  const key=(String(pole||'')+'|'+String(name||'')).toLowerCase();
  const map={
   'forme & santé|standard':{
-   title:'Forme & Santé — Standard',
+   title:'Forme & Santé : Standard',
    promise:'Un cadre d’entraînement individualisé, simple et régulier, sans pilotage quotidien de ton état de forme.',
    diff:'La charge est suivie dans Optitrainer sans questionnaire d’état de forme régulier. Le programme reste stable tant que tout va bien ; une difficulté ou douleur signalée peut justifier une correction.',
    example:'Tu filmes par exemple ton squat parce que tu ne te sens pas à l’aise sur le mouvement. La vidéo est analysée, tu reçois un retour technique et le programme est corrigé si nécessaire.'
   },
   'forme & santé|renforcé':{
-   title:'Forme & Santé — Renforcé',
+   title:'Forme & Santé : Renforcé',
    promise:'Un suivi plus global croisant charge et état de forme hebdomadaire, complété par un budget macro personnalisé.',
    diff:'Contrairement au Standard, la charge et le questionnaire d’état de forme servent aux adaptations hebdomadaires. Le budget macro est inclus ; pas d’agenda de sommeil quotidien séparé.',
    example:'Tu dors moins plusieurs nuits et ton bien-être baisse sur la semaine. Ces données sont utilisées au bilan hebdomadaire pour réduire ou réorganiser volume et intensité si nécessaire.'
   },
   'performance|p1':{
-   title:'Performance — P1',
+   title:'Performance : P1',
    promise:'La base complète de préparation physique à distance : planification, suivi de charge, vidéo et réévaluation.',
    diff:'P1 suit la charge sRPE et peut alléger ou réorganiser l’entraînement lorsque la fatigue, une surcharge ou une difficulté le justifie. Le pilotage hebdomadaire par Hooper commence en P2.',
-   example:'Tu peux envoyer jusqu’à 2 vidéos dans le mois — par exemple un squat et un sprint — pour une analyse technique. À 6 semaines, le retest permet de vérifier l’évolution et de préparer la suite.'
+   example:'Tu peux envoyer jusqu’à 2 vidéos dans le mois, par exemple un squat et un sprint, pour une analyse technique. À 6 semaines, le retest permet de vérifier l’évolution et de préparer la suite.'
   },
   'performance|p2':{
-   title:'Performance — P2',
+   title:'Performance : P2',
    promise:'Le niveau où la charge et le bien-être commencent à piloter réellement la semaine suivante.',
    diff:'P2 ajoute Hooper, l’analyse vidéo hebdomadaire des priorités et un ajustement hebdomadaire de la programmation.',
    example:'Après un match chargé, ton sRPE monte et ton Hooper montre plus de fatigue et de courbatures. La semaine suivante peut être allégée, réorganisée et accompagnée d’un échauffement adapté.'
   },
   'performance|p3':{
-   title:'Performance — P3',
+   title:'Performance : P3',
    promise:'Le suivi le plus rapproché pour les périodes où fatigue, sommeil, compétition et récupération demandent plus de réactivité.',
    diff:'P3 ajoute le suivi complet du sommeil, le budget calorique/macros, des ajustements sous 48 h lorsque l’état de forme le nécessite et des séances de récupération dédiées.',
    example:'Tu reviens d’un déplacement avec deux nuits courtes et une fatigue marquée. Si les données le justifient, le microcycle peut être ajusté sous 48 h et une séance de récupération dédiée ajoutée.'
   },
   'mental|particulier':{
-   title:'Préparation mentale — Particulier',
+   title:'Préparation mentale : Particulier',
    promise:'Un suivi mental adapté à tes objectifs personnels et aux situations que tu rencontres dans la vie quotidienne.',
    diff:'On choisit les exercices et les routines selon tes besoins, puis on les fait évoluer au fil de tes retours et des situations vécues.',
    example:'Tu souhaites être plus à l’aise dans une situation récurrente. On construit un outil que tu testes dans ton quotidien, puis on le réajuste à partir de ton expérience.'
   },
   'mental|sportif':{
-   title:'Préparation mentale — Sportif',
+   title:'Préparation mentale : Sportif',
    promise:'Un plan mental qui suit ta saison : entraînements, avant-match, outils pendant la compétition et débrief après-match.',
    diff:'Au-delà des outils personnalisés, on structure leur utilisation au quotidien et sur le terrain ; le contenu et le rythme des séances mentales évoluent avec le calendrier sportif, sans dépasser le plafond de visios prévu.',
    example:'La semaine d’un match important, on priorise une routine pré-match et des stratégies de recentrage en jeu. Après la rencontre, on débriefe les moments clés pour modifier les exercices avant les prochains matchs.'
@@ -5243,7 +5243,7 @@ function performanceOfferLanding(name,price){
    akOfferPlatforms('Performance',tier)+
    akOfferSingleComparison('Performance',tier)+
    akOfferDemoTeaser('Performance',tier)+
-   '<p class="perf-note">Les données et exemples sont indicatifs ; les ajustements prévus par l’offre sont adaptés à la situation du sportif.</p>'+
+   '<p class="perf-note">Les données et exemples sont indicatifs ; les ajustements prévus par l’offre sont adaptés à chaque personne.</p>'+
   '</div>';
 }
 
