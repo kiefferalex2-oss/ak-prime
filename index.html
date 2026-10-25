@@ -112,7 +112,6 @@ table{width:100%;border-collapse:collapse}th,td{padding:13px 15px;border-bottom:
 /* Cartes des offres : les écarts de prestations restent lisibles d'un coup d'œil. */
 .public-offer-card .akOfferCardTitleRow{display:flex;gap:10px;align-items:baseline;justify-content:space-between}
 .public-offer-card .akOfferCardTitleRow h4{margin:8px 0 3px}
-.akOfferCardTier{color:#e8c68c;border:1px solid rgba(211,171,98,.35);background:rgba(211,171,98,.08);border-radius:8px;padding:4px 7px;letter-spacing:.05em;font-size:10px;font-weight:900;white-space:nowrap}
 .public-offer-card .akOfferCardCompare{margin:17px 0 20px;min-width:0}
 .akOfferCardCompareHead{border-top:1px solid rgba(185,205,228,.18);padding:13px 0 9px;font-size:10px;color:#d4b171;font-weight:900;letter-spacing:.095em}
 .public-offer-card .akOfferCardMetrics{margin:0;padding:0;display:flex;flex-direction:column;min-width:0}
@@ -4294,8 +4293,7 @@ function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',fe
  const differences=akOfferCardDifferences(pole,name);
  return '<div class="public-offer-card publicOfferDetailCard '+(featured?'featured':'')+'" role="button" tabindex="0" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">'+
   '<div class="tag">'+esc(eyebrow)+'</div>'+
-  '<div class="akOfferCardTitleRow"><h4>'+esc(displayName)+'</h4>'+
-   (pole==='Performance'?'<span class="akOfferCardTier">'+esc(name)+'</span>':'')+'</div>'+
+  '<div class="akOfferCardTitleRow"><h4>'+esc(displayName)+'</h4></div>'+
   '<div class="public-price">'+esc(price)+' € <span>/ mois</span></div>'+
   '<div class="public-offer-headline">'+esc(headline||'')+'</div>'+
   '<div class="akOfferCardCompare" aria-label="Prestations et différences de la formule">'+
