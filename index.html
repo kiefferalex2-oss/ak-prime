@@ -4179,7 +4179,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "mental|particulier": {
-  "label": "Préparation mentale : Particulier",
+  "label": "Préparation mentale : Particulier(e)",
   "summary": [
    "Un travail mental individualisé autour de tes objectifs et des situations de ta vie quotidienne",
    "Exercices et routines ajustés au fil des retours ; jusqu’à 1 visio de 45 min par semaine"
@@ -4199,7 +4199,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   }
  },
  "mental|sportif": {
-  "label": "Préparation mentale : Sportif",
+  "label": "Préparation mentale : Sportif(ve)",
   "summary": [
    "Un accompagnement mental intégré aux entraînements, aux matchs et à la saison sportive",
    "Routines quotidiennes et avant/pendant/après-match ; contenu et rythme adaptés au calendrier sportif"
@@ -4238,7 +4238,7 @@ function publicOfferPreview(pole,name){
 function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',featured=false){
  price=publicCatalogPrice(pole,name,price);
  const preview=akOfferCardHighlights(pole,name);
- const displayName=pole==='Performance'?({P1:'Essentiel',P2:'Avancé',P3:'Premium'}[name]||name):name;
+ const displayName=pole==='Performance'?({P1:'Essentiel',P2:'Avancé',P3:'Premium'}[name]||name):pole==='Mental'&&name==='Sportif'?'Sportif(ve)':pole==='Mental'&&name==='Particulier'?'Particulier(e)':name;
  const eyebrow=pole==='Performance'?'PERFORMANCE & RÉATHLÉTISATION':pole==='Forme & Santé'?'FORME & SANTÉ':tag||pole;
  return '<div class="public-offer-card publicOfferDetailCard '+(featured?'featured':'')+'" role="button" tabindex="0" data-pole="'+esc(pole)+'" data-name="'+esc(name)+'" data-price="'+esc(price)+'">'+
   '<div class="tag">'+esc(eyebrow)+'</div>'+
@@ -4254,7 +4254,7 @@ function publicOfferFoundation(title,description,items,ladder){
 }
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME — retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><div class="public-links"><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#offres">Offres</a><a href="#fonctionnement">Fonctionnement</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></div></div></div>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><div class="public-links"><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#offres">Offres</a><a href="#fonctionnement">Fonctionnement</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></div></div></div>'+
  '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Master STAPS en entraînement et optimisation de la performance sportive · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
  '<div class="public-hero-visual"><img class="public-hero-portrait" src="assets/portrait-ak-prime.webp?v=2" alt="Portrait du coach AK PRIME" width="800" height="999" loading="eager" decoding="async">'+
  '<div class="public-hero-card"><div class="tag" style="color:#d5ad67;font-size:11px;font-weight:950;letter-spacing:.08em">LA MÉTHODE AK PRIME</div><h3 style="font-size:25px;margin:9px 0 6px">Standardiser la méthode, pas le client.</h3><p style="color:#aebdcd;font-size:13px;line-height:1.55">Chaque accompagnement suit un cadre clair tout en restant individualisé.</p><div class="public-method-line"><div class="public-method-step"><b>01</b>Évaluer</div><div class="public-method-step"><b>02</b>Comprendre</div><div class="public-method-step"><b>03</b>Planifier</div><div class="public-method-step"><b>04</b>Accompagner</div><div class="public-method-step"><b>05</b>Adapter</div></div></div></div></div></section>'+
@@ -4303,7 +4303,7 @@ function renderPublicSite(){
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Préparation mentale</h3><p>Deux accompagnements selon votre contexte : quotidien ou performance sportive.</p></div></div>'+
   '<div class="public-offers">'+
  publicOfferCard('Mental','Particulier','199','Mental','Un accompagnement personnalisé pour progresser face aux situations concrètes de votre quotidien.','Vous souhaitez développer vos ressources mentales selon vos objectifs et vos besoins.',['Questionnaire initial et objectifs personnalisés','Exercices et routines applicables au quotidien','Retour sur les situations vécues et évolution des outils','Jusqu’à 1 visio de 45 min / semaine'],'PARTICULIER = une progression adaptée aux besoins de la vie quotidienne, sans parcours standardisé.')+
- publicOfferCard('Mental','Sportif','249','Mental sportif','Un suivi mental qui évolue avec vos entraînements, vos matchs et les temps forts de votre saison.','Vous souhaitez intégrer la préparation mentale à votre pratique et adapter le travail à votre calendrier sportif.',['Bilan du calendrier, des objectifs et des moments clés','Routines quotidiennes et à l’entraînement','Préparation avant-match, stratégies pendant le match','Débriefs après-match et ajustements au fil de la saison','Visios positionnées selon les échéances, jusqu’à 1 × 45 min / semaine'],'SPORTIF = un travail appliqué sur le terrain, avant, pendant et après les compétitions, et évolutif selon la saison.',true)+
+ publicOfferCard('Mental','Sportif','249','Mental sportif(ve)','Un suivi mental qui évolue avec vos entraînements, vos matchs et les temps forts de votre saison.','Vous souhaitez intégrer la préparation mentale à votre pratique et adapter le travail à votre calendrier sportif.',['Bilan du calendrier, des objectifs et des moments clés','Routines quotidiennes et à l’entraînement','Préparation avant-match, stratégies pendant le match','Débriefs après-match et ajustements au fil de la saison','Visios positionnées selon les échéances, jusqu’à 1 × 45 min / semaine'],'SPORTIF = un travail appliqué sur le terrain, avant, pendant et après les compétitions, et évolutif selon la saison.',true)+
  '</div></div>'+
  '</div></section>'+
  '</div></section>'+
@@ -4320,7 +4320,7 @@ function renderPublicSite(){
  '<details><summary>Puis-je arrêter mon accompagnement avant la fin de l’engagement ?</summary><p>Votre engagement de 3 ou 6 mois est ferme, même si vous payez chaque mois. Après les 14 jours de rétractation, un simple changement d’avis ne met pas automatiquement fin au contrat. Vous pouvez cependant demander une résiliation amiable : nous conviendrons par écrit de la date de fin et des éventuelles conséquences financières. Vos droits légaux restent applicables et une suspension peut être envisagée en cas d’empêchement temporaire sérieux.</p></details>'+
  '<details><summary>Dans quels cas puis-je être remboursé ?</summary><p>Un remboursement ou une régularisation peut intervenir notamment en cas de rétractation légale, de trop-perçu, de prestations non fournies ouvrant droit à restitution ou selon les termes d’une résiliation amiable écrite. Le seul changement d’avis ne donne pas automatiquement droit au remboursement des mensualités d’un engagement ferme. Un décompte détaillé vous sera communiqué. Si vous avez demandé à commencer pendant les 14 jours de rétractation, la partie des services effectivement fournis peut rester due dans les conditions légales.</p></details>'+
 '</div></div></section>'+
- '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME — Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
+ '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
  '</div>';
 }
 
@@ -4440,8 +4440,8 @@ function poleOfferMini(pole,name,price,subtitle,featured=false){
   'Renforcé':{label:'Renforcé',summary:'Un accompagnement croisant charge et état de forme, avec ajustements hebdomadaires.',points:['Tout le contenu Standard','Analyse vidéo jusqu’à 1 fois / semaine','Questionnaire hebdomadaire d’état de forme (sommeil, fatigue, stress)','Adaptations hebdomadaires','Repères nutritionnels et macronutriments','2 visios / mois']}
  };
  const mental={
-  Particulier:{label:'Particulier',summary:'Un suivi centré sur tes propres objectifs et tes situations de vie.',points:['Questionnaire et objectifs individuels','Routines et exercices selon les besoins','Débrief des situations vécues','Progression et outils réévalués au fil des séances','Jusqu’à 1 visio de 45 min / semaine']},
-  Sportif:{label:'Sportif',summary:'La préparation mentale intégrée à ta saison et à chaque temps de la compétition.',points:['Calendrier sportif et situations prioritaires','Routines quotidiennes et en entraînement','Préparation avant-match','Outils autonomes pendant le match','Débrief et récupération mentale après-match','Séances ajustées selon échéances et progression','Jusqu’à 1 visio de 45 min / semaine']}
+  Particulier:{label:'Particulier(e)',summary:'Un suivi centré sur tes propres objectifs et tes situations de vie.',points:['Questionnaire et objectifs individuels','Routines et exercices selon les besoins','Débrief des situations vécues','Progression et outils réévalués au fil des séances','Jusqu’à 1 visio de 45 min / semaine']},
+  Sportif:{label:'Sportif(ve)',summary:'La préparation mentale intégrée à ta saison et à chaque temps de la compétition.',points:['Calendrier sportif et situations prioritaires','Routines quotidiennes et en entraînement','Préparation avant-match','Outils autonomes pendant le match','Débrief et récupération mentale après-match','Séances ajustées selon échéances et progression','Jusqu’à 1 visio de 45 min / semaine']}
  };
  const details=pole==='Performance'?perf[name]:pole==='Forme & Santé'?forme[name]:pole==='Mental'?mental[name]:null;
   if(details){const rights=akpOfferItems(pole,name);if(rights)details.points=rights;}
@@ -4498,14 +4498,14 @@ function openPublicPoleDetails(key){
    label:'PÔLE PRÉPARATION MENTALE',title:'Préparation mentale',
    intro:'Deux suivis personnalisés : l’un pour les enjeux du quotidien, l’autre intégré à l’entraînement, à la compétition et au calendrier de la saison.',
    forWho:['Personne qui souhaite progresser sur des situations personnelles, professionnelles ou relationnelles','Personne qui recherche des outils mentaux concrets, choisis selon ses objectifs et non à partir d’une liste imposée','Personne pratiquant un sport, de niveau débutant à confirmé, souhaitant préparer et analyser ses entraînements et compétitions'],
-   work:['Définir les priorités individuelles, choisir les outils utiles puis les faire évoluer au fil du suivi','Particulier : routines, mises en situation et débriefs adaptés aux défis de la vie quotidienne','Sportif : construire des routines quotidiennes, ainsi que des routines avant et pendant les entraînements','Sportif : préparer les matchs, établir des stratégies autonomes pendant le jeu et débriefer après la compétition','Sportif : organiser le travail mental selon le calendrier, les périodes de charge et les échéances importantes','Selon les besoins : activation, régulation émotionnelle, attention, confiance, dialogue interne, imagerie, prise de décision ou recentrage'],
+   work:['Définir les priorités individuelles, choisir les outils utiles puis les faire évoluer au fil du suivi','Au quotidien : routines, mises en situation et débriefs adaptés aux objectifs personnels','Dans le sport : construire des routines quotidiennes et des routines avant et pendant les entraînements','En compétition : préparer les matchs, définir des stratégies autonomes et débriefer après la rencontre','Pendant la saison : organiser le travail mental selon les périodes de charge et les échéances importantes','Selon les besoins : activation, régulation émotionnelle, attention, confiance, dialogue interne, imagerie, prise de décision ou recentrage'],
    flow:[['01','Comprendre','Identifier le contexte, les situations prioritaires et les objectifs.'],['02','Organiser','Définir les outils et le rythme du travail ; pour la personne pratiquant un sport, tenir compte du calendrier.'],['03','Mettre en pratique','Tester les routines dans le quotidien ou aux entraînements et matchs.'],['04','Faire évoluer','Débriefer, modifier les exercices et adapter la progression aux retours et aux échéances.']],
-   note:'Les habiletés travaillées dépendent des besoins de chacun : tous les thèmes ne sont pas systématiquement abordés. En Sportif, les routines de match sont utilisées de façon autonome sur le terrain ; il ne s’agit pas d’une présence du coach pendant le match. Les visios restent limitées à une par semaine maximum et peuvent être réparties selon les échéances. Cet accompagnement ne remplace pas une psychothérapie ni une prise en charge de troubles psychiques.',
+   note:'Les habiletés travaillées dépendent des besoins de chacun : tous les thèmes ne sont pas systématiquement abordés. Dans la formule Sportif(ve), les routines de match sont utilisées de façon autonome sur le terrain ; il ne s’agit pas d’une présence du coach pendant le match. Les visios restent limitées à une par semaine maximum et peuvent être réparties selon les échéances. Cet accompagnement ne remplace pas une psychothérapie ni une prise en charge de troubles psychiques.',
    offers:[['Mental','Particulier',199,'Objectifs individuels, exercices quotidiens et réévaluations selon les retours.',false],['Mental','Sportif',249,'Routines entraînement/match, débriefs et séances adaptées au calendrier sportif.',true]]
   }
  };
  const x=configs[key];if(!x)return;
- modal(x.title+' — AK PRIME',
+ modal(x.title+' · AK PRIME',
   '<div class="pole-detail-hero"><div class="eyebrow">'+esc(x.label)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.intro)+'</p></div>'+
   '<div class="pole-detail-grid"><div class="pole-detail-card"><h4>'+(key==='performance'?'Deux domaines d’intervention':'À qui s’adresse ce pôle ?')+'</h4><ul>'+x.forWho.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div><div class="pole-detail-card"><h4>'+(key==='performance'?'Compétences et outils techniques':'Les axes de travail')+'</h4><ul>'+x.work.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div></div>'+
   
@@ -4551,13 +4551,13 @@ function publicOfferDetailData(pole,name){
    example:'Tu reviens d’un déplacement avec deux nuits courtes et une fatigue marquée. Si les données le justifient, le microcycle peut être ajusté sous 48 h et une séance de récupération dédiée ajoutée.'
   },
   'mental|particulier':{
-   title:'Préparation mentale : Particulier',
+   title:'Préparation mentale : Particulier(e)',
    promise:'Un suivi mental adapté à tes objectifs personnels et aux situations que tu rencontres dans la vie quotidienne.',
    diff:'On choisit les exercices et les routines selon tes besoins, puis on les fait évoluer au fil de tes retours et des situations vécues.',
    example:'Tu souhaites être plus à l’aise dans une situation récurrente. On construit un outil que tu testes dans ton quotidien, puis on le réajuste à partir de ton expérience.'
   },
   'mental|sportif':{
-   title:'Préparation mentale : Sportif',
+   title:'Préparation mentale : Sportif(ve)',
    promise:'Un plan mental qui suit ta saison : entraînements, avant-match, outils pendant la compétition et débrief après-match.',
    diff:'Au-delà des outils personnalisés, on structure leur utilisation au quotidien et sur le terrain ; le contenu et le rythme des séances mentales évoluent avec le calendrier sportif, sans dépasser le plafond de visios prévu.',
    example:'La semaine d’un match important, on priorise une routine pré-match et des stratégies de recentrage en jeu. Après la rencontre, on débriefe les moments clés pour modifier les exercices avant les prochains matchs.'
@@ -4578,8 +4578,8 @@ function akOfferDemoConfiguration(pole,name){
   'performance|p3':{label:'Performance · Premium P3',first:'Thomas',last:'Martin',sport:'Handball',level:'N2',specialty:'Arrière',quota:1,period:'week',minutes:30,video:'Vidéo selon besoins',goal:'Puissance, sommeil et récupération',sleep:true,macros:true,mental:false},
   'forme & santé|standard':{label:'Forme & Santé · Standard',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Remise en forme',quota:1,period:'month',minutes:30,video:'1 vidéo / mois',goal:'Reprendre durablement',sleep:false,macros:false,mental:false},
   'forme & santé|renforcé':{label:'Forme & Santé · Renforcé',first:'Camille',last:'Laurent',sport:'Musculation et fitness',level:'Loisir',specialty:'Condition physique',quota:2,period:'month',minutes:30,video:'1 vidéo / semaine',goal:'Progression et habitudes durables',sleep:false,macros:true,mental:false},
-  'mental|particulier':{label:'Préparation mentale · Particulier',first:'Léa',last:'Moreau',sport:'',level:'Accompagnement individuel',specialty:'Confiance et émotions',quota:1,period:'week',minutes:45,video:'Exercices et routines',goal:'Stress et confiance en soi',sleep:false,macros:false,mental:true},
-  'mental|sportif':{label:'Préparation mentale · Sportif',first:'Noah',last:'Bernard',sport:'Basketball',level:'National',specialty:'Meneur',quota:1,period:'week',minutes:45,video:'Routines de compétition',goal:'Routines avant, pendant et après-match',sleep:false,macros:false,mental:true}
+  'mental|particulier':{label:'Préparation mentale · Particulier(e)',first:'Léa',last:'Moreau',sport:'',level:'Accompagnement individuel',specialty:'Confiance et émotions',quota:1,period:'week',minutes:45,video:'Exercices et routines',goal:'Stress et confiance en soi',sleep:false,macros:false,mental:true},
+  'mental|sportif':{label:'Préparation mentale · Sportif(ve)',first:'Noah',last:'Bernard',sport:'Basketball',level:'National',specialty:'Meneur',quota:1,period:'week',minutes:45,video:'Routines de compétition',goal:'Routines avant, pendant et après-match',sleep:false,macros:false,mental:true}
  };
  return specs[key]||null;
 }
@@ -5105,7 +5105,7 @@ function akOfferComparisonData(pole){
   ]
  };
  if(pole==='Mental')return {
-  labels:['Particulier','Sportif'],
+  labels:['Particulier(e)','Sportif(ve)'],
   names:['Particulier','Sportif'],
   rows:[
    ['Questionnaire initial',
@@ -5182,7 +5182,7 @@ function akOfferSingleComparison(pole,name){
  return akOfferSection('01 / COMPARATIF COMPLET',
   pole==='Performance'?'Tout ce qui est inclus dans P1, P2 et P3':
     pole==='Forme & Santé'?'Toutes les prestations : Standard ou Renforcé':
-      'Toutes les prestations : Particulier ou Sportif',
+      'Toutes les prestations de préparation mentale',
   '✓ Inclus · × Non inclus · Les fréquences et limites utiles sont précisées dans chaque case.',
   '<div class="akMatrixDesktop"><table class="akMatrixTable akMatrix'+cols+'">'+
   '<thead><tr><th scope="col">Prestations</th>'+heads+'</tr></thead>'+
@@ -5250,7 +5250,7 @@ function performanceOfferLanding(name,price){
 function openPublicOfferDetails(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',price=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
  if(String(pole).toLowerCase()==='performance'){
-   modal('Performance '+esc(name)+' — AK PRIME',
+   modal('Performance '+esc(name)+' · AK PRIME',
     performanceOfferLanding(name,price),
     '<button class="btn ghost" id="closeOfferDetail">Retour</button><button class="btn primary" id="chooseFromOfferDetail">Choisir Performance '+esc(name)+'</button>');
    document.querySelector('.modal')?.classList.add('offer-landing-modal');
