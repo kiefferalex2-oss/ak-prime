@@ -1874,6 +1874,56 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 @media(max-width:760px){.akp-passport .akp-tabs{padding:8px 12px 14px}.akp-passport .akp-nav-help{padding:11px 12px 8px}}
 @media print{.akp-passport .akp-nav-help{display:none!important}}
 
+
+/* Navigation compacte AK PRIME sur mobile : liste accessible, sans changer l'en-tête desktop. */
+.public-mobile-toggle,.public-mobile-panel{display:none}
+.public-site #accueil,.public-site #methode,.public-site #fonctionnement,
+.public-site #apropos,.public-site #pourquoi-ak-prime,
+.public-site #offres,.public-site #faq{scroll-margin-top:88px}
+@media(prefers-reduced-motion:no-preference){
+ html:has(.public-site){scroll-behavior:smooth}
+}
+@media(max-width:760px){
+ .public-site .public-nav-wrap{isolation:isolate}
+ .public-site .public-nav{padding:12px 15px;gap:12px}
+ .public-site .public-links{display:none}
+ .public-site .public-mobile-toggle{
+   display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:0 0 auto;
+   min-height:44px;padding:9px 13px;border:1px solid rgba(211,171,98,.52);border-radius:12px;
+   background:#16283b;color:#f5f8fc;font-size:13px;font-weight:850;
+   font-family:inherit;cursor:pointer;touch-action:manipulation
+ }
+ .public-site .public-mobile-menu-glyph{color:#e5ba77;font-size:19px;font-weight:600;line-height:1}
+ .public-site .public-mobile-toggle[aria-expanded="true"]{background:#233a50;border-color:#d3ab62}
+ .public-site .public-mobile-toggle:focus-visible,
+ .public-site .public-mobile-panel a:focus-visible,
+ .public-site .public-mobile-login:focus-visible{outline:3px solid #e3b772;outline-offset:3px}
+ .public-site .public-mobile-panel:not([hidden]){
+   display:flex;flex-direction:column;gap:5px;position:absolute;top:100%;left:0;right:0;
+   max-height:calc(100dvh - 72px);overflow-y:auto;overscroll-behavior:contain;
+   padding:13px 15px 18px;background:#0e1c2c;border-bottom:1px solid rgba(211,171,98,.24);
+   box-shadow:0 20px 35px rgba(0,0,0,.35);z-index:95
+ }
+ .public-site .public-mobile-panel a{
+   display:flex;align-items:center;justify-content:space-between;
+   min-height:46px;padding:12px 14px;border:1px solid rgba(164,189,218,.14);
+   border-radius:10px;text-decoration:none;background:#15283d;
+   color:#e4ebf3;font-size:14px;font-weight:730;line-height:1.3
+ }
+ .public-site .public-mobile-panel a::after{content:"›";font-size:22px;line-height:.8;color:#d2ad70}
+ .public-site .public-mobile-panel a:hover,.public-site .public-mobile-panel a:active{
+   background:#223a52;border-color:rgba(211,171,98,.45)
+ }
+ .public-site .public-mobile-login{
+   width:100%;min-height:48px;margin-top:7px;padding:12px 14px;
+   border:0;border-radius:11px;background:#d3ab62;color:#101d2c;
+   font:850 14px inherit;cursor:pointer;touch-action:manipulation
+ }
+ .public-site #accueil,.public-site #methode,.public-site #fonctionnement,
+ .public-site #apropos,.public-site #pourquoi-ak-prime,
+ .public-site #offres,.public-site #faq{scroll-margin-top:76px}
+}
+
 </style>
 </head>
 <body>
@@ -4312,7 +4362,18 @@ function publicOfferFoundation(title,description,items,ladder){
 }
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><div class="public-links"><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#offres">Offres</a><a href="#fonctionnement">Fonctionnement</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></div></div></div>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><div class="public-links"><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#offres">Offres</a><a href="#fonctionnement">Fonctionnement</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></div>'+
+ '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
+ '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
+  '<a href="#accueil">Accueil</a>'+
+  '<a href="#methode">Les trois pôles</a>'+
+  '<a href="#fonctionnement">Comment ça marche</a>'+
+  '<a href="#apropos">À propos du fondateur</a>'+
+  '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
+  '<a href="#offres">Offres et tarifs</a>'+
+  '<a href="#faq">Questions fréquentes</a>'+
+  '<button type="button" class="public-mobile-login" id="publicMobileLoginBtn">Se connecter à mon espace</button>'+
+ '</nav></div>'+
  '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Master STAPS en entraînement et optimisation de la performance sportive · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
  '<div class="public-hero-visual"><img class="public-hero-portrait" src="assets/portrait-ak-prime.webp?v=2" alt="Portrait du coach AK PRIME" width="800" height="999" loading="eager" decoding="async">'+
  '<div class="public-hero-card"><div class="tag" style="color:#d5ad67;font-size:11px;font-weight:950;letter-spacing:.08em">LA MÉTHODE AK PRIME</div><h3 style="font-size:25px;margin:9px 0 6px">Standardiser la méthode, pas le client.</h3><p style="color:#aebdcd;font-size:13px;line-height:1.55">Chaque accompagnement suit un cadre clair tout en restant individualisé.</p><div class="public-method-line"><div class="public-method-step"><b>01</b>Évaluer</div><div class="public-method-step"><b>02</b>Comprendre</div><div class="public-method-step"><b>03</b>Planifier</div><div class="public-method-step"><b>04</b>Accompagner</div><div class="public-method-step"><b>05</b>Adapter</div></div></div></div></div></section>'+
@@ -5591,6 +5652,49 @@ function openPublicOfferCheckout(button){
 }
 
 function bindPublicSite(){
+ // Menu mobile uniquement sur le site vitrine ; les espaces connectés restent inchangés.
+ const menuButton=document.getElementById('publicMobileToggle');
+ const menuPanel=document.getElementById('publicMobileMenu');
+ const menuWrap=document.querySelector('.public-site .public-nav-wrap');
+ const closeMobileMenu=()=>{
+  if(!menuButton||!menuPanel)return;
+  menuPanel.hidden=true;
+  menuButton.setAttribute('aria-expanded','false');
+  menuButton.setAttribute('aria-label','Ouvrir le menu de navigation');
+  const glyph=menuButton.querySelector('.public-mobile-menu-glyph');
+  if(glyph)glyph.textContent='☰';
+ };
+ if(menuButton&&menuPanel){
+  // L'annulation évite d'empiler les écouteurs si l'accueil est réaffiché après une déconnexion.
+  if(window.akpPublicMobileNavEvents)window.akpPublicMobileNavEvents.abort();
+  const controller=new AbortController();
+  window.akpPublicMobileNavEvents=controller;
+  menuButton.addEventListener('click',()=>{
+   const willOpen=menuPanel.hidden;
+   menuPanel.hidden=!willOpen;
+   menuButton.setAttribute('aria-expanded',willOpen?'true':'false');
+   menuButton.setAttribute('aria-label',willOpen?'Fermer le menu de navigation':'Ouvrir le menu de navigation');
+   const glyph=menuButton.querySelector('.public-mobile-menu-glyph');
+   if(glyph)glyph.textContent=willOpen?'✕':'☰';
+  });
+  menuPanel.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',closeMobileMenu));
+  document.addEventListener('pointerdown',e=>{
+   if(!menuPanel.hidden&&menuWrap&&!menuWrap.contains(e.target))closeMobileMenu();
+  },{signal:controller.signal});
+  document.addEventListener('keydown',e=>{
+   if(e.key==='Escape'&&!menuPanel.hidden){
+    closeMobileMenu();
+    menuButton.focus();
+   }
+  },{signal:controller.signal});
+  window.addEventListener('resize',()=>{
+   if(window.innerWidth>760&&!menuPanel.hidden)closeMobileMenu();
+  },{signal:controller.signal});
+ }
+ document.getElementById('publicMobileLoginBtn')?.addEventListener('click',()=>{
+  closeMobileMenu();
+  openPublicLogin();
+ });
  document.getElementById('publicLoginBtn')?.addEventListener('click',()=>openPublicLogin());
  document.getElementById('heroLoginBtn')?.addEventListener('click',()=>openPublicLogin());
  document.querySelectorAll('.publicPoleBtn').forEach(b=>b.onclick=()=>openPublicPoleDetails(b.dataset.pole));
