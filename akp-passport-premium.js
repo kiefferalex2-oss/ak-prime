@@ -112,11 +112,11 @@
   const d=candidate?new Date(candidate+'T12:00:00Z'):null;
   const isValidDate=!!d&&Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===candidate;
   const due=isValidDate?fmtDate(candidate):'À dater';
-  const dueHelp=isValidDate?'Objectif du sportif':
-   rawDate?'Échéance saisie : '+rawDate:'Date à préciser avec le sportif';
+  const dueHelp=isValidDate?'Objectif de l’athlète':
+   rawDate?'Échéance saisie : '+rawDate:'Date à préciser avec l’athlète';
   const cycle=tx(m.cycle?.title)||'Cycle à définir';
   const cycleEnd=m.cycle?.end?fmtDate(m.cycle.end):'Date de fin à définir';
-  const subject=tx(m.name)||'Sportif AK PRIME';
+  const subject=tx(m.name)||'Athlète AK PRIME';
   const initials=tx(m.initials)||subject.split(/\s+/).slice(0,2).map(s=>s.charAt(0)).join('').toUpperCase()||'AK';
   const meta=[
     ['Discipline',discipline],['Poste / spécialité',specialty],
@@ -129,14 +129,14 @@
    '<div class="akLuxHeroBody">'+
      '<div class="akLuxAthleteIntro">'+
       '<div class="akLuxAthleteMark" aria-hidden="true">'+plain(initials)+'</div>'+
-      '<div><span class="akLuxEyebrow">LE SPORTIF</span>'+
+      '<div><span class="akLuxEyebrow">L’ATHLÈTE</span>'+
        '<h3>'+plain(subject)+'</h3>'+
        '<p>'+plain(discipline)+(specialty?' · '+plain(specialty):'')+'</p>'+
        (m.start?'<small>Accompagnement depuis le '+plain(fmtDate(m.start))+'</small>':'')+
       '</div></div>'+
      '<div class="akLuxHeroMain"><span>OBJECTIF PRIORITAIRE</span>'+
        '<h2>'+plain(goal)+'</h2>'+
-       '<p>'+plain(detail||'À approfondir avec le sportif dans le profil détaillé.')+'</p></div>'+
+       '<p>'+plain(detail||'À approfondir avec l’athlète dans le profil détaillé.')+'</p></div>'+
      '<div class="akLuxHeroAside">'+
        '<div class="akLuxHeroNext"><span>CYCLE ACTUEL</span>'+
          '<strong>'+plain(cycle)+'</strong>'+
@@ -214,7 +214,7 @@
    '<div class="akLuxWarnItem"><i>!</i><div><span>'+plain(label)+'</span><p>'+plain(v)+'</p></div></div>').join('');
   return box('04 / ATTENTION','Antécédents & vigilance',
     desc||'<div class="akLuxClear">Aucun signalement précis dans les réponses disponibles.</div>'+
-    '<p class="akLuxFootnote">Les déclarations sont à vérifier et à actualiser avec le sportif. Elles ne constituent pas un avis médical.</p>','warn');
+    '<p class="akLuxFootnote">Les déclarations sont à vérifier et à actualiser avec l’athlète. Elles ne constituent pas un avis médical.</p>','warn');
  }
  function deeper(m,legacy){
   return '<section class="akLuxSection">'+title('05 / DOCUMENTATION','Approfondir le dossier','Informations complètes')+
