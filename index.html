@@ -1800,6 +1800,9 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
  .akDemoDisclosure[open]>.akDemoStage{padding:4px 6px 22px}
 }
 
+
+/* Glossaire discret sous les comparatifs, sans nouvelle ligne de tableau. */
+.akTermNote{font-size:11px;line-height:1.5;color:#475467;margin:10px 0 0;padding:0 3px}
 </style>
 </head>
 <body>
@@ -4027,7 +4030,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   "groups": {
    "Optitrainer": [
     "Programmation individualisée selon les objectifs, le matériel et les contraintes",
-    "Suivi hebdomadaire de la charge d’entraînement (sRPE), sans questionnaire régulier d’état de forme",
+    "Suivi hebdomadaire sRPE (effort ressenti × durée), sans questionnaire régulier d’état de forme",
     "Corrections de programmation seulement en cas de problème, gêne, douleur ou difficulté signalée"
    ],
    "WhatsApp": [
@@ -4050,7 +4053,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   "groups": {
    "Optitrainer": [
     "Programmation individualisée selon les objectifs, le matériel et les contraintes",
-    "Suivi hebdomadaire de la charge d’entraînement (sRPE)",
+    "Suivi hebdomadaire sRPE (effort ressenti × durée)",
     "Questionnaire hebdomadaire d’état de forme : fatigue, stress, récupération et sommeil ressenti",
     "Adaptation hebdomadaire de la programmation selon la charge et l’état de forme",
     "Sommeil évalué via Optitrainer, sans agenda quotidien distinct dans AK PRIME"
@@ -4076,7 +4079,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   "groups": {
    "Optitrainer": [
     "Programmation individualisée selon le sport, le calendrier, le matériel et les objectifs",
-    "Suivi de charge d’entraînement sRPE",
+    "Suivi de charge sRPE (effort ressenti × durée)",
     "Échauffement individualisé selon le sport, les objectifs et la séance, dans Optitrainer",
     "Allègement de la charge et corrections si charge excessive, fatigue inhabituelle, gêne, douleur ou difficulté ; sans pilotage systématique par Hooper"
    ],
@@ -4101,7 +4104,7 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   "groups": {
    "Optitrainer": [
     "Programmation individualisée selon le sport, le calendrier, le matériel et les objectifs",
-    "Suivi de charge sRPE et questionnaire d’état de forme Hooper (fatigue, stress, sommeil perçu, douleurs)",
+    "Suivi sRPE (effort ressenti × durée) et Hooper (fatigue, sommeil, stress, douleurs)",
     "Adaptations hebdomadaires de la charge et de la programmation selon les retours",
     "Échauffement individualisé via les exercices Optitrainer",
     "Récupération anticipée : ajustement hebdomadaire de la charge selon sRPE et Hooper, sans séance dédiée supplémentaire",
@@ -4127,8 +4130,8 @@ const AKP_OFFER_RIGHTS=Object.freeze({
   ],
   "groups": {
    "Optitrainer": [
-    "Programmation individualisée et suivi de charge sRPE",
-    "État de forme Hooper, suivi rapproché et adaptations sous 48 h lorsque nécessaire",
+    "Programmation individualisée et suivi sRPE (effort ressenti × durée)",
+    "Hooper (fatigue, sommeil, stress, douleurs), suivi rapproché et ajustements sous 48 h si nécessaire",
     "Échauffement individualisé et prise en compte du cycle menstruel lorsque pertinent",
     "Séances de récupération dédiées lorsque nécessaire, en plus des adaptations de charge",
     "Préparation aux périodes de compétition et de forte charge ; techniques mentales intégrées si utiles"
@@ -4816,7 +4819,7 @@ function akOfferConcreteItems(pole,name){
  const offers={
   'performance|p1':[
    'Programme individualisé accessible sur Optitrainer selon ton sport, tes objectifs, ton calendrier et ton matériel.',
-   'Charge de chaque séance suivie avec la méthode sRPE.',
+   'Charge de chaque séance suivie par sRPE (effort ressenti × durée).',
    'Échauffement individualisé selon la séance, tes objectifs et ton sport.',
    'Charge allégée ou plan ajusté si le suivi sRPE, une fatigue inhabituelle, une douleur ou une difficulté le justifient.',
    'Jusqu’à 2 analyses techniques vidéo par mois via WhatsApp.',
@@ -4826,7 +4829,7 @@ function akOfferConcreteItems(pole,name){
   ],
   'performance|p2':[
    'Programme individualisé accessible sur Optitrainer selon sport, calendrier, objectifs et matériel.',
-   'Charge sRPE et questionnaire Hooper : fatigue, stress, sommeil perçu et douleurs musculaires.',
+   'Charge sRPE (effort ressenti × durée) et Hooper (fatigue, sommeil, stress, douleurs).',
    'Adaptation hebdomadaire du volume, de l’intensité ou du contenu selon charge et Hooper.',
    'Échauffement individualisé ; récupération anticipée chaque semaine grâce aux données sRPE et Hooper.',
    '1 analyse vidéo par semaine des mouvements prioritaires via WhatsApp.',
@@ -4835,8 +4838,8 @@ function akOfferConcreteItems(pole,name){
    'Prise en compte du cycle menstruel lorsque pertinent.'
   ],
   'performance|p3':[
-   'Séances et programme individualisé accessibles sur Optitrainer, avec suivi de charge sRPE.',
-   'Hooper, état de forme rapproché et agenda détaillé du sommeil (durée, qualité, régularité).',
+   'Séances individualisées sur Optitrainer, avec suivi sRPE (effort ressenti × durée).',
+   'Hooper (fatigue, sommeil, stress, douleurs), suivi rapproché et agenda détaillé du sommeil.',
    'Ajustement de la charge sous 48 h si la fatigue, le sommeil ou le contexte le justifient.',
    'Échauffement individualisé et séances de récupération dédiées si nécessaire.',
    'Analyses vidéo via WhatsApp selon les besoins, sans nombre fixe annoncé.',
@@ -4847,7 +4850,7 @@ function akOfferConcreteItems(pole,name){
   ],
   'forme & santé|standard':[
    'Séances et programme individualisé accessibles sur Optitrainer selon tes objectifs, ton matériel et tes contraintes.',
-   'Suivi hebdomadaire de la charge sRPE.',
+   'Suivi hebdomadaire sRPE (effort ressenti × durée).',
    'Corrections du programme si tu signales une gêne, une douleur ou une difficulté.',
    'Jusqu’à 1 analyse technique vidéo par mois via WhatsApp.',
    '1 visio de 30 minutes par mois.',
@@ -4855,7 +4858,7 @@ function akOfferConcreteItems(pole,name){
   ],
   'forme & santé|renforcé':[
    'Séances et programme individualisé accessibles sur Optitrainer selon tes objectifs, ton matériel et tes contraintes.',
-   'Suivi hebdomadaire de la charge sRPE et de l’état de forme (fatigue, stress, récupération, sommeil perçu).',
+   'Suivi sRPE (effort ressenti × durée) et état de forme (fatigue, stress, récupération, sommeil).',
    'Adaptation de la programmation chaque semaine selon la charge et l’état de forme.',
    'Jusqu’à 1 analyse technique vidéo par semaine via WhatsApp.',
    'Budget calorique et macronutriments personnalisé, sans menus.',
@@ -4894,11 +4897,11 @@ function akOfferIncludedNow(pole,name){
 }
 function akOfferCardHighlights(pole,name){
  const map={
-  'performance|p1':['Programme individualisé + charge sRPE','2 analyses vidéo / mois · 1 visio de 30 min / mois','Retest à 6 semaines'],
-  'performance|p2':['Charge sRPE + Hooper hebdomadaire','Adaptation des séances chaque semaine','1 vidéo / semaine · 2 visios de 30 min / mois'],
-  'performance|p3':['Adaptation de charge sous 48 h si nécessaire','Agenda sommeil et budget de macronutriments','Jusqu’à 1 visio de 30 min / semaine'],
-  'forme & santé|standard':['Programme individualisé et charge sRPE','Correction si gêne ou difficulté signalée','1 vidéo / mois · 1 visio de 30 min / mois'],
-  'forme & santé|renforcé':['Charge et état de forme suivis chaque semaine','Adaptation hebdomadaire de la programmation','Jusqu’à 1 vidéo / semaine · 2 visios / mois'],
+  'performance|p1':['Programme individualisé + sRPE (effort × durée)','2 analyses vidéo / mois · 1 visio de 30 min / mois','Retest à 6 semaines'],
+  'performance|p2':['sRPE (effort × durée) + Hooper (état de forme)','Adaptation des séances chaque semaine','1 vidéo / semaine · 2 visios de 30 min / mois'],
+  'performance|p3':['sRPE (effort × durée) + Hooper (état de forme)','Adaptations sous 48 h · sommeil et nutrition','Jusqu’à 1 visio de 30 min / semaine'],
+  'forme & santé|standard':['Programme et sRPE (effort × durée)','Correction si gêne ou difficulté signalée','1 vidéo / mois · 1 visio de 30 min / mois'],
+  'forme & santé|renforcé':['sRPE (effort × durée) et état de forme','Adaptation hebdomadaire de la programmation','Jusqu’à 1 vidéo / semaine · 2 visios / mois'],
   'mental|particulier':['Objectifs et situations de vie','Exercices et routines adaptés aux retours','Jusqu’à 1 visio de 45 min / semaine'],
   'mental|sportif':['Avant, pendant et après les matchs','Routines quotidiennes, entraînements et débriefs','Suivi organisé selon le calendrier sportif']
  };
@@ -5156,7 +5159,8 @@ function akOfferSingleComparison(pole,name){
   '<div class="akMatrixDesktop"><table class="akMatrixTable akMatrix'+cols+'">'+
   '<thead><tr><th scope="col">Prestations</th>'+heads+'</tr></thead>'+
   '<tbody>'+rowHtml+'</tbody></table></div>'+
-  '<div class="akMatrixMobile">'+mobile+'</div>',
+  '<div class="akMatrixMobile">'+mobile+'</div>'+ 
+  (pole==='Performance'?'<p class="akTermNote">sRPE (effort ressenti × durée de séance) · Hooper (fatigue, sommeil, stress, douleurs).</p>':pole==='Forme & Santé'?'<p class="akTermNote">sRPE (effort ressenti × durée de séance).</p>':''),
   'akComparisonOnly');
 }
 
