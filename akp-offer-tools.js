@@ -883,12 +883,73 @@
  },true);
 document.addEventListener('click',e=>{
    const period=e.target.closest?.('.akSleepRangeBtn');
-   if(!period||state.view!=='client'||state.tab!=='offer-tools')return;
+   if(!period)return;
+   const inCoach=state.view==='client'&&state.tab==='offer-tools';
+   const inClientPassport=authProfile?.role==='client'&&clientPortalView==='passport'&&
+     akSleepPassportEligible(passportActiveModel);
+   if(!inCoach&&!inClientPassport)return;
    const days=Number(period.dataset.nights);
    if(![7,14,30,90].includes(days))return;
    e.preventDefault();
    akSleepDashboardRange=days;
-   render();
+   if(inClientPassport)renderClientPortal();
+   else render();
  },true);
+
+ // Le tableau de bord partagé devient une rubrique du Passeport uniquement
+ // pour les clients Performance Premium (P3), y compris en compte TEST P3.
+ function akSleepPassportEligible(model){
+   return model?.akPassportRole==='client'&&model.pole==='Performance'&&
+     String(model.offer||'').toUpperCase()==='P3';
+ }
+ const beforeSleepPassportNav=passportBookNav;
+ passportBookNav=function(){
+   const html=beforeSleepPassportNav();
+   if(!akSleepPassportEligible(passportActiveModel))return html;
+   const selected=passportBookPage==='sleep';
+   const button='<button type="button" class="passportBookTab '+(selected?'on':'')+
+     '" data-passport-page="sleep" aria-pressed="'+(selected?'true':'false')+'">'+
+     '<span>Sommeil</span><span class="akp-tab-arrow" aria-hidden="true">›</span></button>';
+   return html.replace('6 RUBRIQUES À EXPLORER','7 RUBRIQUES À EXPLORER')
+     .replace('</nav>',button+'</nav>');
+ };
+ const beforeSleepPassportBody=renderPassportBookPage;
+ renderPassportBookPage=function(model){
+   if(passportBookPage!=='sleep')return beforeSleepPassportBody(model);
+   if(!akSleepPassportEligible(model))return beforeSleepPassportBody(model);
+   const rows=(Array.isArray(model.akPassportSleep)?model.akPassportSleep:[])
+     .slice().sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')));
+   const graph=rows.length?renderSleepPremiumDashboard(rows):
+     '<section class="akSleepPassportEmpty"><div class="akSleepPassportEmptyIcon" aria-hidden="true">☾</div>'+
+     '<h3>Votre suivi du sommeil commence ici</h3>'+
+     '<p>Renseigne ta première nuit dans « Mon accompagnement ». Les graphiques de progression apparaîtront automatiquement dans ton Passeport.</p>'+
+     '<button type="button" class="akSleepGoToDiary">Renseigner mon sommeil</button></section>';
+   return '<div class="akp-page akSleepPassportPage">'+
+     '<div class="akp-page-title"><div><span>SUIVI PERSONNALISÉ</span>'+
+     '<h2>Mon sommeil</h2><p>La progression de tes nuits à partir de ton agenda AK PRIME.</p>'+
+     '</div><div class="akp-date-chip">'+rows.length+' nuit'+(rows.length>1?'s':'')+' enregistrée'+(rows.length>1?'s':'')+'</div></div>'+
+     graph+'</div>';
+ };
+ const akSleepPassportCSS=document.createElement('style');
+ akSleepPassportCSS.textContent=[
+   '.akSleepPassportPage{max-width:1220px;margin:0 auto}',
+   '.akSleepPassportPage .akSleepPremium{margin:0}',
+   '.akSleepPassportEmpty{text-align:center;background:#fff;border:1px solid #dce5ed;box-shadow:0 11px 25px #163a5320;border-radius:20px;padding:42px 24px;color:#15344b}',
+   '.akSleepPassportEmptyIcon{width:68px;height:68px;border-radius:20px;background:#eaf0f6;color:#335c80;display:grid;place-items:center;font-size:34px;margin:0 auto 16px}',
+   '.akSleepPassportEmpty h3{font-size:22px;font-weight:850;margin:0 0 8px}',
+   '.akSleepPassportEmpty p{max-width:540px;margin:0 auto 18px;font-size:13px;color:#6b8092;line-height:1.65}',
+   '.akSleepGoToDiary{background:#285577;color:#fff;border:0;padding:12px 18px;border-radius:11px;font-size:12px;font-weight:850;cursor:pointer}',
+   '.akSleepGoToDiary:focus-visible{outline:3px solid #ce9d58;outline-offset:3px}'
+ ].join('\n');
+ document.head.appendChild(akSleepPassportCSS);
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('.akSleepGoToDiary');
+   if(!button||authProfile?.role!=='client'||clientPortalView!=='passport')return;
+   event.preventDefault();
+   clientPortalView='suivi';
+   renderClientPortal();
+   document.getElementById('akSleepDiary')?.scrollIntoView({behavior:'smooth',block:'start'});
+ },true);
+
 window.AKP_OFFER_TOOLS_READY=true;
 })();
