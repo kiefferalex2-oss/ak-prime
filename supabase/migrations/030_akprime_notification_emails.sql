@@ -3,7 +3,7 @@
 create extension if not exists pg_net with schema extensions;
 create table if not exists private.notification_mail_settings(
  singleton boolean primary key default true check(singleton),enabled boolean not null default false,
- from_address text not null default 'AK PRIME <notifications@akprime.fr>',
+ from_address text not null default 'AK PRIME <contact@akprime.fr>',
  site_url text not null default 'https://akprime.fr',enabled_at timestamptz
 );
 insert into private.notification_mail_settings(singleton) values(true) on conflict do nothing;
