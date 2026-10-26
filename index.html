@@ -1869,6 +1869,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .akp-passport .akp-tabs .passportBookTab.on .akp-tab-arrow{color:#edc77f}
 .akp-passport .akp-tabs .passportBookTab.on:hover{background:#254863;border-color:#254863;color:#fff}
 .akp-passport .akp-tabs .passportBookTab:focus-visible{outline:3px solid #e9b96d;outline-offset:2px}
+@container (min-width:761px){.akp-passport .akp-tabs.seven{grid-template-columns:repeat(7,minmax(0,1fr))}}
 @container (max-width:760px){.akp-passport .akp-tabs{grid-template-columns:repeat(3,minmax(0,1fr));padding:8px 12px 14px}.akp-passport .akp-nav-help{padding:11px 12px 8px}}
 @container (max-width:405px){.akp-passport .akp-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.akp-passport .akp-nav-help{gap:3px}.akp-passport .akp-tabs .passportBookTab{min-height:40px}}
 @media(max-width:760px){.akp-passport .akp-tabs{padding:8px 12px 14px}.akp-passport .akp-nav-help{padding:11px 12px 8px}}
@@ -2923,7 +2924,7 @@ function passportBookNav(){
  const items=[['overview','Sommaire'],['profile','Profil sportif'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
  if(passportSleepEligible(passportActiveModel))items.splice(4,0,['sleep','Sommeil']);
  return '<div class="akp-nav-help" role="note"><strong>'+items.length+' RUBRIQUES À EXPLORER</strong><span>Choisis une rubrique ci-dessous pour découvrir son contenu.</span></div>'+
-  '<nav class="akp-tabs" aria-label="Rubriques interactives du passeport">'+items.map(([k,l])=>
+  '<nav class="akp-tabs'+(items.length===7?' seven':'')+'" aria-label="Rubriques interactives du passeport">'+items.map(([k,l])=>
    '<button type="button" class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'" aria-pressed="'+(passportBookPage===k?'true':'false')+'">'+
     '<span>'+l+'</span><span class="akp-tab-arrow" aria-hidden="true">›</span></button>'
   ).join('')+'</nav>';
