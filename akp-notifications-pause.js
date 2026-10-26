@@ -3,14 +3,15 @@
    La cloche se rafraîchit lorsque le back-office est ouvert. */
 (function(){
   'use strict';
-  const POLL_INTERVAL=45000;
+  const POLL_INTERVAL=25000;
   const actorIsCoach=()=>!!authUser?.id&&['owner','coach'].includes(authProfile?.role);
   const eventsDescription={
     questionnaire_submitted:['Questionnaire envoyé','onboarding',5],
     visio_booked:['Nouvelle visio réservée','calendar',5],
     visio_rescheduled:['Visio déplacée par le client','calendar',4],
     visio_cancelled:['Visio annulée par le client','calendar',4],
-    sleep_submitted:['Agenda de sommeil complété','offer-tools',3],
+    sleep_submitted:['Nouvelle nuit renseignée','offer-tools',3],
+    checkin_submitted:['Bilan hebdomadaire envoyé','follow',4],
     renewal_submitted:['Choix de renouvellement reçu','admin',5]
   };
   let lastActivityKeys=null;
@@ -52,8 +53,12 @@
     const persisted=mappedEvents(db.coachActivityEvents);
     const persistedQuestionnaires=new Set((db.coachActivityEvents||[])
       .filter(e=>e.event_type==='questionnaire_submitted').map(e=>e.client_id));
+    const checkinsWithEvents=new Set((db.coachActivityEvents||[])
+      .filter(e=>e.event_type==='checkin_submitted')
+      .map(e=>String(e.event_key||'').split(':')[1]));
     return [...persisted,...legacy.filter(n=>
-      !(n.key?.startsWith('coach:questionnaire:')&&persistedQuestionnaires.has(n.clientId))
+      !(n.key?.startsWith('coach:questionnaire:')&&persistedQuestionnaires.has(n.clientId))&&
+      !(n.key?.startsWith('coach:checkin:')&&checkinsWithEvents.has(n.key.slice('coach:checkin:'.length)))
     )].sort((a,b)=>(Number(a.read)-Number(b.read))||((b.priority||0)-(a.priority||0))||
       String(b.eventDate||'').localeCompare(String(a.eventDate||'')));
   };
@@ -244,5 +249,159 @@
     });
     return result;
   };
+
+  // Actualités envoyées au client : déclenchées par la base à la publication
+  // de résultats, programmes, retours, échéances ou documents visibles.
+  // Elles survivent à la déconnexion : elles ne dépendent pas d'une session ouverte.
+  const CLIENT_POLL_INTERVAL=25000;
+  const clientEventLabels={
+    feedback_posted:['Ton coach a répondu à ton bilan','checkin',5],
+    test_published:['Un résultat de test est disponible','passport',4],
+    cycle_updated:['Ton cycle de suivi a été mis à jour','passport',3],
+    macro_published:['Ton budget nutritionnel est disponible','suivi',4],
+    content_published:['Nouveau contenu de ton coach','suivi',3],
+    passport_updated:['Ton Passeport a été enrichi','passport',3],
+    visio_updated:['Ton rendez-vous a été mis à jour','visios',5],
+    assessment_planned:['Une nouvelle évaluation est planifiée','passport',4],
+    invoice_published:['Une nouvelle facture est disponible','billing',4]
+  };
+  function clientEventNotifications(session){
+    if(!session?.client)return [];
+    const seen=notificationReadSet(session.notificationReads);
+    return (session.activityEvents||[]).map(e=>{
+      const info=clientEventLabels[e.event_type];
+      if(!info)return null;
+      const key='client:activity:'+e.event_key;
+      return {key,title:info[0],detail:'Mis à jour le '+fmtDateTime(e.created_at),
+        target:info[1],priority:info[2],eventDate:e.created_at,read:seen.has(key)};
+    }).filter(Boolean);
+  }
+  const existingClientNotifications=clientNotifications;
+  clientNotifications=function(session){
+    const incoming=clientEventNotifications(session);
+    const recordedCheckins=new Set((session?.activityEvents||[])
+      .filter(e=>e.event_type==='feedback_posted')
+      .map(e=>String(e.event_key||'').split(':')[1]));
+    const old=existingClientNotifications(session)
+      .filter(n=>!(String(n.key||'').startsWith('client:feedback:')&&
+        recordedCheckins.has(String(n.key).slice('client:feedback:'.length))));
+    return [...incoming,...old].sort((a,b)=>
+      Number(!!a.read)-Number(!!b.read)||
+      (b.priority||0)-(a.priority||0)||
+      String(b.eventDate||'').localeCompare(String(a.eventDate||'')));
+  };
+  let clientLastActor='';
+  let clientLastKeys=null;
+  let clientLoading=false;
+  let clientRealtime=null;
+  let clientRealtimeId='';
+  let clientPollTimer=null;
+  const actorIsClient=()=>authProfile?.role==='client'&&!!authUser?.id&&
+    !!clientPortalState?.client?.id;
+  function updateClientBell(){
+    if(!actorIsClient())return;
+    const count=clientNotifications(clientPortalState).filter(x=>!x.read).length;
+    document.querySelectorAll('.notificationBell[data-mode="client"]').forEach(b=>{
+      let node=b.querySelector('.notification-badge');
+      if(!count){node?.remove();b.title='Notifications';return;}
+      if(!node){node=document.createElement('span');node.className='notification-badge';b.appendChild(node);}
+      node.textContent=count>99?'99+':String(count);
+      b.title=count+' notification(s) non lue(s)';
+    });
+  }
+  async function clientActivityRefresh(showToast=true){
+    if(clientLoading||!actorIsClient())return;
+    const actor=authUser.id,session=clientPortalState;
+    clientLoading=true;
+    try{
+      const [activity,readRows]=await Promise.all([
+        supa.from('client_activity_events').select('client_id,event_key,event_type,created_at')
+          .eq('client_id',session.client.id).order('created_at',{ascending:false}).limit(250),
+        supa.from('notification_reads').select('notification_key,read_at').eq('user_id',actor)
+      ]);
+      if(activity.error||readRows.error)throw Error((activity.error||readRows.error).message);
+      if(!actorIsClient()||authUser.id!==actor||clientPortalState!==session)return;
+      const next=activity.data||[];
+      const nowKeys=new Set(next.map(row=>row.event_key));
+      if(clientLastActor!==actor){clientLastActor=actor;clientLastKeys=null;}
+      const fresh=clientLastKeys?next.filter(row=>!clientLastKeys.has(row.event_key)):[];
+      session.activityEvents=next;
+      session.notificationReads=readRows.data||[];
+      clientLastKeys=nowKeys;
+      updateClientBell();
+      if(showToast&&fresh.length)toast(fresh.length+' nouvelle(s) information(s) de ton coach 🔔');
+    }catch(error){
+      console.warn('Notifications du client indisponibles :',error?.message||error);
+    }finally{clientLoading=false;}
+  }
+  function startClientNotifications(){
+    if(!actorIsClient())return;
+    const id=authUser.id,clId=clientPortalState.client.id;
+    if(clientLastActor!==id){
+      clientLastActor=id;
+      clientLastKeys=new Set((clientPortalState.activityEvents||[]).map(e=>e.event_key));
+    }
+    if(clientRealtimeId!==id+':'+clId){
+      if(clientRealtime){supa.removeChannel(clientRealtime);clientRealtime=null;}
+      clientRealtimeId=id+':'+clId;
+      if(typeof supa.channel==='function'){
+        clientRealtime=supa.channel('akprime-client-activity-'+id)
+          .on('postgres_changes',{event:'INSERT',schema:'public',
+            table:'client_activity_events',filter:'client_id=eq.'+clId},
+            ()=>clientActivityRefresh()).subscribe();
+      }
+    }
+    if(clientPollTimer)return;
+    clientPollTimer=window.setInterval(()=>{
+      if(!actorIsClient()){
+        window.clearInterval(clientPollTimer);clientPollTimer=null;
+        clientLastActor='';clientLastKeys=null;
+        if(clientRealtime){supa.removeChannel(clientRealtime);clientRealtime=null;clientRealtimeId='';}
+        return;
+      }
+      clientActivityRefresh();
+    },CLIENT_POLL_INTERVAL);
+    window.addEventListener('focus',()=>{
+      if(actorIsClient())clientActivityRefresh(false);
+    });
+  }
+  // Raccordement au parcours client réel, y compris lors d'un changement
+  // de formule TEST. Les autres modules pourront continuer à envelopper ce rendu.
+  const beforeClientNotificationsPortal=renderClientPortal;
+  renderClientPortal=function(...args){
+    const result=beforeClientNotificationsPortal.apply(this,args);
+    if(actorIsClient())startClientNotifications();
+    return result;
+  };
+  const beforeClientNotificationsEnter=enterClientPortal;
+  enterClientPortal=async function(...args){
+    const result=await beforeClientNotificationsEnter.apply(this,args);
+    if(actorIsClient())await clientActivityRefresh(false);
+    return result;
+  };
+  const beforeClientNotificationsRefresh=refreshClientNotificationData;
+  refreshClientNotificationData=async function(...args){
+    const result=await beforeClientNotificationsRefresh.apply(this,args);
+    if(!actorIsClient())return result;
+    await clientActivityRefresh(false);
+    // Quand une notification ouvre le Passeport, recharger les données utiles :
+    // test, cycle, événements et contenu publié.
+    const session=clientPortalState,id=session.client.id;
+    const [tests,cycles,events,macro]=await Promise.all([
+      supa.from('tests').select('*').eq('client_id',id).order('performed_at',{ascending:false}),
+      supa.from('cycles').select('*').eq('client_id',id).order('start_date',{ascending:false}).limit(1).maybeSingle(),
+      supa.from('passport_events').select('*').eq('client_id',id).eq('client_visible',true).order('event_date',{ascending:false}),
+      (session.client.current_pole==='Performance'&&session.client.current_offer==='P3'||
+       session.client.current_pole==='Forme & Santé'&&session.client.current_offer==='Renforcé')
+        ?supa.rpc('my_published_macro_budget'):Promise.resolve({data:null,error:null})
+    ]);
+    if(clientPortalState!==session)return result;
+    if(!tests.error)session.tests=tests.data||[];
+    if(!cycles.error)session.cycle=cycles.data||null;
+    if(!events.error)session.events=events.data||[];
+    if(!macro.error&&macro.data)session.akMacro=macro.data;
+    return result;
+  };
+
   window.AKP_ACTIVITY_PAUSE_READY=true;
 })();
