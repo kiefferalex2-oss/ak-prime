@@ -24,7 +24,7 @@ Ne pas placer cette clé dans GitHub, les sources JavaScript ou la conversation.
 
 ## 2. Activer uniquement après un test du domaine
 
-Les envois sont préparés depuis `notifications@akprime.fr`.
+Les envois sont préparés depuis `contact@akprime.fr`.
 Après avoir confirmé que le domaine et l'adresse peuvent bien envoyer dans Resend :
 
 ```sql
