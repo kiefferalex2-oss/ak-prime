@@ -3082,7 +3082,7 @@ function renderPremiumPassport(m){
  if(groups.length&&!hasBodySelection&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
    passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
  }
- if(!['overview','profile','cycle','progress','timeline','followup'].includes(passportBookPage))passportBookPage='overview';
+ if(!['overview','profile','cycle','progress','timeline','followup','sleep'].includes(passportBookPage))passportBookPage='overview';
  return '<div class="akp-passport">'+passportHeader(m)+passportBookNav()+'<main id="passportBookBody" class="akp-body">'+renderPassportBookPage(m)+'</main></div>';
 }
 
