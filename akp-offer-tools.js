@@ -500,17 +500,25 @@
  }
  function offerToolsPage(c){
    const keys=toolKeys(c),all=(db.offerEntries||[]).filter(x=>x.client_id===c.id);
-   const sleepHistory=(db.clientSleepDiary||[]).filter(x=>x.client_id===c.id).slice(0,50);
+   const sleepHistory=(db.clientSleepDiary||[])
+     .filter(x=>x.client_id===c.id)
+     .sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')))
+     .slice(0,50);
    const videoMarkup=videoMarkupFor(c);
+   const sleepEntry=x=>'<details class="item"><summary style="cursor:pointer"><strong>'+esc(fmtDate(x.sleep_date))+'</strong> • '+
+     esc(x.duration_hours)+' h • qualité '+esc(x.quality)+'/5</summary><div class="tiny" style="margin-top:6px">'+
+     (x.bedtime?'Coucher : '+esc(String(x.bedtime).slice(0,5))+' • ':'')+
+     (x.wakeup?'Réveil : '+esc(String(x.wakeup).slice(0,5))+' • ':'')+
+     esc(x.notes||'Aucune observation')+'</div></details>';
    const sleepMarkup=hasSleepDiary(c)?'<div class="card panel" style="margin-bottom:13px">'+
      '<h3>Agenda de sommeil — rempli par le client</h3>'+
      '<div class="muted tiny">Le client renseigne ses nuits depuis son espace personnel. Optitrainer conserve le suivi de forme et de charge.</div>'+
      (sleepHistory.length?'<div class="list" style="margin-top:10px">'+
-       sleepHistory.map(x=>'<details class="item"><summary style="cursor:pointer"><strong>'+esc(fmtDate(x.sleep_date))+'</strong> • '+
-         esc(x.duration_hours)+' h • qualité '+esc(x.quality)+'/5</summary><div class="tiny" style="margin-top:6px">'+
-         (x.bedtime?'Coucher : '+esc(String(x.bedtime).slice(0,5))+' • ':'')+
-         (x.wakeup?'Réveil : '+esc(String(x.wakeup).slice(0,5))+' • ':'')+
-         esc(x.notes||'Aucune observation')+'</div></details>').join('')+'</div>':
+       sleepEntry(sleepHistory[0])+
+       (sleepHistory.length>1?'<details style="margin-top:10px">'+
+         '<summary style="cursor:pointer;font-size:12px;font-weight:800;color:#315b7d;padding:9px 4px">Voir l’historique des nuits précédentes ('+(sleepHistory.length-1)+')</summary>'+
+         '<div class="list" style="margin-top:9px">'+sleepHistory.slice(1).map(sleepEntry).join('')+'</div></details>':'')+
+       '</div>':
        '<div class="muted" style="margin-top:10px">Aucune nuit encore renseignée.</div>')+
      '</div>':'';
    const regular=keys.map(type=>{
