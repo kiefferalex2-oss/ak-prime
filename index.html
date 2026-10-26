@@ -2394,14 +2394,18 @@ async function markAllNotificationsRead(mode,list){
  for(const r of rows){const ex=target.notificationReads.find(x=>x.notification_key===r.notification_key);if(ex)ex.read_at=now;else target.notificationReads.push({notification_key:r.notification_key,read_at:now})}
 }
 function renderNotificationRows(list,mode){
- if(!list.length)return '<div class="notification-empty">Aucune notification active. Tout est à jour.</div>';
- return '<div class="notification-list">'+list.map(n=>'<div class="notification-row '+(n.read?'read':'unread')+'"><div class="row" style="align-items:flex-start"><span class="notification-dot"></span><div class="grow"><h4>'+esc(n.title)+'</h4><p>'+esc(n.detail)+'</p></div><span class="status '+(n.read?'blue':'amber')+'">'+(n.read?'Lu':'Nouveau')+'</span></div><div class="row" style="justify-content:flex-end;margin-top:9px"><button class="btn ghost small notificationOpen" data-key="'+esc(n.key)+'">Ouvrir</button></div></div>').join('')+'</div>';
+ // Même historique en base : seules les notifications non lues occupent l'écran.
+ const visible=(list||[]).filter(n=>!n.read);
+ if(!visible.length)return '<div class="notification-empty">Aucune notification non lue. Tout est à jour.</div>';
+ return '<div class="notification-list">'+visible.map(n=>'<div class="notification-row unread"><div class="row" style="align-items:flex-start"><span class="notification-dot"></span><div class="grow"><h4>'+esc(n.title)+'</h4><p>'+esc(n.detail)+'</p></div><span class="status amber">Nouveau</span></div><div class="row" style="justify-content:flex-end;margin-top:9px"><button class="btn ghost small notificationOpen" data-key="'+esc(n.key)+'">Ouvrir</button></div></div>').join('')+'</div>';
 }
 function openNotificationCenter(mode){
- const list=mode==='coach'?coachNotifications():clientNotifications(clientPortalState);
- modal('Notifications',renderNotificationRows(list,mode),'<button class="btn ghost" id="closeNotif">Fermer</button><button class="btn primary" id="markAllNotif">Tout marquer comme lu</button>');
+ // La cloche affiche uniquement les notifications à traiter, dans les deux espaces.
+ const list=(mode==='coach'?coachNotifications():clientNotifications(clientPortalState)).filter(n=>!n.read);
+ modal('Notifications',renderNotificationRows(list,mode),'<button class="btn ghost" id="closeNotif">Fermer</button>'+(list.length?'<button class="btn primary" id="markAllNotif">Tout marquer comme lu</button>':''));
  document.getElementById('closeNotif').onclick=closeModal;
- document.getElementById('markAllNotif').onclick=async()=>{await markAllNotificationsRead(mode,list);closeModal();mode==='coach'?render():renderClientPortal()};
+ const markAllButton=document.getElementById('markAllNotif');
+ if(markAllButton)markAllButton.onclick=async()=>{await markAllNotificationsRead(mode,list);closeModal();mode==='coach'?render():renderClientPortal()};
  document.querySelectorAll('.notificationOpen').forEach(b=>b.onclick=async()=>{
    const n=list.find(x=>x.key===b.dataset.key);if(!n)return;
    await markNotificationRead(n.key,mode);closeModal();
