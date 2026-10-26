@@ -881,63 +881,28 @@
    if(error)return alert('Modification impossible : '+error.message);
    await loadSupabaseData();render();toast(isRestore?'Enregistrement restauré.':'Enregistrement archivé.');
  },true);
-document.addEventListener('click',e=>{
+// La même visualisation sert à l’espace coach et au Passeport.
+ window.AKP_SLEEP_DASHBOARD_RENDER=renderSleepPremiumDashboard;
+ document.addEventListener('click',e=>{
    const period=e.target.closest?.('.akSleepRangeBtn');
    if(!period)return;
-   const inCoach=state.view==='client'&&state.tab==='offer-tools';
-   const inClientPassport=authProfile?.role==='client'&&clientPortalView==='passport'&&
-     akSleepPassportEligible(passportActiveModel);
-   if(!inCoach&&!inClientPassport)return;
+   const inCoachTools=state.view==='client'&&state.tab==='offer-tools';
+   const inCoachPassport=state.view==='client'&&state.tab==='passport';
+   const inClientPassport=authProfile?.role==='client'&&clientPortalView==='passport';
+   if(!inCoachTools&&!inCoachPassport&&!inClientPassport)return;
    const days=Number(period.dataset.nights);
    if(![7,14,30,90].includes(days))return;
    e.preventDefault();
    akSleepDashboardRange=days;
    if(inClientPassport)renderClientPortal();
-   else render();
+   else if(inCoachPassport&&passportActiveModel){
+     const body=document.getElementById('passportBookBody');
+     if(body){body.innerHTML=renderPassportBookPage(passportActiveModel);bindPassportBook();}
+     else render();
+   }else render();
  },true);
 
- // Le tableau de bord partagé devient une rubrique du Passeport uniquement
- // pour les clients Performance Premium (P3), y compris en compte TEST P3.
- function akSleepPassportEligible(model){
-   return model?.akPassportRole==='client'&&model.pole==='Performance'&&
-     String(model.offer||'').toUpperCase()==='P3';
- }
- const beforeSleepPassportNav=passportBookNav;
- passportBookNav=function(){
-   const html=beforeSleepPassportNav();
-   if(!akSleepPassportEligible(passportActiveModel))return html;
-   const selected=passportBookPage==='sleep';
-   const button='<button type="button" class="passportBookTab '+(selected?'on':'')+
-     '" data-passport-page="sleep" aria-pressed="'+(selected?'true':'false')+'">'+
-     '<span>Sommeil</span><span class="akp-tab-arrow" aria-hidden="true">›</span></button>';
-   return html.replace('6 RUBRIQUES À EXPLORER','7 RUBRIQUES À EXPLORER')
-     .replace('</nav>',button+'</nav>');
- };
- const beforeSleepPremiumPassport=renderPremiumPassport;
- renderPremiumPassport=function(model){
-   // Après changement de formule (notamment en compte TEST), ne pas laisser
-   // une rubrique Sommeil active lorsque la nouvelle offre n'y donne plus accès.
-   if(passportBookPage==='sleep'&&!akSleepPassportEligible(model))passportBookPage='overview';
-   return beforeSleepPremiumPassport(model);
- };
- const beforeSleepPassportBody=renderPassportBookPage;
- renderPassportBookPage=function(model){
-   if(passportBookPage!=='sleep')return beforeSleepPassportBody(model);
-   if(!akSleepPassportEligible(model))return beforeSleepPassportBody(model);
-   const rows=(Array.isArray(model.akPassportSleep)?model.akPassportSleep:[])
-     .slice().sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')));
-   const graph=rows.length?renderSleepPremiumDashboard(rows):
-     '<section class="akSleepPassportEmpty"><div class="akSleepPassportEmptyIcon" aria-hidden="true">☾</div>'+
-     '<h3>Votre suivi du sommeil commence ici</h3>'+
-     '<p>Renseigne ta première nuit dans « Mon accompagnement ». Les graphiques de progression apparaîtront automatiquement dans ton Passeport.</p>'+
-     '<button type="button" class="akSleepGoToDiary">Renseigner mon sommeil</button></section>';
-   return '<div class="akp-page akSleepPassportPage">'+
-     '<div class="akp-page-title"><div><span>SUIVI PERSONNALISÉ</span>'+
-     '<h2>Mon sommeil</h2><p>La progression de tes nuits à partir de ton agenda AK PRIME.</p>'+
-     '</div><div class="akp-date-chip">'+rows.length+' nuit'+(rows.length>1?'s':'')+' enregistrée'+(rows.length>1?'s':'')+'</div></div>'+
-     graph+'</div>';
- };
- const akSleepPassportCSS=document.createElement('style');
+  const akSleepPassportCSS=document.createElement('style');
  akSleepPassportCSS.textContent=[
    '.akSleepPassportPage{max-width:1220px;margin:0 auto}',
    '.akSleepPassportPage .akSleepPremium{margin:0}',
