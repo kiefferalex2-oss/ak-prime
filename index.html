@@ -1932,25 +1932,13 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 }
 
 
-/* La rubrique Espace client rejoint les avantages du Passeport. */
-.public-site .ak-difference-compact .ak-diff-client{display:grid;grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);column-gap:50px;row-gap:18px;align-items:start;margin-top:28px;padding:31px 7px 0;border-top:1px solid #d9d2c7}
-.public-site .ak-diff-client-kicker{color:#9d7138;letter-spacing:.13em;font-size:10px;font-weight:900;margin:0 0 13px}
-.public-site .ak-diff-client-intro h3{font-size:clamp(23px,2.35vw,32px);line-height:1.19;letter-spacing:-.027em;color:#1a2c40;margin:0 0 13px;max-width:470px}
-.public-site .ak-diff-client-intro p{font-size:13px;line-height:1.75;color:#5b6c80;margin:0 0 17px;max-width:510px}
-.public-site .ak-diff-client-link{display:inline-flex;align-items:center;gap:9px;padding-bottom:5px;border-bottom:1px solid #aa7b41;color:#855b2c;font-weight:850;font-size:13px;text-decoration:none}
-.public-site .ak-diff-client-link:hover{color:#40301c;border-color:#40301c}
-.public-site .ak-diff-client-link:focus-visible{outline:3px solid #be9654;outline-offset:4px;border-radius:2px}
-.public-site .ak-diff-client-benefits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 27px}
-.public-site .ak-diff-client-item{border-bottom:1px solid #dfd9d1;padding:5px 0 16px;margin-bottom:15px}
-.public-site .ak-diff-client-item strong{display:block;font-size:14px;line-height:1.35;color:#1a2c40;margin-bottom:7px}
-.public-site .ak-diff-client-item span{display:block;font-size:12px;line-height:1.65;color:#586a7c}
-.public-site .ak-diff-client-access-note{grid-column:1/-1;margin:0;font-size:11px;line-height:1.65;color:#697585}
-.public-site #espace-client{scroll-margin-top:90px}
-@media(max-width:950px){.public-site .ak-difference-compact .ak-diff-client{grid-template-columns:1fr;gap:24px;padding-left:0;padding-right:0}}
-@media(max-width:540px){.public-site .ak-diff-client-benefits{grid-template-columns:1fr}.public-site .ak-diff-client-item{margin-bottom:9px;padding-bottom:12px}.public-site .ak-diff-client-intro h3{font-size:25px}}
-/* Optitrainer conserve une rubrique dédiée après le fonctionnement. */
+/* Parcours public : les accès AK PRIME et Optitrainer forment une seule étape. */
 .public-site #outils{scroll-margin-top:88px}
-.public-site .public-tools-section .akOptiSection{padding-top:0!important}
+.public-site .public-tools-section .akOptiSection{margin-top:36px;padding-top:0!important}
+@media(max-width:650px){.public-site .public-tools-section .akOptiSection{margin-top:25px}}
+
+.public-site .ak-difference-compact .public-tools-section{margin-top:35px}
+@media(max-width:650px){.public-site .ak-difference-compact .public-tools-section{margin-top:27px}}
 
 /* Présentation sobre d’Optitrainer, sans écran fictif : seuls les visuels de l’éditeur font foi. */
 .akOptiSection{padding-top:15px!important}
@@ -4409,7 +4397,7 @@ function publicOfferFoundation(title,description,items,ladder){
 }
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Optitrainer</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page">AK PRIME<small>PERFORMANCE SYSTEM</small></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
@@ -4418,7 +4406,7 @@ function renderPublicSite(){
    '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
    '<a href="#offres">Les offres</a>'+
    '<a href="#fonctionnement">Comment ça marche</a>'+
-   '<a href="#outils">Optitrainer</a>'+
+   '<a href="#outils">Vos outils</a>'+
    '<a href="#faq">FAQ</a>'+
   '<button type="button" class="public-mobile-login" id="publicMobileLoginBtn">Se connecter à mon espace</button>'+
  '</nav></div>'+
@@ -4447,8 +4435,10 @@ function renderPublicSite(){
  '<div class="ak-diff-strip"><div class="ak-diff-passport"><div class="ak-diff-passport-kicker">LE PASSEPORT AK PRIME</div><h3>Votre parcours sportif, au même endroit.</h3><p>Plus qu’un tableau de résultats, c’est votre carnet de suivi : objectifs, évaluations, évolution des performances, historique des cycles et points d’attention y trouvent leur place selon votre accompagnement. Vous comprenez <strong>d’où vous partez, où vous en êtes et vers quoi vous avancez.</strong></p><p>Et si vous changez d’entraîneur, de préparateur physique ou de club ? L’objectif est de pouvoir <strong>transmettre, avec votre accord, un historique clair</strong> au professionnel qui prend le relais. Il dispose ainsi de repères sur votre parcours, sans devoir tout reconstruire depuis le début.</p><div class="ak-diff-passport-foot">Un suivi qui vous appartient et qui garde son utilité au-delà d’un accompagnement.</div></div>'+
  '<div class="ak-diff-aside"><h3>Ce que cela change pour vous</h3><div class="ak-diff-point"><b>01</b><div><strong>Vous savez où vous allez</strong><span>Des objectifs et des étapes identifiables, plutôt qu’une succession de séances.</span></div></div><div class="ak-diff-point"><b>02</b><div><strong>Vous comprenez votre progression</strong><span>Vos tests, vos retours et les décisions prises donnent du sens à votre suivi.</span></div></div><div class="ak-diff-point"><b>03</b><div><strong>Vous facilitez la continuité</strong><span>En cas de changement de structure, votre historique peut servir de base à une nouvelle prise en charge, avec votre accord.</span></div></div></div></div>'+
  '<p class="ak-diff-note">Les informations consignées varient selon le pôle et la formule. Le Passeport est un outil de suivi sportif, et non un dossier médical. Le partage ou l’export de données vers un tiers sera proposé uniquement lorsque cette fonctionnalité sera disponible et avec votre accord.</p>'+
+ '<div class="public-tools-section" id="outils"><div class="public-access"><div><div class="public-section-head" style="margin-bottom:0"><div class="kicker">Espace client</div><h2>Un accès personnel ouvert après paiement.</h2><p>Après validation de votre souscription, vous recevez un e-mail pour activer votre espace personnel AK PRIME et définir votre mot de passe. Vous pourrez ensuite retrouver votre suivi et votre Passeport au même endroit.</p></div></div>'+
+ '<div class="public-access-card"><div class="public-access-row"><div class="bubble">1</div><div><strong>Paiement validé</strong><div>Le nom, l’e-mail et l’offre viennent du paiement.</div></div></div><div class="public-access-row"><div class="bubble">2</div><div><strong>Compte AK PRIME préparé</strong><div>Le dossier client et son accès sont créés automatiquement.</div></div></div><div class="public-access-row"><div class="bubble">3</div><div><strong>E-mail d’activation</strong><div>Le client reçoit un lien sécurisé et choisit son mot de passe.</div></div></div><div class="public-access-row"><div class="bubble">4</div><div><strong>Accès à AK PRIME et Optitrainer</strong><div>Vous retrouvez votre suivi, vos questionnaires, vos visios et votre Passeport dans AK PRIME. Votre accès Optitrainer est également mis en place pour consulter vos programmes d’entraînement.</div></div></div></div></div>'+
+ '<div class="akOptiSection">'+akOptitrainerVisual(false)+'</div></div>'+
  '</div></section>'+
- '<div class="ak-diff-client" id="espace-client"><div class="ak-diff-client-intro"><div class="ak-diff-client-kicker">ESPACE CLIENT AK PRIME</div><h3>Votre accompagnement ne se résume pas à recevoir un programme.</h3><p>Un espace personnel pour comprendre votre suivi et retrouver l’essentiel au même endroit : bilans, rendez-vous, progression et documents. Les fonctionnalités visibles dépendent de votre pôle et de votre formule.</p><a class="ak-diff-client-link" href="#offres">Explorer les démonstrations des offres <span aria-hidden="true">→</span></a></div><div class="ak-diff-client-benefits"><div class="ak-diff-client-item"><strong>Un tableau de bord personnel</strong><span>Les informations importantes et les prochaines étapes de votre accompagnement.</span></div><div class="ak-diff-client-item"><strong>Des bilans centralisés</strong><span>Vos questionnaires et vos retours, accessibles depuis votre suivi selon la formule choisie.</span></div><div class="ak-diff-client-item"><strong>Des rendez-vous organisés</strong><span>Vos visios, vos échéances et vos échanges liés à l’accompagnement.</span></div><div class="ak-diff-client-item"><strong>Une progression consultable</strong><span>Votre Passeport, vos évaluations et vos jalons lorsqu’ils sont inclus dans votre accompagnement.</span></div></div><p class="ak-diff-client-access-note">Après validation de votre souscription, vous recevez un e-mail pour activer votre espace personnel. L’accès à Optitrainer complète votre suivi pour consulter les contenus préparés par votre coach.</p></div>'+
   '<section class="public-section dark" id="offres"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Les offres</div><h2>Choisissez l’accompagnement qui vous correspond.</h2><p>Comparez les formules de chaque pôle. Sélectionnez une offre pour découvrir les prestations incluses et ce qui la distingue.</p></div>'+
  '<div class="public-offer-group"><div class="public-offer-group-title"><div><h3>Forme & Santé</h3><p>Deux niveaux de suivi selon le degré d’adaptation souhaité.</p></div></div>'+
   '<div class="public-offers">'+
@@ -4474,7 +4464,6 @@ function renderPublicSite(){
  '<div class="public-process-card"><b>04</b><strong>Planifier</strong><p>Le programme et les priorités sont construits à partir de vos données.</p></div>'+
  '<div class="public-process-card"><b>05</b><strong>Adapter</strong><p>Bilans, visios, retours et réévaluations font évoluer l’accompagnement.</p></div>'+
  '</div></div></section>'+
- '<section class="public-section public-tools-section" id="outils"><div class="public-section-inner"><div class="akOptiSection">'+akOptitrainerVisual(false)+'</div></div></section>'+
  '<section class="public-section" style="padding-top:0" id="faq"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Questions fréquentes</div><h2>Avant de commencer</h2><p>Les réponses essentielles pour choisir votre accompagnement sereinement.</p></div><div class="public-faq">'+
  '<details><summary>Faut-il déjà pratiquer un sport ou avoir de l’expérience ?</summary><p>Non. AK PRIME accompagne les personnes qui débutent, reprennent une activité ou pratiquent déjà régulièrement, ainsi que les personnes pratiquant un sport qui recherchent un suivi plus spécifique. Le pôle et la formule sont choisis selon vos objectifs et votre situation.</p></details>'+
  '<details><summary>Comment fonctionne l’accompagnement à distance ?</summary><p>Nous faisons le point sur vos objectifs et votre contexte, puis vous bénéficiez des prestations prévues par votre formule : programmation ou travail mental, bilans, analyses et échanges. Votre espace AK PRIME centralise votre suivi ; pour les programmes d’entraînement, un accès Optitrainer est également prévu.</p></details>'+
