@@ -2914,9 +2914,15 @@ function passportTopProgress(groups,limit=3){
     return Math.abs(bp||0)-Math.abs(ap||0);
   }).slice(0,limit);
 }
+function passportSleepEligible(m){
+ // Fonctionnalité prévue exclusivement dans la formule Performance Premium.
+ // Cette même rubrique est visible pour le coach dans le dossier du client.
+ return String(m?.pole||'')==='Performance'&&String(m?.offer||'').toUpperCase()==='P3';
+}
 function passportBookNav(){
  const items=[['overview','Sommaire'],['profile','Profil sportif'],['cycle','Cycle'],['progress','Progression'],['timeline','Chronologie'],['followup','Suivi']];
- return '<div class="akp-nav-help" role="note"><strong>6 RUBRIQUES À EXPLORER</strong><span>Choisis une rubrique ci-dessous pour découvrir son contenu.</span></div>'+
+ if(passportSleepEligible(passportActiveModel))items.splice(4,0,['sleep','Sommeil']);
+ return '<div class="akp-nav-help" role="note"><strong>'+items.length+' RUBRIQUES À EXPLORER</strong><span>Choisis une rubrique ci-dessous pour découvrir son contenu.</span></div>'+
   '<nav class="akp-tabs" aria-label="Rubriques interactives du passeport">'+items.map(([k,l])=>
    '<button type="button" class="passportBookTab '+(passportBookPage===k?'on':'')+'" data-passport-page="'+k+'" aria-pressed="'+(passportBookPage===k?'true':'false')+'">'+
     '<span>'+l+'</span><span class="akp-tab-arrow" aria-hidden="true">›</span></button>'
@@ -3045,10 +3051,29 @@ function passportFollowupPage(m){
   '</div>'+
  '</div>';
 }
+function passportSleepPage(m){
+ if(!passportSleepEligible(m))return passportOverviewPage(m);
+ const rows=(Array.isArray(m.akPassportSleep)?m.akPassportSleep:[])
+   .slice().sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')));
+ const graph=rows.length&&typeof window.AKP_SLEEP_DASHBOARD_RENDER==='function'
+   ?window.AKP_SLEEP_DASHBOARD_RENDER(rows)
+   :'<section class="akSleepPassportEmpty"><div class="akSleepPassportEmptyIcon" aria-hidden="true">☾</div>'+
+     '<h3>'+(!rows.length?'Votre suivi du sommeil commence ici':'Tableau de bord en cours de chargement')+'</h3>'+
+     '<p>'+(!rows.length?'Renseigne ta première nuit dans « Mon accompagnement ». Les graphiques apparaîtront ici automatiquement.':
+        'Les données sont enregistrées. Actualise la page si les graphiques ne s’affichent pas.')+'</p>'+
+     (!rows.length&&authProfile?.role==='client'?'<button type="button" class="akSleepGoToDiary">Renseigner mon sommeil</button>':'')+
+     '</section>';
+ return '<div class="akp-page akSleepPassportPage">'+
+  '<div class="akp-page-title"><div><span>SUIVI PERSONNALISÉ</span>'+
+  '<h2>Mon sommeil</h2><p>La progression de tes nuits à partir de ton agenda AK PRIME.</p></div>'+
+  '<div class="akp-date-chip">'+rows.length+' nuit'+(rows.length>1?'s':'')+' enregistrée'+(rows.length>1?'s':'')+'</div></div>'+
+  graph+'</div>';
+}
 function renderPassportBookPage(m){
  if(passportBookPage==='profile')return typeof window.AKP_PREMIUM_PROFILE_PAGE==='function'?window.AKP_PREMIUM_PROFILE_PAGE(m):passportOverviewPage(m);
  if(passportBookPage==='cycle')return passportCyclePage(m);
  if(passportBookPage==='progress')return passportProgressPage(m);
+ if(passportBookPage==='sleep')return passportSleepPage(m);
  if(passportBookPage==='timeline')return passportTimelinePage(m);
  if(passportBookPage==='followup')return passportFollowupPage(m);
  return passportOverviewPage(m);
@@ -3082,7 +3107,8 @@ function renderPremiumPassport(m){
  if(groups.length&&!hasBodySelection&&!groups.some(g=>normalizeTestName(g.name)===passportSelectedTestKey)){
    passportSelectedTestKey=normalizeTestName((groups.find(g=>g.rows.length>=2)||groups[0]).name);
  }
- if(!['overview','profile','cycle','progress','timeline','followup','sleep'].includes(passportBookPage))passportBookPage='overview';
+ if(!['overview','profile','cycle','progress','timeline','followup','sleep'].includes(passportBookPage)||
+     (passportBookPage==='sleep'&&!passportSleepEligible(m)))passportBookPage='overview';
  return '<div class="akp-passport">'+passportHeader(m)+passportBookNav()+'<main id="passportBookBody" class="akp-body">'+renderPassportBookPage(m)+'</main></div>';
 }
 
