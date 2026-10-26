@@ -498,12 +498,201 @@
        '</div></details>';
    }).join('');
  }
+
+ // Tableau de bord sommeil : calcul uniquement sur les nuits saisies par le client.
+ // Les graphiques n'inventent aucune valeur pour les nuits ou champs manquants.
+ let akSleepDashboardRange=14;
+ const akSleepPremiumCSS=document.createElement('style');
+ akSleepPremiumCSS.textContent=[
+  '.akSleepPremium{background:#fff;border:1px solid #dbe4ec;border-radius:23px;overflow:hidden;margin-bottom:14px;box-shadow:0 16px 38px rgba(16,40,62,.075);min-width:0}',
+  '.akSleepPremium *{box-sizing:border-box}',
+  '.akSleepPremiumHero{background:radial-gradient(ellipse at 90% 0%,rgba(221,180,116,.18),transparent 44%),linear-gradient(127deg,#0b1b2b 0%,#193b53 100%);padding:26px 28px 24px;color:#fff}',
+  '.akSleepPremiumTop{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap}',
+  '.akSleepPremiumEyebrow{font-size:10px;color:#e9c891;letter-spacing:.16em;font-weight:900;margin-bottom:7px}',
+  '.akSleepPremiumTop h3{font-size:clamp(22px,2.5vw,30px);line-height:1.2;color:#fff;margin:0 0 9px;letter-spacing:-.025em}',
+  '.akSleepPremiumTop p{font-size:12px;color:#c5d6e1;line-height:1.6;margin:0;max-width:580px}',
+  '.akSleepPremiumPeriods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;border:1px solid #446176;border-radius:13px;padding:5px;background:rgba(255,255,255,.07)}',
+  '.akSleepPremiumPeriods button{background:transparent;color:#cbdce6;border:0;border-radius:9px;padding:9px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}',
+  '.akSleepPremiumPeriods button.is-active{background:#e9c58a;color:#173047;box-shadow:0 3px 9px #0003}',
+  '.akSleepPremiumPeriods button:focus-visible{outline:3px solid #f6dca8;outline-offset:2px}',
+  '.akSleepPremiumKPIs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:24px}',
+  '.akSleepPremiumKPI{padding:16px 16px 15px;border:1px solid rgba(217,233,241,.2);border-radius:15px;background:rgba(255,255,255,.065);min-width:0}',
+  '.akSleepPremiumKPI span{display:block;font-size:11px;color:#b8cedc;line-height:1.5}',
+  '.akSleepPremiumKPI strong{display:block;font-size:clamp(22px,2.5vw,29px);line-height:1.35;letter-spacing:-.045em;color:#fff;margin:5px 0 3px;font-variant-numeric:tabular-nums}',
+  '.akSleepPremiumKPI small{display:block;font-size:10px;line-height:1.5;color:#d8b982}',
+  '.akSleepPremiumBody{padding:23px 27px 25px;background:linear-gradient(180deg,#fff,#fafbfd)}',
+  '.akSleepPremiumCharts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}',
+  '.akSleepPremiumGraph{min-width:0;padding:17px 18px 12px;border:1px solid #e0e8f0;border-radius:17px;background:#fff}',
+  '.akSleepPremiumGraphHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}',
+  '.akSleepPremiumGraphHead h4{color:#17354a;font-size:14px;line-height:1.4;margin:0}',
+  '.akSleepPremiumGraphHead p{font-size:11px;color:#778a9b;margin:4px 0 0;line-height:1.5}',
+  '.akSleepPremiumGraphValue{font-size:16px;font-weight:900;white-space:nowrap;color:#183c58;font-variant-numeric:tabular-nums}',
+  '.akSleepPremiumGraph.gold .akSleepPremiumGraphValue{color:#ac7836}',
+  '.akSleepPremiumSVG{width:100%;height:auto;display:block;margin-top:13px;overflow:visible}',
+  '.akSleepPremiumEmpty{height:200px;display:flex;align-items:center;justify-content:center;text-align:center;color:#778a9b;font-size:12px}',
+  '.akSleepPremiumBottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}',
+  '.akSleepPremiumStat{padding:15px 17px;border:1px solid #e0e8f0;border-radius:14px;background:#f5f8fb;min-width:0}',
+  '.akSleepPremiumStat span{display:block;font-size:11px;color:#6e8091;margin-bottom:5px}',
+  '.akSleepPremiumStat strong{display:block;font-size:16px;line-height:1.4;font-weight:850;color:#18354c;font-variant-numeric:tabular-nums}',
+  '.akSleepPremiumStat small{display:block;font-size:10px;color:#8393a0;margin-top:5px;line-height:1.5}',
+  '.akSleepPremiumFoot{font-size:10px;color:#8494a1;line-height:1.6;margin:13px 2px 0}',
+  '@media(max-width:860px){.akSleepPremiumKPIs{grid-template-columns:repeat(2,minmax(0,1fr))}.akSleepPremiumCharts{grid-template-columns:1fr}}',
+  '@media(max-width:550px){.akSleepPremiumHero{padding:19px 17px}.akSleepPremiumBody{padding:14px}.akSleepPremiumKPI{padding:12px}.akSleepPremiumKPI strong{font-size:24px}.akSleepPremiumGraph{padding:12px}.akSleepPremiumBottom{grid-template-columns:1fr}.akSleepPremiumPeriods{width:100%;justify-content:space-between}.akSleepPremiumPeriods button{flex:1;padding:8px 3px}}'
+ ].join('\n');
+ document.head.appendChild(akSleepPremiumCSS);
+ function akSleepNumber(value,min=0,max=1000){
+   if(value===null||value===undefined||String(value).trim()==='')return null;
+   const num=Number(value);
+   return Number.isFinite(num)&&num>=min&&num<=max?num:null;
+ }
+ function akSleepAverage(values){
+   const valid=values.filter(x=>x!==null&&Number.isFinite(x));
+   return valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:null;
+ }
+ function akSleepHours(value){
+   if(value===null)return '—';
+   const total=Math.round(value*60);
+   return Math.floor(total/60)+' h '+String(total%60).padStart(2,'0');
+ }
+ function akSleepClock(records,key,bedtime=false){
+   const points=records.map(row=>{
+     const match=/^(\d{2}):(\d{2})/.exec(String(row[key]||''));
+     if(!match)return null;
+     const h=Number(match[1]),m=Number(match[2]);
+     if(h>23||m>59)return null;
+     const minutes=h*60+m;
+     return bedtime&&h<12?minutes+1440:minutes;
+   });
+   const mean=akSleepAverage(points);
+   if(mean===null)return '—';
+   const total=((Math.round(mean)%1440)+1440)%1440;
+   return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');
+ }
+ function akSleepCurve(rows,key,title,opts){
+   const values=rows.map(row=>({
+     date:String(row.sleep_date||''),
+     value:akSleepNumber(row[key],opts.minValid,opts.maxValid)
+   }));
+   const filtered=values.filter(row=>row.value!==null);
+   if(!filtered.length)return '<div class="akSleepPremiumEmpty">Aucune donnée de '+esc(title.toLowerCase())+' sur cette sélection.</div>';
+   const width=650,height=235,left=44,right=19,top=17,bottom=38;
+   const bottomY=height-bottom,plotW=width-left-right,plotH=bottomY-top;
+   const vals=filtered.map(x=>x.value);
+   const min=opts.fixedMin??Math.max(0,Math.floor(Math.min(...vals)-.5));
+   let max=opts.fixedMax??Math.ceil(Math.max(...vals)+.5);
+   if(max<=min)max=min+1;
+   const range=max-min;
+   const xAt=i=>left+(values.length===1?plotW/2:i*plotW/(values.length-1));
+   const yAt=v=>top+(max-v)*plotH/range;
+   const plot=values.map((v,i)=>v.value===null?null:{x:xAt(i),y:yAt(v.value),v:v.value,date:v.date});
+   const spans=[];let part=[];
+   plot.forEach(point=>{
+     if(!point){if(part.length)spans.push(part);part=[];}
+     else part.push(point);
+   });
+   if(part.length)spans.push(part);
+   const gradient='akSleepFill'+key;
+   const grid=Array.from({length:5},(_,i)=>{
+     const val=min+(range*i/4),y=yAt(val);
+     const label=opts.fixedMax!==undefined?String(Math.round(val)):String(Number(val.toFixed(1)));
+     return '<line x1="'+left+'" x2="'+(width-right)+'" y1="'+y.toFixed(2)+'" y2="'+y.toFixed(2)+'" stroke="#e9eef3" stroke-dasharray="4 5"/>'+
+       '<text x="'+(left-11)+'" y="'+(y+4).toFixed(2)+'" font-size="12" fill="#8292a3" text-anchor="end">'+label+'</text>';
+   }).join('');
+   const shapes=spans.map(group=>{
+     const path=group.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ');
+     const first=group[0],last=group[group.length-1];
+     const area=path+' L'+last.x.toFixed(2)+' '+bottomY+' L'+first.x.toFixed(2)+' '+bottomY+' Z';
+     return '<path d="'+area+'" fill="url(#'+gradient+')" opacity=".76"/>'+
+       '<path d="'+path+'" fill="none" stroke="'+opts.color+'" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>';
+   }).join('');
+   const dots=plot.filter(Boolean).map(p=>
+     '<circle cx="'+p.x.toFixed(2)+'" cy="'+p.y.toFixed(2)+'" r="4.1" fill="'+opts.color+'" stroke="#fff" stroke-width="2">'+
+       '<title>'+esc(fmtDate(p.date))+' : '+p.v.toFixed(1)+' '+esc(opts.unit)+'</title></circle>'
+   ).join('');
+   const every=Math.max(1,Math.ceil((values.length-1)/5));
+   const ticks=values.map((p,i)=>(i===0||i===values.length-1||i%every===0)?
+     '<text x="'+xAt(i).toFixed(2)+'" y="'+(height-11)+'" font-size="11" fill="#8494a4" text-anchor="middle">'+
+       esc(p.date.slice(8,10)+'/'+p.date.slice(5,7))+'</text>':'').join('');
+   return '<svg class="akSleepPremiumSVG" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(title)+' sur les '+values.length+' nuits renseignées">'+
+     '<defs><linearGradient id="'+gradient+'" x1="0" y1="0" x2="0" y2="1">'+
+     '<stop offset="0%" stop-color="'+opts.color+'" stop-opacity=".21"/>'+
+     '<stop offset="100%" stop-color="'+opts.color+'" stop-opacity="0"/></linearGradient></defs>'+
+     grid+shapes+dots+ticks+'</svg>';
+ }
+ function renderSleepPremiumDashboard(history){
+   if(!history.length)return '';
+   const recent=history.slice(0,akSleepDashboardRange).slice().reverse();
+   const latest=history[0];
+   const durations=recent.map(x=>akSleepNumber(x.duration_hours,.25,24));
+   const qualities=recent.map(x=>akSleepNumber(x.quality,1,5));
+   const durationAverage=akSleepAverage(durations),qualityAverage=akSleepAverage(qualities);
+   const awakeningCounts=recent.map(x=>akSleepNumber(x.awakenings_count,0,12));
+   const countAverage=akSleepAverage(awakeningCounts);
+   const awakeTimes=recent.map(row=>{
+     const count=akSleepNumber(row.awakenings_count,0,12);
+     if(count===0)return 0;
+     const times=Array.isArray(row.awakenings)?row.awakenings:[];
+     if(count===null||count>times.length)return null;
+     const minutes=times.slice(0,count).map(x=>akSleepNumber(x.minutes,0,180));
+     return minutes.some(x=>x===null)?null:minutes.reduce((a,b)=>a+b,0);
+   });
+   const awakeAvg=akSleepAverage(awakeTimes);
+   const valid=durations.filter(x=>x!==null);
+   const regularity=valid.length>=3?
+     Math.round(valid.filter(v=>Math.abs(v-durationAverage)<=.5).length/valid.length*100):null;
+   const last7=history.slice(0,7).map(x=>akSleepNumber(x.duration_hours,.25,24));
+   const prior7=history.slice(7,14).map(x=>akSleepNumber(x.duration_hours,.25,24));
+   const currentAvg=akSleepAverage(last7),previousAvg=akSleepAverage(prior7);
+   const delta=currentAvg!==null&&previousAvg!==null&&
+     last7.filter(x=>x!==null).length>=3&&prior7.filter(x=>x!==null).length>=3?
+     Math.round((currentAvg-previousAvg)*60):null;
+   const trend=delta===null?'Comparaison disponible dès 10 nuits':
+     delta===0?'Stable sur les 7 dernières nuits':
+     (delta>0?'+':'−')+Math.abs(delta)+' min vs 7 nuits précédentes';
+   const subtitle='Dernière saisie le '+fmtDate(latest.sleep_date)+' · '+recent.length+' nuit'+(recent.length>1?'s':'')+' affichée'+(recent.length>1?'s':'');
+   const kpi=(label,value,detail)=>'<div class="akSleepPremiumKPI"><span>'+label+'</span>'+
+     '<strong>'+esc(value)+'</strong><small>'+esc(detail)+'</small></div>';
+   const stat=(label,value,detail)=>'<div class="akSleepPremiumStat"><span>'+label+'</span>'+
+     '<strong>'+esc(value)+'</strong><small>'+esc(detail)+'</small></div>';
+   return '<section class="akSleepPremium" aria-label="Progression du sommeil du client">'+
+    '<div class="akSleepPremiumHero"><div class="akSleepPremiumTop"><div>'+
+     '<div class="akSleepPremiumEyebrow">AK PRIME · SUIVI DU SOMMEIL</div>'+
+     '<h3>La progression, nuit après nuit</h3>'+
+     '<p>'+esc(subtitle)+'. Indicateurs calculés à partir des déclarations du client.</p></div>'+
+     '<div class="akSleepPremiumPeriods" aria-label="Choisir le nombre de nuits">'+
+     [7,14,30,90].map(n=>'<button type="button" class="akSleepRangeBtn '+(akSleepDashboardRange===n?'is-active':'')+
+       '" data-nights="'+n+'" aria-pressed="'+(akSleepDashboardRange===n?'true':'false')+'">'+n+' nuits</button>').join('')+
+     '</div></div>'+
+     '<div class="akSleepPremiumKPIs">'+
+       kpi('Durée moyenne',akSleepHours(durationAverage),trend)+
+       kpi('Qualité moyenne',qualityAverage!==null?qualityAverage.toFixed(1)+' / 5':'—','Qualité déclarée par le client')+
+       kpi('Réveils nocturnes',countAverage!==null?countAverage.toFixed(1):'—','Nombre moyen par nuit renseignée')+
+       kpi('Régularité de la durée',regularity!==null?regularity+' %':'—','Nuits à ± 30 min de la moyenne')+
+     '</div></div>'+
+     '<div class="akSleepPremiumBody">'+
+       '<div class="akSleepPremiumCharts">'+
+         '<div class="akSleepPremiumGraph"><div class="akSleepPremiumGraphHead"><div><h4>Durée de sommeil</h4>'+
+           '<p>Évolution de la durée renseignée</p></div><div class="akSleepPremiumGraphValue">'+esc(akSleepHours(durationAverage))+'</div></div>'+
+           akSleepCurve(recent,'duration_hours','Durée de sommeil',{minValid:.25,maxValid:24,color:'#417eae',unit:'h'})+'</div>'+
+         '<div class="akSleepPremiumGraph gold"><div class="akSleepPremiumGraphHead"><div><h4>Qualité ressentie</h4>'+
+           '<p>Note donnée par le client, de 1 à 5</p></div><div class="akSleepPremiumGraphValue">'+
+           esc(qualityAverage!==null?qualityAverage.toFixed(1)+' / 5':'—')+'</div></div>'+
+           akSleepCurve(recent,'quality','Qualité ressentie',{minValid:1,maxValid:5,fixedMin:1,fixedMax:5,color:'#c2934d',unit:'/5'})+'</div>'+
+       '</div>'+
+       '<div class="akSleepPremiumBottom">'+
+         stat('Heure de coucher moyenne',akSleepClock(recent,'bedtime',true),'Calculée sur les horaires disponibles')+
+         stat('Heure de réveil moyenne',akSleepClock(recent,'wakeup'),'Calculée sur les horaires disponibles')+
+         stat('Temps éveillé la nuit',awakeAvg!==null?Math.round(awakeAvg)+' min':'—','Moyenne des durées nocturnes documentées')+
+       '</div>'+
+       '<p class="akSleepPremiumFoot">Les dates correspondent aux nuits renseignées, sans interpolation des jours manquants. Données déclaratives : les tendances sont descriptives, pas un diagnostic médical. Les observations détaillées restent accessibles dans l’agenda ci-dessous.</p>'+
+     '</div></section>';
+ }
  function offerToolsPage(c){
    const keys=toolKeys(c),all=(db.offerEntries||[]).filter(x=>x.client_id===c.id);
    const sleepHistory=(db.clientSleepDiary||[])
      .filter(x=>x.client_id===c.id)
      .sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')))
-     .slice(0,50);
+     .slice(0,90);
    const videoMarkup=videoMarkupFor(c);
    const sleepEntry=x=>'<details class="item"><summary style="cursor:pointer"><strong>'+esc(fmtDate(x.sleep_date))+'</strong> • '+
      esc(x.duration_hours)+' h • qualité '+esc(x.quality)+'/5</summary><div class="tiny" style="margin-top:6px">'+
@@ -537,7 +726,7 @@
      '<div class="alert blue" style="margin-bottom:13px"><strong>Répartition :</strong> '+
       'Optitrainer gère la programmation, les séances, la charge, la récupération et les échauffements. '+
       'AK PRIME conserve ici les analyses vidéo reçues, le sommeil et les budgets macro selon ta formule.</div>'+
-     videoMarkup+sleepMarkup+regular+
+     videoMarkup+(hasSleepDiary(c)?renderSleepPremiumDashboard(sleepHistory):'')+sleepMarkup+regular+
      (archive.length?'<div class="card panel"><h3>Enregistrements archivés</h3>'+
        archive.map(x=>'<div class="section-title">'+esc(TOOL_SPEC[x.tool_type]?.label||x.tool_type)+'</div>'+
          entryList(c,x.tool_type,true)).join('')+'</div>':'')+
@@ -691,6 +880,15 @@
    const {error}=await supa.from('client_offer_entries').update({archived_at:isRestore?null:new Date().toISOString()}).eq('id',row.id).eq('client_id',c.id);
    if(error)return alert('Modification impossible : '+error.message);
    await loadSupabaseData();render();toast(isRestore?'Enregistrement restauré.':'Enregistrement archivé.');
+ },true);
+document.addEventListener('click',e=>{
+   const period=e.target.closest?.('.akSleepRangeBtn');
+   if(!period||state.view!=='client'||state.tab!=='offer-tools')return;
+   const days=Number(period.dataset.nights);
+   if(![7,14,30,90].includes(days))return;
+   e.preventDefault();
+   akSleepDashboardRange=days;
+   render();
  },true);
 window.AKP_OFFER_TOOLS_READY=true;
 })();
