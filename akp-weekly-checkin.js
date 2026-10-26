@@ -133,7 +133,11 @@
  coachNotifications=function(){
   const existing=oldCoachNotifications().filter(n=>!String(n.key||'').startsWith('coach:checkin:'));
   const reads=new Set((db.notificationReads||[]).map(x=>x.notification_key));
-  const notifications=(db.clients||[]).flatMap(c=>(c.checkins||[]).filter(pending).map(w=>{
+  const loggedCheckins=new Set((db.coachActivityEvents||[])
+    .filter(e=>e.event_type==='checkin_submitted')
+    .map(e=>String(e.event_key||'').split(':')[1]));
+  const notifications=(db.clients||[]).flatMap(c=>(c.checkins||[])
+    .filter(w=>pending(w)&&!loggedCheckins.has(w.id)).map(w=>{
    const key='coach:checkin:'+w.id;
    return {key,title:'Bilan hebdomadaire reçu — '+c.name,
      detail:'Semaine du '+fmtDate(w.date)+' · réponse à traiter.',
