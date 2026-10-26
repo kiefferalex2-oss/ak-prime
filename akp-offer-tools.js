@@ -726,7 +726,7 @@
      '<div class="alert blue" style="margin-bottom:13px"><strong>Répartition :</strong> '+
       'Optitrainer gère la programmation, les séances, la charge, la récupération et les échauffements. '+
       'AK PRIME conserve ici les analyses vidéo reçues, le sommeil et les budgets macro selon ta formule.</div>'+
-     videoMarkup+(hasSleepDiary(c)?renderSleepPremiumDashboard(sleepHistory):'')+sleepMarkup+regular+
+     videoMarkup+sleepMarkup+regular+
      (archive.length?'<div class="card panel"><h3>Enregistrements archivés</h3>'+
        archive.map(x=>'<div class="section-title">'+esc(TOOL_SPEC[x.tool_type]?.label||x.tool_type)+'</div>'+
          entryList(c,x.tool_type,true)).join('')+'</div>':'')+
