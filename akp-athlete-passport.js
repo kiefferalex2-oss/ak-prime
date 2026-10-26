@@ -277,7 +277,7 @@
   if(!authUser?.id||!['owner','coach'].includes(authProfile?.role))return ret;
   const [prof,sleep]=await Promise.all([
    supa.from('client_passport_profiles').select('*').limit(2000),
-   supa.from('client_sleep_diary').select('client_id,sleep_date,duration_hours,quality,notes')
+   supa.from('client_sleep_diary').select('client_id,sleep_date,duration_hours,quality,notes,bedtime,wakeup,awakenings_count,awakenings')
     .order('sleep_date',{ascending:false}).limit(3000)
   ]);
   if(prof.error)throw Error('Passeport — chargement du profil : '+prof.error.message);
