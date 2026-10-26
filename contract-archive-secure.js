@@ -117,7 +117,9 @@ document.addEventListener('click', async function(event) {
     }
     const [file,flag]=sequence[i];
     const script=document.createElement('script');
-    script.src='./'+file+'?rev=20261024-compact-comparison-v86';
+    // En phase de construction, charger la version actuelle du module à chaque ouverture.
+    // Évite de réutiliser un script ancien malgré des mises à jour publiées sur GitHub.
+    script.src='./'+file+'?rev='+Date.now();
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
