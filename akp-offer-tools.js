@@ -923,5 +923,60 @@
    document.getElementById('akSleepDiary')?.scrollIntoView({behavior:'smooth',block:'start'});
  },true);
 
+
+ // Synchronisation légère du Passeport coach avec le journal client.
+ // Le client enregistre immédiatement sa nuit dans Supabase ; le coach
+ // récupère les nouveaux résultats sans recharger l'onglet (au plus 60 s).
+ let akSleepRefreshBusy=false;
+ let akSleepLastRefresh=0;
+ async function akRefreshCoachPassportSleep(){
+   if(akSleepRefreshBusy||document.hidden||
+      !['owner','coach'].includes(authProfile?.role)||
+      state.view!=='client'||state.tab!=='passport')return;
+   const client=currentClient();
+   if(!client||!hasSleepDiary(client)||!document.getElementById('passportBookBody'))return;
+   // Évite de relancer plusieurs lectures en cas de focus et intervalle simultanés.
+   if(Date.now()-akSleepLastRefresh<20000)return;
+   akSleepLastRefresh=Date.now();
+   akSleepRefreshBusy=true;
+   try{
+     const {data,error}=await supa.from('client_sleep_diary')
+       .select('client_id,sleep_date,duration_hours,quality,notes,bedtime,wakeup,awakenings_count,awakenings')
+       .eq('client_id',client.id)
+       .order('sleep_date',{ascending:false}).limit(90);
+     if(error)throw error;
+     if(state.view!=='client'||state.tab!=='passport'||currentClient()?.id!==client.id)return;
+     const incoming=data||[];
+     const existing=(db.akPassportSleepRows||[]).filter(row=>row.client_id===client.id)
+       .sort((a,b)=>String(b.sleep_date||'').localeCompare(String(a.sleep_date||'')));
+     const fingerprint=rows=>JSON.stringify(rows.map(row=>[
+       row.sleep_date,row.duration_hours,row.quality,row.bedtime,row.wakeup,
+       row.awakenings_count,row.awakenings,row.notes
+     ]));
+     if(fingerprint(existing)===fingerprint(incoming))return;
+     db.akPassportSleepRows=(db.akPassportSleepRows||[])
+       .filter(row=>row.client_id!==client.id).concat(incoming);
+     db.clientSleepDiary=(db.clientSleepDiary||[])
+       .filter(row=>row.client_id!==client.id).concat(incoming);
+     if(passportActiveModel&&passportSleepEligible(passportActiveModel)){
+       passportActiveModel.akPassportSleep=incoming;
+       const body=document.getElementById('passportBookBody');
+       if(body){
+         body.innerHTML=renderPassportBookPage(passportActiveModel);
+         bindPassportBook();
+       }
+     }
+   }catch(error){
+     console.warn('Actualisation du sommeil indisponible :',error?.message||error);
+   }finally{akSleepRefreshBusy=false;}
+ }
+ if(!window.__akSleepCoachRefreshTimer){
+   window.__akSleepCoachRefreshTimer=window.setInterval(akRefreshCoachPassportSleep,60000);
+   window.addEventListener('focus',akRefreshCoachPassportSleep);
+   document.addEventListener('visibilitychange',()=>{
+     if(!document.hidden)akRefreshCoachPassportSleep();
+   });
+ }
+
 window.AKP_OFFER_TOOLS_READY=true;
 })();
