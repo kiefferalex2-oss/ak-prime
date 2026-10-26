@@ -913,6 +913,13 @@ document.addEventListener('click',e=>{
    return html.replace('6 RUBRIQUES À EXPLORER','7 RUBRIQUES À EXPLORER')
      .replace('</nav>',button+'</nav>');
  };
+ const beforeSleepPremiumPassport=renderPremiumPassport;
+ renderPremiumPassport=function(model){
+   // Après changement de formule (notamment en compte TEST), ne pas laisser
+   // une rubrique Sommeil active lorsque la nouvelle offre n'y donne plus accès.
+   if(passportBookPage==='sleep'&&!akSleepPassportEligible(model))passportBookPage='overview';
+   return beforeSleepPremiumPassport(model);
+ };
  const beforeSleepPassportBody=renderPassportBookPage;
  renderPassportBookPage=function(model){
    if(passportBookPage!=='sleep')return beforeSleepPassportBody(model);
