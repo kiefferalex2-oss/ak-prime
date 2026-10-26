@@ -82,19 +82,46 @@
    return [...scheduledNotifications(),...oldNotifications()].sort((a,b)=>
      Number(!!a.read)-Number(!!b.read)||(b.priority||0)-(a.priority||0));
  };
+ function assessmentState(c,p){
+   if(p.status==='completed')return 'completed';
+   if(p.status==='cancelled')return 'cancelled';
+   if((c.tests||[]).some(t=>t.assessmentPlanId===p.id))return 'to_close';
+   const days=diffDays(p.due_date);
+   return days<0?'overdue':days===0?'today':'upcoming';
+ }
+ function assessmentSummary(c,rows){
+   const counts={to_close:0,overdue:0,today:0,upcoming:0};
+   rows.forEach(p=>{
+     const value=assessmentState(c,p);
+     if(Object.prototype.hasOwnProperty.call(counts,value))counts[value]++;
+   });
+   const labels=[];
+   if(counts.overdue)labels.push(counts.overdue+' en retard');
+   if(counts.today)labels.push(counts.today+' à réaliser');
+   if(counts.to_close)labels.push(counts.to_close+' à clôturer');
+   if(counts.upcoming)labels.push(counts.upcoming+' à venir');
+   return labels.join(' · ')||'0 en attente';
+ }
  function planRows(c,phase,limit=20){
    const rows=assessmentItems(c.id).filter(p=>p.phase===phase).sort((a,b)=>
      Number(a.status!=='planned')-Number(b.status!=='planned')||
      String(a.due_date).localeCompare(String(b.due_date)));
    return rows.slice(0,limit).map(p=>{
-     const outcome=p.status==='completed'?'Réalisée':p.status==='cancelled'?'Annulée':
-       diffDays(p.due_date)<0?'En retard':diffDays(p.due_date)<=7?'À préparer':'Planifiée';
-     const tone=p.status==='completed'?'green':p.status==='cancelled'?'red':diffDays(p.due_date)<=7?'amber':'blue';
+     const state=assessmentState(c,p);
      const linked=(c.tests||[]).filter(t=>t.assessmentPlanId===p.id);
+     const outcome=({
+       completed:'Réalisée',cancelled:'Annulée',to_close:'Résultats saisis · à clôturer',
+       overdue:'En retard',today:'À réaliser',upcoming:'À venir'
+     })[state]||'Planifiée';
+     const tone=state==='completed'?'green':state==='cancelled'?'red':
+       ['to_close','overdue','today'].includes(state)?'amber':'blue';
+     const canClose=p.phase==='cycle_end'||linked.length>0;
      const action=p.status==='planned'?
        '<div class="row" style="gap:6px;flex-wrap:wrap">'+
        (p.phase!=='cycle_end'?'<button class="btn ghost small akAssessmentResult" data-id="'+esc(p.id)+'">+ Résultat</button>':'')+
-       '<button class="btn ghost small akAssessmentDone" data-id="'+esc(p.id)+'">Clôturer</button>'+
+       '<button class="btn ghost small akAssessmentDone" data-id="'+esc(p.id)+'"'+
+       (canClose?'':' disabled title="Ajoute au moins un résultat lié à cette évaluation pour la clôturer"')+'>'+
+       (p.phase==='cycle_end'?'Clôturer le bilan':'Marquer comme réalisée')+'</button>'+
        '<button class="link akAssessmentCancel" data-id="'+esc(p.id)+'">Annuler</button></div>':'';
      return '<div class="item" style="padding:12px"><div class="row between" style="gap:12px;flex-wrap:wrap">'+
        '<div>'+phaseChip(p.phase)+' <strong>'+esc(p.title)+'</strong>'+
@@ -106,14 +133,15 @@
    }).join('');
  }
  function plannedPanel(c){
-   const count=assessmentItems(c.id).filter(p=>p.status==='planned').length;
+   const allPlans=assessmentItems(c.id);
    const mentally=c.pole==='Mental';
    const sections=(mentally?['cycle_end']:['initial','retest','cycle_end']).map(phase=>{
      const rows=assessmentItems(c.id).filter(p=>p.phase===phase);
      const pending=rows.filter(p=>p.status==='planned').length;
+     const attention=rows.some(p=>['to_close','overdue','today'].includes(assessmentState(c,p)));
      return '<details class="card panel" style="margin:9px 0">'+
        '<summary style="cursor:pointer"><strong>'+esc(LABEL[phase])+'</strong> '+
-       '<span class="status '+(pending?'amber':'blue')+'">'+pending+' à traiter</span> '+
+       '<span class="status '+(attention?'amber':'blue')+'">'+esc(assessmentSummary(c,rows))+'</span> '+
        '<span class="muted tiny">('+rows.length+' au total)</span></summary>'+
        '<div class="list" style="margin-top:9px">'+
        (planRows(c,phase,12)||'<p class="muted tiny">Aucune échéance pour cette étape.</p>')+
@@ -124,12 +152,12 @@
      '<span class="akpCoachFoldTitle"><span class="akpCoachFoldArrow" aria-hidden="true">⌄</span>'+
      '<span class="akpCoachFoldText"><strong>Évaluations & échéances</strong>'+
      '<small>Retests, bilans et dates à suivre</small></span></span>'+
-     '<span class="akpCoachFoldCount">'+count+' à traiter</span></summary>'+
+     '<span class="akpCoachFoldCount">'+esc(assessmentSummary(c,allPlans))+'</span></summary>'+
      '<div class="akpCoachFoldBody">'+
      '<p class="muted tiny">'+(mentally?'Bilans de fin de cycle, sans batterie physique automatique.':
        c.pole==='Performance'?'Retests à six semaines + bilans de fin de cycle, selon les dates du dossier.':
        'Évaluations selon les objectifs et bilans de fin de cycle ; pas de retest sportif automatique.')+
-     ' Chaque évaluation peut être renseignée puis clôturée indépendamment de l’onboarding.</p>'+
+     ' Chaque évaluation peut être renseignée puis clôturée indépendamment de l’onboarding. Après la saisie des résultats, marque l’évaluation comme réalisée pour la retirer des échéances en attente.</p>'+
      '<div class="row" style="gap:8px;flex-wrap:wrap;margin:9px 0 12px">'+
      (authProfile?.role==='owner'&&!c.archivedAt?
        '<button class="btn primary small akNewAssessment">+ Planifier une évaluation</button>'+
@@ -258,7 +286,8 @@
     '<div class="field"><label>Unité</label><input id="tUnit" class="input" value="'+esc(testLibraryItem(prefill)?.unit||'')+'"></div></div>'+
     '<div class="field"><label>Contexte / protocole (facultatif)</label><input id="tContext" class="input" maxlength="300" placeholder="Ex. CMJ, mêmes conditions que la mesure initiale"></div>'+
     '<div class="field"><label>Interprétation du coach (facultatif)</label><textarea id="tNote" class="textarea" rows="3"></textarea></div>'+
-    '<div class="alert blue tiny" id="tHint">'+esc(testLibraryItem(prefill)?.hint||'Choisis un test : son unité sera proposée automatiquement.')+'</div>',
+    '<div class="alert blue tiny" id="tHint">'+esc(testLibraryItem(prefill)?.hint||'Choisis un test : son unité sera proposée automatiquement.')+'</div>'+
+    '<p class="muted tiny">Un résultat ne clôture pas automatiquement toute l’évaluation : après la dernière saisie, clique sur « Marquer comme réalisée » dans « Évaluations & échéances ».</p>',
     '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Enregistrer au Passeport</button>');
    const get=id=>document.getElementById(id);
    get('cancelM').onclick=closeModal;
@@ -301,7 +330,7 @@
        });
        if(error)throw Error(error.message);
        closeModal();await loadSupabaseData();state.tab='passport';render();
-       toast('Résultat classé et enregistré dans le Passeport.');
+       toast(selectedPlan?'Résultat enregistré : il reste à clôturer l’évaluation après la dernière saisie.':'Résultat classé et enregistré dans le Passeport.');
      }catch(e){alert('Résultat non enregistré : '+e.message);button.disabled=false;}
    };
  }
