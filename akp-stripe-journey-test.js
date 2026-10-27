@@ -20,5 +20,22 @@ async function loadPaidOrder(){
   show('resultDetails','Offre : '+o.offer_code+' · '+o.commitment_months+' mois · '+o.payment_mode);
  }
 }
+e('provisionClient').onclick=async()=>{
+ if(!lastOrder||lastOrder.status!=='paid'||lastOrder.test_client_id)return;
+ const button=e('provisionClient');
+ button.disabled=true;
+ try{
+  const result=await supa.functions.invoke('owner-create-test-client',{body:{paidOrderId:lastOrder.id}});
+  const data=result.data;
+  if(result.error||!data?.success)throw Error(data?.error||result.error?.message||'Création impossible');
+  e('demoEmail').value=data.email;
+  e('demoPassword').value=data.password;
+  e('credentialsCard').classList.remove('hidden');
+  show('provisionStatus','Compte TEST créé. Conserve les identifiants et connecte-toi au portail en navigation privée.');
+  await loadPaidOrder();
+ }catch(err){
+  show('provisionStatus',err.message||'Erreur de création',true);
+ }finally{button.disabled=false}
+};
 window.AKP_initStripeJourney=loadPaidOrder;
 })();
