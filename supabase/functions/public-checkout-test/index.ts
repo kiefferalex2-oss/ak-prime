@@ -168,6 +168,14 @@ Deno.serve(async(req:Request)=>{
  }
  let invoice:null|{invoiceNumber:string,hostedUrl:string|null,pdfUrl:string|null}=null;
  try{invoice=await paidInvoice(order)}catch(e){console.warn("Invoice TEST pending",String(e).slice(0,200))}
+ if(invoice?.hostedUrl&&!pass.invoice_email_queued_at){
+   try{
+     const mailed=await admin.rpc("send_invited_stripe_test_invoice",{
+       p_invite_id:pass.id,p_invoice_number:invoice.invoiceNumber,p_invoice_url:invoice.hostedUrl
+     });
+     if(mailed.error)console.warn("Test invoice email queue failed",mailed.error.message.slice(0,160));
+   }catch(e){console.warn("Test invoice mail unavailable",String(e).slice(0,140))}
+ }
  return reply({
     status:"paid",invited:true,
     message:"Invitation envoyée : vérifie ta boîte e-mail et crée ton mot de passe.",
