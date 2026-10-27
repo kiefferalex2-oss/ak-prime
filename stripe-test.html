@@ -34,7 +34,7 @@ button.primary{background:#d8b16d;color:#0d1b28;font-weight:900}button.secondary
  <p class="sub">Crée un lien privé à usage unique, puis ouvre-le en navigation privée. Sur le vrai site, choisis une formule, paie avec une carte de test, reçois l'invitation par e-mail et crée ton compte client. Aucun argent réel n'est prélevé.</p>
  <div class="buttons"><button id="createPublicLink" class="primary" type="button">Créer un lien de parcours complet</button></div>
  <div id="publicLinkResults" class="alert hidden" role="status"></div>
- <div class="buttons"><a id="visitPublicLink" class="hidden" target="_blank" rel="noopener" href="#">Ouvrir le site AK PRIME avec le lien privé</a></div>
+ <div class="buttons"><button id="copyPublicLink" class="secondary hidden" type="button">Copier le lien (pour navigation privée)</button><a id="visitPublicLink" class="hidden" target="_blank" rel="noopener" href="#">Ouvrir le site dans cet onglet</a></div>
  <p class="muted">Lien valable 3 heures, pour une seule commande. Ne le partage pas publiquement. Utilise une adresse e-mail à laquelle tu as accès et qui n'a pas déjà de compte AK PRIME.</p>
 </section>
 <section class="card hidden" id="payArea">
@@ -88,6 +88,11 @@ e('createPublicLink').onclick=async()=>{
   const {data,error}=await supa.functions.invoke('public-checkout-test',{body:{action:'issue'}});
   if(error||!data?.url)throw Error(data?.error||error?.message||'Lien indisponible');
   const a=e('visitPublicLink');a.href=data.url;a.classList.remove('hidden');
+  e('copyPublicLink').classList.remove('hidden');
+  e('copyPublicLink').onclick=async()=>{
+   try{await navigator.clipboard.writeText(data.url);show('publicLinkResults','Lien copié : colle-le dans une fenêtre privée (Ctrl + Maj + N).');}
+   catch{show('publicLinkResults','Copie l’adresse du lien ci-dessous manuellement.');}
+  };
   show('publicLinkResults','Lien généré ! Ouvre-le en navigation privée, puis choisis ton offre depuis le site.');
  }catch(err){show('publicLinkResults','Erreur : '+(err.message||'Lien non créé'),true)}
  finally{b.disabled=false}
