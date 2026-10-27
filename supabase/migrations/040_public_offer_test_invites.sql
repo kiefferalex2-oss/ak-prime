@@ -27,7 +27,7 @@ declare v_pass public.stripe_test_invites%rowtype;
         v_offer public.offer_catalog%rowtype;
         v_id uuid;v_date date;v_end date;v_first text;v_last text;v_email text;
 begin
- if current_user <> 'service_role' then raise exception 'Service interne uniquement.' using errcode='42501'; end if;
+ if coalesce(auth.jwt()->>'role','') <> 'service_role' then raise exception 'Service interne uniquement.' using errcode='42501'; end if;
  select * into v_pass from public.stripe_test_invites where id=p_invite_id for update;
  if v_pass.id is null or v_pass.stripe_order_id is null then raise exception 'Invitation invalide.';end if;
  if v_pass.test_client_id is not null then return v_pass.test_client_id;end if;
