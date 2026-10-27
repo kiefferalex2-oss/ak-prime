@@ -52,7 +52,7 @@ button.primary{background:#d8b16d;color:#0d1b28;font-weight:900}button.secondary
 </section>
 <p class="muted">Protection : seuls les propriétaires connectés peuvent ouvrir une session test. Le statut provient du webhook Stripe signé ; un retour sur cette page ne prouve jamais à lui seul le paiement.</p>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supa=window.supabase.createClient('https://gptvgldboqarfklorjip.supabase.co','sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx',{auth:{persistSession:true,autoRefreshToken:true}});
 const e=id=>document.getElementById(id);
