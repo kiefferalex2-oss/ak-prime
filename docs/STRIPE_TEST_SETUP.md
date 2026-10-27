@@ -6,20 +6,21 @@ Le nouveau banc Stripe est accessible à https://akprime.fr/stripe-test.html (co
 
 ## État constaté le 27 octobre 2026
 
-- Sept produits Stripe et 28 tarifs Stripe **test** créés, avec quatre variantes par offre (3/6 mois × mensuel/comptant), correspondant à `public.quote_offer`.
+- Sept produits Stripe et 28 tarifs Stripe **test** créés et vérifiés dans l'environnement **« environnement de test AK PRIME »** (`acct_1UV85r5iH3zuK1xr`), avec quatre variantes par offre (3/6 mois × mensuel/comptant), correspondant à `public.quote_offer`.
 - `stripe-test-checkout` déployée en version 3 ; utilise `lookup_keys` et contrôle chaque tarif Stripe contre la valeur du devis Supabase avant Checkout.
 - `stripe-test-webhook` déployée en version 2 ; prend en charge les paiements confirmés, expirés, différés réussis et refusés.
-- Endpoint Stripe **test** créé et activé : `we_1UVAqf52NfuzDJzTpmQJi9ND`.
+- Endpoint Stripe du bon environnement **« environnement de test AK PRIME »** créé et activé : `we_1UVBDO5iH3zuK1xrCS936lrS`.
+- L'ancien webhook `we_1UVAqf52NfuzDJzTpmQJi9ND` a été créé dans le *mode test du compte AK PRIME* (`acct_1UVASx52NfuzDJzT`), environnement différent. Ne pas mélanger les secrets/API keys et les prix entre ces deux environnements.
 - **Non vérifié** : présence de la clé API secrète dans Supabase, du secret de signature `whsec_...`, d'`AKP_STRIPE_TEST_ENABLED=true`, puis réussite d'un paiement test de bout en bout.
 
 ## Connexion des secrets, à effectuer personnellement
 
-1. Sur https://dashboard.stripe.com/test/apikeys, récupérer la clé SECRÈTE du mode test (commençant par sk_test_).
+1. Sur le tableau de bord Stripe, **dans « environnement de test AK PRIME »**, récupérer la clé secrète API de CE sandbox (type `sk_test_...`). Ne pas utiliser une clé du mode test de l'autre compte AK PRIME.
 2. Dans Supabase https://supabase.com/dashboard/project/gptvgldboqarfklorjip/settings/functions → Edge Functions → Secrets, créer STRIPE_SECRET_KEY avec la valeur de la clé de test.
 3. Dans le même écran créer AKP_STRIPE_TEST_ENABLED avec la valeur true.
-4. L'endpoint Stripe TEST existe déjà : `we_1UVAqf52NfuzDJzTpmQJi9ND` → `https://gptvgldboqarfklorjip.supabase.co/functions/v1/stripe-test-webhook` (ne pas en créer un deuxième).
+4. Dans **« environnement de test AK PRIME »** (sandbox `acct_1UV85r5iH3zuK1xr`), l'endpoint existe déjà : `we_1UVBDO5iH3zuK1xrCS936lrS` → `https://gptvgldboqarfklorjip.supabase.co/functions/v1/stripe-test-webhook` (ne pas en créer un deuxième).
 5. Événements déjà configurés : `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`.
-6. Dans Stripe, ouvrir cette destination et révéler le **secret de signature TEST** `whsec_...` ; le copier dans Supabase Edge Functions → Secrets sous `STRIPE_WEBHOOK_SECRET`.
+6. Dans Stripe, ouvrir cette destination sandbox et révéler **son** secret de signature `whsec_...` ; le copier dans Supabase Edge Functions → Secrets sous `STRIPE_WEBHOOK_SECRET`. Ne pas utiliser le secret de l'ancien webhook du compte AK PRIME.
 
 Ne jamais transmettre les clés dans la conversation ou les déposer dans GitHub.
 
