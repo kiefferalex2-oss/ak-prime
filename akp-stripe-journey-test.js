@@ -37,5 +37,15 @@ e('provisionClient').onclick=async()=>{
   show('provisionStatus',err.message||'Erreur de création',true);
  }finally{button.disabled=false}
 };
+e('copyDemo').onclick=async()=>{
+ const text='AK PRIME · COMPTE TEST\nIdentifiant : '+e('demoEmail').value+'\nMot de passe : '+e('demoPassword').value;
+ try{
+  await navigator.clipboard.writeText(text);
+  show('provisionStatus','Identifiants copiés.');
+ }catch{
+  show('provisionStatus','Sélectionne et copie les champs ci-dessus.',true);
+ }
+};
+e('refresh').addEventListener('click',loadPaidOrder);
 window.AKP_initStripeJourney=loadPaidOrder;
 })();
