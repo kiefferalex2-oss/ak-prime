@@ -44,9 +44,17 @@ Deno.serve(async (request: Request) => {
     const sessionId=String(body.sessionId||"");
     if (!/^cs_test_[A-Za-z0-9_]{8,300}$/.test(sessionId)) return respond({error:"Identifiant de session invalide"},400);
     const {data,error}=await admin.from("stripe_test_orders")
-      .select("id,status,offer_code,commitment_months,payment_mode,total_cents,monthly_cents,created_at,paid_at,subscription_cancel_at,last_error")
+      .select("id,status,offer_code,commitment_months,payment_mode,total_cents,monthly_cents,created_at,paid_at,subscription_cancel_at,last_error,test_client_id,stripe_session_id")
       .eq("owner_user_id",user.id).eq("stripe_session_id",sessionId).maybeSingle();
     if (error) return respond({error:"Statut indisponible"},500);
+    return respond({order:data||null,mode:"test"});
+  }
+  if (body.action==="latest_paid") {
+    const {data,error}=await admin.from("stripe_test_orders")
+      .select("id,status,offer_code,commitment_months,payment_mode,total_cents,monthly_cents,created_at,paid_at,subscription_cancel_at,last_error,test_client_id,stripe_session_id")
+      .eq("owner_user_id",user.id).eq("status","paid")
+      .order("paid_at",{ascending:false}).limit(1).maybeSingle();
+    if(error)return respond({error:"Dernier paiement TEST indisponible"},500);
     return respond({order:data||null,mode:"test"});
   }
   if (body.action!=="create") return respond({error:"Action non reconnue"},400);
