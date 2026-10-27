@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AK PRIME · Vérification Stripe</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#f4f8fc;background:#0a1525;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 85% 0%,#1b3657,#0b1829 44%,#07111e 100%);padding:28px 16px 80px}
+main{max-width:860px;margin:auto}header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:26px}a{color:#dfb36d}
+.brand{font-size:26px;font-weight:950;letter-spacing:-.8px}.brand b{color:#d8b16d} .label{color:#e0b872;letter-spacing:2px;text-transform:uppercase;font-size:11px;font-weight:900}
+.card{background:#172a42;border:1px solid #35506d;border-radius:21px;padding:24px;box-shadow:0 24px 65px #0005;margin:14px 0}
+h1{font-size:clamp(28px,5vw,42px);letter-spacing:-1.4px;margin:8px 0 10px;line-height:1.1}h1 em{font-style:normal;color:#d8b16d}h2{font-size:19px;margin:0 0 18px}.sub{color:#aec0d0;font-size:14px;line-height:1.7;margin:0 0 10px}
+.badge{display:inline-flex;border-radius:30px;border:1px solid #e1bd7c;background:#342d28;padding:8px 13px;color:#f8d693;font-size:11px;font-weight:900;letter-spacing:1px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+label{font-size:12px;font-weight:850;color:#c9d6e2}input,select{background:#0a1a2d;color:#f6f8fd;border:1px solid #3b5067;border-radius:10px;padding:13px 12px;font-size:14px;width:100%;min-width:0}
+input:focus,select:focus{outline:2px solid #ca9f60}button{border:0;border-radius:10px;padding:14px 18px;font:900 14px/1.4 inherit;cursor:pointer}
+button.primary{background:#d8b16d;color:#0d1b28;font-weight:900}button.secondary{background:#203a59;color:#e5edf5;border:1px solid #4b6180;font-weight:800}button:disabled{opacity:.6;cursor:not-allowed}
+.buttons{display:flex;gap:9px;flex-wrap:wrap}.hidden{display:none!important}.alert{padding:15px 17px;background:#0b213b;border:1px solid #415f80;border-radius:12px;font-size:13px;line-height:1.6;margin-top:14px}.info{margin:0 0 13px;color:#bdd1e4;font-size:13px}
+.checkbox{display:flex;align-items:flex-start;gap:11px;line-height:1.6;margin:9px 0;color:#d5e1eb;font-size:13px}.checkbox input{width:18px;height:18px;flex-shrink:0;margin:2px 0}
+.price{background:#0c2037;border:1px solid #47607a;padding:17px;border-radius:14px;margin:16px 0}.price strong{font-size:25px;color:#efc989}.muted{font-size:12px;color:#9db2c6;line-height:1.65}.error{color:#ffd1bc;border-color:#ad5f44;background:#35211e}.success{color:#c5f5ce;border-color:#438d65;background:#132b24}
+@media(max-width:600px){.row{grid-template-columns:1fr}.card{padding:20px 17px}.brand{font-size:23px}}
+</style></head>
+<body><main>
+<header><span class="brand">AK <b>PRIME</b></span><a href="/" rel="noopener">Retour au site</a></header>
+<div class="badge">STRIPE · TEST UNIQUEMENT</div>
+<h1>Vérifier le parcours<br><em>de paiement.</em></h1>
+<p class="sub">Espace de validation réservé au propriétaire d'AK PRIME. Les cartes Stripe de test ne débitent aucun montant réel. Aucune création de client et aucune facture réelle.</p>
+<section class="card" id="authArea"><h2>Connexion propriétaire</h2><div class="row">
+ <div class="field"><label for="emailLogin">E-mail du compte AK PRIME</label><input id="emailLogin" type="email" autocomplete="username"></div>
+ <div class="field"><label for="passwordLogin">Mot de passe</label><input id="passwordLogin" type="password" autocomplete="current-password"></div>
+ </div><div class="buttons"><button id="login" class="primary">Se connecter</button><button id="logout" class="secondary hidden">Déconnexion</button></div>
+ <div id="authStatus" class="alert hidden" role="status"></div>
+ </section>
+<section class="card hidden" id="payArea">
+ <h2>Simulation Stripe Checkout</h2>
+ <p class="info">Le tarif est calculé par Supabase, puis Stripe ouvre sa page de paiement sécurisée. Cette validation est isolée des dossiers clients.</p>
+ <div class="row">
+  <div class="field"><label for="offer">Formule</label><select id="offer"></select></div>
+  <div class="field"><label for="duration">Engagement</label><select id="duration"><option value="3">3 mois</option><option value="6">6 mois</option></select></div>
+  <div class="field"><label for="payment">Mode de paiement</label><select id="payment"><option value="monthly">Mensuel / abonnement test</option><option value="upfront">Comptant / paiement test</option></select></div>
+  <div class="field"><label for="customerName">Nom du client fictif</label><input id="customerName" value="Client Démonstration AK PRIME" maxlength="160"></div>
+  <div class="field"><label for="customerEmail">Adresse du client fictif</label><input id="customerEmail" type="email"></div>
+ </div>
+ <div class="price" id="quote">Choisir une formule pour calculer le prix serveur.</div>
+ <label class="checkbox"><input id="terms" type="checkbox"> J'accepte, pour cette simulation uniquement, les CGV et l'engagement de 3 ou 6 mois sélectionné.</label>
+ <label class="checkbox"><input id="privacy" type="checkbox"> J'ai pris connaissance de la politique de confidentialité.</label>
+ <label class="checkbox"><input id="health" type="checkbox"> J'accepte le traitement des informations de santé que je pourrais communiquer pour le suivi.</label>
+ <div class="buttons"><button id="pay" class="primary">Ouvrir Stripe Checkout (TEST)</button></div>
+ <div class="alert hidden" id="paymentStatus" role="status"></div>
+</section>
+<section class="card hidden" id="resultCard"><h2>Résultat Stripe</h2>
+ <p class="sub" id="resultText">Confirmation en attente.</p>
+ <div class="buttons"><button class="secondary" id="refresh">Actualiser le statut du webhook</button></div>
+ <div class="alert" id="resultDetails"></div>
+</section>
+<p class="muted">Protection : seuls les propriétaires connectés peuvent ouvrir une session test. Le statut provient du webhook Stripe signé ; un retour sur cette page ne prouve jamais à lui seul le paiement.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+<script>
+const supa=window.supabase.createClient('https://gptvgldboqarfklorjip.supabase.co','sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx',{auth:{persistSession:true,autoRefreshToken:true}});
+const e=id=>document.getElementById(id);
+let user=null,sessionId=new URLSearchParams(location.search).get('session_id')||'';
+let quoting=0;
+function show(id,text,isError=false){const el=e(id);el.textContent=text;el.classList.remove('hidden');el.classList.toggle('error',isError)}
+function hide(id){e(id).classList.add('hidden')}
+async function who(){
+ const {data:{user:u}}=await supa.auth.getUser();user=u;
+ if(!user){e('payArea').classList.add('hidden');e('logout').classList.add('hidden');e('login').classList.remove('hidden');return}
+ const {data:profile,error}=await supa.from('profiles').select('role').eq('id',user.id).maybeSingle();
+ if(error||profile?.role!=='owner'){show('authStatus','Compte connecté, mais accès refusé : cet espace est réservé au propriétaire.',true);hide('payArea');return}
+ hide('authArea');e('payArea').classList.remove('hidden');e('customerEmail').value=user.email||'';
+ await loadOffers();
+ if(sessionId)await getStatus();
+}
+e('login').onclick=async()=>{
+ const email=e('emailLogin').value.trim(),password=e('passwordLogin').value;
+ e('login').disabled=true;
+ try{const {error}=await supa.auth.signInWithPassword({email,password});
+  if(error)throw error;await who()}
+ catch(error){show('authStatus',error.message||'Connexion impossible',true)}
+ finally{e('login').disabled=false}
+};
+e('logout').onclick=async()=>{await supa.auth.signOut();location.href=location.pathname};
+e('passwordLogin').addEventListener('keydown',event=>{if(event.key==='Enter')e('login').click()});
+async function loadOffers(){
+ const {data,error}=await supa.from('offer_catalog')
+   .select('code,pole,offer_name,base_monthly_cents').eq('active',true).order('display_order');
+ if(error||!data?.length){show('paymentStatus','Catalogue indisponible : '+(error?.message||'aucune formule'),true);return}
+ e('offer').innerHTML=data.map(o=>'<option value="'+o.code+'">'+o.pole+' · '+o.offer_name+'</option>').join('');
+ await quote();
+}
+async function quote(){
+ const n=++quoting;
+ const {data,error}=await supa.rpc('quote_offer',{
+  p_offer_code:e('offer').value,p_commitment_months:Number(e('duration').value),p_payment_mode:e('payment').value
+ });
+ if(n!==quoting)return;
+ const q=Array.isArray(data)?data[0]:data;
+ if(error||!q){e('quote').textContent='Tarif indisponible';e('pay').disabled=true;return}
+ e('pay').disabled=false;
+ const euro=c=>(Number(c)/100).toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
+ e('quote').innerHTML='<div class="label">Devis serveur</div><strong>'+euro(q.total_cents)+'</strong><div class="muted">'+
+  (e('payment').value==='monthly'?euro(q.monthly_equivalent_cents)+' par mois pendant '+e('duration').value+' mois': 'Règlement en une fois')+
+  ' · Transaction Stripe TEST uniquement</div>';
+}
+['offer','duration','payment'].forEach(id=>e(id).addEventListener('change',quote));
+e('pay').onclick=async()=>{
+ if(!e('terms').checked||!e('privacy').checked||!e('health').checked)return show('paymentStatus','Veuillez cocher les trois confirmations de test.',true);
+ const email=e('customerEmail').value.trim(),name=e('customerName').value.trim();
+ if(name.length<3||!e('customerEmail').checkValidity())return show('paymentStatus','Nom ou e-mail de démonstration non valide.',true);
+ e('pay').disabled=true;show('paymentStatus','Préparation de la session de paiement sécurisé Stripe…');
+ try{
+  const {data,error}=await supa.functions.invoke('stripe-test-checkout',{body:{
+    action:'create',offerCode:e('offer').value,duration:Number(e('duration').value),
+    paymentMode:e('payment').value,fullName:name,email,
+    acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart:false
+  }});
+  if(error||!data?.url)throw Error(data?.error||error?.message||'Stripe indisponible');
+  if(!/^https:\/\/checkout\.stripe\.com\//.test(data.url))throw Error('Destination Stripe invalide');
+  location.assign(data.url);
+ }catch(error){show('paymentStatus',error.message||'Erreur Stripe',true);e('pay').disabled=false}
+};
+async function getStatus(){
+ if(!sessionId)return;
+ e('resultCard').classList.remove('hidden');
+ const {data,error}=await supa.functions.invoke('stripe-test-checkout',{body:{action:'status',sessionId}});
+ if(error||!data?.order){e('resultText').textContent='Session inconnue ou en cours de préparation.';show('resultDetails',error?.message||'Aucun statut de webhook disponible',true);return}
+ const o=data.order;
+ const statuses={paid:'Paiement TEST confirmé par le webhook Stripe.',checkout_created:'Retour de Stripe reçu. La confirmation du webhook n’est pas encore arrivée.',expired:'Session Stripe expirée.',cancelled:'Paiement annulé.',failed:'Échec de la simulation.'};
+ e('resultText').textContent=statuses[o.status]||'En attente de traitement.';
+ show('resultDetails','Formule : '+o.offer_code+' · '+o.commitment_months+' mois · '+o.payment_mode+
+  ' · Statut serveur : '+o.status+(o.subscription_cancel_at?' · Fin abonnement prévue : '+new Date(o.subscription_cancel_at).toLocaleDateString('fr-FR'):''),
+  o.status==='failed');
+}
+e('refresh').onclick=getStatus;
+who().catch(err=>show('authStatus',err.message||'Erreur de chargement',true));
+</script></body></html>
