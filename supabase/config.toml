@@ -1,0 +1,7 @@
+# AK PRIME Stripe test only
+[functions.stripe-test-checkout]
+verify_jwt = true
+
+# Stripe signs its webhooks; no Supabase JWT required.
+[functions.stripe-test-webhook]
+verify_jwt = false
