@@ -59,6 +59,7 @@ const supa=window.supabase.createClient('https://gptvgldboqarfklorjip.supabase.c
 const e=id=>document.getElementById(id);
 let user=null,sessionId=new URLSearchParams(location.search).get('session_id')||'';
 let quoting=0;
+let lastPaidOrder=null;
 function show(id,text,isError=false){const el=e(id);el.textContent=text;el.classList.remove('hidden');el.classList.toggle('error',isError)}
 function hide(id){e(id).classList.add('hidden')}
 async function who(){
@@ -69,6 +70,7 @@ async function who(){
  hide('authArea');e('payArea').classList.remove('hidden');e('customerEmail').value=user.email||'';
  await loadOffers();
  if(sessionId)await getStatus();
+ await checkLatestPaid();
 }
 e('login').onclick=async()=>{
  const email=e('emailLogin').value.trim(),password=e('passwordLogin').value;
