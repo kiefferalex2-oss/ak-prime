@@ -48,4 +48,6 @@ e('copyDemo').onclick=async()=>{
 };
 e('refresh').addEventListener('click',loadPaidOrder);
 window.AKP_initStripeJourney=loadPaidOrder;
+supa.auth.onAuthStateChange((event,session)=>{if(session?.user&&(event==='SIGNED_IN'||event==='INITIAL_SESSION'))loadPaidOrder().catch(()=>{});});
+supa.auth.getUser().then(({data})=>{if(data?.user)loadPaidOrder().catch(()=>{});}).catch(()=>{});
 })();
