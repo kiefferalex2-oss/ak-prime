@@ -1,17 +1,25 @@
 # AK PRIME — Stripe : banc de validation isolé
 
-**Déployé le 27 octobre 2026. Test uniquement, aucun paiement réel.**
+**Mis à jour le 27 octobre 2026. Test uniquement, aucun paiement réel.**
 
 Le nouveau banc Stripe est accessible à https://akprime.fr/stripe-test.html (connexion propriétaire requise).
+
+## État constaté le 27 octobre 2026
+
+- Sept produits Stripe et 28 tarifs Stripe **test** créés, avec quatre variantes par offre (3/6 mois × mensuel/comptant), correspondant à `public.quote_offer`.
+- `stripe-test-checkout` déployée en version 3 ; utilise `lookup_keys` et contrôle chaque tarif Stripe contre la valeur du devis Supabase avant Checkout.
+- `stripe-test-webhook` déployée en version 2 ; prend en charge les paiements confirmés, expirés, différés réussis et refusés.
+- Endpoint Stripe **test** créé et activé : `we_1UVAqf52NfuzDJzTpmQJi9ND`.
+- **Non vérifié** : présence de la clé API secrète dans Supabase, du secret de signature `whsec_...`, d'`AKP_STRIPE_TEST_ENABLED=true`, puis réussite d'un paiement test de bout en bout.
 
 ## Connexion des secrets, à effectuer personnellement
 
 1. Sur https://dashboard.stripe.com/test/apikeys, récupérer la clé SECRÈTE du mode test (commençant par sk_test_).
 2. Dans Supabase https://supabase.com/dashboard/project/gptvgldboqarfklorjip/settings/functions → Edge Functions → Secrets, créer STRIPE_SECRET_KEY avec la valeur de la clé de test.
 3. Dans le même écran créer AKP_STRIPE_TEST_ENABLED avec la valeur true.
-4. Dans Stripe mode TEST, Developers / Workbench → Webhooks / Event destinations : créer un endpoint HTTPS à : https://gptvgldboqarfklorjip.supabase.co/functions/v1/stripe-test-webhook
-5. Événements requis : checkout.session.completed et checkout.session.expired.
-6. Copier le secret de signature whsec_... de la destination Stripe vers Supabase Edge Functions → Secrets, sous STRIPE_WEBHOOK_SECRET.
+4. L'endpoint Stripe TEST existe déjà : `we_1UVAqf52NfuzDJzTpmQJi9ND` → `https://gptvgldboqarfklorjip.supabase.co/functions/v1/stripe-test-webhook` (ne pas en créer un deuxième).
+5. Événements déjà configurés : `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`.
+6. Dans Stripe, ouvrir cette destination et révéler le **secret de signature TEST** `whsec_...` ; le copier dans Supabase Edge Functions → Secrets sous `STRIPE_WEBHOOK_SECRET`.
 
 Ne jamais transmettre les clés dans la conversation ou les déposer dans GitHub.
 
@@ -27,7 +35,7 @@ Ne jamais transmettre les clés dans la conversation ou les déposer dans GitHub
 ## Architecture et sécurité
 
 - Supabase Edge Functions stripe-test-checkout (JWT requis, rôle propriétaire, tarifs recalculés côté serveur avec public.quote_offer) et stripe-test-webhook (signature vérifiée, événement Stripe LIVE rejeté).
-- Stripe Checkout utilise les produits/prix calculés sur le serveur et pas le montant déclaré par le navigateur.
+- Stripe Checkout utilise les prix du catalogue Stripe TEST trouvés par `lookup_key` et vérifiés contre les prix calculés en base via `public.quote_offer`. Aucun montant soumis par le navigateur n'est utilisé.
 - Mode paiement : paiement comptant en une fois. Mode mensuel : abonnement Stripe TEST, annulé automatiquement à échéance de 3 ou 6 mois par le webhook, avec respect du prix mensuel calculé en base.
 - Données dans les tables isolées public.stripe_test_orders et public.stripe_test_webhook_events, avec RLS et aucun privilège de lecture pour anon/authenticated.
 - Le mode test est bloqué sans un secret sk_test_ et AKP_STRIPE_TEST_ENABLED=true.
