@@ -21,7 +21,7 @@ button.primary{background:#d8b16d;color:#0d1b28;font-weight:900}button.secondary
 <header><span class="brand">AK <b>PRIME</b></span><a href="/" rel="noopener">Retour au site</a></header>
 <div class="badge">STRIPE · TEST UNIQUEMENT</div>
 <h1>Vérifier le parcours<br><em>de paiement.</em></h1>
-<p class="sub">Espace de validation réservé au propriétaire d'AK PRIME. Les cartes Stripe de test ne débitent aucun montant réel. Aucune création de client et aucune facture réelle.</p>
+<p class="sub">Simulation réservée au propriétaire : paiement fictif Stripe, création d’un compte client de démonstration, questionnaire et onboarding. Aucun prélèvement ni facture réelle.</p>
 <section class="card" id="authArea"><h2>Connexion propriétaire</h2><div class="row">
  <div class="field"><label for="emailLogin">E-mail du compte AK PRIME</label><input id="emailLogin" type="email" autocomplete="username"></div>
  <div class="field"><label for="passwordLogin">Mot de passe</label><input id="passwordLogin" type="password" autocomplete="current-password"></div>
@@ -30,7 +30,7 @@ button.primary{background:#d8b16d;color:#0d1b28;font-weight:900}button.secondary
  </section>
 <section class="card hidden" id="payArea">
  <h2>Simulation Stripe Checkout</h2>
- <p class="info">Le tarif est calculé par Supabase, puis Stripe ouvre sa page de paiement sécurisée. Cette validation est isolée des dossiers clients.</p>
+ <p class="info">Le tarif est calculé par Supabase, puis Stripe ouvre sa page de paiement sécurisée. Après paiement confirmé, un dossier de démonstration peut être créé sans toucher aux vrais clients.</p>
  <div class="row">
   <div class="field"><label for="offer">Formule</label><select id="offer"></select></div>
   <div class="field"><label for="duration">Engagement</label><select id="duration"><option value="3">3 mois</option><option value="6">6 mois</option></select></div>
