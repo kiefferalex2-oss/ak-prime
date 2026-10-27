@@ -101,24 +101,26 @@ Deno.serve(async (request: Request) => {
   if(orderError||!order?.id)return respond({error:"Enregistrement de la commande test impossible"},500);
   const stripe=new Stripe(stripeKey);
   try {
+    const lookupKey="akp_"+offerCode+"_"+duration+"_"+paymentMode;
+    const prices=await stripe.prices.list({lookup_keys:[lookupKey],active:true,limit:1});
+    const stripePrice=prices.data[0];
+    const expectedAmount=paymentMode==="monthly"?monthPrice:total;
+    const isRecurring=!!stripePrice?.recurring && stripePrice.recurring.interval==="month" && stripePrice.recurring.interval_count===1;
+    if (!stripePrice || stripePrice.lookup_key!==lookupKey || stripePrice.livemode ||
+        stripePrice.currency!=="eur" || stripePrice.unit_amount!==expectedAmount ||
+        (paymentMode==="monthly"?!isRecurring:!!stripePrice.recurring))
+      throw Error("Le prix Stripe TEST ne correspond pas au devis serveur.");
     const params: Stripe.Checkout.SessionCreateParams = {
       mode:paymentMode==="monthly"?"subscription":"payment",
-      payment_method_types:["card"],
       customer_email:email,
       client_reference_id:order.id,
       locale:"fr",
       billing_address_collection:"required",
       success_url:"https://akprime.fr/stripe-test.html?result=success&session_id={CHECKOUT_SESSION_ID}",
       cancel_url:"https://akprime.fr/stripe-test.html?result=cancelled",
-      line_items:[{
-        price_data:{
-          currency:"eur",
-          unit_amount:paymentMode==="monthly"?monthPrice:total,
-          product_data:{name:"AK PRIME · "+quote.pole+" · "+quote.offer_name,
-            description:duration+" mois d'engagement · "+(paymentMode==="monthly"?"paiement mensuel":"paiement comptant")},
-          ...(paymentMode==="monthly"?{recurring:{interval:"month" as const}}:{})
-        },quantity:1
-      }],
+      // Prix Stripe prédéfini et contrôlé contre le devis calculé dans Supabase.
+      // Aucune somme provenant du navigateur n'est utilisée.
+      line_items:[{price:stripePrice.id,quantity:1}],
       metadata:{akprime_order_id:order.id,environment:"test",commitment_months:String(duration),
         payment_mode:paymentMode},
       ...(paymentMode==="monthly"?{subscription_data:{metadata:{akprime_order_id:order.id}}}:
