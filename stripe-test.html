@@ -70,6 +70,7 @@ async function who(){
  hide('authArea');e('payArea').classList.remove('hidden');e('customerEmail').value=user.email||'';
  await loadOffers();
  if(sessionId)await getStatus();
+ if(window.AKP_initStripeJourney)await window.AKP_initStripeJourney();
 }
 e('login').onclick=async()=>{
  const email=e('emailLogin').value.trim(),password=e('passwordLogin').value;
@@ -133,4 +134,4 @@ async function getStatus(){
 }
 e('refresh').onclick=getStatus;
 who().catch(err=>show('authStatus',err.message||'Erreur de chargement',true));
-</script></body></html>
+</script><script src="/akp-stripe-journey-test.js"></script></body></html>
