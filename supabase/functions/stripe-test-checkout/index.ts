@@ -93,7 +93,8 @@ Deno.serve(async (request: Request) => {
     payment_mode:paymentMode,full_name:fullName,email,
     monthly_cents:monthPrice,total_cents:total,currency:"eur",
     cgv_version:"akprime-cgv-2026-10-20-firm-commitment",
-    accepted_terms_at:now,requested_start_date:startDate,
+    accepted_terms_at:now,privacy_version:"akprime-privacy-2026-10-20",
+    privacy_accepted_at:now,health_consent_at:now,requested_start_date:startDate,
     explicit_early_start:earlyStart,early_start_at:earlyStart?now:null,
     status:"pending"
   }).select("id").single();
