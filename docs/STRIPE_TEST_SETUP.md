@@ -52,6 +52,18 @@ Ne jamais transmettre les clés dans la conversation ou les déposer dans GitHub
 - supabase/migrations/038_stripe_test_consent_evidence.sql
 - supabase/config.toml
 
+## Parcours complet de démonstration après paiement (ajout du 27/10/2026)
+
+- Ouvrir `https://akprime.fr/stripe-test.html` en étant connecté comme propriétaire.
+- La page retrouve automatiquement le dernier paiement Stripe TEST confirmé par webhook, même s'il date de la session précédente.
+- Cliquer sur « Créer le compte client de démonstration » : `owner-create-test-client` vérifie l'état payé, crée une identité Supabase fictive `@example.com`, puis la RPC `owner_provision_paid_test_client` associe une seule fois le dossier fictif à la commande.
+- Le dossier est marqué `is_test=true` et `status=onboarding`, et dispose du bon pôle, de la bonne formule, de l'engagement 3/6 mois et d'un accès au portail. L'onboarding commence au **questionnaire initial**, sans être validé d'avance.
+- Copier immédiatement le mot de passe temporaire affiché une seule fois. En navigation privée, ouvrir `https://akprime.fr/`, se connecter au compte fictif, remplir le questionnaire initial, réserver la visio, puis examiner Passeport, tests, notifications et espace coach.
+- Aucune vraie facture, aucune entrée dans le livre de recettes ni aucune adresse client réelle ne doit être créée par ce module.
+- Les données du sandbox Stripe sont indépendantes de la facturation de production. Ce test **ne remplace pas** le développement et la validation du tunnel commercial public ouvert aux nouveaux clients.
+
+**Contrôle effectué :** une commande Stripe TEST confirmée était présente en base et non encore reliée à un compte fictif. Le clic de création du compte puis le parcours dans le navigateur restent à tester.
+
 ## Après le premier test réussi
 
 Il restera à connecter la confirmation de paiement au provisionnement d’un vrai compte client, à automatiser les factures et paiements récurrents, et à tester l’ensemble du parcours avant ouverture live.
