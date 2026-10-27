@@ -35,7 +35,7 @@ Deno.serve(async(request:Request)=>{
  }
  if(event.livemode!==false)return response("Live events rejected",403);
  if(!/^evt_[A-Za-z0-9_]+$/.test(event.id))return response("Unexpected event id",400);
- const relevant=new Set(["checkout.session.completed","checkout.session.expired"]);
+ const relevant=new Set(["checkout.session.completed","checkout.session.expired","checkout.session.async_payment_succeeded","checkout.session.async_payment_failed"]);
  const shouldIgnore=!relevant.has(event.type);
  const {data:created,error:insertError}=await admin.from("stripe_test_webhook_events").insert({
   stripe_event_id:event.id,event_type:event.type,
@@ -66,13 +66,22 @@ Deno.serve(async(request:Request)=>{
    if(orderError||!order)throw Error("Order and Stripe session do not match");
    if(session.currency!=="eur")throw Error("Currency mismatch");
    const expected=order.payment_mode==="monthly"?order.monthly_cents:order.total_cents;
-   if(event.type==="checkout.session.expired"){
+   if(event.type==="checkout.session.completed" && session.payment_status==="unpaid"){
+     // Paiement différé : attendre le webhook de succès ou d’échec sans confirmer la commande.
+   }else if(event.type==="checkout.session.expired"){
      if(order.status!=="paid"){
        const {error:e}=await admin.from("stripe_test_orders")
         .update({status:"expired",updated_at:new Date().toISOString()}).eq("id",order.id).neq("status","paid");
        if(e)throw Error("Unable to expire order");
      }
-   }else if(event.type==="checkout.session.completed"){
+   }else if(event.type==="checkout.session.async_payment_failed"){
+     if(order.status!=="paid"){
+       const {error:e}=await admin.from("stripe_test_orders")
+         .update({status:"failed",last_error:"Paiement différé refusé",updated_at:new Date().toISOString()})
+         .eq("id",order.id).neq("status","paid");
+       if(e)throw Error("Unable to mark asynchronous payment failed");
+     }
+   }else if(event.type==="checkout.session.completed"||event.type==="checkout.session.async_payment_succeeded"){
      if(session.payment_status!=="paid")throw Error("Payment is not confirmed");
      if(session.amount_total!==expected)throw Error("Price changed after server quote");
      const paidEmail=(session.customer_details?.email??session.customer_email??"").toLowerCase();
