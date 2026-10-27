@@ -70,7 +70,6 @@ async function who(){
  hide('authArea');e('payArea').classList.remove('hidden');e('customerEmail').value=user.email||'';
  await loadOffers();
  if(sessionId)await getStatus();
- await checkLatestPaid();
 }
 e('login').onclick=async()=>{
  const email=e('emailLogin').value.trim(),password=e('passwordLogin').value;
