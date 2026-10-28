@@ -168,7 +168,9 @@ Deno.serve(async(req:Request)=>{
  // Supabase generates the signed invitation link without sending its default email.
  // The existing Resend transport sends the AK PRIME branded invitation instead.
  let activationLink:string|null=null;
+ let brandedRequired=pass.auth_branded_required===true;
  if(!pass.test_client_id){
+   brandedRequired=true;
    let userId=pass.test_auth_user_id as string|null;
    if(!userId){
      const generated=await admin.auth.admin.generateLink({
@@ -181,9 +183,17 @@ Deno.serve(async(req:Request)=>{
          details:generated.error?.message||"Lien d'activation absent"},503,cors);
      userId=generated.data.user.id;
      activationLink=generated.data.properties.action_link;
-     const saved=await admin.from("stripe_test_invites").update({test_auth_user_id:userId})
+     const saved=await admin.from("stripe_test_invites").update({
+       test_auth_user_id:userId,auth_branded_required:true
+     })
        .eq("id",pass.id).is("test_auth_user_id",null);
      if(saved.error)return reply({error:"Impossible d'enregistrer l'identité client TEST."},503,cors);
+   }
+   if(!pass.auth_branded_required && pass.test_auth_user_id){
+     const marker=await admin.from("stripe_test_invites").update({
+       auth_branded_required:true
+     }).eq("id",pass.id);
+     if(marker.error)return reply({error:"Impossible de préparer l'invitation AK PRIME."},503,cors);
    }
    const linked=await admin.rpc("provision_invited_stripe_test_client",{
      p_invite_id:pass.id,p_auth_user_id:userId
@@ -193,7 +203,7 @@ Deno.serve(async(req:Request)=>{
      details:linked.error.message
    },503,cors);
  }
- if(!pass.auth_invite_email_queued_at){
+ if(brandedRequired && !pass.auth_invite_email_queued_at){
    // If an earlier attempt created the Auth user but email delivery failed, use
    // a fresh recovery link to let that user create their password safely.
    if(!activationLink){
