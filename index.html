@@ -5725,25 +5725,9 @@ function openPublicOfferCheckout(button){
          location.assign(result.url);
          return;
        }
-       const {data:{session}}=await supa.auth.getSession();
-       if(!session?.user)throw Error('Connectez-vous d’abord à votre compte AK PRIME pour associer la preuve à votre identité');
-       if(email.toLowerCase()!==String(session.user.email||'').toLowerCase())throw Error('Utilisez l’adresse e-mail de votre compte connecté');
-       if(p.source!=='server'||!p.offerCode)throw Error('Le tarif sécurisé est momentanément indisponible');
-       const {data:result,error:saveError}=await supa.functions.invoke('prepare-checkout-order',{body:{
-         offerCode:p.offerCode,duration,paymentMode,fullName,startMode,startDate:startMode==='date'?startDate:null,acceptedCgv:true,
-         healthConsent,earlyStart,cgvVersion:'akprime-cgv-2026-10-20-firm-commitment',
-         privacyVersion:'akprime-privacy-2026-10-20'
-       }});
-       if(saveError||!result?.order?.id)throw Error(result?.error||saveError?.message||'Enregistrement indisponible');
-       const order=result.order;
-       modal('Demande enregistrée — aucun paiement',
-         '<div class="alert green"><strong>Votre acceptation contractuelle a été enregistrée.</strong><div class="tiny" style="margin-top:5px">Référence : '+esc(order.id)+'. Cette opération prépare la commande mais n’active pas votre accompagnement.</div></div>'+
-         '<div class="checkout-recap"><div><span>Offre</span><strong>'+esc(pole+' — '+name)+'</strong></div><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Date souhaitée</span><strong>'+esc(startMode==='date'?fmtDate(startDate):'Dès que possible')+'</strong></div><div><span>Montant total</span><strong>'+euro(Number(order.total_cents)/100)+'</strong></div><div><span>Paiement</span><strong>Non effectué</strong></div></div>'+
-         '<p class="muted tiny" style="margin-top:12px">La confirmation définitive et le paiement seront disponibles après activation du tunnel sécurisé.</p>',
-         '<button class="btn primary" id="closeCheckoutInfo">Fermer</button>');
-       document.getElementById('closeCheckoutInfo').onclick=()=>{publicCheckoutDraft=null;closeModal()};
+       throw Error('Paiements réels désactivés : seule la simulation Stripe TEST est disponible.');
      }catch(err){
-       errorBox.textContent='Enregistrement impossible : '+(err?.message||'Erreur inattendue')+'. Aucun paiement effectué.';
+       errorBox.textContent='Paiement Stripe TEST non ouvert : '+(err?.message||'Erreur inattendue')+'. Aucun montant réel débité.';
        errorBox.classList.add('show');
      }finally{
        const active=document.getElementById('futureStripeCheckout');if(active){active.disabled=false;active.textContent=window.AKP_PUBLIC_TEST_MODE?'Payer avec Stripe (TEST)':'Enregistrer ma demande (sans paiement)';}
