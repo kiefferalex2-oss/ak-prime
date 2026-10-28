@@ -41,11 +41,15 @@
   const testInvoices=s.akStripeTestInvoices||[];
   if(!s.client?.is_test)return originalBilling(s);
   if(!testInvoices.length){
-   const base=originalBilling(s);
-   if(s.akStripeInvoicesError)return base.replace(
-    '<div class="akWowBillingList">',
-    '<div class="alert">Chargement des factures Stripe TEST indisponible : '+escapeValue(s.akStripeInvoicesError)+'</div><div class="akWowBillingList">');
-   return base;
+   return '<div class="client-main akWowBillingPage"><div class="client-page-head">'+
+    '<div><h2>Mes factures</h2><p>Retrouve ici tes factures Stripe TEST payées.</p></div>'+
+    '<span class="status amber">SIMULATION</span></div>'+
+    '<div class="client-section-card" style="padding:22px">'+
+    '<h3>Aucune facture Stripe TEST disponible pour le moment</h3>'+
+    '<p class="muted tiny">'+
+    escapeValue(s.akStripeInvoicesError||
+      'Si tu as effectué un paiement fictif, sa facture apparaîtra dès qu’elle sera payée et associée à ton compte.')+
+    '</p></div></div>';
   }
   const rows=testInvoices.map(inv=>{
    const amount=Number(inv.amount_paid||0)/100;
