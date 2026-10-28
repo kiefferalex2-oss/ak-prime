@@ -8,6 +8,9 @@
  const macroEligible=c=>(c?.current_pole==='Performance'&&c?.current_offer==='P3')||
    (c?.current_pole==='Forme & Santé'&&c?.current_offer==='Renforcé');
  const sleepDateValue=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const sleepOpened=c=>sleepEligible(c)&&c?.status==='active'&&
+   !!c.start_date&&c.start_date<=sleepDateValue();
+
  const nextSleepDate=day=>new Date(Date.parse(day+'T12:00:00Z')+86400000).toISOString().slice(0,10);
  const sleepWakeEntries=row=>Array.isArray(row?.awakenings)?row.awakenings:[];
  function sleepWakeSummary(row){
@@ -72,6 +75,15 @@
  };
  function sleepForm(s){
   if(!sleepEligible(s.client))return '';
+  if(!sleepOpened(s.client)){
+   const c=s.client,when=c?.start_date?fmtDate(c.start_date):'à définir avec ton coach';
+   return '<section class="client-section-card akSleepCard" id="akSleepDiary">'+
+      '<h3>Mon agenda de sommeil</h3><div class="alert">'+
+      '<strong>Agenda disponible après activation de ton accompagnement.</strong>'+
+      '<p>Ton coach doit valider ton onboarding et activer le suivi, à compter de la date de démarrage ('+
+      safe(when)+'). Tu ne peux pas renseigner de nuit avant cette activation.</p>'+
+      '</div></section>';
+  }
   const rows=s.akSleepRows||[],today=sleepDateValue(),current=rows.find(x=>x.sleep_date===today);
   const editDay=s.akSleepEditingDate,editing=editDay?rows.find(x=>x.sleep_date===editDay):null;
   const completion=current?'<div class="akSleepCompleted" role="status">'+
@@ -211,7 +223,7 @@
   const s=clientPortalState,edit=event.target.closest?.('.akEditSleep');
   if(edit&&s){
    event.preventDefault();
-   if(!sleepEligible(s.client))return;
+   if(!sleepOpened(s.client))return;
    s.akSleepEditingDate=edit.dataset.date;
    renderClientPortal();
    document.getElementById('akSleepDiary')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -235,6 +247,7 @@
   if(!button)return;
   event.preventDefault();
   if(!s?.client||!sleepEligible(s.client))return alert('Agenda indisponible pour cette offre.');
+  if(!sleepOpened(s.client))return alert('Agenda verrouillé : l’accompagnement doit être activé par ton coach à sa date de démarrage.');
   const val=id=>document.getElementById(id)?.value?.trim()||'';
   const day=val('akSleepDate'),hours=Number(val('akSleepHours')),quality=Number(val('akSleepQuality'));
   const bedtime=val('akSleepBedtime'),wakeup=val('akSleepWakeup'),notes=val('akSleepNotes');
