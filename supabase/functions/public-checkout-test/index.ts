@@ -61,7 +61,23 @@ Deno.serve(async(req:Request)=>{
   if(created.error)return reply({error:"Impossible de créer le lien privé"},500,cors);
   return reply({url:"https://akprime.fr/?akp_test="+token,expiresInMinutes:180},200,cors);
  }
- const token=String(body.ticket||"");
+ let token=String(body.ticket||"");
+ if(action==="direct_create"){
+   const customerEmail=String(body.email||"").trim().toLowerCase();
+   const name=String(body.fullName||"").trim();
+   const months=Number(body.duration);
+   const mode=String(body.paymentMode||"");
+   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerEmail)||name.length<3||name.length>160||
+      ![3,6].includes(months)||!["monthly","upfront"].includes(mode)||
+      body.acceptedTerms!==true||body.acceptedPrivacy!==true||body.healthConsent!==true)
+     return reply({error:"Informations ou consentements de la commande incomplets"},400,cors);
+   token=hex(crypto.getRandomValues(new Uint8Array(32)));
+   const issued=await admin.rpc("issue_direct_stripe_test_invite",{
+      p_token_hash:await digest(token),p_email:customerEmail
+   });
+   if(issued.error||!issued.data)
+      return reply({error:issued.error?.message||"Tests publics temporairement indisponibles"},429,cors);
+ }
  if(!/^[0-9a-f]{64}$/.test(token))return reply({error:"Lien de simulation invalide"},401,cors);
  const tokenHash=await digest(token);
  const passQuery=await admin.from("stripe_test_invites").select("*").eq("token_hash",tokenHash).maybeSingle();
@@ -69,7 +85,7 @@ Deno.serve(async(req:Request)=>{
  if(passQuery.error||!pass)return reply({error:"Lien test non reconnu"},403,cors);
  if(new Date(pass.expires_at).getTime()<Date.now())return reply({error:"Lien de test expiré : crée un nouveau lien propriétaire"},410,cors);
  if(action==="check")return reply({valid:!pass.stripe_order_id,paid:!!pass.activated_at},200,cors);
- if(action==="create"){
+ if(action==="create"||action==="direct_create"){
   if(pass.stripe_order_id)return reply({error:"Lien de test déjà utilisé"},409,cors);
   const offerCode=String(body.offerCode||"");
   const duration=Number(body.duration);
