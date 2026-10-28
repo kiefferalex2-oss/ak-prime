@@ -2075,10 +2075,11 @@ async function loadSupabaseData(){
    supa.from('billing_settings').select('*').eq('id',1).maybeSingle(),
    supa.from('invoices').select('*').order('issue_date',{ascending:false}).order('created_at',{ascending:false}),
    supa.from('payment_transactions').select('*').order('paid_at',{ascending:false}),
-   supa.from('revenue_entries').select('*').order('receipt_date',{ascending:false}).order('id',{ascending:false})
+   supa.from('revenue_entries').select('*').order('receipt_date',{ascending:false}).order('id',{ascending:false}),
+   supa.from('coach_new_client_events').select('owner_id,client_id,created_at,is_test').eq('owner_id',authUser.id).order('created_at',{ascending:false})
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[],billingSettings=reqs[17].data||null,invoiceRows=reqs[18].data||[],paymentRows=reqs[19].data||[],revenueRows=reqs[20].data||[];
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[],billingSettings=reqs[17].data||null,invoiceRows=reqs[18].data||[],paymentRows=reqs[19].data||[],revenueRows=reqs[20].data||[],coachNewClientEvents=reqs[21].data||[];
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id'),renewalChoices=groupBy(rcr,'client_id'),invoices=groupBy(invoiceRows,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
@@ -2103,7 +2104,7 @@ async function loadSupabaseData(){
      id:x.id,name:[x.first_name,x.last_name==='-'?'':x.last_name].filter(Boolean).join(' '),email:x.email||'',phone:x.phone||'',
      authUserId:x.auth_user_id||'',accountProfile:x.auth_user_id?pr.find(p=>p.id===x.auth_user_id)||null:null,
      pendingProfile:!x.auth_user_id&&x.email?pr.find(p=>p.role==='client'&&String(p.email||'').toLowerCase()===String(x.email).toLowerCase())||null:null,
-     initials:initials([x.first_name,x.last_name].filter(Boolean).join(' ')),pole:x.current_pole||'À définir',offer:x.current_offer||'À définir',
+     initials:initials([x.first_name,x.last_name].filter(Boolean).join(' ')),pole:x.current_pole||'À définir',offer:x.current_offer||'À définir',isTest:!!x.is_test,
      status:DB_STATUS_TO_UI[x.status]||x.status,start:isoDate(x.start_date),end:isoDate(x.engagement_end_date),next:isoDate(x.next_visio_at),
      sport:x.current_sport||'',specialty:x.position_or_specialty||'',level:x.level||'',age:calcAge(x.birth_date),payment:x.payment_status||'—',
      questionnaire:q.answers||{},questionnaireStatus:q.status||'',questionnaireResponseId:q.id||'',questionnaireSubmittedAt:q.submitted_at||'',deep:ws.deep_flags||{},visioNotes:ws.visio_summary||'',offerNotes:ws.offer_notes||{},
@@ -2129,6 +2130,7 @@ async function loadSupabaseData(){
  db.settings.whatsappNumber=appSettings?.whatsapp_number||'';
  db.settings.whatsappMessage=appSettings?.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
  db.notificationReads=notificationReads;
+ db.coachNewClientEvents=coachNewClientEvents;
  db.billingSettings=billingSettings;
  db.invoices=invoiceRows;
  db.paymentTransactions=paymentRows;
@@ -2317,6 +2319,16 @@ function activeClients(){return db.clients.filter(c=>c.status==='Actif')}
 function notificationReadSet(rows){return new Set((rows||[]).map(x=>x.notification_key))}
 function coachNotifications(){
  const out=[],reads=notificationReadSet(db.notificationReads),now=new Date();
+ // Ces alertes sont créées une seule fois côté serveur, uniquement pour les nouveaux dossiers.
+ for(const evt of db.coachNewClientEvents||[]){
+   const cl=(db.clients||[]).find(c=>c.id===evt.client_id);
+   if(!cl)continue;
+   const label=(evt.is_test?'[TEST] ':'')+'Nouveau client — '+cl.name;
+   out.push({key:'coach:new-client:'+evt.client_id,title:label,
+     detail:cl.pole+' · '+cl.offer+' · '+(evt.is_test?'Simulation, aucun paiement réel · ':'')+
+       'Dossier créé, questionnaire initial à préparer.',
+     target:'client',clientId:cl.id,tab:'onboarding',priority:6});
+ }
  for(const cl of db.clients||[]){
    if(cl.questionnaireStatus==='submitted'&&cl.onboarding?.currentStep==='visio'){
      out.push({key:'coach:questionnaire:'+(cl.questionnaireResponseId||cl.id),title:'Questionnaire reçu — '+cl.name,detail:'Le questionnaire initial est envoyé. Prépare la visio et les points à approfondir.',target:'client',clientId:cl.id,tab:'onboarding',priority:3});
@@ -4122,13 +4134,22 @@ async function refreshClientBookingData(){
 
 async function subscribeCalendarRealtime(mode){
  if(calendarChannel)await supa.removeChannel(calendarChannel);
- calendarChannel=supa.channel('akprime-calendar-'+mode+'-'+Math.random().toString(36).slice(2,7))
+ const channel=supa.channel('akprime-calendar-'+mode+'-'+Math.random().toString(36).slice(2,7))
    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'calendar_version'},async()=>{
      if(mode==='client')await refreshClientBookingData();
      else {
        try{await loadSupabaseData();if(state.view==='calendar'||state.view==='dashboard')render()}catch(e){}
      }
-   }).subscribe();
+   });
+ if(mode==='coach'&&authUser?.id){
+   channel.on('postgres_changes',{
+     event:'INSERT',schema:'public',table:'coach_new_client_events',
+     filter:'owner_id=eq.'+authUser.id
+   },async()=>{
+     try{await loadSupabaseData();render()}catch(err){console.warn('AK PRIME new-client notification refresh',err)}
+   });
+ }
+ calendarChannel=channel.subscribe();
 }
 
 function currentWeekFriday(){
