@@ -102,7 +102,7 @@ begin
   end if;
   if length(coalesce(p_action_link,''))>4096 or
      p_action_link !~ '^https://gptvgldboqarfklorjip[.]supabase[.]co/auth/v1/verify[?]' or
-     p_action_link !~ '[?&]type=invite([&]|$)' then
+     p_action_link !~ '[?&]type=(invite|recovery)([&]|$)' then
      raise exception 'Lien d’activation Supabase incorrect.' using errcode='22023';
   end if;
   select * into v_inv from public.stripe_test_invites where id=p_invite_id for update;
@@ -140,7 +140,7 @@ begin
   v_greeting:='Bonjour '||pg_catalog.initcap(pg_catalog.btrim(v_order.full_name))||',';
   v_html:=pg_catalog.replace(v_html,'{{CUSTOMER_GREETING}}',private.ak_mail_escape(v_greeting));
   v_html:=pg_catalog.replace(v_html,'{{ACTION_LINK}}',
-     pg_catalog.replace(private.ak_mail_escape(p_action_link),'&','&amp;'));
+     private.ak_mail_escape(p_action_link));
   select net.http_post(
    url:='https://api.resend.com/emails',
    headers:=jsonb_build_object(
