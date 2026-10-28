@@ -2474,6 +2474,45 @@ function navBtn(v,label){
 }
 function crumb(){if(state.view==='client')return esc(currentClient()?.name||'Client');const map={dashboard:'Tableau de bord',clients:'Clients',billing:'Facturation',calendar:'Calendrier',backup:'Sauvegardes',contracts:'Preuves contractuelles',settings:'Paramètres'};return map[state.view]||'Back-office'}
 
+async function refreshOwnerEmailSystemHealth(){
+ if(authProfile?.role!=='owner')return;
+ try{
+  const {data,error}=await supa.rpc('owner_email_system_health');
+  window.AKP_EMAIL_HEALTH=error?{error:error.message}:data;
+ }catch(err){window.AKP_EMAIL_HEALTH={error:String(err?.message||err)};}
+ if(state.view==='dashboard')render();
+}
+document.addEventListener('click',event=>{
+ if(event.target.closest?.('#akRefreshMailHealth')){
+  event.preventDefault();void refreshOwnerEmailSystemHealth();
+ }
+});
+function renderMailHealth(){
+ if(authProfile?.role!=='owner')return '';
+ const h=window.AKP_EMAIL_HEALTH;
+ if(!h)return '<section class="card panel" style="margin-bottom:14px"><h3>E-mails AK PRIME</h3><p class="muted tiny">Contrôle en cours…</p></section>';
+ const jobs=Array.isArray(h.jobs)?h.jobs:[];
+ const failures=['notification_failed','new_client_failed','reminder_failed']
+   .reduce((sum,key)=>sum+Number(h[key]||0),0);
+ const pending=['notification_waiting','new_client_waiting','reminder_waiting']
+   .reduce((sum,key)=>sum+Number(h[key]||0),0);
+ const bad=!!h.error||jobs.length<3||failures>0||jobs.some(j=>!j.active||j.last_status!=='succeeded'||
+   !j.last_at||(Date.now()-Date.parse(j.last_at)>20*60*1000));
+ const description=h.error?esc(h.error):
+  bad?'Des tâches ont échoué ou ne répondent pas : vérifie-les avant toute ouverture aux clients.':
+  'Les tâches programmées répondent, mais la livraison aux boîtes mail reste à vérifier.';
+ const lines=jobs.map(j=>'<span style="margin-right:12px;display:inline-block">'+
+  (j.active&&j.last_status==='succeeded'?'✓ ':'⚠ ')+
+  esc(j.name.replace('akprime-',''))+': '+esc(j.last_status||'inconnu')+'</span>').join('');
+ return '<section class="card panel" style="margin-bottom:14px;border-left:4px solid '+(bad?'#bc4b4b':'#c49b57')+'">'+
+  '<div class="row between" style="gap:12px;flex-wrap:wrap;align-items:flex-start"><div>'+
+  '<h3 style="margin:0 0 7px">Surveillance des e-mails</h3>'+
+  '<p class="muted tiny" style="margin:0">'+description+'</p></div>'+
+  '<button class="btn ghost small" id="akRefreshMailHealth" type="button">Vérifier maintenant</button></div>'+
+  '<div class="muted tiny" style="margin-top:10px">'+lines+'</div>'+
+  '<p class="muted tiny" style="margin-top:10px">Échecs : '+failures+' · En attente : '+pending+
+  ' · <strong>Réception effective non encore vérifiée chez Resend.</strong></p></section>';
+}
 function dashboard(){
  const acts=activeClients();
  const next=acts.filter(c=>c.next).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,5);
@@ -2486,7 +2525,7 @@ function dashboard(){
  const pendingCheckins=acts.flatMap(c=>(c.checkins||[]).filter(w=>!w.reviewedAt).map(w=>({c,w})));
  const checkinTodo=pendingCheckins.length;
  const tasks=[...ending.map(c=>{const choice=(c.renewalChoices||[]).find(r=>r.dueDate===c.end);return {c,label:choice?'Choix client reçu — '+renewalDecisionLabel(choice.decision)+(choice.paymentMode?' / '+renewalPaymentLabel(choice.paymentMode):''):'Renouvellement en attente du choix client — '+fmtDate(c.end),tone:choice?'green':'amber',tab:'admin'}}),...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
- return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div><button class="btn primary" id="newClient">+ Nouveau client</button></div>'+
+ return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div>'+renderMailHealth()+
  '<div class="kpis">'+
  kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
  kpi('Tests à terminer',testsTodo.length,'avant programmation')+kpi('Programmations à faire',programmingTodo.length,'tests requis validés')+
@@ -5992,6 +6031,7 @@ async function enterApp(user){
      history.replaceState(null,'',go.pathname+go.search+go.hash);
    }
    render();
+   void refreshOwnerEmailSystemHealth();
    subscribeCalendarRealtime('coach');
  }catch(e){
    showAuth('Connexion réussie, mais impossible de charger la base AK PRIME : '+e.message,true);
