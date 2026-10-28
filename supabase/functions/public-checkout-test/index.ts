@@ -199,6 +199,23 @@ Deno.serve(async(req:Request)=>{
  if(!pass.test_client_id){
    brandedRequired=true;
    let userId=pass.test_auth_user_id as string|null;
+   // Plusieurs achats fictifs peuvent être effectués avec la même adresse.
+   // Si un compte TEST existe déjà, ne pas recréer son identité Auth.
+   const existing=await admin.from("clients")
+      .select("id,is_test,auth_user_id")
+      .ilike("email",order.email).limit(6);
+   if(existing.error)return reply({error:"Vérification du compte existant impossible."},503,cors);
+   const oldClient=(existing.data||[]).find((c:{is_test:boolean,auth_user_id:string})=>c.is_test&&c.auth_user_id);
+   if(oldClient){
+     const reused=await admin.rpc("reuse_paid_stripe_test_client",{p_invite_id:pass.id});
+     if(reused.error||!reused.data?.auth_user_id)
+       return reply({error:"Le paiement est confirmé, mais la reprise du compte TEST a échoué.",
+         details:reused.error?.message||"Dossier non associé"},503,cors);
+     userId=reused.data.auth_user_id;
+     activationLink=null; // Un lien de récupération sécurisé sera généré.
+   }else if((existing.data||[]).length){
+     return reply({error:"Cette adresse est déjà associée à un compte AK PRIME non fictif. Utilise une autre adresse pour le test."},409,cors);
+   }
    if(!userId){
      const generated=await admin.auth.admin.generateLink({
        type:"invite",email:order.email,
@@ -206,7 +223,9 @@ Deno.serve(async(req:Request)=>{
         data:{full_name:order.full_name,akprime_test:true}}
      });
      if(generated.error||!generated.data?.user?.id||!generated.data?.properties?.action_link)
-       return reply({error:"Impossible de préparer l'invitation sécurisée AK PRIME.",
+       return reply({error:generated.error?.code==="email_exists"
+           ?"Cette adresse possède déjà un compte Supabase. Pour tester une nouvelle inscription, utilise une nouvelle adresse e-mail."
+           :"Impossible de préparer l'invitation sécurisée AK PRIME.",
          details:generated.error?.message||"Lien d'activation absent"},503,cors);
      userId=generated.data.user.id;
      activationLink=generated.data.properties.action_link;
@@ -222,13 +241,15 @@ Deno.serve(async(req:Request)=>{
      }).eq("id",pass.id);
      if(marker.error)return reply({error:"Impossible de préparer l'invitation AK PRIME."},503,cors);
    }
-   const linked=await admin.rpc("provision_invited_stripe_test_client",{
-     p_invite_id:pass.id,p_auth_user_id:userId
-   });
-   if(linked.error)return reply({
-     error:"Le compte d'essai a été préparé mais son dossier n'a pas pu être créé.",
-     details:linked.error.message
-   },503,cors);
+   if(!oldClient){
+     const linked=await admin.rpc("provision_invited_stripe_test_client",{
+       p_invite_id:pass.id,p_auth_user_id:userId
+     });
+     if(linked.error)return reply({
+       error:"Le compte d'essai a été préparé mais son dossier n'a pas pu être créé.",
+       details:linked.error.message
+     },503,cors);
+   }
  }
  if(brandedRequired && !pass.auth_invite_email_queued_at){
    // If an earlier attempt created the Auth user but email delivery failed, use
