@@ -5708,7 +5708,7 @@ function openPublicOfferCheckout(button){
        return;
      }
      errorBox.classList.remove('show');
-     const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Enregistrement sécurisé…';
+     const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Préparation du paiement Stripe TEST…';
      try {
        if(window.AKP_PUBLIC_TEST_MODE){
          if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
@@ -5834,7 +5834,7 @@ async function initAuth(){
 window.AKP_PUBLIC_TEST_MODE=true; // Site temporairement ouvert aux simulations Stripe, jamais aux débits réels.
 initAuth();
 </script>
-  <script src="./akp-public-test-flow.js"></script>
+  <script src="./akp-public-test-flow.js?v=akp-direct-20261028"></script>
   <script src="./contract-archive-secure.js?v=akprime-v20261026-sleep-latest-v87"></script>
 </body>
 </html>
