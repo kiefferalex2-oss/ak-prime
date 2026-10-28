@@ -195,6 +195,7 @@ Deno.serve(async(req:Request)=>{
  // Supabase generates the signed invitation link without sending its default email.
  // The existing Resend transport sends the AK PRIME branded invitation instead.
  let activationLink:string|null=null;
+ let reusedExistingTestClient=false;
  let brandedRequired=pass.auth_branded_required===true;
  if(!pass.test_client_id){
    brandedRequired=true;
@@ -212,6 +213,7 @@ Deno.serve(async(req:Request)=>{
        return reply({error:"Le paiement est confirmé, mais la reprise du compte TEST a échoué.",
          details:reused.error?.message||"Dossier non associé"},503,cors);
      userId=reused.data.auth_user_id;
+     reusedExistingTestClient=true;
      activationLink=null; // Un lien de récupération sécurisé sera généré.
    }else if((existing.data||[]).length){
      return reply({error:"Cette adresse est déjà associée à un compte AK PRIME non fictif. Utilise une autre adresse pour le test."},409,cors);
@@ -285,7 +287,9 @@ Deno.serve(async(req:Request)=>{
  }
  return reply({
     status:"paid",invited:true,
-    message:"Invitation AK PRIME personnalisée préparée pour envoi : vérifie tes e-mails et crée ton mot de passe.",
+    message:reusedExistingTestClient
+     ?"Compte TEST existant reconnu : un e-mail AK PRIME de récupération d'accès a été demandé. Tu peux poursuivre ta simulation sans nouveau paiement."
+     :"Invitation AK PRIME personnalisée préparée pour envoi : vérifie tes e-mails et crée ton mot de passe.",
     invoice:invoice
  },200,cors);
 });
