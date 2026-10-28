@@ -5666,6 +5666,7 @@ function openPublicOfferCheckout(button){
     '<div class="checkout-offer-head"><div class="checkout-step">Étape 2 sur 2</div><h3>'+esc(pole)+' — '+esc(name)+'</h3><div class="tiny">Vérifie ton choix et complète les informations qui serviront à créer ton accès AK PRIME.</div></div>'+
     '<div class="checkout-recap"><div><span>Engagement</span><strong>'+duration+' mois</strong></div><div><span>Paiement</span><strong>'+esc(paymentMode==='upfront'?'Comptant':'Mensuel')+'</strong></div><div><span>Démarrage souhaité</span><strong>'+esc(startMode==='date'?fmtDate(startDate):'Dès que possible')+'</strong></div><div><span>Montant</span><strong>'+esc(p.headline)+'</strong></div><div><span>Total engagement</span><strong>'+euro(p.total)+'</strong></div></div>'+
     '<div class="section-title">Tes informations</div><div class="checkout-contact-grid"><div class="field"><label>Nom et prénom</label><input id="checkoutFullName" class="input" type="text" autocomplete="name" value="'+esc(draft.fullName||'')+'" placeholder="Ex. Alex Martin"></div><div class="field"><label>E-mail</label><input id="checkoutEmail" class="input" type="email" autocomplete="email" value="'+esc(draft.email||'')+'" placeholder="nom@exemple.fr"></div></div>'+
+    (window.AKP_PUBLIC_TEST_MODE?'<p class="tiny" style="color:#9db2c7;margin:8px 0 16px">Pour tester une toute première inscription, utilise une adresse e-mail qui n’a jamais servi à créer un compte AK PRIME. Avec une adresse déjà connue, le compte existant sera réutilisé : ce ne sera pas une nouvelle création.</p>':'')+
     '<div class="section-title">Avant de continuer</div><div class="checkout-consents">'+
       '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> J’accepte les conditions générales de vente, dont l’engagement ferme de 3 ou 6 mois choisi ci-dessus, les modalités de paiement et les règles de résiliation anticipée. J’ai pris connaissance de la politique de confidentialité et du droit de rétractation.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
@@ -5797,7 +5798,13 @@ function bindPublicSite(){
 function showAuth(message='',isError=false){
  document.getElementById('root').innerHTML=renderPublicSite();
  bindPublicSite();
- if(message)openPublicLogin(message,isError);
+ const wantsLogin=new URLSearchParams(location.search).get('connexion')==='1';
+ if(message||wantsLogin)openPublicLogin(message,isError);
+ if(wantsLogin){
+  const next=new URL(location.href);
+  next.searchParams.delete('connexion');
+  history.replaceState(null,'',next.pathname+next.search+next.hash);
+ }
 }
 
 function setAuthMsg(msg,err){
