@@ -37,7 +37,13 @@ Deno.serve(async(request)=>{
  const seen=new Set<string>();
  for(const order of orders.data||[]){
   if(!order.stripe_customer_id||!/^cus_[A-Za-z0-9]+$/.test(order.stripe_customer_id))continue;
-  const items=await stripe.invoices.list({customer:order.stripe_customer_id,limit:100});
+  let items;
+  try{
+   items=await stripe.invoices.list({customer:order.stripe_customer_id,limit:100});
+  }catch(err){
+   console.error("AK PRIME Stripe TEST invoice retrieval failed",String(err).slice(0,180));
+   return reply({error:"Service Stripe TEST momentanément indisponible. Réessaie l'actualisation."},503,allowedOrigin);
+  }
   for(const inv of items.data){
     if(inv.livemode!==false||inv.status!=="paid"||seen.has(inv.id))continue;
     seen.add(inv.id);
@@ -50,5 +56,9 @@ Deno.serve(async(request)=>{
     });
   }
  }
- return reply({invoices:invoices.sort((a,b)=>Number(b.created)-Number(a.created)),environment:"test"},200,allowedOrigin);
+ return reply({
+  invoices:invoices.sort((a,b)=>Number(b.created)-Number(a.created)),
+  paid_order_count:(orders.data||[]).length,
+  environment:"test"
+ },200,allowedOrigin);
 });
