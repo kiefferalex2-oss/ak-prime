@@ -1,7 +1,6 @@
 import Stripe from "npm:stripe@22.0.0";
 import {createClient} from "npm:@supabase/supabase-js@2.95.0";
 const url=Deno.env.get("SUPABASE_URL")||"";
-const anon=Deno.env.get("SUPABASE_ANON_KEY")||"";
 const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const key=Deno.env.get("STRIPE_SECRET_KEY")||"";
 const enabled=Deno.env.get("AKP_STRIPE_TEST_ENABLED")==="true"&&key.startsWith("sk_test_");
@@ -18,7 +17,7 @@ Deno.serve(async(request)=>{
  const allowedOrigin=validOrigins.includes(origin)?origin:validOrigins[0];
  if(request.method==="OPTIONS")return reply({},200,allowedOrigin);
  if(request.method!=="POST"||(origin&&!validOrigins.includes(origin)))return reply({error:"Accès refusé"},403,allowedOrigin);
- if(!enabled||!url||!service||!anon)return reply({error:"Facturation TEST indisponible"},503,allowedOrigin);
+ if(!enabled||!url||!service)return reply({error:"Facturation TEST indisponible"},503,allowedOrigin);
  const bearer=request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
  if(!bearer)return reply({error:"Connexion à votre espace requise"},401,allowedOrigin);
  const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
