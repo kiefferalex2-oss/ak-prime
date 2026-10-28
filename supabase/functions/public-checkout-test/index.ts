@@ -140,7 +140,18 @@ Deno.serve(async(req:Request)=>{
       line_items:[{price:price.id,quantity:1}],
       metadata:{akprime_order_id:inserted.data.id,environment:"test",payment_mode:paymentMode},
       ...(paymentMode==="monthly"?{subscription_data:{metadata:{akprime_order_id:inserted.data.id}}}:{
-         invoice_creation:{enabled:true,invoice_data:{metadata:{akprime_test_order_id:inserted.data.id}}},
+         invoice_creation:{
+           enabled:true,
+           invoice_data:{
+             description:"AK PRIME — accompagnement "+offerCode+" — "+duration+" mois — facture de démonstration",
+             footer:"AK PRIME | akprime.fr | contact@akprime.fr | DOCUMENT TEST STRIPE — AUCUN DÉBIT RÉEL — SANS VALEUR COMPTABLE.",
+             custom_fields:[
+               {name:"Prestation",value:"Accompagnement AK PRIME"},
+               {name:"Document",value:"SIMULATION / STRIPE TEST"}
+             ],
+             metadata:{akprime_test_order_id:inserted.data.id}
+           }
+         },
          payment_intent_data:{metadata:{akprime_order_id:inserted.data.id}}
       })
     };
@@ -229,7 +240,8 @@ Deno.serve(async(req:Request)=>{
  if(invoice?.hostedUrl&&!pass.invoice_email_queued_at){
    try{
      const mailed=await admin.rpc("send_invited_stripe_test_invoice",{
-       p_invite_id:pass.id,p_invoice_number:invoice.invoiceNumber,p_invoice_url:invoice.hostedUrl
+       p_invite_id:pass.id,p_invoice_number:invoice.invoiceNumber,
+       p_invoice_url:invoice.hostedUrl,p_pdf_url:invoice.pdfUrl
      });
      if(mailed.error)console.warn("Test invoice email queue failed",mailed.error.message.slice(0,160));
    }catch(e){console.warn("Test invoice mail unavailable",String(e).slice(0,140))}
