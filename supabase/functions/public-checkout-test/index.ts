@@ -131,9 +131,25 @@ Deno.serve(async(req:Request)=>{
     .eq("id",pass.id).is("stripe_order_id",null).select("id").maybeSingle();
   if(claim.error||!claim.data)return reply({error:"Lien utilisé simultanément"},409,cors);
   try{
+    // Créer le client Stripe TEST avant Checkout : la première facture
+    // d'abonnement hérite immédiatement du pied de page et des champs de marque.
+    const stripeCustomer=await stripe.customers.create({
+      email,name:fullName,preferred_locales:["fr"],
+      description:"AK PRIME — Client de simulation Stripe TEST (sans débit réel)",
+      metadata:{akprime_test_order_id:inserted.data.id,environment:"test"},
+      invoice_settings:{
+        footer:"AK PRIME | akprime.fr | contact@akprime.fr | SIMULATION STRIPE TEST — AUCUN DÉBIT RÉEL — SANS VALEUR COMPTABLE.",
+        custom_fields:[
+          {name:"Prestation",value:"Accompagnement AK PRIME"},
+          {name:"Document",value:"SIMULATION / STRIPE TEST"}
+        ]
+      }
+    },{idempotencyKey:"akp-stripe-test-customer-"+inserted.data.id});
+    if(!stripeCustomer.id||stripeCustomer.livemode)
+      throw Error("Client Stripe sandbox invalide");
     const params:Stripe.Checkout.SessionCreateParams={
       mode:paymentMode==="monthly"?"subscription":"payment",
-      customer_email:email,client_reference_id:inserted.data.id,
+      customer:stripeCustomer.id,client_reference_id:inserted.data.id,
       billing_address_collection:"required",locale:"fr",
       success_url:"https://akprime.fr/?akp_test_return=success&ticket="+token+"&session_id={CHECKOUT_SESSION_ID}",
       cancel_url:"https://akprime.fr/?akp_test_return=cancelled&ticket="+token,
