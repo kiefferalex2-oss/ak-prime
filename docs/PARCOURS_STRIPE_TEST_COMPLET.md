@@ -1,5 +1,18 @@
 # AK PRIME — Test complet du parcours de souscription (sandbox uniquement)
 
+## Mise à jour du 28 octobre 2026 — test DIRECT depuis akprime.fr
+
+**Le lien privé n'est plus nécessaire.** Depuis https://akprime.fr/ en navigation privée, un visiteur peut désormais choisir n'importe quelle formule et cliquer sur « Payer avec Stripe (TEST) ». Aucun compte AK PRIME préexistant n'est exigé. Le client renseigne nom, e-mail, consentements et éventuelle date souhaitée. La commande se fait via `public-checkout-test` avec l'action `direct_create`, qui crée une invitation interne à usage unique puis une session Checkout dans le bac à sable Stripe, sans utiliser une clé de production.
+
+Les paiements sont strictement fictifs ; les visiteurs voient une mention de **MODE TEST**. L'activation publique est **automatiquement limitée à 7 jours** à compter de la migration 042, avec une limite globale de 20 essais par 24 h et de 2 essais par e-mail par 24 h. La désactivation se fait en plaçant `enabled_until=now()` dans `private.public_stripe_test_access`.
+
+À la réussite du paiement, le retour AK PRIME vérifie le statut webhook. Il déclenche l'invitation e-mail Supabase Auth, crée un dossier `is_test=true` en onboarding, puis récupère la facture de simulation Stripe et l'envoi par Resend lorsqu'ils sont disponibles. L'e-mail et le PDF **restent à vérifier en conditions réelles** ; aucune facture n'est inscrite dans la comptabilité AK PRIME.
+
+L'ancien parcours « enregistrement de demande » et son obligation de connexion préalable ont été supprimés du formulaire public dans ce mode de simulation. L'ouverture des paiements réels nécessite une implémentation et une validation distinctes.
+
+Le reste du document ci-dessous décrit l'ancien parcours propriétaire par lien, qui demeure disponible en complément mais n'est **plus nécessaire** pour le test demandé.
+
+
 ## Périmètre
 Le site public reste sans encaissement réel. Pour simuler une nouvelle souscription, seul le propriétaire connecté peut créer un lien temporaire de 3 heures sur https://akprime.fr/stripe-test.html.
 
