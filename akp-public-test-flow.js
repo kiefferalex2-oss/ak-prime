@@ -46,6 +46,13 @@
  const retry=document.createElement('button');retry.type='button';retry.textContent='Vérifier mon paiement TEST';panel.appendChild(retry);
  const close=document.createElement('button');close.type='button';close.textContent='Fermer';close.style.marginLeft='10px';panel.appendChild(close);
  close.onclick=()=>backdrop.remove();
+ const newTest=document.createElement('button');
+ newTest.type='button';
+ newTest.textContent='Recommencer une nouvelle souscription TEST';
+ newTest.style.display='block';
+ newTest.style.marginTop='14px';
+ newTest.onclick=()=>location.assign('https://akprime.fr/#offres');
+ panel.appendChild(newTest);
  const api=async(action)=>{
   return window.AKP_PUBLIC_TEST_REQUEST({action,ticket:window.AKP_PUBLIC_TEST_TOKEN});
  };
@@ -71,7 +78,7 @@
     }else{
      const p=document.createElement('p');p.className='akpt-small';p.textContent='La facture Stripe TEST peut prendre quelques instants avant d’être disponible. Revérifie après actualisation.';details.appendChild(p);
     }
-    const p=document.createElement('p');p.textContent='Lorsque tu reçois l’e-mail Supabase, ouvre le lien, définis ton mot de passe (12 caractères minimum), puis connecte-toi à AK PRIME et remplis ton questionnaire initial.';details.appendChild(p);
+    const p=document.createElement('p');p.textContent='Lorsque tu reçois l’e-mail AK PRIME, ouvre le lien sécurisé, définis ton mot de passe (12 caractères minimum), puis connecte-toi pour remplir ton questionnaire initial.';details.appendChild(p);
    }else{
     status.textContent='Statut Stripe TEST : '+x.status+'. Aucun compte ne sera ouvert avant confirmation du paiement.';
    }
@@ -80,5 +87,5 @@
  }
  retry.onclick=verify;
  if(result==='success')verify();
- else status.textContent='Paiement annulé. Tu peux refermer cette fenêtre et créer un nouveau lien de simulation depuis ton espace propriétaire.';
+ else status.textContent='Paiement annulé. Clique sur « Recommencer une nouvelle souscription TEST » pour générer une nouvelle commande depuis les offres.';
 })();
