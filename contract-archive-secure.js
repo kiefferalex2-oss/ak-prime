@@ -85,7 +85,8 @@ document.addEventListener('click', async function(event) {
     ['akp-admin-accordions.js','AKP_ADMIN_ACCORDIONS_READY'],
     ['akp-calendar-compact.js','AKP_CALENDAR_COMPACT_READY'],
     ['akp-test-account-portal.js','AKP_TEST_ACCOUNT_PORTAL_READY'],
-    ['akp-initial-questionnaire-flow.js','AKP_INITIAL_QUESTIONNAIRE_READY']
+    ['akp-initial-questionnaire-flow.js','AKP_INITIAL_QUESTIONNAIRE_READY'],
+    ['akp-test-invoices-client.js','AKP_TEST_INVOICES_READY']
   ];
   window.AKP_MODULE_FAILURE='';
   window.AKP_MODULE_READY=false;
