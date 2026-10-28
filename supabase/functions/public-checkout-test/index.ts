@@ -67,7 +67,7 @@ Deno.serve(async(req:Request)=>{
    const name=String(body.fullName||"").trim();
    const months=Number(body.duration);
    const mode=String(body.paymentMode||"");
-   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerEmail)||name.length<3||name.length>160||
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)||name.length<3||name.length>160||
       ![3,6].includes(months)||!["monthly","upfront"].includes(mode)||
       body.acceptedTerms!==true||body.acceptedPrivacy!==true||body.healthConsent!==true)
      return reply({error:"Informations ou consentements de la commande incomplets"},400,cors);
