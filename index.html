@@ -5716,8 +5716,9 @@ function openPublicOfferCheckout(button){
          if(typeof window.AKP_PUBLIC_TEST_REQUEST!=='function')
            throw Error('Le module de paiement TEST n’est pas chargé. Actualise la page (Ctrl+F5).');
          const result=await window.AKP_PUBLIC_TEST_REQUEST({
-           action:window.AKP_PUBLIC_TEST_TOKEN?'create':'direct_create',
-           ...(window.AKP_PUBLIC_TEST_TOKEN?{ticket:window.AKP_PUBLIC_TEST_TOKEN}:{}),
+           // Toujours une nouvelle commande pour un nouveau clic sur une offre.
+           // Le ticket de retour Stripe de l'achat précédent reste réservé au suivi.
+           action:'direct_create',
            offerCode:p.offerCode,duration,paymentMode,
            fullName,email,startDate:startMode==='date'?startDate:null,
            acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart
