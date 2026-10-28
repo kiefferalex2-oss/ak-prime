@@ -5670,9 +5670,9 @@ function openPublicOfferCheckout(button){
       '<label class="checkout-consent"><input id="checkoutAcceptCgv" type="checkbox" '+(draft.acceptedCgv?'checked':'')+'><span><strong>CGV et informations contractuelles.</strong> J’accepte les conditions générales de vente, dont l’engagement ferme de 3 ou 6 mois choisi ci-dessus, les modalités de paiement et les règles de résiliation anticipée. J’ai pris connaissance de la politique de confidentialité et du droit de rétractation.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutHealthConsent" type="checkbox" '+(draft.healthConsent?'checked':'')+'><span><strong>Données sensibles.</strong> J’accepte explicitement que les informations de santé que je choisis de communiquer (douleurs, blessures, restrictions ou antécédents utiles) soient traitées uniquement pour individualiser mon accompagnement AK PRIME.</span></label>'+
       '<label class="checkout-consent"><input id="checkoutEarlyStart" type="checkbox" '+(draft.earlyStart?'checked':'')+'><span><strong>Démarrage avant 14 jours.</strong> Je demande expressément que l’accompagnement puisse commencer avant la fin du délai légal de rétractation. En cas de rétractation après le début du service, la part déjà exécutée pourra être due dans les conditions prévues par la loi.</span></label>'+
-    '</div><div class="checkout-consent-note">La date demandée sera conservée avec la commande et confirmée au paiement. Un démarrage à moins de 14 jours de la commande exige une demande expresse ; sans celle-ci, « dès que possible » signifie au plus tôt 14 jours après paiement. Le démarrage de l’entraînement reste soumis à la finalisation de l’onboarding. Aucun paiement n’est effectué à cette étape.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
-    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">'+(window.AKP_PUBLIC_TEST_TOKEN?'Stripe TEST uniquement : paiement fictif, aucun débit réel ni facture comptable.':'Cette étape enregistre une demande, sans paiement. Les conditions définitives vous seront communiquées avant toute souscription payante.')+'</div></div>',
-    '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">'+(window.AKP_PUBLIC_TEST_TOKEN?'Payer avec Stripe (TEST)':'Enregistrer ma demande (sans paiement)')+'</button>');
+    '</div><div class="checkout-consent-note">La date demandée sera conservée avec la commande et confirmée au paiement. Un démarrage à moins de 14 jours de la commande exige une demande expresse ; sans celle-ci, « dès que possible » signifie au plus tôt 14 jours après paiement. Le démarrage de l’entraînement reste soumis à la finalisation de l’onboarding. Le paiement fictif s’effectuera sur la page sécurisée de Stripe après validation de ces informations.</div><div id="checkoutValidationError" class="checkout-error"></div>'+
+    '<div class="checkout-price-box"><strong>'+esc(p.detail)+'</strong><div class="checkout-price-sub">'+(window.AKP_PUBLIC_TEST_MODE?'Stripe TEST uniquement : paiement fictif, aucun débit réel ni facture comptable.':'Cette étape enregistre une demande, sans paiement. Les conditions définitives vous seront communiquées avant toute souscription payante.')+'</div></div>',
+    '<button class="btn ghost" id="backPublicCheckout">Retour</button><button class="btn primary" id="futureStripeCheckout">'+(window.AKP_PUBLIC_TEST_MODE?'Payer avec Stripe (TEST)':'Enregistrer ma demande (sans paiement)')+'</button>');
    const captureDraft=()=>{
      draft.fullName=document.getElementById('checkoutFullName')?.value?.trim()||'';
      draft.email=document.getElementById('checkoutEmail')?.value?.trim()||'';
@@ -5710,11 +5710,13 @@ function openPublicOfferCheckout(button){
      errorBox.classList.remove('show');
      const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Enregistrement sécurisé…';
      try {
-       if(window.AKP_PUBLIC_TEST_TOKEN){
+       if(window.AKP_PUBLIC_TEST_MODE){
          if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
          submit.textContent='Ouverture de Stripe TEST…';
          const {data:result,error:checkoutErr}=await supa.functions.invoke('public-checkout-test',{body:{
-           action:'create',ticket:window.AKP_PUBLIC_TEST_TOKEN,offerCode:p.offerCode,duration,paymentMode,
+           action:window.AKP_PUBLIC_TEST_TOKEN?'create':'direct_create',
+           ...(window.AKP_PUBLIC_TEST_TOKEN?{ticket:window.AKP_PUBLIC_TEST_TOKEN}:{}),
+           offerCode:p.offerCode,duration,paymentMode,
            fullName,email,startDate:startMode==='date'?startDate:null,
            acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart
          }});
@@ -5744,7 +5746,7 @@ function openPublicOfferCheckout(button){
        errorBox.textContent='Enregistrement impossible : '+(err?.message||'Erreur inattendue')+'. Aucun paiement effectué.';
        errorBox.classList.add('show');
      }finally{
-       const active=document.getElementById('futureStripeCheckout');if(active){active.disabled=false;active.textContent=window.AKP_PUBLIC_TEST_TOKEN?'Payer avec Stripe (TEST)':'Enregistrer ma demande (sans paiement)';}
+       const active=document.getElementById('futureStripeCheckout');if(active){active.disabled=false;active.textContent=window.AKP_PUBLIC_TEST_MODE?'Payer avec Stripe (TEST)':'Enregistrer ma demande (sans paiement)';}
      }
    };
  };
@@ -5845,6 +5847,7 @@ async function initAuth(){
  });
 }
 
+window.AKP_PUBLIC_TEST_MODE=true; // Site temporairement ouvert aux simulations Stripe, jamais aux débits réels.
 initAuth();
 </script>
   <script src="./akp-public-test-flow.js"></script>
