@@ -5847,7 +5847,17 @@ async function enterApp(user){
  }
  try{
    await loadSupabaseData();
-   state.view='dashboard';render();
+   state.view='dashboard';
+   // L'e-mail « Nouveau client » ouvre directement le dossier après connexion.
+   const go=new URL(location.href),requestedClient=go.searchParams.get('coach_client');
+   if(requestedClient&&/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(requestedClient)){
+     if((db.clients||[]).some(x=>x.id===requestedClient)){
+       state.clientId=requestedClient;state.view='client';state.tab='onboarding';
+     }
+     go.searchParams.delete('coach_client');
+     history.replaceState(null,'',go.pathname+go.search+go.hash);
+   }
+   render();
    subscribeCalendarRealtime('coach');
  }catch(e){
    showAuth('Connexion réussie, mais impossible de charger la base AK PRIME : '+e.message,true);
