@@ -3785,7 +3785,13 @@ async function enterClientPortal(user,profile){
  const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
  clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[],renewalChoices:renewalChoiceRes.data||[],invoices:invoiceRes.data||[]};
- clientPortalView='home';
+ // Les rappels AK PRIME conduisent directement au bon onglet après connexion.
+ const requestedSection=new URL(location.href).searchParams.get('client_section');
+ clientPortalView=['suivi','checkin','billing'].includes(requestedSection)?requestedSection:'home';
+ if(requestedSection){
+   const next=new URL(location.href);next.searchParams.delete('client_section');
+   history.replaceState(null,'',next.pathname+next.search+next.hash);
+ }
  clientVisioWeek=0;
  clientVisioDay='';
  clientQuestionnaireExpanded=false;
