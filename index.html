@@ -3401,13 +3401,49 @@ let contractEvidence=[];
 let contractEvidenceError='';
 function contractsPage(){
  if(authProfile?.role!=='owner')return '<div class="alert">Accès réservé au propriétaire.</div>';
- const rows=contractEvidence.map(o=>{
+ // Un même client peut avoir effectué plusieurs achats fictifs :
+ // conserver toutes les preuves, mais n'afficher qu'une ligne par identité TEST.
+ const grouped=new Map();
+ for(const proof of contractEvidence){
+  const groupKey=proof.is_test?'test:'+String(proof.email||proof.id).trim().toLowerCase():'real:'+proof.id;
+  if(!grouped.has(groupKey))grouped.set(groupKey,[]);
+  grouped.get(groupKey).push(proof);
+ }
+ const proofGroups=[...grouped.values()];
+ const proofButtons=o=>{
   const archived=!o.contract_snapshot&&!!o.evidence_checksum;
-  return '<tr><td>'+(o.is_test?'<span class="status amber">TEST — simulation</span><div style="height:5px"></div>':'')+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+ (archived?'<span class="status blue">Archivée hors site</span>':'<span class="status green">Preuve disponible</span>')+'<div class="muted tiny">'+esc(o.status||'')+'</div></td><td style="min-width:185px">'+(archived?'<div class="muted tiny">Réimportez votre JSON pour retrouver la copie complète.</div>':'<div class="row" style="flex-wrap:wrap;gap:5px"><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">JSON</button><button class="btn ghost small printContractEvidence" data-id="'+esc(o.id)+'">PDF</button>'+(o.is_test?'':'<button class="btn ghost small archiveContractEvidence" data-id="'+esc(o.id)+'">Archiver</button>')+'</div>')+'</td></tr>';
+  if(archived)return '<span class="muted tiny">Archive locale à réimporter.</span>';
+  return '<div class="row" style="flex-wrap:wrap;gap:5px">'+
+   '<button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">JSON</button>'+
+   '<button class="btn ghost small printContractEvidence" data-id="'+esc(o.id)+'">PDF</button>'+
+   (o.is_test?'':'<button class="btn ghost small archiveContractEvidence" data-id="'+esc(o.id)+'">Archiver</button>')+
+   '</div>';
+ };
+ const rows=proofGroups.map(group=>{
+  const o=group[0],archived=!o.contract_snapshot&&!!o.evidence_checksum;
+  const isMultiple=group.length>1;
+  const actions=isMultiple?
+   '<details class="akContractOrderDetails" style="min-width:240px">'+
+   '<summary style="cursor:pointer;color:#205273;font-weight:800;padding:9px 0">Voir les '+group.length+' commandes TEST</summary>'+
+   group.map((p,i)=>'<div style="border-top:1px solid #dde5eb;padding:10px 0">'+
+     '<strong>Essai '+(group.length-i)+'</strong> · '+fmtDateTime(p.created_at||p.paid_at)+
+     '<div class="muted tiny">'+esc(p.offer_code)+' · '+esc(p.commitment_months)+' mois · '+euro(Number(p.total_cents||0)/100)+'</div>'+
+     '<div style="margin-top:7px">'+proofButtons(p)+'</div></div>').join('')+
+   '</details>':proofButtons(o);
+  return '<tr><td>'+
+   (o.is_test?'<span class="status amber">TEST — simulation</span><div style="height:5px"></div>':'')+
+   esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div>'+
+   (isMultiple?'<div class="muted tiny" style="margin-top:5px"><strong>'+group.length+' commandes TEST</strong> pour ce compte.</div>':'')+
+   '</td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td>'+
+   '<td>'+(isMultiple?'<span class="muted tiny">Voir les essais</span>':euro(Number(o.total_cents||0)/100))+'</td>'+
+   '<td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td>'+
+   '<td>'+(archived?'<span class="status blue">Archivée hors site</span>':'<span class="status green">'+(isMultiple?group.length+' preuves disponibles':'Preuve disponible')+'</span>')+
+   '<div class="muted tiny">'+esc(o.status||'')+'</div></td>'+
+   '<td style="min-width:185px">'+actions+'</td></tr>';
  }).join('');
- return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Contrats et consentements horodatés. Les commandes Stripe TEST sont des simulations et n’ont pas valeur de contrat de production. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
+ return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Les preuves sont regroupées par client. Chaque paiement TEST conserve sa preuve distincte dans l’historique, sans créer de contrat réel. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
  (contractEvidenceError?'<div class="alert red">'+esc(contractEvidenceError)+'</div>':'')+
- '<div class="card panel"><div class="row between"><div><h3>'+contractEvidence.length+' dossier(s)</h3><div class="muted tiny">Supabase conserve l’index de preuve après archivage. L’archive locale doit être sauvegardée dans deux emplacements privés.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Exporter les preuves disponibles (JSON)</button></div>'+
+ '<div class="card panel"><div class="row between"><div><h3>'+proofGroups.length+' client(s) / dossier(s) · '+contractEvidence.length+' preuve(s)</h3><div class="muted tiny">Supabase conserve l’index de preuve après archivage. L’archive locale doit être sauvegardée dans deux emplacements privés.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Exporter les preuves disponibles (JSON)</button></div>'+
  '<div class="row" style="flex-wrap:wrap;gap:10px;margin-top:12px"><label class="btn ghost" for="importContractEvidence" style="cursor:pointer">Réimporter un JSON individuel</label><input type="file" accept=".json,application/json" id="importContractEvidence" style="display:none"></div>'+
  '<div style="overflow-x:auto;margin-top:15px"><table class="table"><thead><tr><th>Client</th><th>Offre</th><th>Total</th><th>CGV acceptées</th><th>Stockage</th><th>Actions</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="muted">Aucun dossier enregistré.</td></tr>')+'</tbody></table></div>'+
  '<div class="alert" style="margin-top:12px"><strong>Important :</strong> archiver retire uniquement le document contractuel complet de Supabase ; les informations indispensables au suivi de commande restent conservées. Le bouton PDF ouvre l’impression du navigateur : choisissez « Enregistrer en PDF ». Le PDF sert à la lecture ; <strong>conservez impérativement le fichier JSON</strong> pour le réimport et la vérification.</div></div>';
