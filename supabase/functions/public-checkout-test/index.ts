@@ -165,22 +165,54 @@ Deno.serve(async(req:Request)=>{
   accountInvited:!!pass.test_client_id,invoiceEmailQueued:!!pass.invoice_email_queued_at
  },200,cors);
  if(!paid||!order.stripe_session_id)return reply({error:"Webhook Stripe TEST non encore confirmé"},409,cors);
+ // Supabase generates the signed invitation link without sending its default email.
+ // The existing Resend transport sends the AK PRIME branded invitation instead.
+ let activationLink:string|null=null;
  if(!pass.test_client_id){
-   let userId=pass.test_auth_user_id;
+   let userId=pass.test_auth_user_id as string|null;
    if(!userId){
-     const invite=await admin.auth.admin.inviteUserByEmail(order.email,{
-        redirectTo:"https://akprime.fr/reinitialiser-mot-de-passe.html",
-        data:{full_name:order.full_name,akprime_test:true}
+     const generated=await admin.auth.admin.generateLink({
+       type:"invite",email:order.email,
+       options:{redirectTo:"https://akprime.fr/reinitialiser-mot-de-passe.html",
+        data:{full_name:order.full_name,akprime_test:true}}
      });
-     if(invite.error||!invite.data?.user)return reply({
-       error:"L'e-mail d'invitation n'a pas pu être émis. Utilise une adresse nouvelle et vérifie les paramètres e-mail Supabase.",
-       details:invite.error?.message||"Erreur d'invitation"
-     },503,cors);
-     userId=invite.data.user.id;
-     await admin.from("stripe_test_invites").update({test_auth_user_id:userId}).eq("id",pass.id);
+     if(generated.error||!generated.data?.user?.id||!generated.data?.properties?.action_link)
+       return reply({error:"Impossible de préparer l'invitation sécurisée AK PRIME.",
+         details:generated.error?.message||"Lien d'activation absent"},503,cors);
+     userId=generated.data.user.id;
+     activationLink=generated.data.properties.action_link;
+     const saved=await admin.from("stripe_test_invites").update({test_auth_user_id:userId})
+       .eq("id",pass.id).is("test_auth_user_id",null);
+     if(saved.error)return reply({error:"Impossible d'enregistrer l'identité client TEST."},503,cors);
    }
-   const linked=await admin.rpc("provision_invited_stripe_test_client",{p_invite_id:pass.id,p_auth_user_id:userId});
-   if(linked.error)return reply({error:"Invitation envoyée, mais création du dossier TEST incomplète.",details:linked.error.message},503,cors);
+   const linked=await admin.rpc("provision_invited_stripe_test_client",{
+     p_invite_id:pass.id,p_auth_user_id:userId
+   });
+   if(linked.error)return reply({
+     error:"Le compte d'essai a été préparé mais son dossier n'a pas pu être créé.",
+     details:linked.error.message
+   },503,cors);
+ }
+ if(!pass.auth_invite_email_queued_at){
+   // If an earlier attempt created the Auth user but email delivery failed, use
+   // a fresh recovery link to let that user create their password safely.
+   if(!activationLink){
+     const recovery=await admin.auth.admin.generateLink({
+       type:"recovery",email:order.email,
+       options:{redirectTo:"https://akprime.fr/reinitialiser-mot-de-passe.html"}
+     });
+     if(recovery.error||!recovery.data?.properties?.action_link)
+       return reply({error:"Lien de reprise de compte AK PRIME indisponible.",
+         details:recovery.error?.message||"Lien manquant"},503,cors);
+     activationLink=recovery.data.properties.action_link;
+   }
+   const sent=await admin.rpc("send_invited_stripe_test_auth_email",{
+     p_invite_id:pass.id,p_action_link:activationLink
+   });
+   if(sent.error)return reply({
+     error:"Le compte TEST est créé, mais l'envoi de l'invitation AK PRIME a échoué. Réessaie « Vérifier mon paiement TEST ».",
+     details:sent.error.message
+   },503,cors);
  }
  let invoice:null|{invoiceNumber:string,hostedUrl:string|null,pdfUrl:string|null}=null;
  try{invoice=await paidInvoice(order)}catch(e){console.warn("Invoice TEST pending",String(e).slice(0,200))}
@@ -194,7 +226,7 @@ Deno.serve(async(req:Request)=>{
  }
  return reply({
     status:"paid",invited:true,
-    message:"Invitation envoyée : vérifie ta boîte e-mail et crée ton mot de passe.",
+    message:"Invitation AK PRIME personnalisée préparée pour envoi : vérifie tes e-mails et crée ton mot de passe.",
     invoice:invoice
  },200,cors);
 });
