@@ -95,6 +95,7 @@ declare
   v_html text;
   v_request bigint;
   v_greeting text;
+  v_expected_amount integer;
 begin
   if coalesce(auth.jwt()->>'role','')<>'service_role' then
     raise exception 'Accès serveur uniquement.' using errcode='42501';
@@ -112,11 +113,16 @@ begin
   select * into v_order from public.stripe_test_orders
    where id=v_inv.stripe_order_id and status='paid' and paid_at is not null
    and test_client_id=v_inv.test_client_id;
-  if v_order.id is null or
-     v_order.stripe_session_id not like 'cs_test_%' or
-     v_order.stripe_amount_paid_cents is distinct from
-       case when v_order.payment_mode='monthly' then v_order.monthly_cents else v_order.total_cents end
-  then raise exception 'Paiement test non confirmé.' using errcode='22023';end if;
+  if v_order.payment_mode='monthly' then
+    v_expected_amount:=v_order.monthly_cents;
+  else
+    v_expected_amount:=v_order.total_cents;
+  end if;
+  if v_order.id is null
+     or v_order.stripe_session_id not like 'cs_test_%'
+     or v_order.stripe_amount_paid_cents is distinct from v_expected_amount then
+    raise exception 'Paiement test non confirmé.' using errcode='22023';
+  end if;
   if not exists (
     select 1 from auth.users u
      where u.id=v_inv.test_auth_user_id and lower(u.email)=lower(v_order.email)
