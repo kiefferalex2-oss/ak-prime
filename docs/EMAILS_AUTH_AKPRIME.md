@@ -1,5 +1,27 @@
 # AK PRIME — e-mails d'authentification aux couleurs de la marque
 
+## Activation alternative déployée — 28 octobre 2026
+
+**Les nouveaux comptes créés après un paiement Stripe TEST utilisent désormais un e-mail AK PRIME envoyé par Resend, sans édition des modèles Supabase et sans changement d'abonnement.**
+
+Mécanisme : `public-checkout-test` (v6) génère un lien d'activation sécurisé `auth.admin.generateLink(type="invite")` **sans e-mail Supabase** ; après création du client `is_test=true` et confirmation webhook, la RPC `send_invited_stripe_test_auth_email` (migrations 043–045) met l'e-mail HTML AK PRIME dans la file `pg_net` vers Resend. La clé API de Resend reste dans Vault, jamais dans le navigateur, le GitHub ou le mail.
+
+Le modèle contient le nom de l'utilisateur, le bouton « Créer mon mot de passe » avec le lien sécurisé Supabase, et un avertissement explicite « Aucun paiement réel » pour ces comptes tests.
+
+- Le formulaire public, le compte et le paiement test restent inchangés.
+- Les anciens e-mails envoyés par Supabase ne peuvent pas être changés rétroactivement ; aucun deuxième e-mail n'est expédié à leurs destinataires.
+- Si Resend refuse la demande, le client peut relancer « Vérifier mon paiement TEST » : un nouveau lien de récupération sécurisé peut être généré. Un e-mail demandé est marqué comme *mis en file*, ce qui ne garantit pas encore sa réception.
+- Ce contournement ne personnalise pas automatiquement les e-mails de récupération et de confirmation Supabase ; leurs modèles HTML restent prêts dans le dépôt. Pour généraliser la personnalisation à tous les e-mails Auth, le SMTP personnalisé reste recommandé.
+- L'absence d'un test de réception d'un **nouveau compte** signifie que le rendu et la délivrabilité de ce nouveau message restent à confirmer.
+
+### Données de contrôle
+
+`public.stripe_test_invites.auth_branded_required` distingue les nouvelles invitations personnalisées de celles déjà envoyées avec Supabase.
+`auth_invite_email_queued_at` et `auth_invite_email_request_id` enregistrent le passage dans la file Resend.
+La fonction SQL vérifie la confirmation Stripe TEST, le compte autorisé, l'e-mail correspondant et l'origine du lien signé, et n'est exécutable que par `service_role`.
+
+---
+
 ## Fichiers prêts
 - Invitation / activation du compte : `supabase/templates/invite.html`
 - Réinitialisation du mot de passe : `supabase/templates/recovery.html`
