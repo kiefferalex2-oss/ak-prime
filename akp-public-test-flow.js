@@ -6,7 +6,7 @@
  const query=new URLSearchParams(location.search);
  const ticket=query.get('akp_test')||query.get('ticket')||'';
  window.AKP_PUBLIC_TEST_TOKEN=/^[a-f0-9]{64}$/.test(ticket)?ticket:'';
- if(!window.AKP_PUBLIC_TEST_TOKEN)return;
+ window.AKP_PUBLIC_TEST_MODE=true;
  const result=query.get('akp_test_return')||'';
  const css=document.createElement('style');
  css.textContent='.akpt-banner{position:fixed;bottom:12px;left:12px;z-index:100000;background:#162942;color:#fff;border:1px solid #d9b56d;border-radius:11px;padding:10px 14px;font:700 12px system-ui;box-shadow:0 8px 30px #0003}.akpt-box{position:fixed;inset:0;z-index:110000;background:#06121dc9;display:grid;place-items:center;padding:18px}.akpt-panel{width:min(560px,100%);border-radius:18px;background:#172a42;color:#f2f6fa;padding:26px;box-shadow:0 25px 80px #0008;font-family:system-ui}.akpt-panel h2{font-size:27px;margin:0 0 12px}.akpt-panel p{font-size:14px;line-height:1.6}.akpt-panel button{padding:13px 17px;background:#d8b16d;color:#17202f;border:none;border-radius:9px;cursor:pointer;font-weight:800}.akpt-panel a{color:#f2d290}.akpt-small{font-size:12px;opacity:.8}.akpt-message{white-space:pre-wrap;padding:10px;background:#203850;border-radius:9px;margin:12px 0}';
@@ -15,6 +15,7 @@
  label.className='akpt-banner';
  label.textContent='AK PRIME · MODE TEST / AUCUN PAIEMENT RÉEL';
  document.body.appendChild(label);
+ if(!window.AKP_PUBLIC_TEST_TOKEN)return;
  if(result!=='success'&&result!=='cancelled')return;
  const backdrop=document.createElement('div');backdrop.className='akpt-box';
  const panel=document.createElement('div');panel.className='akpt-panel';backdrop.appendChild(panel);document.body.appendChild(backdrop);
