@@ -5713,14 +5713,16 @@ function openPublicOfferCheckout(button){
        if(window.AKP_PUBLIC_TEST_MODE){
          if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
          submit.textContent='Ouverture de Stripe TEST…';
-         const {data:result,error:checkoutErr}=await supa.functions.invoke('public-checkout-test',{body:{
+         if(typeof window.AKP_PUBLIC_TEST_REQUEST!=='function')
+           throw Error('Le module de paiement TEST n’est pas chargé. Actualise la page (Ctrl+F5).');
+         const result=await window.AKP_PUBLIC_TEST_REQUEST({
            action:window.AKP_PUBLIC_TEST_TOKEN?'create':'direct_create',
            ...(window.AKP_PUBLIC_TEST_TOKEN?{ticket:window.AKP_PUBLIC_TEST_TOKEN}:{}),
            offerCode:p.offerCode,duration,paymentMode,
            fullName,email,startDate:startMode==='date'?startDate:null,
            acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart
-         }});
-         if(checkoutErr||!result?.url)throw Error(result?.error||checkoutErr?.message||'Stripe TEST indisponible');
+         });
+         if(!result?.url)throw Error(result?.error||'Stripe TEST n’a pas retourné de page de paiement.');
          if(!result.url.startsWith('https://checkout.stripe.com/'))throw Error('Adresse Stripe incorrecte');
          location.assign(result.url);
          return;
@@ -5834,7 +5836,7 @@ async function initAuth(){
 window.AKP_PUBLIC_TEST_MODE=true; // Site temporairement ouvert aux simulations Stripe, jamais aux débits réels.
 initAuth();
 </script>
-  <script src="./akp-public-test-flow.js?v=akp-direct-20261028"></script>
+  <script src="./akp-public-test-flow.js?v=akp-direct-fix-20261028"></script>
   <script src="./contract-archive-secure.js?v=akprime-v20261026-sleep-latest-v87"></script>
 </body>
 </html>
