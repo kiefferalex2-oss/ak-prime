@@ -3403,9 +3403,9 @@ function contractsPage(){
  if(authProfile?.role!=='owner')return '<div class="alert">Accès réservé au propriétaire.</div>';
  const rows=contractEvidence.map(o=>{
   const archived=!o.contract_snapshot&&!!o.evidence_checksum;
-  return '<tr><td>'+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+ (archived?'<span class="status blue">Archivée hors site</span>':'<span class="status green">Preuve disponible</span>')+'<div class="muted tiny">'+esc(o.status||'')+'</div></td><td style="min-width:185px">'+(archived?'<div class="muted tiny">Réimportez votre JSON pour retrouver la copie complète.</div>':'<div class="row" style="flex-wrap:wrap;gap:5px"><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">JSON</button><button class="btn ghost small printContractEvidence" data-id="'+esc(o.id)+'">PDF</button><button class="btn ghost small archiveContractEvidence" data-id="'+esc(o.id)+'">Archiver</button></div>')+'</td></tr>';
+  return '<tr><td>'+(o.is_test?'<span class="status amber">TEST — simulation</span><div style="height:5px"></div>':'')+esc(o.full_name||'—')+'<div class="muted tiny">'+esc(o.email||'')+'</div></td><td>'+esc(o.offer_code||'')+'<div class="muted tiny">'+esc(o.commitment_months)+' mois • '+esc(o.payment_mode)+'</div></td><td>'+euro(Number(o.total_cents||0)/100)+'</td><td>'+esc(o.cgv_version||'—')+'<div class="muted tiny">'+esc(o.cgv_accepted_at||'—')+'</div></td><td>'+ (archived?'<span class="status blue">Archivée hors site</span>':'<span class="status green">Preuve disponible</span>')+'<div class="muted tiny">'+esc(o.status||'')+'</div></td><td style="min-width:185px">'+(archived?'<div class="muted tiny">Réimportez votre JSON pour retrouver la copie complète.</div>':'<div class="row" style="flex-wrap:wrap;gap:5px"><button class="btn ghost small exportContractEvidence" data-id="'+esc(o.id)+'">JSON</button><button class="btn ghost small printContractEvidence" data-id="'+esc(o.id)+'">PDF</button>'+(o.is_test?'':'<button class="btn ghost small archiveContractEvidence" data-id="'+esc(o.id)+'">Archiver</button>')+'</div>')+'</td></tr>';
  }).join('');
- return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Archives téléchargeables, copie Supabase facultative et réimport sécurisé. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
+ return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Contrats et consentements horodatés. Les commandes Stripe TEST sont des simulations et n’ont pas valeur de contrat de production. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
  (contractEvidenceError?'<div class="alert red">'+esc(contractEvidenceError)+'</div>':'')+
  '<div class="card panel"><div class="row between"><div><h3>'+contractEvidence.length+' dossier(s)</h3><div class="muted tiny">Supabase conserve l’index de preuve après archivage. L’archive locale doit être sauvegardée dans deux emplacements privés.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Exporter les preuves disponibles (JSON)</button></div>'+
  '<div class="row" style="flex-wrap:wrap;gap:10px;margin-top:12px"><label class="btn ghost" for="importContractEvidence" style="cursor:pointer">Réimporter un JSON individuel</label><input type="file" accept=".json,application/json" id="importContractEvidence" style="display:none"></div>'+
@@ -3419,9 +3419,15 @@ function downloadContractJSON(data,filename){
 }
 async function loadContractEvidence(){
  if(authProfile?.role!=='owner')return;
- const {data,error}=await supa.rpc('owner_contract_evidence');
- contractEvidenceError=error?error.message:'';
- contractEvidence=error?[]:(Array.isArray(data)?data:[]);
+ // Contrats de production et consentements de simulation sont conservés séparément.
+ const [real,test]=await Promise.all([
+   supa.rpc('owner_contract_evidence'),
+   supa.rpc('owner_stripe_test_consent_evidence')
+ ]);
+ contractEvidenceError=[real.error?.message,test.error?.message].filter(Boolean).join(' · ');
+ contractEvidence=[...(Array.isArray(real.data)?real.data:[]),
+   ...(Array.isArray(test.data)?test.data:[])].sort((x,y)=>
+    String(y.created_at||'').localeCompare(String(x.created_at||'')));
 }
 function printContractEvidence(o){
  const p=window.open('','_blank');
