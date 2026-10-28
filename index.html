@@ -3762,6 +3762,51 @@ function importData(e){
 }
 
 
+// Factures Stripe TEST : chargement natif, indépendamment des modules annexes.
+async function loadClientTestInvoices(s){
+ if(!s?.client?.is_test||s.client.auth_user_id!==authUser?.id)return;
+ s.akInvoiceLoadState='loading';
+ s.akStripeInvoiceError='';
+ if(clientPortalState===s&&clientPortalView==='billing')renderClientPortal();
+ try{
+  const {data:{session},error:sessionError}=await supa.auth.getSession();
+  if(sessionError||!session?.access_token)throw Error('Session expirée : reconnecte-toi.');
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),16000);
+  let response;
+  try{
+   response=await fetch('https://gptvgldboqarfklorjip.supabase.co/functions/v1/client-test-invoices',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':'sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx',
+      'Authorization':'Bearer '+session.access_token
+    },
+    body:'{}',cache:'no-store',signal:controller.signal
+   });
+  }finally{clearTimeout(timeout);}
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error((body.error||'Réponse serveur inattendue')+' (HTTP '+response.status+')');
+  if(clientPortalState!==s)return;
+  s.akStripeTestInvoices=Array.isArray(body.invoices)?body.invoices:[];
+  s.akStripeOrderCount=Number(body.paid_order_count||0);
+  s.akInvoiceLoadState='ready';
+ }catch(err){
+  if(clientPortalState!==s)return;
+  s.akInvoiceLoadState='error';
+  s.akStripeInvoiceError=err?.name==='AbortError'?'Délai du serveur dépassé.':String(err?.message||err);
+ }finally{
+  if(clientPortalState===s&&clientPortalView==='billing')renderClientPortal();
+ }
+}
+function akSafeStripeInvoiceUrl(value){
+ if(typeof value!=='string')return '';
+ try{
+  const u=new URL(value);
+  return u.protocol==='https:'&&['invoice.stripe.com','pay.stripe.com'].includes(u.hostname)
+   ?u.href:'';
+ }catch{return ''}
+}
 async function enterClientPortal(user,profile){
  const {data:client,error}=await supa.from('clients').select('*').eq('auth_user_id',user.id).maybeSingle();
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
@@ -3797,6 +3842,7 @@ async function enterClientPortal(user,profile){
  clientQuestionnaireExpanded=false;
  clientMobileMenuOpen=false;
  renderClientPortal();
+ if(client.is_test)void loadClientTestInvoices(clientPortalState);
 }
 function showClientPending(message){
  document.getElementById('root').innerHTML='<div class="auth-shell"><div class="auth-card"><div class="auth-logo">AK PRIME<span>ESPACE CLIENT</span></div><h1>Compte client</h1><p>'+esc(message)+'</p><button class="btn ghost" id="pendingLogout">Déconnexion</button></div></div>';
@@ -3937,6 +3983,45 @@ function renderClientHome(s){
  '</div>';
 }
 function renderClientBilling(s){
+ if(s.client?.is_test){
+  const rows=s.akStripeTestInvoices||[];
+  const state=s.akInvoiceLoadState||'loading';
+  const header='<div class="client-page-head"><div><h2>Mes factures</h2>'+
+   '<p>Documents Stripe liés à tes commandes de démonstration.</p></div>'+
+   '<span class="status amber">ENVIRONNEMENT TEST</span></div>';
+  const refresh='<button class="btn ghost small" type="button" id="refreshClientTestInvoices"'+
+   (state==='loading'?' disabled':'')+'>'+
+   (state==='loading'?'Chargement en cours…':'Actualiser mes factures')+'</button>';
+  const cards=rows.map(inv=>{
+   const hosted=akSafeStripeInvoiceUrl(inv.url),pdf=akSafeStripeInvoiceUrl(inv.pdf);
+   const created=Number(inv.created)>0
+    ?new Date(Number(inv.created)*1000).toLocaleDateString('fr-FR'):'—';
+   const amount=Number(inv.amount_paid||0);
+   return '<article class="client-section-card" style="margin-top:14px">'+
+    '<div class="row between" style="gap:12px;flex-wrap:wrap">'+
+    '<div><div class="muted tiny">FACTURE STRIPE TEST</div>'+
+    '<h3 style="margin:5px 0">'+esc(inv.number||'Facture de simulation')+'</h3>'+
+    '<p class="muted tiny">Émise le '+esc(created)+' · '+esc(inv.offer_code||'AK PRIME')+'</p></div>'+
+    '<div><strong style="font-size:19px">'+centsMoney(amount)+'</strong>'+
+    '<div><span class="status amber">Payée en simulation</span></div></div></div>'+
+    '<div class="row" style="gap:9px;flex-wrap:wrap;margin-top:12px">'+
+    (hosted?'<a class="btn primary small" href="'+esc(hosted)+'" target="_blank" rel="noopener noreferrer">Consulter la facture</a>':'')+
+    (pdf?'<a class="btn ghost small" href="'+esc(pdf)+'" target="_blank" rel="noopener noreferrer">Télécharger le PDF</a>':'')+
+    '</div><p class="muted tiny" style="margin-top:10px">Simulation uniquement : aucun débit bancaire réel ni facture comptable AK PRIME.</p></article>';
+  }).join('');
+  const notice=state==='loading'
+   ?'<div class="client-section-card">Recherche de tes factures Stripe TEST…</div>'
+   :state==='error'
+    ?'<div class="alert red">Impossible de charger les factures : '+esc(s.akStripeInvoiceError||'Erreur inconnue')+'</div>'
+    :!rows.length
+     ?'<div class="client-section-card"><h3>Aucune facture liée à ce compte</h3>'+
+       '<p>Cette connexion ne possède pas de facture Stripe TEST payée associée à son dossier. Vérifie que tu utilises le compte de la commande et non un compte de démonstration distinct.</p></div>'
+     :'';
+  return '<div class="client-main akWowBillingPage">'+header+
+    '<div style="margin:10px 0 15px">'+refresh+'</div><div class="akWowBillingList">'+
+    notice+cards+'</div></div>';
+ }
+
  const invoices=(s.invoices||[]).slice().sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date)));
  const rows=invoices.length?invoices.map(i=>'<div class="client-section-card"><div class="row between"><div><div class="muted tiny">FACTURE</div><h3 style="margin:4px 0">'+esc(i.invoice_number)+'</h3><div class="muted tiny">Émise le '+fmtDate(i.issue_date)+' • prestation du '+fmtDate(i.service_date)+'</div></div><div style="text-align:right"><div style="font-size:19px;font-weight:900">'+centsMoney(i.amount_incl_tax_cents)+'</div><span class="status '+invoiceStatusTone(i.payment_status)+'">'+esc(invoiceStatusLabel(i.payment_status))+'</span></div></div><button class="btn ghost small clientPrintInvoice" data-id="'+i.id+'" style="margin-top:12px">Imprimer / enregistrer en PDF</button></div>').join(''):(s.client?.is_test?'<div class="client-section-card" style="padding:24px"><div class="row between" style="align-items:flex-start;gap:12px;flex-wrap:wrap"><div><div class="muted tiny" style="letter-spacing:.12em;font-weight:900">APERÇU DE FACTURATION • SIMULATION</div><h3 style="margin:7px 0">Exemple du rendu final</h3><p class="muted tiny">Exemples d’affichage uniquement, non des factures émises. Aucun paiement enregistré.</p></div><span class="status amber">Non valable</span></div>'+
  ['Octobre 2026','Septembre 2026','Août 2026'].map((period,i)=>'<div class="item row between" style="margin-top:12px;padding:16px 18px;gap:15px;flex-wrap:wrap"><div><strong>Accompagnement Performance P3</strong><div class="muted tiny" style="margin-top:5px">'+period+' • Pièce illustrative n° '+(i+1)+'</div></div><span class="status blue">Démonstration</span></div>').join('')+
@@ -3996,6 +4081,7 @@ function renderClientPortal(){
  document.querySelectorAll('.clientGoCheckin').forEach(b=>b.onclick=()=>{clientPortalView='checkin';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
  document.querySelectorAll('.clientPrintInvoice').forEach(b=>b.onclick=()=>printInvoice(b.dataset.id));
+ document.getElementById('refreshClientTestInvoices')?.addEventListener('click',()=>void loadClientTestInvoices(clientPortalState));
  document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
  document.getElementById('openClientRenewalChoice')?.addEventListener('click',openClientRenewalChoice);
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
