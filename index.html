@@ -3483,7 +3483,7 @@ function contractsPage(){
    '<div class="muted tiny">'+esc(o.status||'')+'</div></td>'+
    '<td style="min-width:185px">'+actions+'</td></tr>';
  }).join('');
- return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Les preuves sont regroupées par client. Chaque paiement TEST conserve sa preuve distincte dans l’historique, sans créer de contrat réel. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
+ return '<div class="page-title"><div><h1>Preuves contractuelles</h1><p>Les preuves sont regroupées par client. Les paiements réels et les simulations restent séparés. Chaque commande conserve sa preuve distincte. Propriétaire uniquement.</p></div><button class="btn primary" id="refreshContractEvidence">Actualiser</button></div>'+
  (contractEvidenceError?'<div class="alert red">'+esc(contractEvidenceError)+'</div>':'')+
  '<div class="card panel"><div class="row between"><div><h3>'+proofGroups.length+' client(s) / dossier(s) · '+contractEvidence.length+' preuve(s)</h3><div class="muted tiny">Supabase conserve l’index de preuve après archivage. L’archive locale doit être sauvegardée dans deux emplacements privés.</div></div><button class="btn ghost" id="downloadAllContractEvidence">Exporter les preuves disponibles (JSON)</button></div>'+
  '<div class="row" style="flex-wrap:wrap;gap:10px;margin-top:12px"><label class="btn ghost" for="importContractEvidence" style="cursor:pointer">Réimporter un JSON individuel</label><input type="file" accept=".json,application/json" id="importContractEvidence" style="display:none"></div>'+
@@ -3498,13 +3498,15 @@ function downloadContractJSON(data,filename){
 async function loadContractEvidence(){
  if(authProfile?.role!=='owner')return;
  // Contrats de production et consentements de simulation sont conservés séparément.
- const [real,test]=await Promise.all([
+ const [real,test,live]=await Promise.all([
    supa.rpc('owner_contract_evidence'),
-   supa.rpc('owner_stripe_test_consent_evidence')
+   supa.rpc('owner_stripe_test_consent_evidence'),
+   supa.rpc('owner_stripe_live_consent_evidence')
  ]);
- contractEvidenceError=[real.error?.message,test.error?.message].filter(Boolean).join(' · ');
+ contractEvidenceError=[real.error?.message,test.error?.message,live.error?.message].filter(Boolean).join(' · ');
  contractEvidence=[...(Array.isArray(real.data)?real.data:[]),
-   ...(Array.isArray(test.data)?test.data:[])].sort((x,y)=>
+   ...(Array.isArray(test.data)?test.data:[]),
+   ...(Array.isArray(live.data)?live.data:[])].sort((x,y)=>
     String(y.created_at||'').localeCompare(String(x.created_at||'')));
 }
 function printContractEvidence(o){
