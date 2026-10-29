@@ -2528,7 +2528,7 @@ function dashboard(){
  const pendingCheckins=acts.flatMap(c=>(c.checkins||[]).filter(w=>!w.reviewedAt).map(w=>({c,w})));
  const checkinTodo=pendingCheckins.length;
  const tasks=[...ending.map(c=>{const choice=(c.renewalChoices||[]).find(r=>r.dueDate===c.end);return {c,label:choice?'Choix client reçu — '+renewalDecisionLabel(choice.decision)+(choice.paymentMode?' / '+renewalPaymentLabel(choice.paymentMode):''):'Renouvellement en attente du choix client — '+fmtDate(c.end),tone:choice?'green':'amber',tab:'admin'}}),...pendingCheckins.map(x=>({c:x.c,label:'Check-in du '+fmtDate(x.w.date)+' à traiter',tone:'amber'})),...visioTodo.map(c=>({c,label:'Préparer / réaliser la visio',tone:'blue'})),...testsTodo.map(c=>({c,label:'Tests requis à terminer',tone:'amber'})),...programmingTodo.map(c=>({c,label:'Programmation à finaliser',tone:'green'}))].slice(0,8);
- return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div>'+renderMailHealth()+
+ return '<div class="page-title"><div><h1>Tableau de bord</h1><p>Ce qui demande ton attention aujourd’hui.</p></div></div>'+renderMailHealth()+
  '<div class="kpis">'+
  kpi('Questionnaires à compléter',questionnaireTodo.length,'clients en attente')+kpi('Visios à préparer',visioTodo.length,'questionnaire reçu')+
  kpi('Tests à terminer',testsTodo.length,'avant programmation')+kpi('Programmations à faire',programmingTodo.length,'tests requis validés')+
