@@ -1968,12 +1968,12 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 /* Signature exacte AK PRIME navy/or : image vectorielle issue du logo valide. */
 .ak-brand-logo{display:block;width:185px;height:auto;max-width:100%;box-sizing:border-box;background:#fff;border-radius:7px;padding:6px 9px;object-fit:contain;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .public-logo{display:inline-flex;align-items:center;flex-direction:row;flex-shrink:0}
-.public-logo .ak-brand-logo{width:192px}
+.public-logo .ak-brand-logo{width:176px;background:transparent;border-radius:0;padding:0;box-shadow:none;}
 .brand .ak-brand-logo{width:176px}
 .client-brand .ak-brand-logo{width:176px}
 .auth-logo .ak-brand-logo{width:224px}
 .akOfferDemoShell .client-brand .ak-brand-logo{width:164px}
-@media(max-width:700px){.public-logo .ak-brand-logo{width:155px}.client-brand .ak-brand-logo{width:145px}.brand .ak-brand-logo{width:160px}.akOfferDemoShell .client-brand .ak-brand-logo{width:135px}}
+@media(max-width:700px){.public-logo .ak-brand-logo{width:143px}.client-brand .ak-brand-logo{width:145px}.brand .ak-brand-logo{width:160px}.akOfferDemoShell .client-brand .ak-brand-logo{width:135px}}
 @media(max-width:390px){.client-brand .ak-brand-logo{width:126px}.akOfferDemoShell .client-brand .ak-brand-logo{width:118px}}
 
 
@@ -4701,7 +4701,7 @@ function publicOfferFoundation(title,description,items,ladder){
 }
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark.svg?v=20261029" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
