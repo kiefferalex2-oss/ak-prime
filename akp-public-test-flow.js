@@ -34,7 +34,7 @@
  const label=document.createElement('div');
  label.className='akpt-banner';
  label.textContent='AK PRIME · MODE TEST / AUCUN PAIEMENT RÉEL';
- document.body.appendChild(label);
+ if(window.AKP_PUBLIC_TEST_MODE)document.body.appendChild(label);
  if(!window.AKP_PUBLIC_TEST_TOKEN)return;
  if(result!=='success'&&result!=='cancelled')return;
  const backdrop=document.createElement('div');backdrop.className='akpt-box';
