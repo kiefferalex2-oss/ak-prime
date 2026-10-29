@@ -5909,6 +5909,21 @@ function openPublicOfferCheckout(button){
      errorBox.classList.remove('show');
      const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Préparation du paiement Stripe TEST…';
      try {
+       if(window.AKP_LIVE_CHECKOUT_MODE===true){
+         if(p.source!=='server'||!p.offerCode)throw Error('Tarif sécurisé indisponible');
+         submit.textContent='Ouverture du paiement sécurisé…';
+         const result=await fetch('https://gptvgldboqarfklorjip.supabase.co/functions/v1/public-checkout-live',{
+           method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx'},
+           body:JSON.stringify({offerCode:p.offerCode,duration,paymentMode,fullName,email,
+             startDate:startMode==='date'?startDate:null,earlyStart,
+             acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,
+             cgvVersion:'akprime-cgv-2026-10-20-firm-commitment'})
+         });
+         const data=await result.json().catch(()=>({}));
+         if(!result.ok||!data.url)throw Error(data.error||'Paiement sécurisé indisponible');
+         if(!/^https:\/\/checkout\.stripe\.com\//.test(data.url))throw Error('Lien Stripe inattendu');
+         location.assign(data.url);return;
+       }
        if(window.AKP_PUBLIC_TEST_MODE){
          if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
          submit.textContent='Ouverture de Stripe TEST…';
@@ -6050,7 +6065,8 @@ async function initAuth(){
  });
 }
 
-window.AKP_PUBLIC_TEST_MODE=true; // Site temporairement ouvert aux simulations Stripe, jamais aux débits réels.
+window.AKP_LIVE_CHECKOUT_MODE=false; // Verrou de sécurité : activer uniquement après validation du parcours réel.
+window.AKP_PUBLIC_TEST_MODE=true; // Parcours de simulation conservé tant que le mode réel reste verrouillé.
 initAuth();
 </script>
   <script src="./akp-public-test-flow.js?v=akp-repeat-invoice-20261028"></script>
