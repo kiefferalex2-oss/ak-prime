@@ -3,7 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AK PRIME — Coaching, Performance & Mental</title>
+<title>AK PRIME | Coaching sportif, préparation physique et mentale</title>
+<meta name="description" content="Coaching sportif à distance, préparation physique et mentale personnalisées. Programmes individualisés, suivi des progrès et accompagnement par un coach diplômé STAPS.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://akprime.fr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AK PRIME">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://akprime.fr/">
+<meta property="og:title" content="AK PRIME | Coaching sportif, préparation physique et mentale">
+<meta property="og:description" content="Coaching sportif à distance, préparation physique et mentale personnalisées. Programmes individualisés, suivi des progrès et accompagnement par un coach diplômé STAPS.">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://akprime.fr/#site","url":"https://akprime.fr/","name":"AK PRIME","inLanguage":"fr-FR","publisher":{"@id":"https://akprime.fr/#organisation"}},{"@type":"Organization","@id":"https://akprime.fr/#organisation","name":"AK PRIME","url":"https://akprime.fr/","email":"contact@akprime.fr","logo":"https://akprime.fr/assets/ak-prime-wordmark-white-gold.svg","founder":{"@type":"Person","name":"Alex Kieffer","jobTitle":"Préparateur physique et coach sportif"},"hasOfferCatalog":{"@type":"OfferCatalog","name":"Accompagnements AK PRIME","itemListElement":[{"@type":"OfferCatalog","name":"Performance sportive","url":"https://akprime.fr/preparation-physique/"},{"@type":"OfferCatalog","name":"Forme & Santé","url":"https://akprime.fr/coaching-sportif/"},{"@type":"OfferCatalog","name":"Préparation mentale","url":"https://akprime.fr/preparation-mentale/"}]}}]}</script>
 <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon-akprime.svg?v=1">
 <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon-akprime.svg?v=1">
 <meta name="theme-color" content="#0d233b">
@@ -2036,10 +2047,39 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
   .public-site .public-hero-portrait{width:min(94%,310px)}
   .public-site #apropos .ak-about-portrait-inner{min-height:340px}
 }
+
+/* Contenu public indexable dès le HTML initial, remplacé par le rendu applicatif. */
+.seo-preload{min-height:70vh;padding:clamp(45px,7vw,95px) 22px;color:#fff;background:radial-gradient(circle at 75% 16%,#21416b,transparent 40%),linear-gradient(150deg,#08111d,#102945)}
+.seo-preload-inner{max-width:1080px;margin:0 auto}
+.seo-preload-label{font-weight:850;color:#d3ab62;letter-spacing:.12em;font-size:12px}
+.seo-preload h1{font-size:clamp(31px,5vw,54px);line-height:1.14;letter-spacing:-.035em;max-width:860px;margin:19px 0}
+.seo-preload p{max-width:780px;line-height:1.75;color:#c7d2df}
+.seo-preload nav{display:flex;flex-wrap:wrap;gap:10px;margin:27px 0}
+.seo-preload nav a{background:#d3ab62;color:#102033;padding:11px 14px;border-radius:9px;text-decoration:none;font-weight:850}
+.seo-preload a{color:#edc783}
+.seo-preload .seo-preload-coach{font-size:13px}
+.public-seo-links{display:flex;gap:11px 14px;flex-wrap:wrap;align-items:center}
+.public-seo-links a{color:#d0ae74;text-decoration:none;font-weight:700;font-size:11px}
+.public-seo-links a:hover{text-decoration:underline;color:#f2d49d}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root">
+<main class="seo-preload" aria-label="Présentation AK PRIME">
+  <div class="seo-preload-inner">
+    <p class="seo-preload-label">AK PRIME · COACHING À DISTANCE</p>
+    <h1>Coaching sportif, préparation physique et préparation mentale personnalisés</h1>
+    <p>AK PRIME propose des accompagnements individualisés à distance : performance sportive, forme et santé, préparation mentale. La programmation, les échanges et les outils de suivi sont adaptés à la formule retenue.</p>
+    <nav aria-label="Découvrir les accompagnements">
+      <a href="/preparation-physique/">Préparation physique</a>
+      <a href="/coaching-sportif/">Coaching sportif</a>
+      <a href="/preparation-mentale/">Préparation mentale</a>
+    </nav>
+    <p class="seo-preload-coach">Alex Kieffer · Master STAPS en entraînement et optimisation de la performance sportive.</p>
+    <p><a href="mailto:contact@akprime.fr">Contacter AK PRIME</a></p>
+  </div>
+</main>
+</div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -4783,7 +4823,7 @@ function renderPublicSite(){
  '<details><summary>Puis-je arrêter mon accompagnement avant la fin de l’engagement ?</summary><p>Votre engagement de 3 ou 6 mois est ferme, même si vous payez chaque mois. Après les 14 jours de rétractation, un simple changement d’avis ne met pas automatiquement fin au contrat. Vous pouvez cependant demander une résiliation amiable : nous conviendrons par écrit de la date de fin et des éventuelles conséquences financières. Vos droits légaux restent applicables et une suspension peut être envisagée en cas d’empêchement temporaire sérieux.</p></details>'+
  '<details><summary>Dans quels cas puis-je être remboursé ?</summary><p>Un remboursement ou une régularisation peut intervenir notamment en cas de rétractation légale, de trop-perçu, de prestations non fournies ouvrant droit à restitution ou selon les termes d’une résiliation amiable écrite. Le seul changement d’avis ne donne pas automatiquement droit au remboursement des mensualités d’un engagement ferme. Un décompte détaillé vous sera communiqué. Si vous avez demandé à commencer pendant les 14 jours de rétractation, la partie des services effectivement fournis peut rester due dans les conditions légales.</p></details>'+
 '</div></div></section>'+
- '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
+ '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div><nav class="public-seo-links" aria-label="Domaines de coaching"><a href="/preparation-physique/">Préparation physique</a><a href="/coaching-sportif/">Coaching sportif</a><a href="/preparation-mentale/">Préparation mentale</a></nav></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
  '</div>';
 }
 
