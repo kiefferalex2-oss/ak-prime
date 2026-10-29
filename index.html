@@ -6065,6 +6065,25 @@ async function initAuth(){
  });
 }
 
+(function(){
+ const params=new URLSearchParams(location.search);
+ const outcome=params.get('akp_live_return');
+ if(outcome!=='success'&&outcome!=='cancel')return;
+ const modal=document.createElement('div');modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');
+ modal.style.cssText='position:fixed;inset:0;z-index:120000;display:grid;place-items:center;background:#071424d9;padding:16px';
+ const panel=document.createElement('div');panel.style.cssText='max-width:560px;width:100%;background:#122942;color:#f6f9fc;border:1px solid #d3ab62;border-radius:17px;padding:30px;font:15px/1.65 system-ui';
+ const title=document.createElement('h2');title.style.cssText='margin:0 0 14px;font-size:25px;color:#e7c17c';
+ title.textContent=outcome==='success'?'Ton paiement est en cours de confirmation':'Paiement annulé';
+ const detail=document.createElement('p');detail.textContent=outcome==='success'
+  ?'Stripe nous a redirigés vers AK PRIME. Le paiement sera confirmé uniquement par notre système sécurisé. Si le règlement est validé, tu recevras un e-mail d’activation pour accéder à ton espace client et compléter ton questionnaire initial.'
+  :'Aucun nouveau paiement n’a été confirmé à partir de cette page. Tu peux revenir aux offres quand tu le souhaites.';
+ const help=document.createElement('p');help.style.cssText='font-size:13px;color:#cbd7e4';
+ help.textContent='En cas de difficulté : contact@akprime.fr';
+ const close=document.createElement('button');close.type='button';close.textContent='Retour à AK PRIME';
+ close.style.cssText='background:#d3ab62;border:0;border-radius:9px;color:#12202f;font-weight:800;padding:12px 17px;cursor:pointer';
+ close.addEventListener('click',()=>{modal.remove();history.replaceState(null,'',location.pathname+location.hash)});
+ panel.append(title,detail,help,close);modal.appendChild(panel);document.body.appendChild(modal);
+})();
 window.AKP_LIVE_CHECKOUT_MODE=false; // Verrou de sécurité : activer uniquement après validation du parcours réel.
 window.AKP_PUBLIC_TEST_MODE=true; // Parcours de simulation conservé tant que le mode réel reste verrouillé.
 initAuth();
