@@ -1987,6 +1987,27 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .ak-wordmark{display:inline-block;font-family:Inter,Arial,Helvetica,sans-serif;font-weight:900;font-style:normal;letter-spacing:-.045em;white-space:nowrap;line-height:1.1;color:#f7fafc}.ak-wordmark b{color:#d8b16d;font-weight:900}.public-logo{font-size:24px;letter-spacing:0;line-height:1.1;flex-direction:row;align-items:center}.brand .ak-wordmark{font-size:23px}.client-brand .ak-wordmark{font-size:22px}.auth-logo .ak-wordmark{font-size:29px;color:#0e243e}.akOfferDemoShell .client-brand .ak-wordmark{font-size:20px}@media(max-width:520px){.public-logo{font-size:21px}.client-brand .ak-wordmark,.akOfferDemoShell .client-brand .ak-wordmark{font-size:18px}}
 
 
+
+/* Retours verifiables : aucune note inventee, aucun avis de compte test. */
+.akpTrustSection{background:linear-gradient(160deg,#0c1c2d,#172d43);color:#eef4fa}
+.akpTrustSection .public-section-head h2,.akpTrustSection .public-section-head p{color:#eef4fa}
+.akpTrustSection .public-section-head p{opacity:.8}
+.akpTrustGrid,.akpReviewsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px}
+.akpTrustCard,.akpReviewCard{background:rgba(255,255,255,.045);border:1px solid rgba(216,177,109,.24);border-radius:18px;padding:24px;box-shadow:0 10px 26px #0002}
+.akpTrustCard>span{font-size:10px;letter-spacing:.13em;color:#deb979;font-weight:850}
+.akpTrustCard h3{font-size:21px;line-height:1.25;margin:13px 0;color:#fff}
+.akpTrustCard p,.akpReviewsHeader p,.akpReviewRules{font-size:13px;color:#b8cbdc;line-height:1.75}
+.akpReviewsHeader{margin:37px 0 19px}
+.akpReviewsHeader h3{font-size:25px;color:#fff;margin:0 0 9px}
+.akpReviewsHeader p{max-width:850px;margin:0}
+.akpReviewCard .akpReviewStars{color:#e1bb77;font-size:19px;letter-spacing:3px}
+.akpReviewCard blockquote{margin:13px 0 19px;color:#edf4fa;white-space:pre-wrap;font:normal 15px/1.7 system-ui}
+.akpReviewMeta{display:flex;flex-direction:column;gap:5px}
+.akpReviewMeta strong{font-size:14px;color:#fff}
+.akpReviewMeta span,.akpReviewMeta small{font-size:11px;color:#b9cadc}
+.akpReviewRules{margin-top:20px}
+.akpReviewRules a{color:#f0d29c;text-decoration:underline}
+
 /* Branding adapte aux back-offices : logo visible dans la barre coach sur telephone. */
 .akCoachTopLogo{display:none}
 @media(max-width:780px){.akCoachTopLogo{display:block;width:110px;max-width:32vw;height:auto;margin-right:7px}.topbar-title{display:flex;align-items:center;gap:7px;min-width:0}.topbar-title .crumb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
@@ -2633,7 +2654,7 @@ function shell(inner){
  '<aside class="sidebar"><div class="brand"><div><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="621" height="82" decoding="async"><span>COACH CONSOLE</span></div></div>'+
  '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('billing','Facturation')+navBtn('calendar','Calendrier')+
- '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+(authProfile?.role==='owner'?navBtn('contracts','Preuves contractuelles'):'')+navBtn('settings','Paramètres')+
+ '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+(authProfile?.role==='owner'?navBtn('reviews','Avis clients')+navBtn('contracts','Preuves contractuelles'):'')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
  '<main><div class="topbar"><div class="topbar-title"><img class="akCoachTopLogo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="110" height="15" decoding="async"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
@@ -2687,6 +2708,41 @@ function renderMailHealth(){
    '<button class="btn ghost small" id="akRefreshMailHealth" type="button">Actualiser le contrôle</button>'+
    '</div></details>';
 }
+
+let akpReviewAdminRows=null;
+function reviewAdminPage(){
+ if(authProfile?.role!=='owner')return '<div class="card panel">Accès réservé au propriétaire.</div>';
+ const reviews=akpReviewAdminRows||[];
+ const count=reviews.filter(x=>x.moderation_status==='pending').length;
+ return '<div class="page-title"><div><h1>Avis clients</h1><p>Retours de clients réels, sans modification du contenu ni sélection selon la note.</p></div><button type="button" id="akpRefreshReviews" class="btn ghost small">Actualiser</button></div>'+
+ '<div class="card panel" style="margin-bottom:17px"><h3>'+count+' avis à examiner</h3><p class="muted tiny">Seuls les clients réels peuvent publier un retour après deux semaines d’accompagnement. La modération sert à écarter le spam, les injures, les données personnelles ou les contenus hors sujet — jamais une note défavorable. Les refus doivent être motivés.</p></div>'+
+ (!akpReviewAdminRows?'<div class="card panel">Chargement des avis…</div>':
+ !reviews.length?'<div class="card panel">Aucun avis client reçu pour le moment.</div>':
+ reviews.map(x=>'<article class="card panel" style="margin-bottom:13px"><div class="row between" style="align-items:flex-start"><div><h3>'+esc(x.public_name)+' · '+esc(x.rating)+'/5</h3><div class="muted tiny">'+esc(x.pole_label)+' · '+esc(x.offer_label)+' · Expérience du '+esc(fmtDate(x.experience_date))+' · Avis du '+esc(fmtDate(x.created_at))+'</div></div><span class="status '+(x.moderation_status==='published'?'green':x.moderation_status==='rejected'?'amber':'blue')+'">'+(x.moderation_status==='published'?'Publié':x.moderation_status==='rejected'?'Non publié':'À examiner')+'</span></div><p style="white-space:pre-wrap;line-height:1.65;margin:15px 0">'+esc(x.review_text)+'</p>'+
+ (x.moderation_status==='rejected'?'<p class="muted tiny">Motif : '+esc(x.moderation_reason||'Non précisé')+'</p>':'')+
+ '<div class="row" style="gap:10px;flex-wrap:wrap"><button type="button" class="btn primary small akpPublishReview" data-id="'+esc(x.id)+'">Publier tel quel</button><button type="button" class="btn ghost small akpRejectReview" data-id="'+esc(x.id)+'">Refuser avec motif</button></div></article>').join(''));
+}
+async function akpLoadOwnerReviews(){
+ if(authProfile?.role!=='owner')return;
+ const {data,error}=await supa.from('akp_client_reviews').select('id,public_name,rating,review_text,experience_date,pole_label,offer_label,moderation_status,moderation_reason,created_at,published_at').order('created_at',{ascending:false}).limit(100);
+ if(error){toast('Impossible de charger les avis : '+error.message);return}
+ akpReviewAdminRows=data||[];
+ if(state.view==='reviews')render();
+}
+async function akpModerateReview(id,choice){
+ if(authProfile?.role!=='owner')return;
+ const review=(akpReviewAdminRows||[]).find(x=>x.id===id);if(!review)return;
+ let reason=null;
+ if(choice==='rejected'){
+  reason=prompt('Motif obligatoire de refus (spam, injure, données sensibles, hors-sujet…). Ne refuse pas un avis à cause de sa note :')||'';
+  if(reason.trim().length<10)return toast('Précise un motif d’au moins 10 caractères');
+ }else if(!confirm('Publier cet avis sans modifier son texte, même si la note est défavorable ?'))return;
+ const {error}=await supa.from('akp_client_reviews').update({moderation_status:choice,moderation_reason:reason}).eq('id',id);
+ if(error){toast('Impossible de modifier le statut : '+error.message);return}
+ toast(choice==='published'?'Avis publié sans modification':'Refus enregistré avec motif');
+ await akpLoadOwnerReviews();
+}
+
 function dashboard(){
  const acts=activeClients();
  const next=acts.filter(c=>c.next).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,5);
@@ -3724,7 +3780,7 @@ function bindContractEvidence(){
 }
 function render(){
  const root=document.getElementById('root');
- const pages={dashboard,clients:clientsPage,client:clientPage,billing:billingPage,calendar:calendarPage,backup:backupPage,contracts:contractsPage,settings:settingsPage};
+ const pages={dashboard,clients:clientsPage,client:clientPage,billing:billingPage,calendar:calendarPage,backup:backupPage,reviews:reviewAdminPage,contracts:contractsPage,settings:settingsPage};
  root.innerHTML=shell((pages[state.view]||dashboard)());
  bind();
 }
@@ -3732,7 +3788,10 @@ function bind(){
  bindNotificationBells();
  bindPassportBook();
  bindContractEvidence();
- document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}if(state.view==='contracts')await loadContractEvidence();render()});
+ document.getElementById('akpRefreshReviews')?.addEventListener('click',()=>void akpLoadOwnerReviews());
+ document.querySelectorAll('.akpPublishReview').forEach(b=>b.onclick=()=>void akpModerateReview(b.dataset.id,'published'));
+ document.querySelectorAll('.akpRejectReview').forEach(b=>b.onclick=()=>void akpModerateReview(b.dataset.id,'rejected'));
+ document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{state.view=b.dataset.nav;if(state.view==='calendar')try{await loadSupabaseData()}catch(e){}if(state.view==='contracts')await loadContractEvidence();render();if(state.view==='reviews')void akpLoadOwnerReviews()});
  document.querySelectorAll('.openClient').forEach(b=>b.onclick=()=>{state.clientId=b.dataset.id;state.view='client';state.tab=b.dataset.tabTarget||'overview';render()});
  document.getElementById('backClients')?.addEventListener('click',()=>{state.view='clients';render()});
  document.getElementById('akCoachOptiSave')?.addEventListener('click',e=>
@@ -4063,7 +4122,7 @@ async function enterClientPortal(user,profile){
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte existe, mais ton accès à l’espace AK PRIME n’est pas encore activé. En production, l’accès sera débloqué après validation du paiement et liaison sécurisée avec ton dossier.');return}
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
- const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes]=await Promise.all([
+ const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes,reviewRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
    supa.from('questionnaire_responses').select('*').eq('client_id',client.id).order('updated_at',{ascending:false}).limit(1).maybeSingle(),
    supa.from('tests').select('*').eq('client_id',client.id).order('performed_at',{ascending:false}),
@@ -4076,11 +4135,12 @@ async function enterClientPortal(user,profile){
    supa.from('app_settings').select('*').eq('id',1).maybeSingle(),
    supa.from('notification_reads').select('notification_key,read_at').eq('user_id',authUser.id),
    supa.from('renewal_choices').select('*').eq('client_id',client.id).order('due_date',{ascending:false}),
-   supa.from('invoices').select('*').eq('client_id',client.id).order('issue_date',{ascending:false}).order('created_at',{ascending:false})
+   supa.from('invoices').select('*').eq('client_id',client.id).order('issue_date',{ascending:false}).order('created_at',{ascending:false}),
+   supa.from('akp_client_reviews').select('id,public_name,rating,review_text,experience_date,moderation_status,moderation_reason').eq('client_id',client.id).maybeSingle()
  ]);
- const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes].find(r=>r.error)?.error;
+ const anyErr=[templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes,reviewRes].find(r=>r.error)?.error;
  if(anyErr){showClientPending('Dossier chargé, mais une partie de l’espace client est indisponible : '+anyErr.message);return}
- clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[],renewalChoices:renewalChoiceRes.data||[],invoices:invoiceRes.data||[]};
+ clientPortalState={client,profile,template:templRes.data,response:responseRes.data,tests:testRes.data||[],cycle:cycleRes.data,events:eventRes.data||[],appointments:apptRes.data||[],checkins:checkinRes.data||[],availableSlots:slotsRes.data||[],bookingPolicy:(policyRes.data||[])[0]||null,appSettings:settingsRes.data||null,notificationReads:readsRes.data||[],renewalChoices:renewalChoiceRes.data||[],invoices:invoiceRes.data||[],review:reviewRes.data||null};
  // Les rappels AK PRIME conduisent directement au bon onglet après connexion.
  const requestedSection=new URL(location.href).searchParams.get('client_section');
  clientPortalView=['suivi','checkin','billing'].includes(requestedSection)?requestedSection:'home';
@@ -4107,7 +4167,7 @@ function renderClientEngagementBanner(c){
  return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
 }
 function clientNavMarkup(){
- const items=[['home','⌂','Accueil'],['visios','◷','Mes visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures']];
+ const items=[['home','⌂','Accueil'],['visios','◷','Mes visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures'],['avis','★','Mon avis']];
  const current=items.find(x=>x[0]===clientPortalView)||items[0];
  const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
  const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
@@ -4314,6 +4374,39 @@ function renderClientSuivi(s){
  '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(safeOptitrainerLink(c.optitrainer_url)?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
  '</div>';
 }
+
+function renderClientReview(s){
+ const c=s.client, existing=s.review;
+ if(c.is_test)return '<div class="client-main"><div class="client-section-card"><h2>Avis clients</h2><p>Les avis publics sont réservés aux accompagnements réels. Un compte de simulation ne peut pas déposer de témoignage.</p></div></div>';
+ const start=c.start_date?new Date(String(c.start_date).slice(0,10)+'T12:00:00'):null;
+ const eligible=!!start && Number.isFinite(start.getTime()) &&
+   Date.now()-start.getTime()>=14*86400000 && ['active','inactive','paused'].includes(c.status);
+ if(existing)return '<div class="client-main"><div class="client-section-card"><h2>Ton avis sur AK PRIME</h2><span class="status '+(existing.moderation_status==='published'?'green':'blue')+'">'+(existing.moderation_status==='published'?'Publié':existing.moderation_status==='rejected'?'Non publié':'En cours de vérification')+'</span><p class="muted tiny" style="margin:15px 0">Note : '+esc(existing.rating)+'/5 · Expérience du '+esc(fmtDate(existing.experience_date))+'</p><p style="white-space:pre-wrap;line-height:1.7">'+esc(existing.review_text)+'</p>'+(existing.moderation_status==='rejected'?'<p class="muted tiny">Motif de non-publication : '+esc(existing.moderation_reason||'Contacte AK PRIME pour en savoir plus.')+'</p>':'')+'<p class="muted tiny">Un seul avis par accompagnement. Pour contester la modération ou demander sa suppression, écris à contact@akprime.fr.</p></div></div>';
+ if(!eligible)return '<div class="client-main"><div class="client-section-card"><h2>Ton avis compte</h2><p>Tu pourras partager ton expérience après au moins deux semaines de suivi effectif. Cela garantit que les avis proviennent de véritables clients ayant commencé leur accompagnement.</p><p class="muted tiny">Aucun avis n’est demandé pendant une simulation ou avant le démarrage du suivi.</p></div></div>';
+ return '<div class="client-main"><div class="client-section-card" style="max-width:810px"><h2>Partager ton expérience</h2><p>Ton retour aide les autres à choisir. Les avis positifs comme négatifs sont acceptés, sans aucune contrepartie. Nous vérifions seulement l’identité client et les contenus manifestement inappropriés.</p>'+
+ '<form id="akpReviewForm" style="display:grid;gap:16px;margin-top:20px">'+
+ '<div class="field"><label for="akpReviewName">Nom affiché publiquement (prénom ou pseudonyme)</label><input class="input" id="akpReviewName" required maxlength="48" minlength="2" placeholder="Ex. Camille L." autocomplete="off"></div>'+
+ '<div class="field"><label for="akpReviewRating">Ta note</label><select class="input" id="akpReviewRating" required><option value="">Choisir une note</option><option value="5">5 / 5 — Excellent</option><option value="4">4 / 5 — Bien</option><option value="3">3 / 5 — Moyen</option><option value="2">2 / 5 — Décevant</option><option value="1">1 / 5 — Très décevant</option></select></div>'+
+ '<div class="field"><label for="akpReviewText">Ton expérience avec AK PRIME</label><textarea class="textarea" id="akpReviewText" required minlength="30" maxlength="1200" rows="5" placeholder="Décris librement ce que tu as apprécié ou non, sans données médicales ni informations sur d’autres personnes."></textarea><div class="muted tiny">Entre 30 et 1 200 caractères. Aucun témoignage n’est retouché pour sa promotion.</div></div>'+
+ '<label class="check"><input type="checkbox" id="akpReviewConsent" required> J’accepte la publication de mon pseudonyme, de ma note et de mon texte sur le site AK PRIME, après vérification. Je peux demander la suppression via contact@akprime.fr.</label>'+
+ '<button type="submit" class="btn primary" id="akpSendReview">Envoyer mon avis</button>'+
+ '</form><p class="muted tiny" style="margin-top:16px">Vérification : client réel ayant commencé son suivi il y a au moins 14 jours. Classement public : avis récents d’abord, affichés au maximum 24 mois. Refus motivés uniquement pour spam, injures, données personnelles sensibles ou propos hors sujet.</p></div></div>';
+}
+async function akpSubmitClientReview(event){
+ event.preventDefault();
+ const s=clientPortalState,c=s?.client,form=event.currentTarget;
+ if(!c||c.is_test||s.review)return;
+ if(!form.reportValidity())return;
+ const button=document.getElementById('akpSendReview');button.disabled=true;button.textContent='Envoi…';
+ const row={client_id:c.id,public_name:document.getElementById('akpReviewName').value.trim(),
+    rating:Number(document.getElementById('akpReviewRating').value),
+    review_text:document.getElementById('akpReviewText').value.trim(),
+    experience_date:localDateISO(),consent_publication:document.getElementById('akpReviewConsent').checked};
+ const {data,error}=await supa.from('akp_client_reviews').insert(row).select('id,public_name,rating,review_text,experience_date,moderation_status,moderation_reason').single();
+ if(error){toast('Impossible de déposer ton avis : '+error.message);button.disabled=false;button.textContent='Envoyer mon avis';return}
+ s.review=data;toast('Merci ! Ton avis est enregistré et sera examiné sans modification de son contenu.');renderClientPortal();
+}
+
 function renderClientPortal(){
  const s=clientPortalState,c=s.client;
  const nav=clientNavMarkup();
@@ -4330,6 +4423,8 @@ function renderClientPortal(){
      '</div></div>'+renderClientWeeklyCheckin(s)+'</div>';
  }else if(clientPortalView==='billing'){
    main=renderClientBilling(s);
+ }else if(clientPortalView==='avis'){
+   main=renderClientReview(s);
  }else{
    main=renderClientHome(s);
  }
@@ -4354,6 +4449,7 @@ function renderClientPortal(){
  document.getElementById('clientPrintPassport')?.addEventListener('click',()=>window.print());
  document.getElementById('clientLogout').onclick=async()=>{if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}await supa.auth.signOut();authUser=null;authProfile=null;clientPortalState=null;clientPortalView='home';clientVisioWeek=0;clientVisioDay='';clientQuestionnaireExpanded=false;clientMobileMenuOpen=false;showAuth()};
  document.getElementById('clientOpti')?.addEventListener('click',()=>{const url=safeOptitrainerLink(c.optitrainer_url);if(url)window.open(url,'_blank','noopener,noreferrer');else toast('Le lien Optitrainer est indisponible. Contacte ton coach.')});
+ document.getElementById('akpReviewForm')?.addEventListener('submit',e=>void akpSubmitClientReview(e));
  document.getElementById('saveQuestionnaireDraft')?.addEventListener('click',()=>saveClientQuestionnaire('draft'));
  document.getElementById('submitQuestionnaire')?.addEventListener('click',()=>saveClientQuestionnaire('submitted'));
  document.getElementById('submitWeeklyCheckin')?.addEventListener('click',submitClientWeeklyCheckin);
@@ -4812,9 +4908,22 @@ function publicOfferCard(pole,name,price,tag,headline,fit,items,difference='',fe
 function publicOfferFoundation(title,description,items,ladder){
  return '<div class="public-offer-foundation"><div><h4>'+esc(title)+'</h4><p>'+esc(description)+'</p><div class="public-offer-ladder">'+ladder.map(x=>'<span>'+x+'</span>').join('')+'</div></div><ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
 }
+
+async function akpLoadPublishedReviews(){
+ const box=document.getElementById('akpReviewsPublicList');if(!box)return;
+ const {data,error}=await supa.from('akp_published_reviews')
+   .select('public_name,rating,review_text,experience_date,pole_label,offer_label,created_at,published_at')
+   .gte('published_at',new Date(Date.now()-730*86400000).toISOString())
+   .order('published_at',{ascending:false}).limit(12);
+ if(!box.isConnected)return;
+ if(error){box.innerHTML='<p class="muted">Les avis sont momentanément indisponibles.</p>';return}
+ if(!data?.length){box.innerHTML='<p style="color:#b8cbdc;margin:0">Les premiers avis seront affichés ici après vérification des accompagnements réalisés. Aucun témoignage fictif n’est publié.</p>';return}
+ box.innerHTML='<div class="akpReviewsGrid">'+data.map(x=>'<article class="akpReviewCard"><div class="akpReviewStars" aria-label="'+esc(x.rating)+' étoiles sur 5">'+('★'.repeat(x.rating)+'☆'.repeat(5-x.rating))+'</div><blockquote>'+esc(x.review_text)+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+'</strong><span>'+esc(x.pole_label)+' · '+esc(x.offer_label)+'</span><small>Expérience du '+esc(fmtDate(x.experience_date))+' · publié le '+esc(fmtDate(x.published_at))+'</small></div></article>').join('')+'</div>';
+}
+
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#avis">Avis & confiance</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
@@ -4822,6 +4931,7 @@ function renderPublicSite(){
    '<a href="#apropos">Le coach</a>'+
    '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
    '<a href="#offres">Les offres</a>'+
+   '<a href="#avis">Avis & confiance</a>'+
    '<a href="#fonctionnement">Comment ça marche</a>'+
    '<a href="#outils">Vos outils</a>'+
    '<a href="#faq">FAQ</a>'+
@@ -4874,7 +4984,16 @@ function renderPublicSite(){
  publicOfferCard('Mental','Sportif','249','Mental sportif(ve)','Un suivi mental qui évolue avec vos entraînements, vos matchs et les temps forts de votre saison.','Vous souhaitez intégrer la préparation mentale à votre pratique et adapter le travail à votre calendrier sportif.',['Bilan du calendrier, des objectifs et des moments clés','Routines quotidiennes et à l’entraînement','Préparation avant-match, stratégies pendant le match','Débriefs après-match et ajustements au fil de la saison','Visios positionnées selon les échéances, jusqu’à 1 × 45 min / semaine'],'SPORTIF = un travail appliqué sur le terrain, avant, pendant et après les compétitions, et évolutif selon la saison.',true)+
  '</div></div>'+
  '</div></section>'+
- '<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
+ '<section class="public-section akpTrustSection" id="avis"><div class="public-section-inner">'+
+ '<div class="public-section-head"><div class="kicker">Confiance et transparence</div><h2>Des engagements concrets. Des retours authentiques.</h2><p>Notre méthode, nos qualifications et les avis des personnes réellement accompagnées, sans note inventée.</p></div>'+
+ '<div class="akpTrustGrid"><div class="akpTrustCard"><span>01 · EXPERTISE</span><h3>Un coach diplômé</h3><p>Master STAPS en entraînement et optimisation de la performance sportive. Une expérience de terrain en préparation physique et mentale.</p></div>'+
+ '<div class="akpTrustCard"><span>02 · SUIVI</span><h3>Un accompagnement traçable</h3><p>Questionnaire initial, objectifs, Passeport AK PRIME, échanges et retests selon votre formule. Des outils consultables dans votre espace personnel.</p></div>'+
+ '<div class="akpTrustCard"><span>03 · TRANSPARENCE</span><h3>Tarifs et droits détaillés</h3><p>Prestations et engagement précisés avant paiement, factures accessibles et assurance responsabilité professionnelle prenant effet le 1er novembre 2026.</p></div></div>'+
+ '<div class="akpReviewsHeader"><h3>Avis sur les accompagnements AK PRIME</h3><p>Retours libres de clients réels ayant débuté leur accompagnement depuis au moins 14 jours. Les notes négatives ne sont pas écartées : seule une modération motivée (spam, propos illicites, données personnelles sensibles ou hors sujet) est possible.</p></div>'+
+ '<div id="akpReviewsPublicList" aria-live="polite"><p style="color:#b8cbdc">Chargement des avis clients…</p></div>'+
+ '<p class="akpReviewRules">Avis affichés du plus récent au plus ancien pendant 24 mois au maximum. Note et texte laissés par le client, sans réécriture ni contrepartie. Pour demander le retrait d’un avis ou signaler un problème : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.</p>'+
+ '</div></section>'+ 
+'<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
  '<div class="public-process-card"><b>01</b><strong>Choisir</strong><p>Vous sélectionnez le pôle et le niveau d’accompagnement adapté.</p></div>'+
  '<div class="public-process-card"><b>02</b><strong>Activer</strong><p>Après validation du paiement, votre accès personnel AK PRIME est activé.</p></div>'+
  '<div class="public-process-card"><b>03</b><strong>Évaluer</strong><p>Questionnaire initial, échange et tests lorsque l’offre le nécessite.</p></div>'+
@@ -6221,6 +6340,7 @@ function bindPublicSite(){
 function showAuth(message='',isError=false){
  document.getElementById('root').innerHTML=renderPublicSite();
  bindPublicSite();
+ void akpLoadPublishedReviews();
  if(window.akprimeAnalytics)window.akprimeAnalytics.start();
  const params=new URLSearchParams(location.search);
  const wantsLogin=params.get('connexion')==='1';
