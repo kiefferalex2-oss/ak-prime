@@ -4168,8 +4168,23 @@ function renderClientEngagementBanner(c){
  const sub=d<=14?'Alex préparera avec toi le bilan de cycle et la suite de l’accompagnement.':'Tu retrouveras cette échéance dans ton Passeport AK PRIME.';
  return '<div class="client-engagement '+tone+'"><div><strong>'+esc(msg)+'</strong><div class="muted tiny" style="margin-top:4px">'+esc(sub)+'</div></div><button class="btn ghost small" id="engagementPassportBtn">Voir mon Passeport</button></div>';
 }
+// L'onglet Avis se débloque uniquement après 14 jours de suivi réel
+// (même règle calendaire UTC que la politique de sécurité Supabase).
+function clientCanLeaveReview(s){
+ const c=s?.client;
+ if(!c||c.is_test||!['active','inactive','paused'].includes(c.status))return false;
+ const start=isoDate(c.start_date);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(start))return false;
+ const startMs=Date.parse(start+'T00:00:00Z');
+ const todayMs=Date.parse(new Date().toISOString().slice(0,10)+'T00:00:00Z');
+ return Number.isFinite(startMs)&&(todayMs-startMs)>=14*86400000;
+}
+function clientReviewMenuEnabled(s){
+ return !!s?.client&&!s.client.is_test&&(!!s.review||clientCanLeaveReview(s));
+}
 function clientNavMarkup(){
- const items=[['home','⌂','Accueil'],['visios','◷','Mes visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures'],['avis','★','Mon avis']];
+ const items=[['home','⌂','Accueil'],['visios','◷','Mes visios'],['checkin','≋','Bilan'],['suivi','✦','Accompagnement'],['passport','◇','Passeport'],['billing','▣','Factures']];
+ if(clientReviewMenuEnabled(clientPortalState))items.push(['avis','★','Mon avis']);
  const current=items.find(x=>x[0]===clientPortalView)||items[0];
  const top='<div class="client-nav">'+items.map(([k,icon,label])=>'<button class="clientNavBtn '+(clientPortalView===k?'on':'')+'" data-view="'+k+'"><span>'+icon+'</span>'+label+'</button>').join('')+'</div>';
  const mobile='<button class="client-mobile-menu-toggle" id="clientMobileMenuToggle" type="button">'+current[1]+' '+current[2]+' <span class="chev">'+(clientMobileMenuOpen?'▲':'▼')+'</span></button>'+
@@ -4248,6 +4263,7 @@ function renderClientHome(s){
  if(needsInitial)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Première étape : ton questionnaire initial</strong><div class="muted tiny">Renseigne tes objectifs, ton parcours et tes disponibilités pour préparer ton accompagnement.</div></div><button type="button" class="btn primary small clientGoInitial">Compléter mon profil <span aria-hidden="true">↗</span></button></div>');
  if(!needsInitial&&(!next||next.is_demo))actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">◷</div><div class="akWowActionCopy"><strong>Tes visios, à ton rythme</strong><div class="muted tiny">Choisis un créneau quand tu le souhaites. Aucune réservation imposée.</div></div><button type="button" class="btn ghost small clientGoVisios">Voir mes créneaux <span aria-hidden="true">↗</span></button></div>');
  if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card good"><div class="akWowActionIcon">✓</div><div class="akWowActionCopy"><strong>Ton prochain chapitre</strong><div class="muted tiny">Ton choix pour la suite est enregistré. Retrouve tes progrès.</div></div><button class="btn ghost small clientGoPassport">Voir le Passeport <span aria-hidden="true">↗</span></button></div>');
+ if(clientCanLeaveReview(s)&&!s.review&&!needsInitial)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">★</div><div class="akWowActionCopy"><strong>Partager ton expérience</strong><div class="muted tiny">Après deux semaines de suivi, ton avis est le bienvenu. Positif ou négatif, il reste libre.</div></div><button type="button" class="btn ghost small clientGoReview">Donner mon avis <span aria-hidden="true">↗</span></button></div>');
  const optiUrl=safeOptitrainerLink(c.optitrainer_url);
  const waNum=normalizeWhatsAppNumber(s.appSettings?.whatsapp_number||'');
  const firstName=[c.first_name].filter(Boolean).join(' ')||'toi';
@@ -4380,9 +4396,7 @@ function renderClientSuivi(s){
 function renderClientReview(s){
  const c=s.client, existing=s.review;
  if(c.is_test)return '<div class="client-main"><div class="client-section-card"><h2>Avis clients</h2><p>Les avis publics sont réservés aux accompagnements réels. Un compte de simulation ne peut pas déposer de témoignage.</p></div></div>';
- const start=c.start_date?new Date(String(c.start_date).slice(0,10)+'T12:00:00'):null;
- const eligible=!!start && Number.isFinite(start.getTime()) &&
-   Date.now()-start.getTime()>=14*86400000 && ['active','inactive','paused'].includes(c.status);
+ const eligible=clientCanLeaveReview(s);
  if(existing)return '<div class="client-main"><div class="client-section-card"><h2>Ton avis sur AK PRIME</h2><span class="status '+(existing.moderation_status==='published'?'green':'blue')+'">'+(existing.moderation_status==='published'?'Publié':existing.moderation_status==='rejected'?'Non publié':'En cours de vérification')+'</span><p class="muted tiny" style="margin:15px 0">Note : '+esc(existing.rating)+'/5 · Expérience du '+esc(fmtDate(existing.experience_date))+'</p><p style="white-space:pre-wrap;line-height:1.7">'+esc(existing.review_text)+'</p>'+(existing.moderation_status==='rejected'?'<p class="muted tiny">Motif de non-publication : '+esc(existing.moderation_reason||'Contacte AK PRIME pour en savoir plus.')+'</p>':'')+'<p class="muted tiny">Un seul avis par accompagnement. Pour contester la modération ou demander sa suppression, écris à contact@akprime.fr.</p></div></div>';
  if(!eligible)return '<div class="client-main"><div class="client-section-card"><h2>Ton avis compte</h2><p>Tu pourras partager ton expérience après au moins deux semaines de suivi effectif. Cela garantit que les avis proviennent de véritables clients ayant commencé leur accompagnement.</p><p class="muted tiny">Aucun avis n’est demandé pendant une simulation ou avant le démarrage du suivi.</p></div></div>';
  return '<div class="client-main"><div class="client-section-card" style="max-width:810px"><h2>Partager ton expérience</h2><p>Ton retour aide les autres à choisir. Les avis positifs comme négatifs sont acceptés, sans aucune contrepartie. Nous vérifions seulement l’identité client et les contenus manifestement inappropriés.</p>'+
@@ -4397,7 +4411,7 @@ function renderClientReview(s){
 async function akpSubmitClientReview(event){
  event.preventDefault();
  const s=clientPortalState,c=s?.client,form=event.currentTarget;
- if(!c||c.is_test||s.review)return;
+ if(!clientCanLeaveReview(s)||s.review)return;
  if(!form.reportValidity())return;
  const button=document.getElementById('akpSendReview');button.disabled=true;button.textContent='Envoi…';
  const row={client_id:c.id,public_name:document.getElementById('akpReviewName').value.trim(),
@@ -4411,6 +4425,7 @@ async function akpSubmitClientReview(event){
 
 function renderClientPortal(){
  const s=clientPortalState,c=s.client;
+ if(clientPortalView==='avis'&&!clientReviewMenuEnabled(s))clientPortalView='home';
  const nav=clientNavMarkup();
  let main='';
  if(clientPortalView==='passport'){
@@ -4444,6 +4459,7 @@ function renderClientPortal(){
  document.querySelectorAll('.clientGoVisios').forEach(b=>b.onclick=()=>{clientPortalView='visios';renderClientPortal()});
  document.querySelectorAll('.clientGoCheckin').forEach(b=>b.onclick=()=>{clientPortalView='checkin';renderClientPortal()});
  document.querySelectorAll('.clientGoPassport').forEach(b=>b.onclick=()=>{clientPortalView='passport';renderClientPortal()});
+ document.querySelectorAll('.clientGoReview').forEach(b=>b.onclick=()=>{if(!clientCanLeaveReview(clientPortalState))return;clientPortalView='avis';clientMobileMenuOpen=false;renderClientPortal()});
  document.querySelectorAll('.clientPrintInvoice').forEach(b=>b.onclick=()=>printInvoice(b.dataset.id));
  document.getElementById('refreshClientTestInvoices')?.addEventListener('click',()=>void loadClientTestInvoices(clientPortalState));
  document.getElementById('toggleQuestionnaireAnswers')?.addEventListener('click',()=>{clientQuestionnaireExpanded=!clientQuestionnaireExpanded;renderClientPortal()});
@@ -4925,7 +4941,7 @@ async function akpLoadPublishedReviews(){
 
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#avis">Avis clients</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
@@ -4933,7 +4949,7 @@ function renderPublicSite(){
    '<a href="#apropos">Le coach</a>'+
    '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
    '<a href="#offres">Les offres</a>'+
-   '<a href="#avis">Avis clients</a>'+
+   ''+
    '<a href="#fonctionnement">Comment ça marche</a>'+
    '<a href="#outils">Vos outils</a>'+
    '<a href="#faq">FAQ</a>'+
