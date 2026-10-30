@@ -404,7 +404,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 /* Responsive */
 @media(max-width:1100px){
  .app{grid-template-columns:84px 1fr}
- .sidebar{padding:17px 8px}.brand{justify-content:center;padding:2px 0 14px}.brand>div:last-child{display:none}.sidebar-section-label,.sidebar-note,.nav-label{display:none}.nav button{justify-content:center;padding:10px}.nav-ico{width:32px;height:32px;font-size:15px}.nav button.on{box-shadow:none}.top-user>div:first-child{display:none}
+ .sidebar{padding:17px 8px}.brand{justify-content:center;padding:2px 0 14px}.brand>div:last-child{display:block;min-width:0}.brand .ak-brand-logo{width:64px}.brand span{display:none}.sidebar-section-label,.sidebar-note,.nav-label{display:none}.nav button{justify-content:center;padding:10px}.nav-ico{width:32px;height:32px;font-size:15px}.nav button.on{box-shadow:none}.top-user>div:first-child{display:none}
 }
 @media(max-width:780px){
  .app{display:block}.sidebar{display:none}.topbar{height:64px;padding:0 13px}.topbar-role,.top-user,.top-search-wrap{display:none}.content{padding:18px 12px 42px}
@@ -1986,6 +1986,12 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 /* Identité AK PRIME : mot-symbole simple, sans monogramme A/K */
 .ak-wordmark{display:inline-block;font-family:Inter,Arial,Helvetica,sans-serif;font-weight:900;font-style:normal;letter-spacing:-.045em;white-space:nowrap;line-height:1.1;color:#f7fafc}.ak-wordmark b{color:#d8b16d;font-weight:900}.public-logo{font-size:24px;letter-spacing:0;line-height:1.1;flex-direction:row;align-items:center}.brand .ak-wordmark{font-size:23px}.client-brand .ak-wordmark{font-size:22px}.auth-logo .ak-wordmark{font-size:29px;color:#0e243e}.akOfferDemoShell .client-brand .ak-wordmark{font-size:20px}@media(max-width:520px){.public-logo{font-size:21px}.client-brand .ak-wordmark,.akOfferDemoShell .client-brand .ak-wordmark{font-size:18px}}
 
+
+/* Branding adapte aux back-offices : logo visible dans la barre coach sur telephone. */
+.akCoachTopLogo{display:none}
+@media(max-width:780px){.akCoachTopLogo{display:block;width:110px;max-width:32vw;height:auto;margin-right:7px}.topbar-title{display:flex;align-items:center;gap:7px;min-width:0}.topbar-title .crumb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media(max-width:480px){.topbar-title .crumb{display:none}.akCoachTopLogo{width:112px;max-width:42vw}}
+
 /* Signature exacte AK PRIME navy/or : image vectorielle issue du logo valide. */
 .ak-brand-logo{display:block;width:185px;height:auto;max-width:100%;box-sizing:border-box;background:transparent;border-radius:0;padding:0;object-fit:contain;box-shadow:none}
 .public-logo{display:inline-flex;align-items:center;flex-direction:row;flex-shrink:0}
@@ -2629,7 +2635,7 @@ function shell(inner){
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('billing','Facturation')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+(authProfile?.role==='owner'?navBtn('contracts','Preuves contractuelles'):'')+navBtn('settings','Paramètres')+
  '</div><div class="sidebar-note"><strong>AK PRIME System</strong><span>Dossiers, visios, tests et parcours centralisés.</span></div></aside>'+
- '<main><div class="topbar"><div class="topbar-title"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
+ '<main><div class="topbar"><div class="topbar-title"><img class="akCoachTopLogo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="110" height="15" decoding="async"><div class="crumb">AK PRIME / '+crumb()+'</div><span class="topbar-role">Espace coach</span></div><div class="top-actions"><div class="top-search-wrap"><span>⌕</span><input id="globalSearch" class="input" placeholder="Rechercher un client…"></div>'+notificationBell('coach')+'<div class="top-user"><div><strong>Coach</strong><span>'+esc(authUser?.email||'')+'</span></div><div class="avatar">AK</div></div><button class="btn ghost small" id="logoutBtn">Déconnexion</button></div></div>'+
  '<div class="content">'+inner+'</div></main></div>';
 }
 function navBtn(v,label){
