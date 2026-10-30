@@ -1988,25 +1988,27 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 
 
 
-/* Retours verifiables : aucune note inventee, aucun avis de compte test. */
-.akpTrustSection{background:linear-gradient(160deg,#0c1c2d,#172d43);color:#eef4fa}
-.akpTrustSection .public-section-head h2,.akpTrustSection .public-section-head p{color:#eef4fa}
-.akpTrustSection .public-section-head p{opacity:.8}
-.akpTrustGrid,.akpReviewsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px}
-.akpTrustCard,.akpReviewCard{background:rgba(255,255,255,.045);border:1px solid rgba(216,177,109,.24);border-radius:18px;padding:24px;box-shadow:0 10px 26px #0002}
-.akpTrustCard>span{font-size:10px;letter-spacing:.13em;color:#deb979;font-weight:850}
-.akpTrustCard h3{font-size:21px;line-height:1.25;margin:13px 0;color:#fff}
-.akpTrustCard p,.akpReviewsHeader p,.akpReviewRules{font-size:13px;color:#b8cbdc;line-height:1.75}
-.akpReviewsHeader{margin:37px 0 19px}
-.akpReviewsHeader h3{font-size:25px;color:#fff;margin:0 0 9px}
-.akpReviewsHeader p{max-width:850px;margin:0}
-.akpReviewCard .akpReviewStars{color:#e1bb77;font-size:19px;letter-spacing:3px}
-.akpReviewCard blockquote{margin:13px 0 19px;color:#edf4fa;white-space:pre-wrap;font:normal 15px/1.7 system-ui}
-.akpReviewMeta{display:flex;flex-direction:column;gap:5px}
-.akpReviewMeta strong{font-size:14px;color:#fff}
-.akpReviewMeta span,.akpReviewMeta small{font-size:11px;color:#b9cadc}
-.akpReviewRules{margin-top:20px}
-.akpReviewRules a{color:#f0d29c;text-decoration:underline}
+/* Avis clients compacts : fin de page, affichage authentique uniquement. */
+.akpReviewsCompact{padding:30px 18px 28px;background:#102237;color:#edf3f8}
+.akpReviewsCompactHead{display:flex;align-items:baseline;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin:0 0 14px}
+.akpReviewsCompactHead h2{font-size:clamp(22px,2.5vw,27px);line-height:1.25;letter-spacing:-.02em;margin:0;color:#fff}
+.akpReviewsCompactHead p{font-size:13px;line-height:1.55;color:#bac9d6;margin:0}
+.akpReviewEmpty{font-size:13px;line-height:1.6;color:#b7c9d9;margin:0}
+.akpReviewsCompact .akpReviewsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin:6px 0 12px}
+.akpReviewsCompact .akpReviewCard{background:rgba(255,255,255,.045);border:1px solid rgba(216,177,109,.22);border-radius:13px;padding:16px;min-width:0}
+.akpReviewsCompact .akpReviewStars{color:#e1bb77;font-size:17px;letter-spacing:2px}
+.akpReviewsCompact .akpReviewCard blockquote{margin:10px 0 13px;color:#edf4fa;white-space:pre-wrap;font:normal 13px/1.6 system-ui}
+.akpReviewsCompact .akpReviewMeta{display:flex;flex-direction:column;gap:4px}
+.akpReviewsCompact .akpReviewMeta strong{font-size:13px;color:#fff}
+.akpReviewsCompact .akpReviewMeta span,.akpReviewsCompact .akpReviewMeta small{font-size:11px;color:#b9cadc}
+.akpReviewInfo{margin-top:12px;font-size:11px;line-height:1.65;color:#aabdd0;max-width:980px}
+.akpReviewInfo summary{display:inline-block;list-style:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px;color:#c7d5e2}
+.akpReviewInfo summary::after{content:" ▾";font-size:11px}
+.akpReviewInfo[open] summary::after{content:" ▴"}
+.akpReviewInfo summary::-webkit-details-marker{display:none}
+.akpReviewInfo p{margin:9px 0 0;color:#b9c9d8}
+.akpReviewInfo a{color:#f1d29b}
+@media(max-width:640px){.akpReviewsCompact{padding:25px 18px}.akpReviewsCompactHead{display:block}.akpReviewsCompactHead p{margin-top:6px}}
 
 /* Branding adapte aux back-offices : logo visible dans la barre coach sur telephone. */
 .akCoachTopLogo{display:none}
@@ -4914,16 +4916,16 @@ async function akpLoadPublishedReviews(){
  const {data,error}=await supa.from('akp_published_reviews')
    .select('public_name,rating,review_text,experience_date,pole_label,offer_label,created_at,published_at')
    .gte('published_at',new Date(Date.now()-730*86400000).toISOString())
-   .order('published_at',{ascending:false}).limit(12);
+   .order('published_at',{ascending:false}).limit(3);
  if(!box.isConnected)return;
  if(error){box.innerHTML='<p class="muted">Les avis sont momentanément indisponibles.</p>';return}
- if(!data?.length){box.innerHTML='<p style="color:#b8cbdc;margin:0">Les premiers avis seront affichés ici après vérification des accompagnements réalisés. Aucun témoignage fictif n’est publié.</p>';return}
+ if(!data?.length){box.innerHTML='<p class="akpReviewEmpty">Les premiers avis vérifiés seront publiés ici après les premiers accompagnements.</p>';return}
  box.innerHTML='<div class="akpReviewsGrid">'+data.map(x=>'<article class="akpReviewCard"><div class="akpReviewStars" aria-label="'+esc(x.rating)+' étoiles sur 5">'+('★'.repeat(x.rating)+'☆'.repeat(5-x.rating))+'</div><blockquote>'+esc(x.review_text)+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+'</strong><span>'+esc(x.pole_label)+' · '+esc(x.offer_label)+'</span><small>Expérience du '+esc(fmtDate(x.experience_date))+' · publié le '+esc(fmtDate(x.published_at))+'</small></div></article>').join('')+'</div>';
 }
 
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
- '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#avis">Avis & confiance</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
+ '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#avis">Avis clients</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
@@ -4931,7 +4933,7 @@ function renderPublicSite(){
    '<a href="#apropos">Le coach</a>'+
    '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
    '<a href="#offres">Les offres</a>'+
-   '<a href="#avis">Avis & confiance</a>'+
+   '<a href="#avis">Avis clients</a>'+
    '<a href="#fonctionnement">Comment ça marche</a>'+
    '<a href="#outils">Vos outils</a>'+
    '<a href="#faq">FAQ</a>'+
@@ -4984,16 +4986,7 @@ function renderPublicSite(){
  publicOfferCard('Mental','Sportif','249','Mental sportif(ve)','Un suivi mental qui évolue avec vos entraînements, vos matchs et les temps forts de votre saison.','Vous souhaitez intégrer la préparation mentale à votre pratique et adapter le travail à votre calendrier sportif.',['Bilan du calendrier, des objectifs et des moments clés','Routines quotidiennes et à l’entraînement','Préparation avant-match, stratégies pendant le match','Débriefs après-match et ajustements au fil de la saison','Visios positionnées selon les échéances, jusqu’à 1 × 45 min / semaine'],'SPORTIF = un travail appliqué sur le terrain, avant, pendant et après les compétitions, et évolutif selon la saison.',true)+
  '</div></div>'+
  '</div></section>'+
- '<section class="public-section akpTrustSection" id="avis"><div class="public-section-inner">'+
- '<div class="public-section-head"><div class="kicker">Confiance et transparence</div><h2>Des engagements concrets. Des retours authentiques.</h2><p>Notre méthode, nos qualifications et les avis des personnes réellement accompagnées, sans note inventée.</p></div>'+
- '<div class="akpTrustGrid"><div class="akpTrustCard"><span>01 · EXPERTISE</span><h3>Un coach diplômé</h3><p>Master STAPS en entraînement et optimisation de la performance sportive. Une expérience de terrain en préparation physique et mentale.</p></div>'+
- '<div class="akpTrustCard"><span>02 · SUIVI</span><h3>Un accompagnement traçable</h3><p>Questionnaire initial, objectifs, Passeport AK PRIME, échanges et retests selon votre formule. Des outils consultables dans votre espace personnel.</p></div>'+
- '<div class="akpTrustCard"><span>03 · TRANSPARENCE</span><h3>Tarifs et droits détaillés</h3><p>Prestations et engagement précisés avant paiement, factures accessibles et assurance responsabilité professionnelle prenant effet le 1er novembre 2026.</p></div></div>'+
- '<div class="akpReviewsHeader"><h3>Avis sur les accompagnements AK PRIME</h3><p>Retours libres de clients réels ayant débuté leur accompagnement depuis au moins 14 jours. Les notes négatives ne sont pas écartées : seule une modération motivée (spam, propos illicites, données personnelles sensibles ou hors sujet) est possible.</p></div>'+
- '<div id="akpReviewsPublicList" aria-live="polite"><p style="color:#b8cbdc">Chargement des avis clients…</p></div>'+
- '<p class="akpReviewRules">Avis classés du plus récent au plus ancien et affichés pendant 24 mois au maximum. Dépôt réservé à un client réel après 14 jours d’accompagnement, puis vérification de l’éligibilité et des contenus inappropriés, sous 30 jours calendaires. Aucun avis ne reçoit de contrepartie et aucune note, positive ou négative, n’est exclue en raison de sa valeur. Le texte n’est pas modifié après son dépôt : les auteurs ne peuvent pas le modifier eux-mêmes, mais peuvent en demander le retrait. Les visiteurs ne peuvent pas contacter les auteurs via AK PRIME. Tout refus de publication est motivé. Pour demander un retrait ou signaler un problème : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.</p>'+
- '</div></section>'+ 
-'<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
+ '<section class="public-section" id="fonctionnement"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">Fonctionnement</div><h2>De l’inscription au suivi, tout est cadré.</h2></div><div class="public-process">'+
  '<div class="public-process-card"><b>01</b><strong>Choisir</strong><p>Vous sélectionnez le pôle et le niveau d’accompagnement adapté.</p></div>'+
  '<div class="public-process-card"><b>02</b><strong>Activer</strong><p>Après validation du paiement, votre accès personnel AK PRIME est activé.</p></div>'+
  '<div class="public-process-card"><b>03</b><strong>Évaluer</strong><p>Questionnaire initial, échange et tests lorsque l’offre le nécessite.</p></div>'+
@@ -5012,6 +5005,11 @@ function renderPublicSite(){
  '<details><summary>Puis-je arrêter mon accompagnement avant la fin de l’engagement ?</summary><p>Votre engagement de 3 ou 6 mois est ferme, même si vous payez chaque mois. Après les 14 jours de rétractation, un simple changement d’avis ne met pas automatiquement fin au contrat. Vous pouvez cependant demander une résiliation amiable : nous conviendrons par écrit de la date de fin et des éventuelles conséquences financières. Vos droits légaux restent applicables et une suspension peut être envisagée en cas d’empêchement temporaire sérieux.</p></details>'+
  '<details><summary>Dans quels cas puis-je être remboursé ?</summary><p>Un remboursement ou une régularisation peut intervenir notamment en cas de rétractation légale, de trop-perçu, de prestations non fournies ouvrant droit à restitution ou selon les termes d’une résiliation amiable écrite. Le seul changement d’avis ne donne pas automatiquement droit au remboursement des mensualités d’un engagement ferme. Un décompte détaillé vous sera communiqué. Si vous avez demandé à commencer pendant les 14 jours de rétractation, la partie des services effectivement fournis peut rester due dans les conditions légales.</p></details>'+
 '</div></div></section>'+
+ '<section class="public-section akpReviewsCompact" id="avis"><div class="public-section-inner">'+
+ '<div class="akpReviewsCompactHead"><h2>Avis clients</h2><p>Des retours vérifiés de personnes réellement accompagnées par AK PRIME.</p></div>'+
+ '<div id="akpReviewsPublicList" aria-live="polite"><p class="akpReviewEmpty">Les premiers avis vérifiés seront publiés ici après les premiers accompagnements.</p></div>'+
+ '<details class="akpReviewInfo"><summary>Comment fonctionnent les avis ?</summary><p>Les clients peuvent déposer une note et un commentaire depuis leur espace personnel après 14 jours de suivi réel. Les avis positifs comme négatifs sont acceptés, sans contrepartie ni modification. Vérification sous 30 jours : refus uniquement en cas de spam, propos illicites, informations personnelles sensibles ou hors sujet, avec motif communiqué. Les avis publiés sont classés du plus récent au plus ancien et conservés à l’affichage pendant 24 mois au maximum. Pour demander un retrait ou signaler un avis : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.</p></details>'+
+ '</div></section>'+
  '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div><nav class="public-seo-links" aria-label="Domaines de coaching"><a href="/preparation-physique/">Préparation physique</a><a href="/coaching-sportif/">Coaching sportif</a><a href="/preparation-mentale/">Préparation mentale</a></nav></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button><button type="button" class="akpCookieSettings">Gérer mes cookies</button></div></div></footer>'+
  '</div>';
 }
