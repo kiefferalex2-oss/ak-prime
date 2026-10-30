@@ -135,8 +135,14 @@
   function start(){
     publicActive=true;
     if(choice===null)openPreferences();
-    else if(choice==='accepted')pageView();
-    else removeBanner();
+    else if(choice==='accepted'){
+      pageView();
+      if(pendingVerifiedPurchase){
+        const purchase=pendingVerifiedPurchase;
+        pendingVerifiedPurchase=null;
+        trackVerifiedPurchase(purchase);
+      }
+    }else removeBanner();
   }
   function pause(){
     publicActive=false;
@@ -170,7 +176,7 @@
       return false;
     }
     if(!publicActive||choice===null){
-      if(choice===null)pendingVerifiedPurchase=verified;
+      if(choice===null||choice==='accepted')pendingVerifiedPurchase=verified;
       return false;
     }
     if(choice!=='accepted')return false;
