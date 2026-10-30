@@ -113,7 +113,7 @@
     banner.querySelector('.akp-consent-privacy').addEventListener('click',()=>{
       const privacy=document.querySelector('.publicLegalBtn[data-legal="privacy"]');
       if(privacy)privacy.click();
-      else window.location.href='https://akprime.fr/#faq';
+      else window.location.href='https://akprime.fr/?confidentialite=1';
     });
     document.body.appendChild(banner);
   }
