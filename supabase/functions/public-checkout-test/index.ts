@@ -105,6 +105,12 @@ Deno.serve(async(req:Request)=>{
     if(!Number.isFinite(days)||days<0||days>120||(days<14&&!earlyStart))
       return reply({error:"Date ou consentement de démarrage anticipé non valide"},400,cors);
   }
+  // Refuser AVANT Stripe les adresses appartenant deja a un compte reel.
+  // Un compte de test et un compte reel ne doivent jamais partager une identite client.
+  const existingClients=await admin.from("clients").select("is_test").ilike("email",email).limit(6);
+  if(existingClients.error)return reply({error:"Verification du compte momentanement indisponible. Aucune commande creee."},503,cors);
+  if((existingClients.data||[]).some((c:{is_test:boolean})=>c.is_test!==true))
+    return reply({error:"Pour cette simulation, utilise une adresse e-mail differente de celle de ton compte AK PRIME habituel. Aucun paiement n'a ete ouvert."},409,cors);
   const query=await admin.rpc("quote_offer",{p_offer_code:offerCode,p_commitment_months:duration,p_payment_mode:paymentMode});
   const quote=Array.isArray(query.data)?query.data[0]:query.data;
   if(query.error||!quote||quote.currency!=="eur")return reply({error:"Devis sécurisé indisponible"},503,cors);
