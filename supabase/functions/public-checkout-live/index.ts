@@ -23,8 +23,8 @@ Deno.serve(async req=>{
  if(start){const delta=(Date.parse(start+"T12:00:00Z")-Date.parse(today+"T12:00:00Z"))/86400000;if(!Number.isFinite(delta)||delta<0||delta>120||(delta<14&&x.earlyStart!==true))return respond({error:"Date de début ou consentement de démarrage anticipé invalide"},400,cors)}
  const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
  // Ne jamais encaisser avant validation de la RC Pro et de la médiation.
- const launch=await admin.from("app_settings")
-   .select("insurance_verified,mediation_verified").eq("id",1).maybeSingle();
+ const launch=await admin.from("akp_launch_control")
+   .select("insurance_verified,mediation_verified").eq("singleton",true).maybeSingle();
  if(launch.error||!launch.data||launch.data.insurance_verified!==true||launch.data.mediation_verified!==true)
    return respond({error:"Les souscriptions seront ouvertes prochainement. Aucun paiement n'a été effectué."},503,cors);
  const te=new TextEncoder();
