@@ -2659,7 +2659,7 @@ function renderMailHealth(){
    .reduce((sum,key)=>sum+Number(h?.[key]||0),0);
  const pending=['notification_waiting','new_client_waiting','reminder_waiting']
    .reduce((sum,key)=>sum+Number(h?.[key]||0),0);
- const bad=!!h?.error||(!!h&&(jobs.length<3||failures>0||
+ const bad=!!h?.error||(!!h&&(jobs.length<5||failures>0||Number(h?.resend_failures_24h||0)>0||
    jobs.some(j=>!j.active||j.last_status!=='succeeded'||!j.last_at||
      Date.now()-Date.parse(j.last_at)>20*60*1000)));
  const heading=bad?'E-mails : anomalie à vérifier':!h?'Surveillance des e-mails':'Surveillance des e-mails';
@@ -2676,7 +2676,8 @@ function renderMailHealth(){
    details+
    '<p class="muted tiny">Messages en échec : '+failures+' · En attente : '+pending+
    ' · Échecs de tâches sur 24 h : '+Number(h?.cron_errors_24h||0)+'</p>'+
-   '<p class="muted tiny">Les envois acceptés ne garantissent pas la réception en boîte mail.</p>'+
+   '<p class="muted tiny">Confirmations de livraison Resend : '+Number(h?.resend_delivered_total||0)+' au total · '+Number(h?.resend_delivered_24h||0)+' sur 24 h · incidents fournisseur sur 24 h : '+Number(h?.resend_failures_24h||0)+'</p>'+ 
+   '<p class="muted tiny">Une livraison technique ne garantit pas la lecture ni l’arrivée hors dossier spam.</p>'+ 
    '<button class="btn ghost small" id="akRefreshMailHealth" type="button">Actualiser le contrôle</button>'+
    '</div></details>';
 }
