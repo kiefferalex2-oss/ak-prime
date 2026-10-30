@@ -16,6 +16,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://akprime.fr/#site","url":"https://akprime.fr/","name":"AK PRIME","inLanguage":"fr-FR","publisher":{"@id":"https://akprime.fr/#organisation"}},{"@type":"Organization","@id":"https://akprime.fr/#organisation","name":"AK PRIME","url":"https://akprime.fr/","email":"contact@akprime.fr","logo":"https://akprime.fr/assets/ak-prime-wordmark-white-gold.svg","founder":{"@type":"Person","name":"Alex Kieffer","jobTitle":"Préparateur physique et coach sportif"},"hasOfferCatalog":{"@type":"OfferCatalog","name":"Accompagnements AK PRIME","itemListElement":[{"@type":"OfferCatalog","name":"Performance sportive","url":"https://akprime.fr/preparation-physique/"},{"@type":"OfferCatalog","name":"Forme & Santé","url":"https://akprime.fr/coaching-sportif/"},{"@type":"OfferCatalog","name":"Préparation mentale","url":"https://akprime.fr/preparation-mentale/"}]}}]}</script>
 <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon-akprime.svg?v=1">
+<link rel="stylesheet" href="./akp-ga4-consent.css?v=1">
 <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon-akprime.svg?v=1">
 <meta name="theme-color" content="#0d233b">
 <style>
@@ -2122,6 +2123,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 </div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
+<script src="./akp-ga4-consent.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://gptvgldboqarfklorjip.supabase.co';
@@ -4863,7 +4865,7 @@ function renderPublicSite(){
  '<details><summary>Puis-je arrêter mon accompagnement avant la fin de l’engagement ?</summary><p>Votre engagement de 3 ou 6 mois est ferme, même si vous payez chaque mois. Après les 14 jours de rétractation, un simple changement d’avis ne met pas automatiquement fin au contrat. Vous pouvez cependant demander une résiliation amiable : nous conviendrons par écrit de la date de fin et des éventuelles conséquences financières. Vos droits légaux restent applicables et une suspension peut être envisagée en cas d’empêchement temporaire sérieux.</p></details>'+
  '<details><summary>Dans quels cas puis-je être remboursé ?</summary><p>Un remboursement ou une régularisation peut intervenir notamment en cas de rétractation légale, de trop-perçu, de prestations non fournies ouvrant droit à restitution ou selon les termes d’une résiliation amiable écrite. Le seul changement d’avis ne donne pas automatiquement droit au remboursement des mensualités d’un engagement ferme. Un décompte détaillé vous sera communiqué. Si vous avez demandé à commencer pendant les 14 jours de rétractation, la partie des services effectivement fournis peut rester due dans les conditions légales.</p></details>'+
 '</div></div></section>'+
- '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div><nav class="public-seo-links" aria-label="Domaines de coaching"><a href="/preparation-physique/">Préparation physique</a><a href="/coaching-sportif/">Coaching sportif</a><a href="/preparation-mentale/">Préparation mentale</a></nav></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button></div></div></footer>'+
+ '<footer class="public-footer"><div class="public-footer-inner"><div>AK PRIME. Préparation physique, forme & santé, préparation mentale.<div style="margin-top:5px"><a href="mailto:contact@akprime.fr" style="color:inherit">contact@akprime.fr</a> · akprime.fr</div><nav class="public-seo-links" aria-label="Domaines de coaching"><a href="/preparation-physique/">Préparation physique</a><a href="/coaching-sportif/">Coaching sportif</a><a href="/preparation-mentale/">Préparation mentale</a></nav></div><div class="public-footer-links"><button class="publicLegalBtn" data-legal="mentions">Mentions légales</button><button class="publicLegalBtn" data-legal="cgv">CGV</button><button class="publicLegalBtn" data-legal="mediation">Médiation</button><button class="publicLegalBtn" data-legal="privacy">Confidentialité</button><button class="publicLegalBtn" data-legal="withdrawal">Rétractation</button><button type="button" class="akpCookieSettings">Gérer mes cookies</button></div></div></footer>'+
  '</div>';
 }
 
@@ -4930,7 +4932,7 @@ function openPublicLegal(type){
     '<h3>Transferts hors Espace économique européen</h3><p>Certains prestataires peuvent être établis ou recourir à des sous-traitants situés hors de l’Espace économique européen. Lorsqu’un transfert international de données a lieu, il doit reposer sur un mécanisme de transfert reconnu par la réglementation applicable et sur les garanties prévues par le prestataire concerné.</p>'+
     '<h3>Durées de conservation</h3><p>Les données ne sont pas conservées indéfiniment. Elles sont gardées pendant la durée nécessaire à l’accompagnement puis, lorsque cela est nécessaire, pendant les délais permettant de respecter les obligations légales, comptables ou de défendre les droits d’AK PRIME ou du client. Les données dont la conservation n’est plus nécessaire sont supprimées ou anonymisées.</p>'+
     '<h3>Sécurité</h3><p>AK PRIME met en œuvre une authentification individuelle, une séparation des droits coach/client, des règles d’accès au niveau de la base de données et un verrou d’activation du portail. Les accès sont limités aux besoins du suivi et les mesures de sécurité sont adaptées à la sensibilité des informations traitées.</p>'+
-    '<h3>Cookies et traceurs</h3><p>La version actuelle du site n’intègre pas de traceur publicitaire ni d’outil de mesure d’audience nécessitant un consentement. Des mécanismes techniques strictement nécessaires peuvent être utilisés pour l’authentification, la sécurité et le fonctionnement du service. Si des traceurs non essentiels sont ajoutés ultérieurement, un mécanisme de consentement adapté sera mis en place avant leur dépôt.</p>'+
+    '<h3>Cookies et mesure d’audience</h3><p>AK PRIME propose une mesure facultative de fréquentation avec <strong>Google Analytics 4 (Google)</strong> pour comprendre les visites, la consultation des offres et les interactions sur les pages publiques. Cet outil peut utiliser des cookies de mesure (notamment _ga) et transmettre à Google des informations relatives à la navigation. Aucun script Google Analytics n’est chargé avant votre accord explicite ; si vous refusez, cette mesure reste désactivée. Il ne s’agit pas d’un outil destiné à collecter des informations de santé ni le contenu des comptes privés.</p><p>Le consentement est facultatif, mémorisé localement et peut être retiré à tout moment via <strong>« Gérer mes cookies »</strong> en bas du site. Une fois le retrait effectué, les mesures suivantes sont désactivées et les cookies GA accessibles sont supprimés dans la mesure du possible. Les traitements indispensables à l’authentification et à la sécurité du service restent distincts de cette mesure facultative. Pour en savoir plus sur les pratiques de Google : <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Règles de confidentialité de Google</a>.</p>'+
     '<h3>Vos droits</h3><p>Vous pouvez, selon les conditions prévues par le RGPD, demander l’accès, la rectification, l’effacement, la limitation ou la portabilité de vos données, vous opposer à certains traitements et retirer votre consentement lorsque le traitement repose sur celui-ci. Les demandes peuvent être adressées à <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>. Vous pouvez également introduire une réclamation auprès de la CNIL.</p>'+
    '</div>'
   },
@@ -5964,6 +5966,10 @@ async function publicCheckoutPrice(pole,name,base,duration,paymentMode){
 }
 function openPublicOfferCheckout(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
+ if(window.akprimeAnalytics){
+   const safeOffer=publicOfferCode(pole,name);
+   if(safeOffer)window.akprimeAnalytics.track('begin_checkout',{offer_code:safeOffer});
+ }
  const benefits=publicOfferBenefits(pole,name);
  const sameDraft=publicCheckoutDraft&&publicCheckoutDraft.pole===pole&&publicCheckoutDraft.name===name;
  const draft=sameDraft?publicCheckoutDraft:{pole,name,duration:3,paymentMode:'monthly',fullName:'',email:'',acceptedCgv:false,healthConsent:false,earlyStart:false,startMode:'asap',startDate:''};
@@ -6170,6 +6176,14 @@ function bindPublicSite(){
 function showAuth(message='',isError=false){
  document.getElementById('root').innerHTML=renderPublicSite();
  bindPublicSite();
+ if(window.akprimeAnalytics)window.akprimeAnalytics.start();
+ const params=new URLSearchParams(location.search);
+ if(params.get('confidentialite')==='1'){
+   openPublicLegal('privacy');
+   const cleaned=new URL(location.href);
+   cleaned.searchParams.delete('confidentialite');
+   history.replaceState(null,'',cleaned.pathname+cleaned.search+cleaned.hash);
+ }
  const wantsLogin=new URLSearchParams(location.search).get('connexion')==='1';
  if(message||wantsLogin)openPublicLogin(message,isError);
  if(wantsLogin){
@@ -6183,6 +6197,7 @@ function setAuthMsg(msg,err){
  const el=document.getElementById('authMsg');if(!el)return;el.textContent=msg;el.className='auth-msg show'+(err?' err':'');
 }
 async function enterApp(user){
+ if(window.akprimeAnalytics)window.akprimeAnalytics.pause();
  authUser=user;
  const {data:profile,error}=await supa.from('profiles').select('id,role,full_name').eq('id',user.id).maybeSingle();
  if(error){showAuth('Connexion réussie mais profil inaccessible : '+error.message,true);return}
