@@ -2123,7 +2123,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 </div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
-<script src="./akp-ga4-consent.js?v=4"></script>
+<script src="./akp-ga4-consent.js?v=5"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://gptvgldboqarfklorjip.supabase.co';
@@ -6265,6 +6265,37 @@ async function initAuth(){
  close.style.cssText='background:#d3ab62;border:0;border-radius:9px;color:#12202f;font-weight:800;padding:12px 17px;cursor:pointer';
  close.addEventListener('click',()=>{modal.remove();history.replaceState(null,'',location.pathname+location.hash)});
  panel.append(title,detail,help,close);modal.appendChild(panel);document.body.appendChild(modal);
+ // A success redirect is NEVER used as proof of payment. The server checks the
+ // live Stripe session against a paid order already recorded by our webhook.
+ if(outcome==='success'){
+  const sessionId=params.get('session_id')||'';
+  if(/^cs_live_[A-Za-z0-9_]{15,220}$/.test(sessionId)){
+   const verify=async(attempt=0)=>{
+    try{
+     const result=await fetch('https://gptvgldboqarfklorjip.supabase.co/functions/v1/verify-live-purchase',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY},
+      body:JSON.stringify({session_id:sessionId}),
+      cache:'no-store'
+     });
+     const data=await result.json().catch(()=>({}));
+     if(result.ok&&data.state==='confirmed'){
+      title.textContent='Paiement confirmé';
+      detail.textContent='Ton paiement a été confirmé par Stripe et enregistré par AK PRIME. Tu recevras un e-mail d’activation pour accéder à ton espace personnel.';
+      if(window.akprimeAnalytics)window.akprimeAnalytics.trackVerifiedPurchase(data);
+      return;
+     }
+     // The webhook may still be processing; retry briefly while this page is open.
+     if(result.status===202&&data.state==='pending'&&attempt<5){
+      setTimeout(()=>verify(attempt+1),1200+attempt*1200);
+     }
+    }catch(error){
+     // An unavailable verification service must never produce a purchase event.
+    }
+   };
+   void verify();
+  }
+ }
 })();
 window.AKP_PUBLIC_TEST_MODE=/^[0-9a-f]{64}$/.test(new URLSearchParams(location.search).get('akp_test')||new URLSearchParams(location.search).get('ticket')||'');
 window.AKP_LIVE_CHECKOUT_MODE=!window.AKP_PUBLIC_TEST_MODE; // Paiement réel public, TEST uniquement sur lien de simulation.
