@@ -5877,6 +5877,11 @@ function performanceOfferLanding(name,price){
 
 function openPublicOfferDetails(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',price=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
+ // Suivi d'une fiche réellement ouverte : couvre cartes, clavier et accès depuis les pôles.
+ if(window.akprimeAnalytics){
+   const code=publicOfferCode(pole,name);
+   if(code)window.akprimeAnalytics.track('view_offer_details',{offer_code:code});
+ }
  if(String(pole).toLowerCase()==='performance'){
    modal('Performance '+esc(name)+' · AK PRIME',
     performanceOfferLanding(name,price),
@@ -5966,12 +5971,13 @@ async function publicCheckoutPrice(pole,name,base,duration,paymentMode){
 }
 function openPublicOfferCheckout(button){
  const pole=button.dataset.pole||'',name=button.dataset.name||'',base=Number(button.dataset.price)||offerBaseMonthlyPrice(pole,name)||0;
- if(window.akprimeAnalytics){
+ const benefits=publicOfferBenefits(pole,name);
+ const sameDraft=publicCheckoutDraft&&publicCheckoutDraft.pole===pole&&publicCheckoutDraft.name===name;
+ // Le bouton « Retour » ne doit pas recompter un début de commande.
+ if(!sameDraft&&window.akprimeAnalytics){
    const safeOffer=publicOfferCode(pole,name);
    if(safeOffer)window.akprimeAnalytics.track('begin_checkout',{offer_code:safeOffer});
  }
- const benefits=publicOfferBenefits(pole,name);
- const sameDraft=publicCheckoutDraft&&publicCheckoutDraft.pole===pole&&publicCheckoutDraft.name===name;
  const draft=sameDraft?publicCheckoutDraft:{pole,name,duration:3,paymentMode:'monthly',fullName:'',email:'',acceptedCgv:false,healthConsent:false,earlyStart:false,startMode:'asap',startDate:''};
  publicCheckoutDraft=draft;
  modal('Choisir mon accompagnement',
@@ -6087,6 +6093,8 @@ function openPublicOfferCheckout(button){
          const data=await result.json().catch(()=>({}));
          if(!result.ok||!data.url)throw Error(data.error||'Paiement sécurisé indisponible');
          if(!/^https:\/\/checkout\.stripe\.com\//.test(data.url))throw Error('Lien Stripe inattendu');
+         // Redirection vers Stripe : étape suivie, PAS une vente confirmée.
+         if(window.akprimeAnalytics)window.akprimeAnalytics.track('checkout_redirect',{offer_code:p.offerCode||'unknown'});
          location.assign(data.url);return;
        }
        if(window.AKP_PUBLIC_TEST_MODE){
