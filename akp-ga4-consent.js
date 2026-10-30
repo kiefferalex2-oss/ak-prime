@@ -134,10 +134,16 @@
     setConsent(false);
   }
   function track(event,params){
-    if(!publicActive||choice!=='accepted')return;
-    if(!/^(view_offer_list|view_offer_details|view_service_details|begin_checkout)$/.test(event))return;
+    // Les simulations Stripe TEST ne doivent jamais biaiser les statistiques publiques.
+    if(!publicActive||choice!=='accepted'||window.AKP_PUBLIC_TEST_MODE===true)return;
+    if(!/^(view_offer_list|view_offer_details|view_service_details|begin_checkout|checkout_redirect)$/.test(event))return;
+    // Paramètres strictement bornés : aucun nom, e-mail, paiement, URL de retour ou contenu client.
+    const safe={};
+    const allowedCodes=['forme_standard','forme_renforce','performance_p1','performance_p2','performance_p3','mental_particulier','mental_sportif'];
+    if(params&&typeof params.offer_code==='string'&&allowedCodes.includes(params.offer_code))safe.offer_code=params.offer_code;
+    if(params&&typeof params.service_group==='string'&&['forme','performance','mental'].includes(params.service_group))safe.service_group=params.service_group;
     loadGoogle();
-    window.gtag('event',event,params||{});
+    window.gtag('event',event,safe);
   }
   document.addEventListener('click',event=>{
     const target=event.target instanceof Element?event.target.closest('button,a,[role="button"]'):null;
@@ -152,15 +158,6 @@
     if(target.matches('.publicPoleBtn')){
       const group=target.dataset.pole;
       if(['forme','performance','mental'].includes(group))track('view_service_details',{service_group:group});
-    }
-    const offer=target.closest('.publicOfferDetailCard');
-    if(offer&&offer.closest('.public-site')){
-      const group=offer.dataset.pole;
-      const plan=offer.dataset.name;
-      const category=group==='Performance'?'performance':group==='Mental'?'mental':group==='Forme & Santé'?'forme':'';
-      if(category&&['P1','P2','P3','Standard','Renforcé','Particulier','Sportif'].includes(plan)){
-        track('view_offer_details',{service_group:category,offer_tier:plan.toLowerCase()});
-      }
     }
   },true);
   window.akprimeAnalytics={start,pause,track,openPreferences};
