@@ -4970,6 +4970,7 @@ function openPublicLogin(message='',isError=false){
  '<p class="muted tiny" style="margin-top:0">Accès réservé aux clients activés et à l’équipe AK PRIME.</p>'+
  '<div class="field"><label>E-mail</label><input id="authEmail" class="input" type="email" autocomplete="email" style="width:100%"></div>'+
  '<div class="field"><label>Mot de passe</label><input id="authPassword" class="input" type="password" autocomplete="current-password" style="width:100%"></div>'+
+ '<div style="text-align:right;margin:-2px 0 12px"><button class="btn ghost small" type="button" id="akRecoverPassword">Mot de passe oublié ou lien expiré ?</button></div>'+
  '<div id="authMsg" class="auth-msg '+(isError?'err ':'')+(message?'show':'')+'">'+esc(message)+'</div>'+
  '<div class="public-login-note">Après paiement, votre compte sera activé avec l’adresse e-mail utilisée lors de la souscription. Vous recevrez un lien pour créer votre mot de passe.</div>',
  '<button class="btn ghost" id="cancelPublicLogin">Retour</button><button class="btn primary" id="loginBtn">Se connecter</button>');
@@ -4982,6 +4983,27 @@ function openPublicLogin(message='',isError=false){
    closeModal();await enterApp(data.user);
  };
  document.getElementById('loginBtn').onclick=login;
+ document.getElementById('akRecoverPassword').onclick=async()=>{
+   const recoveryEmail=email.value.trim();
+   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recoveryEmail)){
+     setAuthMsg('Indique ton adresse e-mail dans le champ ci-dessus pour recevoir un nouveau lien sécurisé.',true);
+     email.focus();
+     return;
+   }
+   const btn=document.getElementById('akRecoverPassword');
+   btn.disabled=true;
+   setAuthMsg('Demande de nouveau lien en cours…',false);
+   try{
+     const {error}=await supa.auth.resetPasswordForEmail(recoveryEmail,{
+       redirectTo:'https://akprime.fr/reinitialiser-mot-de-passe.html'
+     });
+     if(error)throw error;
+     setAuthMsg('Si cette adresse correspond à un compte AK PRIME, un nouveau lien sécurisé a été envoyé. Vérifie aussi tes courriers indésirables.',false);
+   }catch(error){
+     setAuthMsg('Envoi momentanément indisponible : '+String(error?.message||'Réessaie depuis la connexion.'),true);
+     btn.disabled=false;
+   }
+ };
  password.onkeydown=e=>{if(e.key==='Enter')login()};
 }
 
