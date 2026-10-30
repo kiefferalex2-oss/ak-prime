@@ -30,7 +30,7 @@
   }
   function loadGoogle(){
     if(googleLoaded)return;
-    if(choice!=='accepted'||!publicActive)return;
+    if(choice!=='accepted'||!publicActive||window.AKP_PUBLIC_TEST_MODE===true)return;
     googleLoaded=true;
     window['ga-disable-'+MEASUREMENT_ID]=false;
     const gtag=googleCommand();
@@ -60,7 +60,7 @@
     return location.origin+location.pathname;
   }
   function pageView(){
-    if(choice!=='accepted'||!publicActive)return;
+    if(choice!=='accepted'||!publicActive||window.AKP_PUBLIC_TEST_MODE===true)return;
     loadGoogle();
     setConsent(true);
     const page=safeLocation();
