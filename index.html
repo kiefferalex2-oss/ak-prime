@@ -4177,13 +4177,14 @@ function renderClientHome(s){
  const c=s.client,cycle=s.cycle,r=s.response;
  const next=(s.appointments||[]).find(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date())||akTestVirtualVisio(s);
  const qDone=r?.status==='submitted';
+ const needsInitial=!qDone&&!!s.template;
  const d=c.engagement_end_date?daysUntil(isoDate(c.engagement_end_date)):null;
  const renewalPending=d!==null&&d<=14&&!currentClientRenewalChoice(s);
  const engagementValue=!c.engagement_end_date?'À définir':d<0?'Terminée':d===0?"Aujourd’hui":d+' jours';
  const first=c.first_name||'';
  const actionCards=[];
- if(!qDone&&s.template)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Ton questionnaire initial</strong><div class="muted tiny">Complète ton profil pour préparer ton accompagnement sur mesure.</div></div><button class="btn primary small clientGoInitial">Compléter <span aria-hidden="true">↗</span></button></div>');
- if(!next||next.is_demo)actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">02</div><div class="akWowActionCopy"><strong>Ton prochain rendez-vous</strong><div class="muted tiny">Un temps d’échange pour faire le point et avancer.</div></div><button class="btn ghost small clientGoVisios">Choisir un créneau <span aria-hidden="true">↗</span></button></div>');
+ if(needsInitial)actionCards.push('<div class="client-action-card urgent"><div class="akWowActionIcon">01</div><div class="akWowActionCopy"><strong>Première étape : ton questionnaire initial</strong><div class="muted tiny">Renseigne tes objectifs, ton parcours et tes disponibilités pour préparer ton accompagnement.</div></div><button type="button" class="btn primary small clientGoInitial">Compléter mon profil <span aria-hidden="true">↗</span></button></div>');
+ if(!needsInitial&&(!next||next.is_demo))actionCards.push('<div class="client-action-card"><div class="akWowActionIcon">◷</div><div class="akWowActionCopy"><strong>Tes visios, à ton rythme</strong><div class="muted tiny">Choisis un créneau quand tu le souhaites. Aucune réservation imposée.</div></div><button type="button" class="btn ghost small clientGoVisios">Voir mes créneaux <span aria-hidden="true">↗</span></button></div>');
  if(d!==null&&d<=14&&currentClientRenewalChoice(s))actionCards.push('<div class="client-action-card good"><div class="akWowActionIcon">✓</div><div class="akWowActionCopy"><strong>Ton prochain chapitre</strong><div class="muted tiny">Ton choix pour la suite est enregistré. Retrouve tes progrès.</div></div><button class="btn ghost small clientGoPassport">Voir le Passeport <span aria-hidden="true">↗</span></button></div>');
  const optiUrl=safeOptitrainerLink(c.optitrainer_url);
  const waNum=normalizeWhatsAppNumber(s.appSettings?.whatsapp_number||'');
@@ -4194,17 +4195,24 @@ function renderClientHome(s){
   '<div class="akWowHeroCopy">'+
    '<span class="akWowEyebrow"><span class="akWowSpark">✦</span> TON ESPACE PERSONNEL · AK PRIME</span>'+
    '<h1>Bonjour '+esc(firstName)+'.<span>Ta progression commence ici.</span></h1>'+
-   '<p>Une vision claire de ton accompagnement, de tes objectifs et de tes prochaines étapes.</p>'+
+   '<p>'+(needsInitial?'Pour commencer, remplis ton questionnaire initial. C’est la première chose à faire pour personnaliser ton suivi.':'Une vision claire de ton accompagnement, de tes objectifs et de tes prochaines étapes.')+'</p>'+
    '<div class="akWowHeroPills"><span>✦ '+esc(c.current_pole||'Accompagnement')+'</span><span>'+esc(c.current_offer||'Formule personnalisée')+'</span><span class="akWowLive"><i></i>'+esc(c.status==='active'?'Suivi actif':c.status==='onboarding'?'Démarrage en cours':c.status||'')+'</span></div>'+
-   '<button class="akWowHeroCta '+(!qDone&&s.template?'clientGoInitial':'clientGoVisios')+'" type="button">'+
-      (!qDone&&s.template?'Continuer mon onboarding':'Gérer mes visios')+' <span aria-hidden="true">↗</span></button>'+
+   '<button class="akWowHeroCta '+(needsInitial?'clientGoInitial':'clientGoFollow')+'" type="button">'+
+      (needsInitial?'Compléter mon profil':'Voir mon accompagnement')+' <span aria-hidden="true">↗</span></button>'+
   '</div>'+
+  (needsInitial?
+  '<div class="akWowHeroSide akWowHeroSideInitial">'+
+   '<div class="akWowHeroSideTop"><span>PREMIÈRE ÉTAPE · À COMPLÉTER</span><span class="akWowHeroSymbol">01</span></div>'+
+   '<strong>Ton questionnaire initial</strong>'+
+   '<p>Renseigne ton profil et tes objectifs pour que ton coach prépare un accompagnement adapté. Les visios restent libres, depuis l’onglet Mes visios.</p>'+
+   '<button type="button" class="akWowTextLink clientGoInitial">Compléter mon profil <span aria-hidden="true">→</span></button>'+
+  '</div>':
   '<div class="akWowHeroSide">'+
    '<div class="akWowHeroSideTop"><span>'+(next?.is_demo?'APERÇU VISIO · DÉMO':'PROCHAIN RENDEZ-VOUS')+'</span><span class="akWowHeroSymbol">↗</span></div>'+
-   '<strong>'+esc(next?fmtDateTime(next.starts_at):'À planifier')+'</strong>'+
-   '<p>'+(next?(next.is_demo?'Exemple non réservé · hors quota':esc((next.appointment_type==='Visio initiale'?'Visio initiale · Hors quota':'Visio de suivi')+' · '+next.duration_minutes+' min')):'Choisis ton prochain créneau avec ton coach.')+'</p>'+
-   '<button type="button" class="akWowTextLink clientGoVisios">'+(next?'Voir mes rendez-vous':'Réserver une visio')+' <span aria-hidden="true">→</span></button>'+
-  '</div>'+
+   '<strong>'+esc(next?fmtDateTime(next.starts_at):'Aucune visio réservée')+'</strong>'+
+   '<p>'+(next?(next.is_demo?'Exemple non réservé · hors quota':esc((next.appointment_type==='Visio initiale'?'Visio initiale · Hors quota':'Visio de suivi')+' · '+next.duration_minutes+' min')):'Les visios se réservent quand tu le souhaites.')+'</p>'+
+   '<button type="button" class="akWowTextLink clientGoVisios">'+(next?'Voir mes rendez-vous':'Voir les créneaux')+' <span aria-hidden="true">→</span></button>'+
+  '</div>')+
  '</section>'+
  '<div class="akWowSectionHead akWowSectionHeadMetrics"><div><span class="akWowKicker">01 / TABLEAU DE BORD</span><h2>Ta progression en un regard</h2></div><span class="akWowSectionHint">Le meilleur reste à construire.</span></div>'+
  '<div class="client-summary-grid">'+
@@ -4295,13 +4303,13 @@ function renderClientQuestionnaireSection(s){
    const sent=r.submitted_at?fmtDateTime(r.submitted_at):'Envoyé';
    return '<div class="client-section-card"><div class="questionnaire-done"><div class="row"><div class="checkmark">✓</div><div><strong>Questionnaire initial complété</strong><div class="muted tiny" style="margin-top:4px">Envoyé : '+esc(sent)+'</div></div></div><button class="btn ghost small" id="toggleQuestionnaireAnswers">'+(clientQuestionnaireExpanded?'Masquer':'Voir mes réponses')+'</button></div>'+(clientQuestionnaireExpanded?renderQuestionnaireAnswers(t,r.answers||{}):'')+'</div>';
  }
- return '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Questionnaire initial</h3><div class="muted tiny">'+esc(t.description||'À compléter pour préparer ton accompagnement.')+'</div></div><span class="status '+(r?.status==='draft'?'amber':'blue')+'">'+(r?.status==='draft'?'Brouillon':'À compléter')+'</span></div>'+renderClientQuestionnaire(t,r?.answers||{})+'</div>';
+ return '<div class="client-section-card" id="clientInitialQuestionnaire" tabindex="-1" style="scroll-margin-top:22px"><div class="row between"><div><h3 style="margin-bottom:4px">Questionnaire initial</h3><div class="muted tiny">'+esc(t.description||'À compléter pour préparer ton accompagnement.')+'</div></div><span class="status '+(r?.status==='draft'?'amber':'blue')+'">'+(r?.status==='draft'?'Brouillon':'À compléter')+'</span></div>'+renderClientQuestionnaire(t,r?.answers||{})+'</div>';
 }
 function renderClientSuivi(s){
  const c=s.client;
  return '<div class="client-main"><div class="client-page-head"><div><h2>Mon suivi</h2><p>Questionnaire, bilan qualitatif et retours du coach.</p></div></div>'+
- renderClientWeeklyCheckin(s)+
  renderClientQuestionnaireSection(s)+
+ renderClientWeeklyCheckin(s)+
  '<div class="client-section-card"><div class="row between"><div><h3 style="margin-bottom:4px">Tests & progression</h3><div class="muted tiny">Tes résultats, retests et courbes sont regroupés dans ton Passeport AK PRIME.</div></div><button class="btn ghost small clientGoPassport">Voir mon Passeport</button></div></div>'+
  '<div class="client-section-card"><h3>Contact & entraînement</h3>'+renderClientWhatsAppButton(s,c)+(safeOptitrainerLink(c.optitrainer_url)?'<button class="btn ghost" id="clientOpti" style="margin-top:10px">Ouvrir Optitrainer</button>':'')+'</div>'+
  '</div>';
@@ -4328,6 +4336,13 @@ function renderClientPortal(){
  document.getElementById('root').innerHTML='<div class="client-portal'+(clientPortalView==='passport'?'':' ak-wow')+'"><div class="client-top"><div class="client-brand"><span><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="621" height="82" decoding="async"><small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
+ document.querySelectorAll('.clientGoInitial').forEach(b=>b.onclick=()=>{
+   clientPortalView='suivi';clientMobileMenuOpen=false;renderClientPortal();
+   requestAnimationFrame(()=>{
+     const target=document.getElementById('clientInitialQuestionnaire');
+     if(target){target.scrollIntoView({behavior:'auto',block:'start'});target.focus({preventScroll:true})}
+   });
+ });
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
  document.querySelectorAll('.clientGoVisios').forEach(b=>b.onclick=()=>{clientPortalView='visios';renderClientPortal()});
  document.querySelectorAll('.clientGoCheckin').forEach(b=>b.onclick=()=>{clientPortalView='checkin';renderClientPortal()});
@@ -5391,7 +5406,7 @@ function bindAkOfferDemo(pole,name){
  }
  shell.addEventListener('click',function(event){
   const tab=event.target.closest('.akOfferDemoTab');
-  const action=event.target.closest('.clientGoPassport,.clientGoFollow,.clientGoVisios,.clientGoCheckin');
+  const action=event.target.closest('.clientGoPassport,.clientGoFollow,.clientGoInitial,.clientGoVisios,.clientGoCheckin');
   const subTab=event.target.closest('.passportBookTab');
   const metric=event.target.closest('.passportMetricBtn,.passportMetricJump');
   const passNav=event.target.closest('.passportInlineNav');
