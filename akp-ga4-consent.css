@@ -1,0 +1,20 @@
+/* AK PRIME : bandeau de consentement GA4, non bloquant, acceptation et refus équivalents. */
+.akp-consent-banner{
+  position:fixed;z-index:100100;left:50%;bottom:18px;transform:translateX(-50%);
+  width:min(92vw,810px);padding:19px 22px;display:flex;align-items:center;gap:22px;
+  background:#10263e;color:#f5f8fd;border:1px solid rgba(211,171,98,.53);
+  border-radius:17px;box-shadow:0 20px 55px rgba(5,14,25,.4);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+.akp-consent-text{flex:1 1 65%;min-width:0}
+.akp-consent-text strong{display:block;font-size:14px;line-height:1.4;color:#fff}
+.akp-consent-text p{font-size:12px;line-height:1.55;margin:6px 0;color:#d3dfeb}
+.akp-consent-privacy{appearance:none;background:none;border:0;padding:0;margin:4px 0 0;cursor:pointer;color:#e5bc78;font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.akp-consent-actions{display:flex;gap:10px;align-items:stretch;flex:0 0 auto}
+.akp-consent-actions button{appearance:none;min-width:112px;padding:12px 14px;border-radius:10px;border:1px solid #d3ab62;background:#d3ab62;color:#122236;font-weight:900;font-size:13px;cursor:pointer}
+.akp-consent-actions button:hover,.akp-consent-actions button:focus-visible{background:#edc982;outline-offset:3px}
+@media(max-width:700px){
+ .akp-consent-banner{bottom:10px;padding:16px;display:block;width:calc(100vw - 22px);max-height:min(85vh,560px);overflow-y:auto;border-radius:14px}
+ .akp-consent-actions{display:grid;grid-template-columns:1fr 1fr;margin-top:14px}
+ .akp-consent-actions button{min-width:0}
+}
