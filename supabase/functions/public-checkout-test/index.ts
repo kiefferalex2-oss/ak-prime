@@ -150,7 +150,7 @@ Deno.serve(async(req:Request)=>{
     const params:Stripe.Checkout.SessionCreateParams={
       mode:paymentMode==="monthly"?"subscription":"payment",
       customer:stripeCustomer.id,client_reference_id:inserted.data.id,
-      billing_address_collection:"required",locale:"fr",
+      billing_address_collection:"required",customer_update:{address:"auto",name:"auto"},locale:"fr",
       success_url:"https://akprime.fr/?akp_test_return=success&ticket="+token+"&session_id={CHECKOUT_SESSION_ID}",
       cancel_url:"https://akprime.fr/?akp_test_return=cancelled&ticket="+token,
       line_items:[{price:price.id,quantity:1}],
