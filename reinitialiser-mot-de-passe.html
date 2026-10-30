@@ -103,15 +103,21 @@
    }
  });
  showMode();
+ // detectSessionInUrl:true valide deja automatiquement un code PKCE ou un
+ // jeton d'invitation. Le verifier une deuxieme fois consommait un code a usage
+ // unique et affichait a tort "lien expire" apres une connexion reussie.
  async function check(){
-   const code=url.searchParams.get('code');
-   if(code){
-     const {error}=await client.auth.exchangeCodeForSession(code);
-     if(error){message('Ce lien est expiré ou invalide. Demandez un nouvel e-mail depuis AK PRIME.','error');return;}
+   try{
+     const {data,error}=await client.auth.getSession();
+     if(!error&&data?.session){showMode();setValid();return;}
+     if(valid)return; // Un evenement SIGNED_IN a pu arriver en parallele.
+     const authError=url.searchParams.get('error_description')||
+       hash.get('error_description')||'';
+     if(authError)message('Ce lien de connexion n’est plus valide. Demandez un nouveau lien depuis AK PRIME.','error');
+     else message('Aucune session active. Si vous avez deja ouvert votre lien, demandez un nouvel acces depuis AK PRIME.','error');
+   }catch(err){
+     if(!valid)message('Verification momentanement indisponible. Vous pouvez reessayer ou demander un nouveau lien.','error');
    }
-   const {data:{session},error}=await client.auth.getSession();
-   if(!error&&session)setValid();
-   else if(!valid)message('Ce lien est expiré ou invalide. Demandez un nouvel e-mail depuis la connexion AK PRIME.','error');
  }
  check();
  byId('f').addEventListener('submit',async event=>{
