@@ -8,6 +8,7 @@
   let googleLoaded=false;
   let lastPageView='';
   let banner=null;
+  let pendingVerifiedPurchase=null;
 
   try {
     const stored=localStorage.getItem(CONSENT_KEY);
@@ -92,8 +93,18 @@
     removeBanner();
     lastPageView='';
     if(choice==='accepted'){
-      if(publicActive){loadGoogle();setConsent(true);pageView();}
+      if(publicActive){
+        loadGoogle();
+        setConsent(true);
+        pageView();
+        if(pendingVerifiedPurchase){
+          const purchase=pendingVerifiedPurchase;
+          pendingVerifiedPurchase=null;
+          trackVerifiedPurchase(purchase);
+        }
+      }
     }else{
+      pendingVerifiedPurchase=null;
       setConsent(false);
       forgetGoogleCookies();
     }
@@ -130,6 +141,7 @@
   function pause(){
     publicActive=false;
     lastPageView='';
+    pendingVerifiedPurchase=null;
     removeBanner();
     setConsent(false);
   }
@@ -145,6 +157,42 @@
     loadGoogle();
     window.gtag('event',event,safe);
   }
+  // Called ONLY after the server has checked a paid live Stripe order.
+  // This supplements Stripe's accounting; it does not modify orders or take payment.
+  function trackVerifiedPurchase(verified){
+    if(!verified||verified.state!=='confirmed'||window.AKP_PUBLIC_TEST_MODE===true)return false;
+    const id=verified.transaction_id;
+    const code=verified.offer_code;
+    const amount=verified.value;
+    const allowedCodes=['forme_standard','forme_renforce','performance_p1','performance_p2','performance_p3','mental_particulier','mental_sportif'];
+    if(typeof id!=='string'||!/^akp-[a-f0-9]{32}$/.test(id)||!allowedCodes.includes(code)||
+       verified.currency!=='EUR'||typeof amount!=='number'||!Number.isFinite(amount)||amount<=0||amount>100000){
+      return false;
+    }
+    if(!publicActive||choice===null){
+      if(choice===null)pendingVerifiedPurchase=verified;
+      return false;
+    }
+    if(choice!=='accepted')return false;
+    const key='akp-ga4-confirmed-purchase-'+id;
+    try{if(localStorage.getItem(key)==='sent')return false;}catch(error){}
+    loadGoogle();
+    if(!googleLoaded||typeof window.gtag!=='function')return false;
+    setConsent(true);
+    const event={
+      transaction_id:id,
+      currency:'EUR',
+      value:amount,
+      items:[{item_id:code,item_name:code,price:amount,quantity:1}]
+    };
+    try{
+      window.gtag('event','purchase',event);
+      // Browser-level deduplication. GA4 also deduplicates e-commerce by transaction_id.
+      try{localStorage.setItem(key,'sent');}catch(error){}
+      return true;
+    }catch(error){return false;}
+  }
+
   document.addEventListener('click',event=>{
     const target=event.target instanceof Element?event.target.closest('button,a,[role="button"]'):null;
     if(!target)return;
@@ -160,5 +208,5 @@
       if(['forme','performance','mental'].includes(group))track('view_service_details',{service_group:group});
     }
   },true);
-  window.akprimeAnalytics={start,pause,track,openPreferences};
+  window.akprimeAnalytics={start,pause,track,openPreferences,trackVerifiedPurchase};
 })();
