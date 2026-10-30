@@ -1987,7 +1987,7 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .ak-wordmark{display:inline-block;font-family:Inter,Arial,Helvetica,sans-serif;font-weight:900;font-style:normal;letter-spacing:-.045em;white-space:nowrap;line-height:1.1;color:#f7fafc}.ak-wordmark b{color:#d8b16d;font-weight:900}.public-logo{font-size:24px;letter-spacing:0;line-height:1.1;flex-direction:row;align-items:center}.brand .ak-wordmark{font-size:23px}.client-brand .ak-wordmark{font-size:22px}.auth-logo .ak-wordmark{font-size:29px;color:#0e243e}.akOfferDemoShell .client-brand .ak-wordmark{font-size:20px}@media(max-width:520px){.public-logo{font-size:21px}.client-brand .ak-wordmark,.akOfferDemoShell .client-brand .ak-wordmark{font-size:18px}}
 
 /* Signature exacte AK PRIME navy/or : image vectorielle issue du logo valide. */
-.ak-brand-logo{display:block;width:185px;height:auto;max-width:100%;box-sizing:border-box;background:#fff;border-radius:7px;padding:6px 9px;object-fit:contain;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.ak-brand-logo{display:block;width:185px;height:auto;max-width:100%;box-sizing:border-box;background:transparent;border-radius:0;padding:0;object-fit:contain;box-shadow:none}
 .public-logo{display:inline-flex;align-items:center;flex-direction:row;flex-shrink:0}
 .public-logo .ak-brand-logo{width:176px;background:transparent;border-radius:0;padding:0;box-shadow:none;}
 .brand .ak-brand-logo{width:176px}
@@ -2624,7 +2624,7 @@ function bindNotificationBells(){
 
 function shell(inner){
  return '<div class="app">'+
- '<aside class="sidebar"><div class="brand"><div><img class="ak-brand-logo" src="./assets/ak-prime-wordmark.svg?v=20261029" alt="AK PRIME" width="621" height="82" decoding="async"><span>COACH CONSOLE</span></div></div>'+
+ '<aside class="sidebar"><div class="brand"><div><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="621" height="82" decoding="async"><span>COACH CONSOLE</span></div></div>'+
  '<div class="sidebar-section-label">Pilotage</div><div class="nav">'+
  navBtn('dashboard','Tableau de bord')+navBtn('clients','Clients')+navBtn('billing','Facturation')+navBtn('calendar','Calendrier')+
  '<div class="sep"></div><div class="sidebar-section-label inside">Système</div>'+navBtn('backup','Sauvegardes')+(authProfile?.role==='owner'?navBtn('contracts','Preuves contractuelles'):'')+navBtn('settings','Paramètres')+
@@ -4319,7 +4319,7 @@ function renderClientPortal(){
  }else{
    main=renderClientHome(s);
  }
- document.getElementById('root').innerHTML='<div class="client-portal'+(clientPortalView==='passport'?'':' ak-wow')+'"><div class="client-top"><div class="client-brand"><span><img class="ak-brand-logo" src="./assets/ak-prime-wordmark.svg?v=20261029" alt="AK PRIME" width="621" height="82" decoding="async"><small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
+ document.getElementById('root').innerHTML='<div class="client-portal'+(clientPortalView==='passport'?'':' ak-wow')+'"><div class="client-top"><div class="client-brand"><span><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="621" height="82" decoding="async"><small>ESPACE CLIENT</small></span></div>'+nav.top+'<div class="row client-top-actions">'+nav.mobile+notificationBell('client')+'<div class="client-user-mini"><strong>'+esc([c.first_name,c.last_name==='-'?'':c.last_name].filter(Boolean).join(' ')||'Client AK PRIME')+'</strong><span>'+esc(c.current_offer||'')+'</span></div><button class="btn ghost small" id="clientLogout">Déconnexion</button></div></div>'+main+'</div>';
  document.querySelectorAll('.clientNavBtn').forEach(b=>b.onclick=()=>{clientPortalView=b.dataset.view;clientMobileMenuOpen=false;if(clientPortalView!=='suivi')clientQuestionnaireExpanded=false;renderClientPortal()});
  document.getElementById('clientMobileMenuToggle')?.addEventListener('click',()=>{clientMobileMenuOpen=!clientMobileMenuOpen;renderClientPortal()});
  document.querySelectorAll('.clientGoFollow').forEach(b=>b.onclick=()=>{clientPortalView='suivi';renderClientPortal()});
@@ -5332,7 +5332,7 @@ function akOfferDemoMarkup(pole,name){
    '<p>Le véritable design du portail, avec cinq mois d’exemples adaptés à <strong>'+esc(cfg.label)+'</strong>. Clique sur les onglets pour le découvrir.</p></div>'+
    '<span class="akOfferDemoReadonly">Données fictives · lecture seule</span></div>'+
   '<div class="akOfferDemoShell client-portal ak-wow true-client-demo" data-demo-offer="'+esc(pole+'|'+name)+'">'+
-   '<div class="client-top"><div class="client-brand"><span><img class="ak-brand-logo" src="./assets/ak-prime-wordmark.svg?v=20261029" alt="AK PRIME" width="621" height="82" decoding="async"><small>ESPACE CLIENT</small></span></div>'+
+   '<div class="client-top"><div class="client-brand"><span><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261030-brand" alt="AK PRIME" width="621" height="82" decoding="async"><small>ESPACE CLIENT</small></span></div>'+
     '<nav class="client-nav akOfferDemoNav" aria-label="Navigation de la démonstration">'+
      items.map(([view,icon,label])=>'<button type="button" class="akOfferDemoTab '+(view==='home'?'on':'')+'" data-demo-view="'+view+'" aria-current="'+(view==='home'?'page':'false')+'"><span>'+icon+'</span>'+label+'</button>').join('')+
     '</nav>'+
