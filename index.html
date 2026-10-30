@@ -6186,18 +6186,33 @@ function showAuth(message='',isError=false){
  bindPublicSite();
  if(window.akprimeAnalytics)window.akprimeAnalytics.start();
  const params=new URLSearchParams(location.search);
- if(params.get('confidentialite')==='1'){
-   openPublicLegal('privacy');
+ const wantsLogin=params.get('connexion')==='1';
+ const legalDoc=params.get('confidentialite')==='1'?'privacy':params.get('legal');
+ const offerDetails=params.get('offre')||'';
+ const offerChoose=params.get('choisir')||'';
+ const supportedDocs=['privacy','mentions','cgv','mediation','withdrawal'];
+ const supportedCodes=['forme_standard','forme_renforce','performance_p1','performance_p2','performance_p3','mental_particulier','mental_sportif'];
+ // The public SEO landing pages link to the SAME offer cards and checkout as the main site.
+ // Never accept arbitrary content or HTML from query parameters.
+ const requestedCode=supportedCodes.includes(offerChoose)?offerChoose:supportedCodes.includes(offerDetails)?offerDetails:'';
+ const requestedAction=supportedCodes.includes(offerChoose)?'choose':'detail';
+ if(params.has('confidentialite')||params.has('legal')||params.has('offre')||params.has('choisir')||wantsLogin){
    const cleaned=new URL(location.href);
-   cleaned.searchParams.delete('confidentialite');
+   for(const key of ['confidentialite','legal','offre','choisir','connexion'])cleaned.searchParams.delete(key);
    history.replaceState(null,'',cleaned.pathname+cleaned.search+cleaned.hash);
  }
- const wantsLogin=new URLSearchParams(location.search).get('connexion')==='1';
  if(message||wantsLogin)openPublicLogin(message,isError);
- if(wantsLogin){
-  const next=new URL(location.href);
-  next.searchParams.delete('connexion');
-  history.replaceState(null,'',next.pathname+next.search+next.hash);
+ if(!wantsLogin && supportedDocs.includes(legalDoc))openPublicLegal(legalDoc);
+ if(!wantsLogin && requestedCode){
+   const card=Array.from(document.querySelectorAll('.publicOfferDetailCard')).find(el=>publicOfferCode(el.dataset.pole,el.dataset.name)===requestedCode);
+   if(card){
+     requestAnimationFrame(()=>{
+       // Scroll to the corresponding official offer and open the real existing flow.
+       card.scrollIntoView({behavior:'auto',block:'center'});
+       if(requestedAction==='choose')openPublicOfferCheckout(card);
+       else openPublicOfferDetails(card);
+     });
+   }
  }
 }
 
