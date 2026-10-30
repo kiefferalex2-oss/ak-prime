@@ -6,7 +6,8 @@
  const query=new URLSearchParams(location.search);
  const ticket=query.get('akp_test')||query.get('ticket')||'';
  window.AKP_PUBLIC_TEST_TOKEN=/^[a-f0-9]{64}$/.test(ticket)?ticket:'';
- window.AKP_PUBLIC_TEST_MODE=!!window.AKP_PUBLIC_TEST_TOKEN;
+ // Ne jamais ecraser le mode TEST deja conserve dans cet onglet par le site principal.
+ window.AKP_PUBLIC_TEST_MODE=!!window.AKP_PUBLIC_TEST_TOKEN||window.AKP_PUBLIC_TEST_MODE===true;
  window.AKP_LIVE_CHECKOUT_MODE=!window.AKP_PUBLIC_TEST_MODE;
  // Public sandbox endpoint: use the publishable key on apikey, not as a bearer JWT.
  window.AKP_PUBLIC_TEST_REQUEST=async(payload)=>{
