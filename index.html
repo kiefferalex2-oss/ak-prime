@@ -25,6 +25,8 @@
 <link rel="stylesheet" href="./akp-ga4-consent.css?v=1">
 <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon-akprime.svg?v=1">
 <meta name="theme-color" content="#0d233b">
+<!-- Masque le HTML de secours avant le premier affichage, uniquement lorsque JS est actif. -->
+<script>document.documentElement.classList.add('akp-js');</script>
 <style>
 :root{
   --bg:#f3f6fa;--panel:#fff;--panel2:#f8fafc;--nav:#0d1827;--nav2:#13243a;--text:#101828;
@@ -2084,6 +2086,21 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
   .public-site #apropos .ak-about-portrait-inner{min-height:340px}
 }
 
+/* Le contenu SEO reste accessible sans JavaScript, mais ne doit jamais clignoter avant le site réel. */
+.akp-js .seo-preload{display:none!important}
+.akp-starting{display:none}
+.akp-js .akp-starting{
+  min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  background:radial-gradient(circle at 65% 30%,#1b3554 0,transparent 46%),#08111d;
+  padding:25px;color:#eaf0f6
+}
+.akp-starting img{display:block;width:clamp(150px,32vw,205px);height:auto}
+.akp-starting-line{display:block;width:100px;height:2px;border-radius:5px;overflow:hidden;background:rgba(216,177,109,.17)}
+.akp-starting-line::after{content:"";display:block;width:38px;height:100%;background:#d8b16d;border-radius:5px;animation:akp-startline 1.3s ease-in-out infinite alternate}
+@keyframes akp-startline{to{transform:translateX(62px)}}
+@media(prefers-reduced-motion:reduce){.akp-starting-line::after{animation:none;width:100px}}
+
 /* Contenu public indexable dès le HTML initial, remplacé par le rendu applicatif. */
 .seo-preload{min-height:70vh;padding:clamp(45px,7vw,95px) 22px;color:#fff;background:radial-gradient(circle at 75% 16%,#21416b,transparent 40%),linear-gradient(150deg,#08111d,#102945)}
 .seo-preload-inner{max-width:1080px;margin:0 auto}
@@ -2155,6 +2172,10 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
     <p><a href="mailto:contact@akprime.fr">Contacter AK PRIME : contact@akprime.fr</a></p>
   </div>
 </main>
+<div class="akp-starting" role="status" aria-label="Chargement d’AK PRIME">
+  <img src="./assets/ak-prime-wordmark-white-gold.svg" alt="AK PRIME" width="621" height="82">
+  <span class="akp-starting-line" aria-hidden="true"></span>
+</div>
 </div>
 <div id="modalRoot"></div>
 <div id="toast" class="toast">Enregistré</div>
@@ -6425,9 +6446,15 @@ async function enterApp(user){
  }
 }
 async function initAuth(){
- await loadPublicOfferCatalog();
- const {data:{session}}=await supa.auth.getSession();
- if(session?.user) await enterApp(session.user); else showAuth();
+ // Le catalogue et la session sont indépendants : les charger ensemble évite une attente inutile.
+ try{
+   const [,auth]=await Promise.all([loadPublicOfferCatalog(),supa.auth.getSession()]);
+   const session=auth?.data?.session;
+   if(session?.user) await enterApp(session.user); else showAuth();
+ }catch(error){
+   console.error('Initialisation AK PRIME :',error);
+   showAuth();
+ }
  supa.auth.onAuthStateChange(async(event,session)=>{
    if(event==='SIGNED_OUT'){if(calendarChannel){await supa.removeChannel(calendarChannel);calendarChannel=null}authUser=null;authProfile=null;clientPortalState=null;showAuth()}
  });
