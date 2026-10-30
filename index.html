@@ -6087,6 +6087,33 @@ function openPublicOfferCheckout(button){
      errorBox.classList.remove('show');
      const submit=document.getElementById('futureStripeCheckout');submit.disabled=true;submit.textContent='Préparation du paiement sécurisé…';
      try {
+       if(window.AKP_PUBLIC_TEST_MODE){
+         if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
+         submit.textContent='Ouverture de Stripe TEST…';
+         if(typeof window.AKP_PUBLIC_TEST_REQUEST!=='function')
+           throw Error('Le module de paiement TEST n’est pas chargé. Actualise la page (Ctrl+F5).');
+         const ticket=window.AKP_PUBLIC_TEST_TOKEN||'';
+         const payload={
+           // Toujours une nouvelle commande pour un nouveau clic sur une offre.
+           // Le ticket de retour Stripe de l'achat précédent reste réservé au suivi.
+           action:ticket?'create':'direct_create', ticket:ticket||undefined,
+           offerCode:p.offerCode,duration,paymentMode,
+           fullName,email,startDate:startMode==='date'?startDate:null,
+           acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart
+         };
+         let result;
+         try{result=await window.AKP_PUBLIC_TEST_REQUEST(payload);}
+         catch(err){
+           // Un lien TEST deja consomme ne doit jamais pousser vers la production.
+           if(ticket&&/d[eé]j[aà] utilis[eé]/i.test(String(err?.message||''))){
+             result=await window.AKP_PUBLIC_TEST_REQUEST({...payload,action:'direct_create',ticket:undefined});
+           }else throw err;
+         }
+         if(!result?.url)throw Error(result?.error||'Stripe TEST n’a pas retourné de page de paiement.');
+         if(!result.url.startsWith('https://checkout.stripe.com/'))throw Error('Adresse Stripe incorrecte');
+         location.assign(result.url);
+         return;
+       }
        if(window.AKP_LIVE_CHECKOUT_MODE===true){
          if(p.source!=='server'||!p.offerCode)throw Error('Tarif sécurisé indisponible');
          submit.textContent='Ouverture du paiement sécurisé…';
@@ -6103,24 +6130,6 @@ function openPublicOfferCheckout(button){
          // Redirection vers Stripe : étape suivie, PAS une vente confirmée.
          if(window.akprimeAnalytics)window.akprimeAnalytics.track('checkout_redirect',{offer_code:p.offerCode||'unknown'});
          location.assign(data.url);return;
-       }
-       if(window.AKP_PUBLIC_TEST_MODE){
-         if(p.source!=='server'||!p.offerCode)throw Error('Tarif serveur momentanément indisponible');
-         submit.textContent='Ouverture de Stripe TEST…';
-         if(typeof window.AKP_PUBLIC_TEST_REQUEST!=='function')
-           throw Error('Le module de paiement TEST n’est pas chargé. Actualise la page (Ctrl+F5).');
-         const result=await window.AKP_PUBLIC_TEST_REQUEST({
-           // Toujours une nouvelle commande pour un nouveau clic sur une offre.
-           // Le ticket de retour Stripe de l'achat précédent reste réservé au suivi.
-           action:'direct_create',
-           offerCode:p.offerCode,duration,paymentMode,
-           fullName,email,startDate:startMode==='date'?startDate:null,
-           acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,earlyStart
-         });
-         if(!result?.url)throw Error(result?.error||'Stripe TEST n’a pas retourné de page de paiement.');
-         if(!result.url.startsWith('https://checkout.stripe.com/'))throw Error('Adresse Stripe incorrecte');
-         location.assign(result.url);
-         return;
        }
        throw Error('Paiements réels désactivés : seule la simulation Stripe TEST est disponible.');
      }catch(err){
@@ -6319,7 +6328,15 @@ async function initAuth(){
   }
  }
 })();
-window.AKP_PUBLIC_TEST_MODE=/^[0-9a-f]{64}$/.test(new URLSearchParams(location.search).get('akp_test')||new URLSearchParams(location.search).get('ticket')||'');
+// Le contexte TEST reste attaché à l'onglet pendant la recette (même en naviguant entre pages).
+// Il ne doit jamais basculer silencieusement vers un paiement réel.
+const akpTestTicket=(new URLSearchParams(location.search).get('akp_test')||new URLSearchParams(location.search).get('ticket')||'');
+const akpHasTestTicket=/^[0-9a-f]{64}$/.test(akpTestTicket);
+try{
+ if(akpHasTestTicket)sessionStorage.setItem('akp-test-mode-until',String(Date.now()+3*60*60*1000));
+ window.AKP_PUBLIC_TEST_MODE=akpHasTestTicket||Number(sessionStorage.getItem('akp-test-mode-until')||0)>Date.now();
+ if(!window.AKP_PUBLIC_TEST_MODE)sessionStorage.removeItem('akp-test-mode-until');
+}catch{window.AKP_PUBLIC_TEST_MODE=akpHasTestTicket;}
 window.AKP_LIVE_CHECKOUT_MODE=!window.AKP_PUBLIC_TEST_MODE; // Paiement réel public, TEST uniquement sur lien de simulation.
 initAuth();
 </script>
