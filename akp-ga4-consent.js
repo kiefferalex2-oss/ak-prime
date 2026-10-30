@@ -118,7 +118,7 @@
     banner.setAttribute('aria-label','Choix des cookies de mesure d’audience');
     banner.innerHTML=
       '<div class="akp-consent-text"><strong>Respect de votre vie privée</strong>'+
-      '<p>AK PRIME utilise Google Analytics uniquement avec votre accord pour mesurer les visites et les interactions avec les offres. Aucun suivi analytique des espaces privés ni des informations de santé. Vous pouvez refuser et revenir sur votre choix à tout moment.</p>'+
+      '<p>AK PRIME utilise Google Analytics uniquement avec votre accord pour mesurer les visites, les offres consultées et les achats confirmés par Stripe (formule, montant initial et transaction pseudonymisée). Aucun suivi analytique des espaces privés ni des informations de santé. Vous pouvez refuser et revenir sur votre choix à tout moment.</p>'+
       '<button type="button" class="akp-consent-privacy">Lire notre politique de confidentialité</button></div>'+
       '<div class="akp-consent-actions"><button type="button" data-akp-consent="refused">Refuser</button>'+
       '<button type="button" data-akp-consent="accepted">Accepter</button></div>';
