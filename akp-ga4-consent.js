@@ -38,12 +38,16 @@
     gtag('consent','default',deniedState());
     gtag('set','allow_google_signals',false);
     gtag('set','allow_ad_personalization_signals',false);
+    // Ne pas transmettre les tokens et informations potentiellement sensibles des URL.
+    gtag('set','page_location',safeLocation());
     gtag('consent','update',Object.assign(deniedState(),{analytics_storage:'granted'}));
     gtag('js',new Date());
     gtag('config',MEASUREMENT_ID,{
       send_page_view:false,
       allow_google_signals:false,
-      allow_ad_personalization_signals:false
+      allow_ad_personalization_signals:false,
+      page_location:safeLocation(),
+      page_path:location.pathname
     });
     const script=document.createElement('script');
     script.async=true;
