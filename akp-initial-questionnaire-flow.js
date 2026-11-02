@@ -129,7 +129,7 @@ function initialVisioBooked(s){
  return records.find(a=>a.status!=='cancelled')||null;
 }
 function initialVisioMarkup(s){
- const booked=initialVisioBooked(s),rows=s.akInitialSlots||[],client=s.client||{};
+ const booked=initialVisioBooked(s),rows=(s.akInitialSlots||[]).filter(sl=>Date.parse(sl.starts_at)>=Date.now()+24*60*60*1000),client=s.client||{};
  const isComplete=booked?.status==='completed'||!!s.akInitialVisioCompleted;
  let inner='';
  if(booked&&['scheduled','confirmed'].includes(booked.status)){
@@ -167,7 +167,7 @@ function initialVisioMarkup(s){
  return '<section class="akIntroSection" id="akInitialVisioWrap"><div class="akIntroVisio">'+
    '<div class="akIntroVisioTop"><div><h3>Réserver ma première visio initiale</h3>'+
    '<p>Choisis directement un créneau de '+(s.bookingPolicy?.duration_minutes|| (client.current_pole==='Mental'?45:30))+
-   ' minutes. Cette visio de démarrage est incluse en plus de tes visios habituelles.</p></div>'+
+   ' minutes. Cette visio de démarrage est incluse en plus de tes visios habituelles. Réserve au moins 24 heures à l’avance.</p></div>'+ 
    '<span class="akIntroVisioTag">HORS QUOTA · INCLUSE</span></div>'+
    inner+'</div></section>';
 }
@@ -203,6 +203,11 @@ function bindInitialVisio(s){
  wrapper.addEventListener('click',async e=>{
   const button=e.target.closest('.akInitialBookSlot');if(!button||button.disabled)return;
   const start=button.dataset.start;
+  if(!Number.isFinite(Date.parse(start))||Date.parse(start)<Date.now()+24*60*60*1000){
+   alert('La première visio doit être réservée au minimum 24 heures à l’avance. Actualise les créneaux.');
+   await reloadInitialVisioSlots(s);
+   return;
+  }
   if(!confirm('Confirmer ta visio initiale du '+fmtDateTime(start)+' ?\nCette visio ne sera pas décomptée de ton quota mensuel ou hebdomadaire.'))return;
   button.disabled=true;
   const {error}=await supa.rpc('book_my_initial_visio',{p_starts_at:start});
