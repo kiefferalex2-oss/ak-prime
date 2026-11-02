@@ -276,7 +276,7 @@
   };
  }
  document.addEventListener('click',e=>{
-  const btn=e.target.closest?.('.akCalV2 [data-ak-cal-nav],.akCalV2 [data-day],.akCalV2 .akCalV2Inspect');
+  const btn=e.target.closest?.('.akCalV2 [data-ak-cal-nav],.akCalV2 .akCalV2Day[data-day],.akCalV2 .akCalV2Inspect');
   if(!btn)return;
   e.preventDefault();e.stopImmediatePropagation();
   if(btn.hasAttribute('data-ak-cal-nav')){
@@ -285,7 +285,7 @@
     chosen='';
     render();return;
   }
-  if(btn.hasAttribute('data-day')){
+  if(btn.classList.contains('akCalV2Day')&&btn.hasAttribute('data-day')){
     chosen=btn.dataset.day;render();return;
   }
   const event=getEvent(btn.dataset.key);
