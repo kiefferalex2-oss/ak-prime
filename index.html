@@ -3587,14 +3587,89 @@ function invoiceById(id){
 }
 
 function invoiceDocumentHtml(i){
+ // Modèle d'impression des factures manuelles AK PRIME.
+ // Ne modifie ni les données figées de la facture, ni les PDF natifs de Stripe.
  const items=Array.isArray(i.line_items)?i.line_items:[];
- const lines=items.map(x=>'<tr><td>'+esc(x.description||'Prestation AK PRIME')+'</td><td style="text-align:center">'+esc(String(x.quantity||1))+'</td><td style="text-align:right">'+centsMoney(x.unit_price_excl_tax_cents||0)+'</td><td style="text-align:right">'+centsMoney(x.line_total_excl_tax_cents||0)+'</td></tr>').join('');
- return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>'+esc(i.invoice_number)+'</title><style>body{font-family:Arial,sans-serif;color:#111827;margin:0;padding:42px;font-size:13px}.top{display:flex;justify-content:space-between;gap:30px;border-bottom:3px solid #0c1b33;padding-bottom:22px}.brand{font-size:28px;font-weight:900;color:#0c1b33}.muted{color:#64748b}.box{margin-top:25px;display:grid;grid-template-columns:1fr 1fr;gap:25px}.panel{border:1px solid #dbe2ea;border-radius:10px;padding:16px}h1{font-size:22px;margin:0 0 5px}h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0 0 9px}table{width:100%;border-collapse:collapse;margin-top:28px}th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:left}th{background:#f8fafc;font-size:11px;text-transform:uppercase}.totals{margin-left:auto;margin-top:18px;width:330px}.total{display:flex;justify-content:space-between;padding:7px 0}.grand{font-size:18px;font-weight:900;border-top:2px solid #0c1b33;margin-top:4px;padding-top:10px}.foot{margin-top:34px;border-top:1px solid #e5e7eb;padding-top:14px;font-size:11px;color:#64748b}@media print{body{padding:20px}}</style></head><body>'+
- '<div class="top"><div><div class="brand">'+esc(i.seller_business_name||'AK PRIME')+'</div><div>'+esc(i.seller_legal_name||'')+' EI</div><div class="muted">'+esc(i.seller_legal_form||'')+'</div><div style="margin-top:8px">'+esc(i.seller_address||'')+'</div><div>'+esc(i.seller_email||'')+'</div><div>SIREN : '+esc(i.seller_siren||'')+' • SIRET : '+esc(i.seller_siret||'')+'</div></div><div style="text-align:right"><h1>FACTURE</h1><strong>'+esc(i.invoice_number)+'</strong><div class="muted" style="margin-top:8px">Émise le '+fmtDate(i.issue_date)+'</div><div class="muted">Prestation du '+fmtDate(i.service_date)+'</div></div></div>'+
- '<div class="box"><div class="panel"><h3>Facturé à</h3><strong>'+esc(i.customer_name||'')+'</strong>'+(i.customer_billing_address?'<div>'+esc(i.customer_billing_address)+'</div>':'')+(i.customer_email?'<div>'+esc(i.customer_email)+'</div>':'')+'</div><div class="panel"><h3>Paiement</h3><div>Échéance : '+fmtDate(i.due_date)+'</div><div>Statut : <strong>'+esc(invoiceStatusLabel(i.payment_status))+'</strong></div>'+(i.paid_at?'<div>Encaissée le '+fmtDate(i.paid_at)+'</div>':'')+'<div style="margin-top:6px">'+esc(i.operation_category||'Prestations de services')+'</div></div></div>'+
- '<table><thead><tr><th>Prestation</th><th style="text-align:center">Qté</th><th style="text-align:right">Prix unitaire HT</th><th style="text-align:right">Total HT</th></tr></thead><tbody>'+lines+'</tbody></table>'+
- '<div class="totals"><div class="total"><span>Total HT</span><strong>'+centsMoney(i.amount_excl_tax_cents)+'</strong></div><div class="total"><span>TVA</span><strong>'+centsMoney(i.tax_cents)+'</strong></div><div class="total grand"><span>Total à payer</span><span>'+centsMoney(i.amount_incl_tax_cents)+'</span></div></div>'+
- '<div class="foot">'+(i.vat_exempt?'<div><strong>'+esc(i.vat_mention||'TVA non applicable, art. 293 B du code général des impôts')+'.</strong></div>':'')+'<div style="margin-top:5px">Facture éditée par AK PRIME. Document à conserver.</div></div></body></html>';
+ const lines=items.map(x=>'<tr><td><span class="item-name">'+esc(x.description||'Prestation AK PRIME')+'</span></td>'+
+  '<td class="center">'+esc(String(x.quantity||1))+'</td>'+
+  '<td class="number">'+centsMoney(x.unit_price_excl_tax_cents||0)+'</td>'+
+  '<td class="number strong">'+centsMoney(x.line_total_excl_tax_cents||0)+'</td></tr>').join('');
+ const logo="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 621 82\" role=\"img\" aria-label=\"AK PRIME\">\n<defs><linearGradient id=\"navy\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#062b55\"/><stop offset=\"1\" stop-color=\"#001a37\"/></linearGradient><linearGradient id=\"gold\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#d3b069\"/><stop offset=\"1\" stop-color=\"#aa833a\"/></linearGradient></defs>\n<path fill=\"url(#navy)\" fill-rule=\"evenodd\" d=\"M3,77L3,78L28,78L32,73L33,70L35,68L36,65L38,63L39,60L41,58L42,55L44,53L45,50L47,48L48,45L50,43L51,40L53,38L54,35L56,33L56,32L57,31L57,30L58,29L59,26L62,23L63,23L64,24L64,25L66,27L66,28L67,29L67,30L68,31L68,32L69,33L69,34L70,35L70,36L71,37L71,38L72,39L73,42L75,44L75,45L76,46L76,47L77,48L77,49L78,50L78,51L79,52L79,53L80,54L80,55L81,56L82,59L81,60L48,60L48,61L46,63L45,66L43,68L42,71L40,73L40,74L39,75L38,78L145,78L145,47L146,46L147,46L179,78L211,78L172,39L172,38L177,33L178,33L186,25L187,25L195,17L196,17L203,10L204,10L210,4L178,4L172,10L171,10L151,30L150,30L147,33L146,33L145,32L145,4L122,4L122,77L121,78L120,78L119,77L119,76L118,75L118,74L117,73L117,72L116,71L116,70L115,69L115,68L114,67L113,64L111,62L111,61L110,60L110,59L109,58L109,57L108,56L108,55L107,54L107,53L106,52L106,51L105,50L104,47L102,45L102,44L101,43L101,42L100,41L100,40L99,39L99,38L98,37L98,36L97,35L96,32L94,30L94,29L93,28L93,27L92,26L92,25L91,24L91,23L90,22L89,19L87,17L87,16L86,15L86,14L85,13L85,12L84,11L84,10L83,9L82,6L80,4L46,4L46,5L44,7L43,10L41,12L40,15L38,17L37,20L35,22L34,25L32,27L32,28L31,29L30,32L28,34L27,37L25,39L25,40L24,41L24,42L22,44L22,45L21,46L20,49L18,51L17,54L15,56L14,59L12,61L11,64L9,66L9,67L8,68L7,71L5,73L5,74Z\"/><path fill=\"url(#gold)\" fill-rule=\"evenodd\" d=\"M545,4L545,78L620,78L620,60L569,60L568,59L568,50L569,49L612,49L613,48L613,34L612,33L569,33L568,32L568,23L569,22L620,22L620,4ZM439,4L439,78L460,78L460,41L461,40L462,40L464,42L464,43L467,46L467,47L471,51L471,52L474,55L474,56L478,60L478,61L482,65L482,66L488,73L489,72L489,71L492,68L492,67L496,63L496,62L498,60L498,59L506,50L506,49L509,46L509,45L513,41L514,41L515,42L515,77L516,78L537,78L538,77L538,71L537,70L537,68L538,67L538,5L537,4L513,4L513,5L510,8L510,9L507,12L507,13L504,16L504,17L501,20L501,21L498,24L498,25L496,27L496,28L493,31L493,32L490,35L490,36L489,37L487,37L484,34L484,33L478,26L478,25L476,23L476,22L472,18L472,17L470,15L470,14L467,11L467,10L464,7L464,6L462,4ZM409,4L409,78L431,78L431,4ZM317,4L317,21L320,21L321,22L334,22L335,21L352,21L353,22L354,21L364,21L365,22L366,22L367,21L370,21L371,22L374,22L375,23L376,23L378,26L378,34L377,35L377,36L375,38L372,38L371,39L317,39L317,78L340,78L340,58L341,57L349,57L350,58L351,58L362,69L363,69L372,78L401,78L390,67L389,67L381,59L381,58L382,57L386,57L387,56L389,56L390,55L393,54L399,48L399,47L400,46L400,44L401,43L401,38L402,37L402,21L401,20L401,16L400,15L399,12L393,6L392,6L391,5L389,5L388,4ZM227,4L227,21L232,21L233,22L235,22L236,21L262,21L263,22L264,21L273,21L274,22L276,22L277,21L279,21L280,22L283,22L287,26L287,34L283,38L281,38L280,39L227,39L227,78L249,78L250,77L250,58L251,57L295,57L296,56L298,56L299,55L300,55L302,53L303,53L307,49L307,48L309,45L309,43L310,42L310,18L309,17L309,15L308,14L307,11L303,7L302,7L299,5L297,5L296,4Z\"/>\n</svg>";
+ const isPaid=i.payment_status==='paid';
+ const status=invoiceStatusLabel(i.payment_status);
+ const customerAddress=i.customer_billing_address?'<div class="address">'+esc(i.customer_billing_address)+'</div>':'';
+ const customerEmail=i.customer_email?'<div class="subline">'+esc(i.customer_email)+'</div>':'';
+ const sellerForm=i.seller_legal_form?'<div class="subline">'+esc(i.seller_legal_form)+'</div>':'';
+ const sellerSiren=i.seller_siren?'<span>SIREN '+esc(i.seller_siren)+'</span>':'';
+ const sellerSiret=i.seller_siret?'<span>SIRET '+esc(i.seller_siret)+'</span>':'';
+ const statusPayment=isPaid?'<span class="status good">PAYÉE</span>':'<span class="status pending">'+esc(status).toUpperCase()+'</span>';
+ const vatNotice=i.vat_exempt?'<p class="tax-note">'+esc(i.vat_mention||'TVA non applicable, art. 293 B du code général des impôts')+'.</p>':'';
+ const feeLabel=isPaid?'TOTAL TTC':'TOTAL À PAYER';
+ const paymentDate=i.paid_at?'<div class="fact"><span>Règlement</span><strong>'+fmtDate(i.paid_at)+'</strong></div>':'';
+ const style='@page{size:A4;margin:16mm 16mm 18mm}'+
+  '*{box-sizing:border-box}html,body{margin:0;padding:0;background:white;color:#1a2b3d;font:12px/1.52 Arial,Helvetica,sans-serif}'+
+  'body{margin:0 auto;max-width:840px}h1,h2,h3,p{margin:0}'+
+  '.topbar{height:8px;background:#132c44;border-bottom:3px solid #d7af68;margin-bottom:28px}'+
+  '.masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:28px}'+
+  '.identity{flex:1;min-width:0}.logo{width:212px;max-width:90%;height:auto;display:block;margin-bottom:18px}'+
+  '.legal-name{font-weight:800;font-size:13px;color:#162c43}.subline{font-size:11px;color:#617185;margin-top:3px;overflow-wrap:anywhere}'+
+  '.legal-info{margin-top:7px;font-size:11px;color:#617185}.legal-info span+span:before{content:" · ";}'+
+  '.invoice-head{text-align:right;min-width:220px}.invoice-head h1{font-size:29px;letter-spacing:.1em;color:#10283f}'+
+  '.invoice-head .invoice-num{font-size:13px;font-weight:800;margin:4px 0 12px;overflow-wrap:anywhere}'+
+  '.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:800;color:#b28a4b;text-transform:uppercase}'+
+  '.status{display:inline-block;border-radius:5px;padding:5px 10px;font-size:10px;letter-spacing:.08em;font-weight:800}'+
+  '.status.good{background:#e8f3ed;color:#176042}.status.pending{background:#fff2de;color:#925a0e}'+
+  '.section{margin-top:27px}.section-label{margin-bottom:10px;font-size:10px;color:#a77e3e;letter-spacing:.13em;text-transform:uppercase;font-weight:800}'+
+  '.participants{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:21px 0;border-top:1px solid #dbe3eb;border-bottom:1px solid #dbe3eb}'+
+  '.participant h2{font-size:13px;color:#132c44;margin-top:6px}.participant .address{white-space:pre-line;margin-top:5px;color:#425369}'+
+  '.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 22px;margin-top:6px}'+
+  '.fact{display:flex;gap:10px;justify-content:space-between;border-bottom:1px solid #e8edf2;padding:4px 0}.fact span{color:#697a8c}.fact strong{text-align:right;color:#182d42}'+
+  '.service-head{font-size:15px;font-weight:800;color:#132c44;margin:27px 0 9px}'+
+  'table{width:100%;border-collapse:collapse;table-layout:fixed;border:1px solid #dde5ed}'+
+  'thead{background:#142f48;color:#fff}th{padding:12px 11px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;text-align:left}'+
+  'td{padding:15px 11px;border-bottom:1px solid #e5e9ef;vertical-align:top;overflow-wrap:anywhere}'+
+  'th:nth-child(1){width:53%}th:nth-child(2){width:10%}th:nth-child(3){width:18%}th:nth-child(4){width:19%}'+
+  '.center{text-align:center}.number{text-align:right;white-space:nowrap}.strong,.item-name{font-weight:800}'+
+  '.settlement{display:grid;grid-template-columns:1fr 285px;gap:28px;margin-top:24px}'+
+  '.payment-info{padding:16px;border-left:3px solid #d7af68;background:#f6f8fa;color:#516176;font-size:11px;align-self:start}'+
+  '.payment-info strong{display:block;color:#1d344a;font-size:12px;margin-bottom:5px}'+
+  '.totals{border-top:1px solid #dce4eb}.totals .amount{display:flex;justify-content:space-between;gap:16px;padding:9px 0;color:#526477}'+
+  '.totals .amount b{color:#1c3045}.totals .major{background:#142f48;color:white;padding:14px 13px;margin-top:7px;font-size:15px;font-weight:800}'+
+  '.totals .major b{color:white}.totals .balance{font-weight:700;font-size:11px;color:#627184}'+
+  '.footer{margin-top:53px;border-top:2px solid #d7af68;padding-top:13px;font-size:10px;color:#68798b;display:flex;justify-content:space-between;gap:24px}'+
+  '.footer .left{max-width:70%}.tax-note{color:#26394a;font-weight:800;margin-bottom:5px}'+
+  '@media print{body{width:100%;max-width:none}.topbar,thead,.totals .major,.status,.payment-info{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+ return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
+ '<title>Facture '+esc(i.invoice_number||'AK PRIME')+'</title><style>'+style+'</style></head><body>'+
+ '<div class="topbar"></div><header class="masthead"><div class="identity">'+
+ '<div class="logo" role="img" aria-label="AK PRIME">'+logo+'</div>'+
+ '<div class="legal-name">'+esc(i.seller_legal_name||'AK PRIME')+' EI</div>'+sellerForm+
+ '<div class="subline">'+esc(i.seller_address||'')+'</div>'+
+ '<div class="subline">'+esc(i.seller_email||'')+'</div>'+
+ '<div class="legal-info">'+sellerSiren+sellerSiret+'</div></div>'+
+ '<div class="invoice-head"><h1>FACTURE</h1><div class="invoice-num">N° '+esc(i.invoice_number||'—')+'</div>'+statusPayment+'</div></header>'+
+ '<section class="section participants"><div class="participant"><div class="eyebrow">Facturé à</div>'+
+ '<h2>'+esc(i.customer_name||'Client')+'</h2>'+customerAddress+customerEmail+'</div>'+
+ '<div class="participant"><div class="eyebrow">Références</div><div class="facts">'+
+ '<div class="fact"><span>Émission</span><strong>'+fmtDate(i.issue_date)+'</strong></div>'+
+ '<div class="fact"><span>Prestation</span><strong>'+fmtDate(i.service_date)+'</strong></div>'+
+ '<div class="fact"><span>Échéance</span><strong>'+fmtDate(i.due_date)+'</strong></div>'+paymentDate+
+ '</div></div></section>'+
+ '<div class="service-head">Détail de la prestation</div>'+
+ '<table><thead><tr><th>Désignation</th><th class="center">Qté</th><th class="number">Prix unitaire HT</th><th class="number">Montant HT</th></tr></thead>'+
+ '<tbody>'+lines+'</tbody></table>'+
+ '<section class="settlement"><div class="payment-info"><strong>'+esc(i.operation_category||'Prestations de services')+'</strong>'+
+ (isPaid?'Facture acquittée. Merci pour ta confiance.':'Paiement attendu à la date d’échéance indiquée.')+
+ '</div><div class="totals">'+
+ '<div class="amount"><span>Total HT</span><b>'+centsMoney(i.amount_excl_tax_cents)+'</b></div>'+
+ '<div class="amount"><span>TVA</span><b>'+centsMoney(i.tax_cents)+'</b></div>'+
+ '<div class="amount major"><span>'+feeLabel+'</span><b>'+centsMoney(i.amount_incl_tax_cents)+'</b></div>'+
+ (isPaid?'<div class="amount balance"><span>Solde dû</span><b>'+centsMoney(0)+'</b></div>':'')+
+ '</div></section>'+
+ '<footer class="footer"><div class="left">'+vatNotice+
+ '<div>'+esc(i.seller_business_name||'AK PRIME')+' · Facture émise pour une prestation de coaching.</div>'+
+ '<div>Document à conserver pour tes justificatifs.</div></div><div>akprime.fr</div></footer>'+
+ '</body></html>';
 }
 
 function printInvoice(id){
