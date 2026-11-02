@@ -6313,7 +6313,7 @@ function openPublicOfferCheckout(button){
        }
        throw Error('Paiements réels désactivés : seule la simulation Stripe TEST est disponible.');
      }catch(err){
-       errorBox.textContent='Paiement non ouvert : '+(err?.message||'Erreur inattendue')+'. Aucun débit n’a été confirmé.';
+       errorBox.textContent='Impossible de préparer le paiement : '+(err?.message||'Erreur inattendue')+' Aucun débit n’a été confirmé.';
        errorBox.classList.add('show');
      }finally{
        const active=document.getElementById('futureStripeCheckout');if(active){active.disabled=false;active.textContent=window.AKP_PUBLIC_TEST_MODE?'Payer avec Stripe (TEST)':'Payer avec Stripe';}
