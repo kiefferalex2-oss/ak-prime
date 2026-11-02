@@ -4144,6 +4144,11 @@ async function enterClientPortal(user,profile){
  const {data:client,error}=await supa.from('clients').select('*').eq('auth_user_id',user.id).maybeSingle();
  if(error){showClientPending('Impossible de charger ton dossier : '+error.message);return}
  if(!client){showClientPending('Ton compte existe, mais ton accès à l’espace AK PRIME n’est pas encore activé. En production, l’accès sera débloqué après validation du paiement et liaison sécurisée avec ton dossier.');return}
+ // Ne jamais afficher de bandeau TEST dans le portail d'un client réel,
+ // même si ce navigateur a précédemment utilisé le lien de simulation.
+ if(client.is_test!==true){
+   document.querySelectorAll('.akpt-banner, #akClientDemoBanner').forEach(el=>el.remove());
+ }
  const today=localDateISO(), end=new Date(); end.setDate(end.getDate()+20); const endDate=localDateISO(end);
  const [templRes,responseRes,testRes,cycleRes,eventRes,apptRes,checkinRes,slotsRes,policyRes,settingsRes,readsRes,renewalChoiceRes,invoiceRes,reviewRes]=await Promise.all([
    supa.from('questionnaire_templates').select('*').eq('pole',client.current_pole).eq('active',true).order('version',{ascending:false}).limit(1).maybeSingle(),
