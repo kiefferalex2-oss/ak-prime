@@ -6549,6 +6549,7 @@ try{
  window.AKP_PUBLIC_TEST_MODE=akpHasTestTicket||Number(sessionStorage.getItem('akp-test-mode-until')||0)>Date.now();
  if(!window.AKP_PUBLIC_TEST_MODE)sessionStorage.removeItem('akp-test-mode-until');
 }catch{window.AKP_PUBLIC_TEST_MODE=akpHasTestTicket;}
+// Publication commerciale du 02/11/2026 : ventes Stripe réelles ouvertes aux visiteurs du site ; lien TEST isolé.
 window.AKP_LIVE_CHECKOUT_MODE=!window.AKP_PUBLIC_TEST_MODE; // Paiement réel public, TEST uniquement sur lien de simulation.
 initAuth();
 </script>
