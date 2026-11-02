@@ -112,7 +112,16 @@ const renderOriginalPortal=renderClientPortal;
 renderClientPortal=function(...args){
  const result=renderOriginalPortal.apply(this,args);
  const c=clientPortalState?.client;
- if(!c?.is_test)return result;
+ // Strictly a connected, authenticated DEMO dossier. Never show this toolbar
+ // for paid/real clients, even if a test checkout tab was previously opened.
+ const demoAuthorized=c?.is_test===true &&
+   c.auth_user_id===authUser?.id &&
+   c.portal_access_enabled===true &&
+   authProfile?.role==='client';
+ if(!demoAuthorized){
+   document.getElementById('akClientDemoBanner')?.remove();
+   return result;
+ }
  const main=document.querySelector('.client-portal .client-main');
  if(!main)return result;
  if(main.querySelector('#akClientDemoBanner'))return result;
@@ -137,6 +146,13 @@ renderClientPortal=function(...args){
  };
  const btn=banner.querySelector('#akDemoApplyOffer');
  btn.onclick=async()=>{
+  // The backend RPC independently rejects non-test accounts.
+  const current=clientPortalState?.client;
+  if(current?.is_test!==true || current.auth_user_id!==authUser?.id ||
+     current.portal_access_enabled!==true || authProfile?.role!=='client'){
+    banner.remove();
+    return;
+  }
   const offerCode=banner.querySelector('#akDemoSwitchOffer').value;
   if(offerCode===testOfferCode(c)){toast('Cette formule est déjà sélectionnée.');return}
   btn.disabled=true;btn.textContent='Mise à jour…';
