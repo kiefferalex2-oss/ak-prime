@@ -289,7 +289,7 @@ function standalone(s){
   '<div class="akIntroTop"><div class="akIntroBrand">AK PRIME <span style="font-size:10px;color:#8798a8">/ QUESTIONNAIRE INITIAL</span></div>'+
   '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+
   '<button type="button" class="btn ghost small" id="akIntroExit">← Accéder à mon espace</button>'+
-  (c.is_test?'<span style="font-size:10px;font-weight:850;color:#9f7944">COMPTE TEST · SANS PAIEMENT</span>'+
+  (c.is_test===true&&c.auth_user_id===authUser?.id&&c.portal_access_enabled===true&&authProfile?.role==='client'?'<span style="font-size:10px;font-weight:850;color:#9f7944">COMPTE TEST · SANS PAIEMENT</span>'+
    '<select class="select" id="akIntroDemoOffer" aria-label="Offre à tester">'+
    Object.keys(labels).map(key=>'<option value="'+key+'" '+(key===offerCode(c)?'selected':'')+'>'+esc(labels[key])+'</option>').join('')+'</select>'+
    '<button type="button" class="btn ghost small" id="akIntroChangeOffer">Changer de formule test</button>':'')+
@@ -316,6 +316,9 @@ function standalone(s){
  document.getElementById('akIntroLeave')?.addEventListener('click',exitInitialQuestionnaire);
  bindInitialVisio(s);
  document.getElementById('akIntroChangeOffer')?.addEventListener('click',async()=>{
+   const demo=clientPortalState?.client;
+   if(demo?.is_test!==true || demo.auth_user_id!==authUser?.id ||
+      demo.portal_access_enabled!==true || authProfile?.role!=='client')return;
    const btn=document.getElementById('akIntroChangeOffer');
    const next=document.getElementById('akIntroDemoOffer')?.value;
    if(!next||next===offerCode(clientPortalState.client))return;
