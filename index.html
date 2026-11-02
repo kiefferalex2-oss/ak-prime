@@ -5052,8 +5052,12 @@ function renderPublicSite(){
 }
 
 function legalPlaceholder(label){return '<span class="legal-placeholder">'+esc(label)+'</span>'}
-// Compléter uniquement après signature d'une convention avec un médiateur référencé, compétent pour l'activité AK PRIME.
-const AKP_MEDIATOR={name:'',address:'',website:''};
+// Convention de médiation de la consommation SMP signée le 02/11/2026 (référencée CECMC).
+const AKP_MEDIATOR={
+ name:'Société de la Médiation Professionnelle',
+ address:'Alteritae, 5 rue Salvaing, 12000 Rodez, France',
+ website:'https://www.mediateur-consommation-smp.fr/'
+};
 function akpMediatorDetails(){
  const m=AKP_MEDIATOR;
  if(m.name&&m.address&&/^https:\/\//.test(m.website)){
@@ -5071,6 +5075,7 @@ function openPublicLegal(type){
     '<h3>Responsable de la publication</h3><p>Alex Kieffer.</p>'+
     '<h3>Activité</h3><p>Coaching sportif, préparation physique et préparation mentale non clinique, à distance et en présentiel. L’activité d’encadrement sportif est exercée dans le cadre des qualifications et de la carte professionnelle détenues par l’exploitant.</p>'+
     '<h3>Hébergement</h3><p>Le site est hébergé par <strong>Netlify, Inc.</strong>, 101 2nd Street, San Francisco, CA 94105, États-Unis. Contact : <a href="mailto:support@netlify.com">support@netlify.com</a>.</p>'+
+    '<h3>Médiation de la consommation</h3>'+akpMediatorDetails()+
     '<h3>Propriété intellectuelle</h3><p>Les textes, éléments graphiques, interfaces, méthodes de présentation et contenus propres à AK PRIME sont protégés. Toute reproduction ou réutilisation non autorisée est interdite, sous réserve des droits appartenant à des tiers.</p>'+
    '</div>'
   },
