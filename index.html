@@ -6302,7 +6302,7 @@ function openPublicOfferCheckout(button){
            body:JSON.stringify({offerCode:p.offerCode,duration,paymentMode,fullName,email,
              startDate:startMode==='date'?startDate:null,earlyStart,
              acceptedTerms:true,acceptedPrivacy:true,healthConsent:true,
-             cgvVersion:'akprime-cgv-2026-10-20-firm-commitment'})
+             cgvVersion:'akprime-cgv-2026-11-02-mediation-smp'})
          });
          const data=await result.json().catch(()=>({}));
          if(!result.ok||!data.url)throw Error(data.error||'Paiement sécurisé indisponible');
