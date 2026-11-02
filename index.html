@@ -4518,7 +4518,7 @@ function renderBookingPanel(s){
  const next=future[0];
  const preview=!next?akTestVirtualVisio(s):null;
  const history=all.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)||new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,10);
- const slots=(s.availableSlots||[]).slice();
+ const slots=(s.availableSlots||[]).filter(sl=>Date.parse(sl.starts_at)>=Date.now()+24*60*60*1000).slice();
  const policy=s.bookingPolicy||{};
  const quotaText=policy.quota_period==='week'
    ? (policy.quota_count||1)+' visio'+((policy.quota_count||1)>1?'s':'')+' par semaine'
@@ -4559,7 +4559,8 @@ function renderBookingPanel(s){
  const hist=history.length?history.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join(''):'<div class="muted">Aucune visio dans l’historique.</div>';
  return nextActions+
  '<div class="client-section-card akWowBookingCard"><div class="row between"><div><h3 style="margin-bottom:3px">Choisis ton prochain créneau</h3><div class="muted tiny">'+esc(quotaText)+' • '+esc(policy.duration_minutes||30)+' min</div></div><span class="status blue">3 semaines</span></div>'+
- '<div class="client-week-tabs">'+weekButtons+'</div>'+
+ '<div class="muted tiny" style="margin-top:9px">Réservation possible au minimum 24 heures à l’avance. Les créneaux plus proches ne sont pas proposés.</div>'+ 
+ '<div class="client-week-tabs">'+weekButtons+'</div>'+ 
  (weekSlots.length?'<div class="client-day-strip">'+dayButtons+'</div><div class="section-title" style="margin-top:6px">Horaires disponibles</div><div class="client-time-grid">'+timeButtons+'</div>':'<div class="muted" style="padding:16px 0">Aucun créneau disponible sur cette semaine.</div>')+
  '<div class="muted tiny" style="margin-top:13px">Une annulation à moins de 24 h ou une absence reste comptabilisée dans ton quota.</div></div>'+
  '<details class="client-collapsed" style="margin-top:13px"><summary>Historique de mes visios <span class="muted tiny">('+history.length+')</span></summary><div class="list" style="margin-top:12px">'+hist+'</div></details>';
@@ -4570,6 +4571,11 @@ function bindBookingButtons(){
  document.querySelectorAll('.clientDayBtn').forEach(b=>b.onclick=()=>{clientVisioDay=b.dataset.date||'';const panel=document.getElementById('clientBookingPanel');if(panel){panel.innerHTML=renderBookingPanel(clientPortalState);bindBookingButtons()}});
  document.querySelectorAll('.bookSlot').forEach(b=>b.onclick=async()=>{
    const start=b.dataset.start;
+   if(!Number.isFinite(Date.parse(start))||Date.parse(start)<Date.now()+24*60*60*1000){
+     alert('Réserve au moins 24 heures avant le début de la visio. Actualise les disponibilités pour choisir un autre créneau.');
+     await refreshClientBookingData();
+     return;
+   }
    if(!confirm('Réserver la visio du '+fmtDateTime(start)+' ?'))return;
    b.disabled=true;
    const {error}=await supa.rpc('book_my_appointment',{p_starts_at:start});
