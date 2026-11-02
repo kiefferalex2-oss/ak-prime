@@ -31,7 +31,11 @@ Deno.serve(async req=>{
  const hash=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",te.encode(value)))).map(b=>b.toString(16).padStart(2,"0")).join("");
  const ip=req.headers.get("cf-connecting-ip")||req.headers.get("x-forwarded-for")?.split(",")[0]||"unknown";
  const limit=await admin.rpc("reserve_stripe_live_checkout",{p_key_hash:await hash(ip+"|"+email)});
- if(limit.error||limit.data!==true)return respond({error:"Trop de demandes, réessaie plus tard."},429,cors);
+ if(limit.error){
+  console.error("Live checkout rate-limit database error",limit.error.code||"unknown");
+  return respond({error:"Le contrôle du paiement rencontre une erreur technique. Réessaie dans quelques instants ; aucun débit n’a été effectué."},503,cors);
+ }
+ if(limit.data!==true)return respond({error:"Trop de tentatives de paiement pour cette adresse e-mail sur une courte période. Réessaie dans un moment ; aucun débit n’a été effectué."},429,cors);
  const quote=await admin.rpc("quote_offer",{p_offer_code:offer,p_commitment_months:months,p_payment_mode:mode});
  const q=Array.isArray(quote.data)?quote.data[0]:quote.data;
  if(quote.error||!q||q.currency!=="eur"||q.monthly_equivalent_cents<=0||q.total_cents<=0)return respond({error:"Tarif indisponible"},503,cors);
