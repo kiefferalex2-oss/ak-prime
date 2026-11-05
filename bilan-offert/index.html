@@ -120,6 +120,7 @@ html{scroll-behavior:smooth}
      <div class="akp-discovery-fields">
       <div class="akp-discovery-field"><label for="akpDiscoveryName">Nom et prénom *</label><input id="akpDiscoveryName" name="full_name" type="text" maxlength="120" autocomplete="name" required placeholder="Votre nom complet"></div>
       <div class="akp-discovery-field"><label for="akpDiscoveryEmail">Adresse e-mail *</label><input id="akpDiscoveryEmail" name="email" type="email" maxlength="254" autocomplete="email" required placeholder="vous@exemple.fr"></div>
+      <div class="akp-discovery-field akp-discovery-field-wide"><label for="akpDiscoveryPhone">Numéro de téléphone *</label><input id="akpDiscoveryPhone" name="phone" type="tel" inputmode="tel" maxlength="26" autocomplete="tel" required minlength="9" placeholder="Ex. 06 12 34 56 78" aria-describedby="akpDiscoveryPhoneHint"><small id="akpDiscoveryPhoneHint" style="color:#6b7b91;font-size:11px">Pour organiser votre rendez-vous et vous joindre si nécessaire.</small></div>
       <div class="akp-discovery-field akp-discovery-field-wide"><label for="akpDiscoveryGoal">Votre objectif (facultatif)</label><textarea id="akpDiscoveryGoal" name="goal" maxlength="600" rows="2" placeholder="Remise en forme, prise de masse, performance, préparation mentale…"></textarea></div>
      </div>
      <div class="akp-discovery-bot" aria-hidden="true"><label for="akpDiscoveryWebsite">Site internet</label><input id="akpDiscoveryWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
@@ -194,11 +195,14 @@ function akpInitDiscoveryPublic(){
    startsAt:akpDiscoveryTime,
    name:document.getElementById("akpDiscoveryName").value.trim(),
    email:document.getElementById("akpDiscoveryEmail").value.trim(),
+   phone:document.getElementById("akpDiscoveryPhone").value.trim(),
    goal:document.getElementById("akpDiscoveryGoal").value.trim(),
    website:document.getElementById("akpDiscoveryWebsite").value,
    acceptedPrivacy:document.getElementById("akpDiscoveryPrivacy").checked
   };
   if(!form.reportValidity())return;
+  const digits=data.phone.replace(/[^0-9]/g,"");
+  if(!/^[+0-9 ().-]{9,26}$/.test(data.phone)||digits.length<9||digits.length>15){akpDiscoveryStatus("Indiquez un numéro de téléphone valide.","error");document.getElementById("akpDiscoveryPhone").focus();return;}
   if(btn){btn.disabled=true;btn.textContent="Réservation en cours…";}
   akpDiscoveryStatus("Nous vérifions que ce créneau est encore disponible.");
   try{
