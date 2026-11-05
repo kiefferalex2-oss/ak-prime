@@ -2123,6 +2123,51 @@ table{background:#fff}th{background:#f7f9fb;color:#7b8797;font-size:10px;font-we
 .public-seo-links{display:flex;gap:11px 14px;flex-wrap:wrap;align-items:center}
 .public-seo-links a{color:#d0ae74;text-decoration:none;font-weight:700;font-size:11px}
 .public-seo-links a:hover{text-decoration:underline;color:#f2d49d}
+
+/* AK PRIME — bilan découverte 20 minutes, intégré au planning du coach */
+html{scroll-behavior:smooth}
+.akp-discovery-hero{margin-top:24px;border:1px solid rgba(218,176,101,.6);border-radius:16px;padding:17px 19px;background:linear-gradient(120deg,rgba(211,171,98,.16),rgba(22,40,64,.9));box-shadow:0 14px 30px rgba(0,0,0,.17);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.akp-discovery-hero strong{display:block;color:#e8c78b;letter-spacing:.07em;font-size:11px;margin-bottom:7px}
+.akp-discovery-hero span{display:block;font-size:15px;font-weight:750;color:#fff;max-width:340px;line-height:1.5}
+.akp-discovery-hero a{display:inline-flex;align-items:center;justify-content:center;background:#d3ab62;color:#101d30;text-decoration:none;border-radius:11px;padding:13px 17px;font-weight:900;white-space:nowrap}
+.akp-discovery-section{scroll-margin-top:25px;background:linear-gradient(180deg,#f0f4fa,#fff);border-bottom:1px solid #e0e7f0;padding:64px 18px 74px;color:#15263e}
+.akp-discovery-inner{max-width:1110px;margin:0 auto}
+.akp-discovery-kicker{font-size:12px;color:#9f7228;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.akp-discovery-section h2{font-size:clamp(29px,3vw,43px);margin:0 0 9px;letter-spacing:-.035em;line-height:1.15;color:#13243a}
+.akp-discovery-section .akp-discovery-lead{font-size:16px;line-height:1.65;color:#56657a;margin:0 0 26px;max-width:750px}
+.akp-discovery-layout{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.3fr);gap:22px;align-items:start}
+.akp-discovery-info{background:linear-gradient(155deg,#142c48,#0d1b30);padding:27px;border-radius:20px;color:#e4ecf6;box-shadow:0 12px 35px rgba(8,25,43,.14)}
+.akp-discovery-info h3{color:#fff;font-size:22px;margin:0 0 16px}
+.akp-discovery-info ul{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:15px}
+.akp-discovery-info li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5}
+.akp-discovery-info li:before{content:'✓';color:#e7bd76;font-weight:900}
+.akp-discovery-info .akp-discovery-free{color:#e7bd76;font-size:13px;font-weight:900;border-top:1px solid #35516c;padding-top:17px}
+.akp-discovery-formbox{background:#fff;border:1px solid #dde5ee;border-radius:20px;padding:26px;box-shadow:0 16px 45px rgba(20,42,71,.08)}
+.akp-discovery-formbox h3{font-size:21px;color:#152942;margin:0 0 4px}
+.akp-discovery-aux{margin:0 0 18px;color:#64738a;font-size:13px}
+.akp-discovery-label{font-size:12px;font-weight:900;color:#34475f;margin:15px 0 9px;text-transform:uppercase;letter-spacing:.06em}
+.akp-discovery-days,.akp-discovery-times{display:flex;flex-wrap:wrap;gap:8px}
+.akp-discovery-choice{border:1px solid #cfdae7;background:#f8fafc;border-radius:10px;padding:9px 12px;color:#1a2b45;font-weight:700;font-size:13px;cursor:pointer;min-width:70px;text-align:center}
+.akp-discovery-choice:hover{border-color:#bb9150}
+.akp-discovery-choice[aria-pressed="true"]{color:#121e2f;background:#f4deaf;border-color:#b9914d;box-shadow:inset 0 0 0 1px #b9914d}
+.akp-discovery-choice:focus-visible{outline:3px solid #cfa454;outline-offset:2px}
+.akp-discovery-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 10px}
+.akp-discovery-field{display:flex;flex-direction:column;gap:6px}
+.akp-discovery-field label{font-size:12px;color:#405069;font-weight:800}
+.akp-discovery-field input,.akp-discovery-field textarea{border:1px solid #cdd7e4;border-radius:10px;padding:12px 13px;font-size:14px;color:#182b42;background:#fff;min-width:0;width:100%}
+.akp-discovery-field input:focus,.akp-discovery-field textarea:focus{outline:2px solid #d1a65a;outline-offset:1px}
+.akp-discovery-field-wide{grid-column:1/-1}
+.akp-discovery-privacy{display:flex;align-items:start;gap:9px;font-size:12px;color:#506079;line-height:1.55;margin:12px 0 18px}
+.akp-discovery-privacy input{margin-top:3px;flex:0 0 auto}
+.akp-discovery-privacy a{color:#214a80;text-decoration:underline}
+.akp-discovery-submit{width:100%;border:0;border-radius:11px;background:#d3ab62;color:#101c2e;font-weight:900;font-size:15px;padding:14px;cursor:pointer}
+.akp-discovery-submit:disabled{background:#e6eaf0;color:#7d8998;cursor:not-allowed}
+.akp-discovery-status{min-height:20px;color:#536780;font-size:13px;line-height:1.55;padding:4px 0}
+.akp-discovery-status.error{color:#b42318}
+.akp-discovery-status.success{color:#146c50;font-weight:700}
+.akp-discovery-bot{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+@media(max-width:820px){.akp-discovery-layout{grid-template-columns:1fr}.akp-discovery-info{padding:21px}}
+@media(max-width:560px){.akp-discovery-section{padding:43px 14px 53px}.akp-discovery-formbox{padding:18px}.akp-discovery-fields{grid-template-columns:1fr}.akp-discovery-hero{padding:16px}.akp-discovery-hero a{width:100%}.akp-discovery-choice{min-width:63px;padding:9px 10px}}
 </style>
 </head>
 <body>
@@ -2292,10 +2337,11 @@ async function loadSupabaseData(){
    supa.from('invoices').select('*').order('issue_date',{ascending:false}).order('created_at',{ascending:false}),
    supa.from('payment_transactions').select('*').order('paid_at',{ascending:false}),
    supa.from('revenue_entries').select('*').order('receipt_date',{ascending:false}).order('id',{ascending:false}),
-   supa.from('coach_new_client_events').select('owner_id,client_id,created_at,is_test').eq('owner_id',authUser.id).order('created_at',{ascending:false})
+   supa.from('coach_new_client_events').select('owner_id,client_id,created_at,is_test').eq('owner_id',authUser.id).order('created_at',{ascending:false}),
+   supa.from('akp_discovery_bookings').select('id,coach_user_id,starts_at,duration_minutes,full_name,email,goal,status,created_at').eq('coach_user_id',authUser.id).order('starts_at')
  ]);
  const err=reqs.find(r=>r.error)?.error;if(err)throw err;
- const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[],billingSettings=reqs[17].data||null,invoiceRows=reqs[18].data||[],paymentRows=reqs[19].data||[],revenueRows=reqs[20].data||[],coachNewClientEvents=reqs[21].data||[];
+ const cr=reqs[0].data||[],tr=reqs[1].data||[],cyr=reqs[2].data||[],chr=reqs[3].data||[],er=reqs[4].data||[],wr=reqs[5].data||[],qr=reqs[6].data||[],pr=reqs[7].data||[],obr=reqs[8].data||[],awr=reqs[9].data||[],adwr=reqs[10].data||[],aer=reqs[11].data||[],apr=reqs[12].data||[],rr=reqs[13].data||[],appSettings=reqs[14].data||null,notificationReads=reqs[15].data||[],rcr=reqs[16].data||[],billingSettings=reqs[17].data||null,invoiceRows=reqs[18].data||[],paymentRows=reqs[19].data||[],revenueRows=reqs[20].data||[],coachNewClientEvents=reqs[21].data||[],discoveryBookings=reqs[22].data||[];
  const tests=groupBy(tr,'client_id'),cycles=groupBy(cyr,'client_id'),checks=groupBy(chr,'client_id'),events=groupBy(er,'client_id'),questions=groupBy(qr,'client_id'),renewals=groupBy(rr,'client_id'),renewalChoices=groupBy(rcr,'client_id'),invoices=groupBy(invoiceRows,'client_id');
  const work=Object.fromEntries(wr.map(x=>[x.client_id,x]));
  const onboard=Object.fromEntries(obr.map(x=>[x.client_id,x]));
@@ -2342,6 +2388,7 @@ async function loadSupabaseData(){
  db.availabilityDateWindows=adwr;
  db.availabilityExceptions=aer;
  db.appointments=apr.map(a=>({...a,clientName:db.clients.find(c=>c.id===a.client_id)?.name||'Client'}));
+ db.discoveryBookings=discoveryBookings;
  db.settings=db.settings||{};
  db.settings.whatsappNumber=appSettings?.whatsapp_number||'';
  db.settings.whatsappMessage=appSettings?.whatsapp_default_message||'Bonjour Alex, je te contacte concernant mon accompagnement AK PRIME.';
@@ -3486,6 +3533,7 @@ function calendarPage(){
  const days=[['Lundi',1],['Mardi',2],['Mercredi',3],['Jeudi',4],['Vendredi',5],['Samedi',6],['Dimanche',7]];
  const windows=db.availabilityWindows||[], dated=db.availabilityDateWindows||[], exceptions=db.availabilityExceptions||[];
  const appointments=db.appointments||[];
+ const discovery=(db.discoveryBookings||[]).slice().sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const upcoming=appointments.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)>=new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
  const toProcess=appointments.filter(a=>['scheduled','confirmed'].includes(a.status)&&new Date(a.starts_at)<new Date()).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at));
  const visioHistory=appointments.filter(a=>['completed','cancelled','cancelled_late','no_show'].includes(a.status)).sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at)).slice(0,20);
@@ -3499,6 +3547,8 @@ function calendarPage(){
      const iso=localDateISO(d);
      const label=new Intl.DateTimeFormat('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit'}).format(d);
      const rows=dated.filter(w=>String(w.availability_date).slice(0,10)===iso);
+     const discoveryForDay=discovery.filter(b=>b.status==='scheduled'&&akpDiscoveryParisDate(b.starts_at)===iso);
+     const clientForDay=appointments.filter(b=>['scheduled','confirmed'].includes(b.status)&&akpDiscoveryParisDate(b.starts_at)===iso);
      const fullBlock=exceptions.some(e=>iso>=String(e.exception_date).slice(0,10)&&iso<=String(e.end_date||e.exception_date).slice(0,10)&&!e.start_time&&!e.end_time);
      const recurring=windows.filter(w=>w.weekday===(((d.getDay()+6)%7)+1));
      const detail=rows.length
@@ -3508,7 +3558,8 @@ function calendarPage(){
          : recurring.length
            ? '<div class="tiny muted">Planning habituel : '+recurring.map(w=>esc(String(w.start_time).slice(0,5))+'–'+esc(String(w.end_time).slice(0,5))).join(' • ')+'</div>'
            : '<div class="tiny muted">Aucune disponibilité</div>';
-     return '<div class="card panel" style="min-width:170px;padding:12px"><div class="row between"><div><strong style="text-transform:capitalize">'+esc(label)+'</strong><div class="tiny '+(rows.length?'account-good':'muted')+'">'+(rows.length?'Planning précis':'')+'</div></div><button class="btn ghost small addDateAvailability" data-date="'+iso+'">+</button></div><div class="list" style="margin-top:8px">'+detail+'</div></div>';
+     const blocked=discoveryForDay.map(b=>'<div class="tiny" style="color:#805a19;margin-top:7px">● '+esc(fmtTime(b.starts_at))+' — Bilan offert · '+esc(b.full_name)+'</div>').join('')+clientForDay.map(b=>'<div class="tiny" style="color:#395e86;margin-top:7px">● '+esc(fmtTime(b.starts_at))+' — Visio client</div>').join('');
+     return '<div class="card panel" style="min-width:170px;padding:12px"><div class="row between"><div><strong style="text-transform:capitalize">'+esc(label)+'</strong><div class="tiny '+(rows.length?'account-good':'muted')+'">'+(rows.length?'Planning précis':'')+'</div></div><button class="btn ghost small addDateAvailability" data-date="'+iso+'">+</button></div><div class="list" style="margin-top:8px">'+detail+blocked+'</div></div>';
    }).join('');
    return '<div style="margin-top:'+(wi?18:12)+'px"><div class="section-title">Semaine '+(wi+1)+'</div><div style="display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:9px;overflow:auto;padding-bottom:4px">'+cards+'</div></div>';
  }).join('');
@@ -3519,6 +3570,21 @@ function calendarPage(){
  }).join('');
 
  const exRows=exceptions.map(e=>{const end=String(e.end_date||e.exception_date).slice(0,10),range=end!==String(e.exception_date).slice(0,10)?fmtDate(e.exception_date)+' → '+fmtDate(end):fmtDate(e.exception_date);return '<div class="item row between"><div><strong>'+range+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée(s) entière(s)')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>'}).join('');
+ const discoveryNext=discovery.filter(b=>b.status==='scheduled'&&new Date(b.starts_at)>=new Date());
+ const discoveryOverdue=discovery.filter(b=>b.status==='scheduled'&&new Date(b.starts_at)<new Date());
+ const discoveryHistory=discovery.filter(b=>b.status!=='scheduled').slice().reverse().slice(0,15);
+ const discoveryRow=(b,actions)=>'<div class="item"><div class="row between" style="align-items:flex-start"><div><strong>'+fmtDateTime(b.starts_at)+' — '+esc(b.full_name)+'</strong><div class="tiny muted">'+esc(b.email)+' · Bilan découverte · 20 min</div>'+(b.goal?'<div class="tiny muted" style="margin-top:5px">Objectif : '+esc(b.goal)+'</div>':'')+'</div><span class="status '+(b.status==='scheduled'?'blue':b.status==='completed'?'green':'amber')+'">'+esc(({scheduled:'Réservé',cancelled:'Annulé',completed:'Réalisé',no_show:'Absent'})[b.status]||b.status)+'</span></div>'+(actions?'<div class="row" style="margin-top:9px;flex-wrap:wrap">'+actions+'</div>':'')+'</div>';
+ const discoveryUpRows=discoveryNext.map(b=>discoveryRow(b,
+  '<button class="btn ghost small akpDiscoveryCoachAction" data-id="'+esc(b.id)+'" data-status="cancelled">Annuler / libérer</button>')).join('');
+ const discoveryOverdueRows=discoveryOverdue.map(b=>discoveryRow(b,
+  '<button class="btn primary small akpDiscoveryCoachAction" data-id="'+esc(b.id)+'" data-status="completed">Marquer réalisé</button>'+
+  '<button class="btn ghost small akpDiscoveryCoachAction" data-id="'+esc(b.id)+'" data-status="no_show">Absent</button>')).join('');
+ const discoveryPanel='<div class="card panel" style="margin-bottom:13px;border:1px solid #d7b473;background:linear-gradient(135deg,#fffaf0,#fff)">'+
+  '<div class="row between"><div><h3 style="margin-bottom:4px">Bilans découverte offerts · 20 min</h3><div class="muted tiny">Réservations depuis le site. Les créneaux sont automatiquement bloqués pour tous les clients.</div></div><span class="status amber">'+discoveryNext.length+' à venir</span></div>'+
+  '<div class="grid2" style="margin-top:13px"><div><strong>À venir</strong><div class="list" style="margin-top:8px">'+(discoveryUpRows||'<div class="muted tiny">Aucun bilan réservé.</div>')+'</div></div>'+
+  '<div><strong>À clôturer</strong><div class="list" style="margin-top:8px">'+(discoveryOverdueRows||'<div class="muted tiny">Aucun bilan passé en attente.</div>')+'</div></div></div>'+
+  (discoveryHistory.length?'<details style="margin-top:13px"><summary class="muted tiny" style="cursor:pointer">Historique des bilans ('+discoveryHistory.length+')</summary><div class="list" style="margin-top:8px">'+discoveryHistory.map(b=>discoveryRow(b,'')).join('')+'</div></details>':'')+
+  '</div>';
  const apptRows=upcoming.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min • <span class="status blue">'+appointmentStatusLabel(a.status)+'</span></div></div><div class="row"><button class="link openClient" data-id="'+a.client_id+'">Dossier</button><button class="link cancelAppointment" data-id="'+a.id+'" data-client-id="'+a.client_id+'">Annuler</button></div></div>').join('');
  const processRows=toProcess.map(a=>'<div class="item"><div class="row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">À clôturer</div></div><button class="link openClient" data-id="'+a.client_id+'">Dossier</button></div><div class="row" style="margin-top:8px"><button class="btn primary small coachCompleteVisio" data-id="'+a.id+'">Marquer réalisée</button><button class="btn danger small coachNoShowVisio" data-id="'+a.id+'">Absent</button></div></div>').join('');
  const historyRows=visioHistory.map(a=>'<div class="item row between"><div><strong>'+fmtDateTime(a.starts_at)+' — '+esc(a.clientName)+'</strong><div class="muted tiny">'+esc(a.appointment_type||'Visio')+' • '+a.duration_minutes+' min</div></div><span class="status '+appointmentStatusTone(a.status)+'">'+esc(appointmentStatusLabel(a.status))+'</span></div>').join('');
@@ -3527,6 +3593,7 @@ function calendarPage(){
  '<div class="card panel" style="margin-bottom:13px"><div class="row between"><div><h3 style="margin-bottom:4px">Planning des 3 prochaines semaines</h3><div class="muted tiny">Clique sur + pour définir précisément tes disponibilités d’une date. Dès qu’une date possède un planning précis, il remplace le planning hebdomadaire habituel pour ce jour.</div></div><span class="status green">Temps réel</span></div>'+threeWeeks+'</div>'+
  '<div class="card panel" style="margin-bottom:13px"><div><h3 style="margin-bottom:4px">Planning hebdomadaire habituel</h3><div class="muted tiny">Facultatif : il sert de base pour les jours où tu n’as pas défini de planning précis.</div></div>'+
  '<div style="display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:10px;overflow:auto;margin-top:14px;padding-bottom:4px">'+weekly+'</div></div>'+
+ discoveryPanel+
  '<div class="grid2"><div class="card panel"><h3>Indisponibilités ponctuelles</h3><div class="list">'+(exRows||'<div class="muted">Aucune exception enregistrée.</div>')+'</div></div>'+
  '<div class="card panel"><h3>Rendez-vous à venir</h3><div class="list">'+(apptRows||'<div class="muted">Aucune visio réservée.</div>')+'</div></div></div>'+
  '<div class="grid2" style="margin-top:13px"><div class="card panel"><h3>Visios à clôturer</h3><div class="list">'+(processRows||'<div class="muted">Aucune visio passée en attente de statut.</div>')+'</div></div>'+
@@ -3908,6 +3975,19 @@ function bind(){
  document.querySelectorAll('.deleteAvailability').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_windows').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Disponibilité retirée');render()});
  document.getElementById('addException')?.addEventListener('click',openExceptionModal);
  document.querySelectorAll('.deleteException').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_exceptions').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Indisponibilité retirée');render()});
+
+ document.querySelectorAll('.akpDiscoveryCoachAction').forEach(button=>button.onclick=async()=>{
+  const action=button.dataset.status,id=button.dataset.id;
+  const booking=(db.discoveryBookings||[]).find(b=>b.id===id);
+  if(!booking||!['cancelled','completed','no_show'].includes(action))return;
+  const label=action==='cancelled'?'annuler ce bilan et libérer le créneau':action==='completed'?'marquer ce bilan réalisé':'marquer le participant absent';
+  if(!confirm('Souhaites-tu '+label+' pour '+booking.full_name+' ?'))return;
+  button.disabled=true;
+  const {error}=await supa.from('akp_discovery_bookings').update({status:action}).eq('id',id).eq('coach_user_id',authUser.id);
+  if(error){toast('Impossible de modifier le bilan : '+error.message);button.disabled=false;return}
+  await loadSupabaseData();toast('Bilan mis à jour · planning synchronisé');render();
+ });
+
  document.querySelectorAll('.cancelAppointment').forEach(b=>b.onclick=async()=>{if(!confirm('Annuler cette visio ? Le créneau sera immédiatement libéré.'))return;const a=(db.appointments||[]).find(x=>x.id===b.dataset.id);const {error}=await supa.from('appointments').update({status:'cancelled',cancelled_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);if(a)await supa.from('appointment_events').insert({appointment_id:a.id,client_id:a.client_id,event_type:'cancelled',old_starts_at:a.starts_at,detail:'Visio annulée par le coach.'});await loadSupabaseData();toast('Visio annulée');render()});
  document.querySelectorAll('.coachCompleteVisio').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('appointments').update({status:'completed',completed_at:new Date().toISOString()}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Visio marquée réalisée');render()});
  document.querySelectorAll('.coachNoShowVisio').forEach(b=>b.onclick=async()=>{if(!confirm('Marquer le client absent ? '+((db.appointments||[]).find(a=>a.id===b.dataset.id)?.appointment_type==='Visio initiale'?'La visio initiale reste hors quota.':'Cette visio restera comptabilisée dans son quota.')))return;const {error}=await supa.from('appointments').update({status:'no_show'}).eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Absence enregistrée');render()});
@@ -5048,13 +5128,15 @@ async function akpLoadPublishedReviews(){
  box.innerHTML='<div class="akpReviewsGrid">'+data.map(x=>'<article class="akpReviewCard"><div class="akpReviewStars" aria-label="'+esc(x.rating)+' étoiles sur 5">'+('★'.repeat(x.rating)+'☆'.repeat(5-x.rating))+'</div><blockquote>'+esc(x.review_text)+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+'</strong><span>'+esc(x.pole_label)+' · '+esc(x.offer_label)+'</span><small>Expérience du '+esc(fmtDate(x.experience_date))+' · publié le '+esc(fmtDate(x.published_at))+'</small></div></article>').join('')+'</div>';
 }
 
+function akpDiscoveryPublicSection(){return "\n<section id=\"bilan-offert\" class=\"akp-discovery-section\" aria-labelledby=\"akpDiscoveryTitle\">\n <div class=\"akp-discovery-inner\">\n  <div class=\"akp-discovery-kicker\">UN PREMIER ÉCHANGE, SANS ENGAGEMENT</div>\n  <h2 id=\"akpDiscoveryTitle\">Votre premier bilan découverte est offert.</h2>\n  <p class=\"akp-discovery-lead\">20 minutes en visioconférence pour faire le point sur vos objectifs et voir comment AK PRIME peut vous accompagner. Aucune souscription nécessaire.</p>\n  <div class=\"akp-discovery-layout\">\n   <div class=\"akp-discovery-info\">\n    <h3>20 minutes pour faire le point.</h3>\n    <ul>\n     <li>Parlez-nous de vos objectifs et de votre situation actuelle.</li>\n     <li>Échangez avec un coach diplômé sur vos besoins.</li>\n     <li>Découvrez les accompagnements réellement adaptés à votre profil.</li>\n    </ul>\n    <div class=\"akp-discovery-free\">✓ Offert · En visio · Sans engagement · Partout en France</div>\n   </div>\n   <div class=\"akp-discovery-formbox\">\n    <h3>Choisissez votre créneau</h3>\n    <p class=\"akp-discovery-aux\">Heure de Paris · Réservation au moins 24 h à l’avance · Créneau bloqué dès validation.</p>\n    <div class=\"akp-discovery-label\">1. Sélectionnez un jour</div>\n    <div id=\"akpDiscoveryDays\" class=\"akp-discovery-days\"><span class=\"akp-discovery-status\">Chargement des disponibilités…</span></div>\n    <div class=\"akp-discovery-label\">2. Choisissez une heure</div>\n    <div id=\"akpDiscoveryTimes\" class=\"akp-discovery-times\"><span class=\"akp-discovery-status\">Sélectionnez une date.</span></div>\n    <form id=\"akpDiscoveryForm\">\n     <div class=\"akp-discovery-label\">3. Vos coordonnées</div>\n     <div class=\"akp-discovery-fields\">\n      <div class=\"akp-discovery-field\"><label for=\"akpDiscoveryName\">Nom et prénom *</label><input id=\"akpDiscoveryName\" name=\"full_name\" type=\"text\" maxlength=\"120\" autocomplete=\"name\" required placeholder=\"Votre nom complet\"></div>\n      <div class=\"akp-discovery-field\"><label for=\"akpDiscoveryEmail\">Adresse e-mail *</label><input id=\"akpDiscoveryEmail\" name=\"email\" type=\"email\" maxlength=\"254\" autocomplete=\"email\" required placeholder=\"vous@exemple.fr\"></div>\n      <div class=\"akp-discovery-field akp-discovery-field-wide\"><label for=\"akpDiscoveryGoal\">Votre objectif (facultatif)</label><textarea id=\"akpDiscoveryGoal\" name=\"goal\" maxlength=\"600\" rows=\"2\" placeholder=\"Remise en forme, prise de masse, performance, préparation mentale…\"></textarea></div>\n     </div>\n     <div class=\"akp-discovery-bot\" aria-hidden=\"true\"><label for=\"akpDiscoveryWebsite\">Site internet</label><input id=\"akpDiscoveryWebsite\" name=\"website\" type=\"text\" tabindex=\"-1\" autocomplete=\"off\"></div>\n     <label class=\"akp-discovery-privacy\"><input id=\"akpDiscoveryPrivacy\" type=\"checkbox\" required><span>J’accepte que mes coordonnées soient utilisées par AK PRIME uniquement pour organiser ce bilan et me recontacter à son sujet. <a href=\"?confidentialite=1\">Politique de confidentialité</a>.</span></label>\n     <button id=\"akpDiscoverySubmit\" class=\"akp-discovery-submit\" type=\"submit\" disabled>Choisissez votre créneau pour réserver</button>\n     <div id=\"akpDiscoveryStatus\" class=\"akp-discovery-status\" role=\"status\" aria-live=\"polite\"></div>\n    </form>\n   </div>\n  </div>\n </div>\n</section>";}
 function renderPublicSite(){
  return '<div class="public-site" id="accueil">'+
  '<div class="public-nav-wrap"><div class="public-nav"><a class="public-logo" href="#accueil" aria-label="AK PRIME, retour en haut de page"><img class="ak-brand-logo" src="./assets/ak-prime-wordmark-white-gold.svg?v=20261029-white" alt="AK PRIME" width="621" height="82" decoding="async"></a><nav class="public-links" aria-label="Navigation principale AK PRIME"><a href="#accueil">Accueil</a><a href="#methode">Les pôles</a><a href="#apropos">Le coach</a><a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a><a href="#offres">Les offres</a><a href="#fonctionnement">Comment ça marche</a><a href="#outils">Vos outils</a><a href="#faq">FAQ</a><a href="#avis">Avis clients</a><button class="public-login-btn" id="publicLoginBtn">Se connecter</button></nav>'+
  '<button type="button" class="public-mobile-toggle" id="publicMobileToggle" aria-controls="publicMobileMenu" aria-expanded="false" aria-label="Ouvrir le menu de navigation"><span class="public-mobile-menu-glyph" aria-hidden="true">☰</span><span>Menu</span></button></div>'+
  '<nav class="public-mobile-panel" id="publicMobileMenu" aria-label="Navigation mobile AK PRIME" hidden>'+
    '<a href="#accueil">Accueil</a>'+
-   '<a href="#methode">Les pôles</a>'+
+   '<a href="#bilan-offert">Bilan offert</a>'+ 
+   '<a href="#bilan-offert">Bilan offert</a><a href="#methode">Les pôles</a>'+
    '<a href="#apropos">Le coach</a>'+
    '<a href="#pourquoi-ak-prime">Pourquoi AK PRIME</a>'+
    '<a href="#offres">Les offres</a>'+
@@ -5064,10 +5146,10 @@ function renderPublicSite(){
    '<a href="#avis">Avis clients</a>'+
   '<button type="button" class="public-mobile-login" id="publicMobileLoginBtn">Se connecter à mon espace</button>'+
  '</nav></div>'+
- '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Master STAPS en entraînement et optimisation de la performance sportive · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
+ '<section class="public-hero"><div class="public-hero-inner"><div><span class="public-eyebrow">Coaching individualisé • à distance</span><h1>Bien plus qu’un programme.<span style="display:block;margin-top:8px">Un suivi pensé pour votre progression.</span></h1><p>Performance sportive, remise en forme ou préparation mentale : AK PRIME vous accompagne avec une méthode structurée, un suivi personnalisé et des ajustements adaptés à votre quotidien.</p><div class="public-hero-actions"><a class="public-primary" href="#offres">Découvrir les accompagnements</a></div><div class="akp-discovery-hero"><div><strong>BILAN DÉCOUVERTE OFFERT · 20 MIN</strong><span>Vos objectifs méritent un échange personnalisé, sans engagement.</span></div><a href="#bilan-offert">Réserver mon créneau →</a></div><p style="font-size:13px;line-height:1.6;color:#d5ad67;margin-top:20px">Master STAPS en entraînement et optimisation de la performance sportive · Préparation physique · Forme &amp; Santé · Préparation mentale</p></div>'+
  '<div class="public-hero-visual"><img class="public-hero-portrait" src="assets/portrait-accueil-ak-prime-20261029-final.svg?v=transparent-20261029" alt="Alex Kieffer, fondateur d’AK PRIME, bras croisés en polo noir sur fond bleu" width="750" height="937" loading="eager" decoding="async">'+
  '<div class="public-hero-card"><div class="tag" style="color:#d5ad67;font-size:11px;font-weight:950;letter-spacing:.08em">LA MÉTHODE AK PRIME</div><h3 style="font-size:25px;margin:9px 0 6px">Standardiser la méthode, pas le client.</h3><p style="color:#aebdcd;font-size:13px;line-height:1.55">Chaque accompagnement suit un cadre clair tout en restant individualisé.</p><div class="public-method-line"><div class="public-method-step"><b>01</b>Évaluer</div><div class="public-method-step"><b>02</b>Comprendre</div><div class="public-method-step"><b>03</b>Planifier</div><div class="public-method-step"><b>04</b>Accompagner</div><div class="public-method-step"><b>05</b>Adapter</div></div></div></div></div></section>'+
- '<section class="public-section" id="methode"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">3 pôles</div><h2>Trois pôles. Des objectifs différents. Une même exigence de suivi.</h2><p>Découvrez nos trois domaines d’accompagnement et trouvez celui qui correspond à vos besoins.</p></div><div class="public-poles">'+
+ akpDiscoveryPublicSection()+'<section class="public-section" id="methode"><div class="public-section-inner"><div class="public-section-head"><div class="kicker">3 pôles</div><h2>Trois pôles. Des objectifs différents. Une même exigence de suivi.</h2><p>Découvrez nos trois domaines d’accompagnement et trouvez celui qui correspond à vos besoins.</p></div><div class="public-poles">'+
  '<div class="public-pole"><div class="num">01 · FORME & SANTÉ</div><h3>Forme & Santé</h3><p>Que vous débutiez, repreniez une activité après une pause ou une blessure, ou pratiquiez déjà régulièrement, profitez d’un <a href="/coaching-sportif/" title="Coach sportif à distance : programme et suivi personnalisé" style="color:inherit;text-decoration:underline;text-decoration-color:#d3ab62;text-underline-offset:3px">coaching sportif personnalisé à distance</a> construit autour de vos objectifs, de votre niveau et de votre quotidien.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="forme">Découvrir le pôle</button></div></div>'+
  '<div class="public-pole"><div class="num">02 · PERFORMANCE</div><h3>Performance</h3><p>Optimisez votre <a href="/preparation-physique/" title="Préparateur physique à distance : méthode et accompagnement AK PRIME" style="color:inherit;text-decoration:underline;text-decoration-color:#d3ab62;text-underline-offset:3px">préparation physique à distance</a> et développez vos performances selon les exigences de votre discipline, ou bénéficiez d’un accompagnement en réathlétisation pour préparer progressivement votre retour au sport après une blessure.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="performance">Découvrir le pôle</button></div></div>'+
  '<div class="public-pole"><div class="num">03 · MENTAL</div><h3>Préparation mentale</h3><p>Développez vos ressources mentales avec une <a href="/preparation-mentale/" title="Préparation mentale sportive à distance et routines personnalisées" style="color:inherit;text-decoration:underline;text-decoration-color:#d3ab62;text-underline-offset:3px">préparation mentale à distance</a> : mieux vous connaître, traverser les difficultés et aborder vos objectifs avec davantage de maîtrise, dans la vie quotidienne comme dans le sport, à tout niveau.</p><div class="pole-more"><button class="btn ghost publicPoleBtn" data-pole="mental">Découvrir le pôle</button></div></div>'+
@@ -5200,6 +5282,7 @@ function openPublicLegal(type){
    body:common+'<div class="legal-doc">'+
     '<h3>Responsable du traitement</h3><p>Le responsable du traitement est <strong>Alex Kieffer, entrepreneur individuel, AK PRIME</strong>, 9 rue des Italiens, 74200 Thonon-les-Bains, France. Contact données personnelles : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.</p>'+
     '<h3>Données traitées</h3><ul><li>identité et coordonnées ;</li><li>données de compte et d’authentification ;</li><li>offre souscrite, paiements, échéances et relation contractuelle ;</li><li>questionnaires, objectifs, contraintes et retours de suivi ;</li><li>résultats de tests, cycles, bilans, visios et historique du suivi ;</li><li>données techniques nécessaires au fonctionnement et à la sécurité du service.</li></ul>'+
+    '<h3>Bilan découverte gratuit</h3><p>Lorsqu’une personne réserve un bilan découverte de 20 minutes sans abonnement, AK PRIME recueille uniquement son nom, son e-mail, le créneau demandé et, facultativement, l’objectif communiqué. Ces données permettent de bloquer le créneau, d’organiser le rendez-vous, d’envoyer les confirmations et de reprendre contact à ce sujet. Le client n’a pas à créer de compte pour bénéficier de ce bilan. Les demandes sont accessibles uniquement au coach et aux prestataires techniques nécessaires (hébergement et e-mails). Elles ne sont pas utilisées pour des newsletters sans consentement distinct.</p>'+ 
     '<h3>Données sensibles</h3><p>Certaines informations relatives notamment aux douleurs, blessures, antécédents, restrictions, sommeil ou cycle menstruel peuvent constituer des données concernant la santé. AK PRIME limite leur collecte à ce qui est utile à l’accompagnement et prévoit un consentement explicite et distinct lorsque ce fondement est requis.</p>'+
     '<h3>Finalités et bases juridiques</h3><p>Les données sont utilisées pour créer et sécuriser l’espace client, exécuter l’accompagnement souscrit, individualiser la programmation, organiser les rendez-vous, suivre la progression, gérer la relation contractuelle et les paiements, répondre aux demandes et assurer la sécurité du service. Selon les traitements, les bases juridiques sont l’exécution du contrat, le respect d’obligations légales, l’intérêt légitime lié à la sécurité du service et, lorsque nécessaire pour des données sensibles ou usages optionnels, le consentement.</p>'+
     '<h3>Caractère obligatoire ou facultatif</h3><p>Les informations indispensables à la création du compte, à la facturation et à l’exécution de la prestation sont obligatoires. Les informations signalées comme facultatives peuvent ne pas être fournies ; cela peut toutefois limiter certaines possibilités d’individualisation du suivi.</p>'+
@@ -6410,7 +6493,94 @@ function openPublicOfferCheckout(button){
  };
 }
 
+
+let akpDiscoveryAvailable=[],akpDiscoveryDay="",akpDiscoveryTime="";
+function akpDiscoveryParisDate(iso){
+ return new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Paris",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(iso));
+}
+function akpDiscoveryDateLabel(iso){
+ return new Intl.DateTimeFormat("fr-FR",{timeZone:"Europe/Paris",weekday:"short",day:"numeric",month:"short"}).format(new Date(iso));
+}
+function akpDiscoveryStatus(message,kind){
+ const n=document.getElementById("akpDiscoveryStatus");if(!n)return;
+ n.textContent=message||"";n.className="akp-discovery-status"+(kind?" "+kind:"");
+}
+function akpDiscoveryRender(){
+ const days=document.getElementById("akpDiscoveryDays"),times=document.getElementById("akpDiscoveryTimes");
+ if(!days||!times)return;
+ const uniques=[...new Set(akpDiscoveryAvailable.map(akpDiscoveryParisDate))];
+ if(!uniques.includes(akpDiscoveryDay))akpDiscoveryDay=uniques[0]||"";
+ if(!akpDiscoveryAvailable.includes(akpDiscoveryTime))akpDiscoveryTime="";
+ days.innerHTML=uniques.length?uniques.map((date,i)=>{
+  const iso=akpDiscoveryAvailable.find(x=>akpDiscoveryParisDate(x)===date);
+  return '<button type="button" class="akp-discovery-choice" data-akp-day="'+esc(date)+'" aria-pressed="'+(date===akpDiscoveryDay?'true':'false')+'">'+esc(akpDiscoveryDateLabel(iso))+'</button>';
+ }).join(""):'<span class="akp-discovery-status">Aucun créneau publié pour les trois prochaines semaines. Revenez prochainement.</span>';
+ const filtered=akpDiscoveryAvailable.filter(x=>akpDiscoveryParisDate(x)===akpDiscoveryDay);
+ times.innerHTML=filtered.length?filtered.map(iso=>
+  '<button type="button" class="akp-discovery-choice" data-akp-time="'+esc(iso)+'" aria-pressed="'+(iso===akpDiscoveryTime?'true':'false')+'">'+esc(fmtTime(iso))+'</button>'
+ ).join(""):'<span class="akp-discovery-status">Aucune heure disponible pour cette date.</span>';
+ const submit=document.getElementById("akpDiscoverySubmit");
+ if(submit){submit.disabled=!akpDiscoveryTime;submit.textContent=akpDiscoveryTime?"Réserver mon bilan gratuit de 20 min":"Choisissez votre créneau pour réserver";}
+ days.querySelectorAll("[data-akp-day]").forEach(b=>b.onclick=()=>{akpDiscoveryDay=b.dataset.akpDay;akpDiscoveryTime="";akpDiscoveryStatus("");akpDiscoveryRender();});
+ times.querySelectorAll("[data-akp-time]").forEach(b=>b.onclick=()=>{akpDiscoveryTime=b.dataset.akpTime;akpDiscoveryStatus("");akpDiscoveryRender();});
+}
+async function akpDiscoveryReload(){
+ const days=document.getElementById("akpDiscoveryDays");if(!days)return;
+ try{
+  const response=await fetch(SUPABASE_URL+"/functions/v1/public-discovery-booking",{method:"GET",
+   headers:{"apikey":SUPABASE_PUBLISHABLE_KEY},cache:"no-store"});
+  const body=await response.json();
+  if(!response.ok)throw Error(body.error||"Chargement impossible");
+  akpDiscoveryAvailable=(body.slots||[]).filter(x=>typeof x==="string");
+  akpDiscoveryRender();
+ }catch(error){
+  days.innerHTML='<span class="akp-discovery-status error">Les disponibilités sont momentanément indisponibles. Veuillez réessayer.</span>';
+  const times=document.getElementById("akpDiscoveryTimes");if(times)times.textContent="";
+  akpDiscoveryStatus("Vous pouvez aussi nous écrire à contact@akprime.fr.","error");
+ }
+}
+function akpInitDiscoveryPublic(){
+ const form=document.getElementById("akpDiscoveryForm");if(!form)return;
+ akpDiscoveryTime="";akpDiscoveryDay="";akpDiscoveryAvailable=[];
+ void akpDiscoveryReload();
+ form.addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(!akpDiscoveryTime){akpDiscoveryStatus("Sélectionnez d’abord un créneau.","error");return;}
+  const btn=document.getElementById("akpDiscoverySubmit");
+  const data={
+   startsAt:akpDiscoveryTime,
+   name:document.getElementById("akpDiscoveryName").value.trim(),
+   email:document.getElementById("akpDiscoveryEmail").value.trim(),
+   goal:document.getElementById("akpDiscoveryGoal").value.trim(),
+   website:document.getElementById("akpDiscoveryWebsite").value,
+   acceptedPrivacy:document.getElementById("akpDiscoveryPrivacy").checked
+  };
+  if(!form.reportValidity())return;
+  if(btn){btn.disabled=true;btn.textContent="Réservation en cours…";}
+  akpDiscoveryStatus("Nous vérifions que ce créneau est encore disponible.");
+  try{
+   const response=await fetch(SUPABASE_URL+"/functions/v1/public-discovery-booking",{
+    method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_PUBLISHABLE_KEY},
+    body:JSON.stringify(data),cache:"no-store"
+   });
+   const result=await response.json();
+   if(!response.ok)throw Error(result.error||"Impossible de réserver ce créneau.");
+   const pretty=akpDiscoveryDateLabel(data.startsAt)+" à "+fmtTime(data.startsAt);
+   const box=document.querySelector(".akp-discovery-formbox");
+   if(box){
+    box.innerHTML='<div style="padding:18px 5px"><div style="font-size:35px;color:#218262;margin-bottom:10px">✓</div><h3>Bilan découverte réservé !</h3><p style="line-height:1.7;color:#40546c"><strong>'+esc(pretty)+'</strong> (heure de Paris), 20 minutes en visio.</p><p style="color:#53647b;line-height:1.65">'+(result.emailSent?'Un e-mail de confirmation vous a été envoyé.':'AK PRIME vous recontactera à l’adresse indiquée pour transmettre le lien de visioconférence.')+'</p><p style="color:#53647b">Merci pour votre confiance.</p></div>';
+   }
+  }catch(error){
+   akpDiscoveryStatus(error.message||"Réservation impossible. Essayez un autre créneau.","error");
+   await akpDiscoveryReload();
+  }finally{
+   if(btn&&btn.isConnected){btn.disabled=!akpDiscoveryTime;btn.textContent="Réserver mon bilan gratuit de 20 min";}
+  }
+ });
+}
+
 function bindPublicSite(){
+ akpInitDiscoveryPublic();
  // Menu mobile uniquement sur le site vitrine ; les espaces connectés restent inchangés.
  const menuButton=document.getElementById('publicMobileToggle');
  const menuPanel=document.getElementById('publicMobileMenu');
