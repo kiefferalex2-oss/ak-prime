@@ -1,0 +1,30 @@
+/* AK PRIME — Formulaire d'avis public, bleu nuit et touches or. */
+.public-site .akpOpenReviewWrite{margin:18px 0 24px;border:1px solid rgba(221,185,119,.38);border-radius:17px;background:linear-gradient(130deg,rgba(235,244,255,.09),rgba(12,35,58,.5));overflow:hidden;color:#ecf4fa}
+.public-site .akpOpenReviewWrite summary{list-style:none;cursor:pointer;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.public-site .akpOpenReviewWrite summary::-webkit-details-marker{display:none}
+.public-site .akpOpenReviewWrite summary strong{display:block;color:#fff;font-size:17px;line-height:1.35}
+.public-site .akpOpenReviewWrite summary small{display:block;color:#c1d0df;font-size:12px;margin-top:5px}
+.public-site .akpOpenReviewCta{display:inline-flex;align-items:center;justify-content:center;background:#d6ac69;color:#14283e;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:850;white-space:nowrap}
+.public-site .akpOpenReviewWrite[open] summary{border-bottom:1px solid rgba(255,255,255,.13)}
+.public-site .akpOpenReviewForm{padding:23px 24px 20px}
+.public-site .akpOpenReviewFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.public-site .akpOpenReviewFields label{display:flex;flex-direction:column;gap:7px;color:#e6edf6;font-size:12px;font-weight:700}
+.public-site .akpOpenReviewFields input,.public-site .akpOpenReviewFields select,.public-site .akpOpenReviewFields textarea{width:100%;min-width:0;border:1px solid #64778d;background:#f9fbfd;border-radius:9px;padding:12px 13px;font:inherit;font-size:14px;line-height:1.5;color:#162d46}
+.public-site .akpOpenReviewFields input:focus,.public-site .akpOpenReviewFields select:focus,.public-site .akpOpenReviewFields textarea:focus{outline:2px solid #dcb877;outline-offset:2px}
+.public-site .akpOpenReviewFields .akpOpenReviewMessage{grid-column:1/-1}
+.public-site .akpOpenReviewFields .akpOpenReviewMessage small{font-size:11px;color:#b8cbdc;font-weight:400}
+.public-site .akpOpenReviewConsent{display:flex;align-items:flex-start;gap:10px;margin-top:17px;font-size:12px;line-height:1.6;color:#d1dfea;font-weight:400}
+.public-site .akpOpenReviewConsent input{margin-top:4px;flex:none;accent-color:#cda25d}
+.public-site .akpOpenReviewActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+.public-site .akpOpenReviewSubmit{background:#d6ac69;border:0;border-radius:11px;padding:13px 22px;color:#132942;font-size:13px;font-weight:900;cursor:pointer}
+.public-site .akpOpenReviewSubmit:hover{background:#f0c98b}
+.public-site .akpOpenReviewSubmit:disabled{opacity:.6;cursor:wait}
+.public-site #akpOpenReviewResult{margin:0;font-size:12px;line-height:1.5;color:#b9c8d6}
+.public-site #akpOpenReviewResult.success{color:#b9ebc8}
+.public-site #akpOpenReviewResult.error{color:#ffbdbd}
+.public-site .akpOpenReviewLegal{margin:14px 0 0;font-size:11px;color:#aebfd0;line-height:1.65}
+.public-site .akpOpenReviewHoney{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none}
+.akpOpenAdminReview{padding:15px 0;border-top:1px solid #dde5ed}
+.akpOpenAdminReview:first-of-type{border-top:0}
+.akpOpenAdminReview .btn{font-size:11px}
+@media(max-width:650px){.public-site .akpOpenReviewWrite summary{padding:17px}.public-site .akpOpenReviewForm{padding:17px}.public-site .akpOpenReviewFields{grid-template-columns:1fr}.public-site .akpOpenReviewCta{width:100%}.public-site .akpOpenReviewSubmit{width:100%}}
