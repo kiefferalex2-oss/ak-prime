@@ -6,7 +6,7 @@ $$;
 revoke all on function private.is_prospection_owner() from public, anon;
 grant execute on function private.is_prospection_owner() to authenticated, service_role;
 
-create table public.prospection_settings (
+create table if not exists public.prospection_settings (
   singleton boolean primary key default true check(singleton),
   enabled boolean not null default false,
   research_enabled boolean not null default true,
@@ -16,9 +16,9 @@ create table public.prospection_settings (
   last_run_at timestamptz,
   last_status text not null default 'À configurer.'
 );
-insert into public.prospection_settings(singleton) values(true);
+insert into public.prospection_settings(singleton) values(true) on conflict(singleton) do nothing;
 
-create table public.prospection_leads (
+create table if not exists public.prospection_leads (
   id uuid primary key default gen_random_uuid(),
   fingerprint text not null unique check(length(fingerprint)=64),
   name text not null check(length(name) between 1 and 200),
@@ -46,8 +46,8 @@ create table public.prospection_leads (
       ((kind='club' and length(trim(professional_relevance))>=10)
        or (kind='individual' and consent and length(trim(consent_note))>=10))))
 );
-create unique index prospection_email_unique on public.prospection_leads(lower(email)) where email is not null;
-create index prospection_leads_stage_created on public.prospection_leads(stage,created_at);
+create unique index if not exists prospection_email_unique on public.prospection_leads(lower(email)) where email is not null;
+create index if not exists prospection_leads_stage_created on public.prospection_leads(stage,created_at);
 alter table public.prospection_settings enable row level security;
 alter table public.prospection_leads enable row level security;
 revoke all on public.prospection_settings,public.prospection_leads from public,anon,authenticated;
@@ -60,18 +60,23 @@ grant update(name,kind,email,source_url,contact_url,opportunity_date,evidence,
   professional_relevance,source_verified,consent,consent_note,subject,body,approved,stage)
   on public.prospection_leads to authenticated;
 grant all on public.prospection_settings,public.prospection_leads to service_role;
+drop policy if exists prospection_settings_read on public.prospection_settings;
 create policy prospection_settings_read on public.prospection_settings for select to authenticated
   using ((select private.is_prospection_owner()));
+drop policy if exists prospection_settings_update on public.prospection_settings;
 create policy prospection_settings_update on public.prospection_settings for update to authenticated
   using ((select private.is_prospection_owner())) with check((select private.is_prospection_owner()));
+drop policy if exists prospection_leads_read on public.prospection_leads;
 create policy prospection_leads_read on public.prospection_leads for select to authenticated
   using ((select private.is_prospection_owner()));
+drop policy if exists prospection_leads_insert on public.prospection_leads;
 create policy prospection_leads_insert on public.prospection_leads for insert to authenticated
   with check((select private.is_prospection_owner()));
+drop policy if exists prospection_leads_update on public.prospection_leads;
 create policy prospection_leads_update on public.prospection_leads for update to authenticated
   using ((select private.is_prospection_owner())) with check((select private.is_prospection_owner()));
 
-create function private.prospection_keep_terminal_state()
+create or replace function private.prospection_keep_terminal_state()
 returns trigger language plpgsql security invoker set search_path='' as $$
 begin
   if old.stage='opted_out' and new.stage<>'opted_out' then
@@ -84,11 +89,12 @@ begin
 end;
 $$;
 revoke all on function private.prospection_keep_terminal_state() from public,anon,authenticated;
+drop trigger if exists prospection_keep_terminal on public.prospection_leads;
 create trigger prospection_keep_terminal before update on public.prospection_leads
   for each row execute function private.prospection_keep_terminal_state();
 
 -- Service-only RPCs, invoker security: the runner's service role performs the work.
-create function public.prospection_reserve_research(p_day date)
+create or replace function public.prospection_reserve_research(p_day date)
 returns boolean language plpgsql security invoker set search_path='' as $$
 declare reserved boolean;
 begin
@@ -103,7 +109,7 @@ $$;
 revoke all on function public.prospection_reserve_research(date) from public,anon,authenticated;
 grant execute on function public.prospection_reserve_research(date) to service_role;
 
-create function public.prospection_claim_message()
+create or replace function public.prospection_claim_message()
 returns setof public.prospection_leads language plpgsql security invoker set search_path='' as $$
 declare cfg public.prospection_settings; target uuid; local_now timestamp;
 begin
