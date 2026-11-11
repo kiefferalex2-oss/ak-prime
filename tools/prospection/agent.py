@@ -9,6 +9,7 @@ import email
 import email.policy
 import hashlib
 import html
+import http.client
 import imaplib
 import ipaddress
 import json
@@ -115,11 +116,22 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def source_text(url):
-    # No automatic redirects to unvalidated destinations. No credentials attached.
+    # Pin a verified public IP while preserving TLS hostname verification (no DNS
+    # rebinding, proxies, redirects, cookies or credentials on untrusted pages).
     public_url(url)
-    opener = urllib.request.build_opener(NoRedirect)
-    req = urllib.request.Request(url, headers={"User-Agent": "AKPrimeProspection/1.0 (+https://akprime.fr)"})
-    with opener.open(req, timeout=20) as response:
+    parsed = urllib.parse.urlparse(url)
+    addresses = socket.getaddrinfo(parsed.hostname, 443, type=socket.SOCK_STREAM)
+    if not addresses or any(not ipaddress.ip_address(a[4][0]).is_global for a in addresses):
+        raise ValueError("Source non publique")
+    ip = addresses[0][4][0]
+    connection = http.client.HTTPSConnection(parsed.hostname, 443, timeout=20, context=ssl.create_default_context())
+    connection._create_connection = lambda address, timeout, source_address=None, **kw: socket.create_connection((ip, 443), timeout, source_address)
+    try:
+        path = urllib.parse.urlunparse(("", "", parsed.path or "/", parsed.params, parsed.query, ""))
+        connection.request("GET", path, headers={"User-Agent": "AKPrimeProspection/1.0 (+https://akprime.fr)"})
+        response = connection.getresponse()
+        if response.status != 200:
+            raise ValueError("Source indisponible ou redirection")
         if "text/html" not in response.headers.get("Content-Type", ""):
             raise ValueError("Source HTML requise")
         raw = response.read(500_001)
@@ -130,6 +142,8 @@ def source_text(url):
         # Include mailto targets for contact pages where the label is only "Email".
         mailto = re.findall(r'mailto:([^\s"<>?]+)', raw.decode("utf-8", errors="replace"), re.I)
         return normalized_text(" ".join(parser.parts + mailto))
+    finally:
+        connection.close()
 
 
 def recent(date_string, at=None):
