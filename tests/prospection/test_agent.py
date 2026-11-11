@@ -7,6 +7,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
+sys.path.insert(0, str(Path(__file__).parents[2] / 'tools/prospection'))
 spec = importlib.util.spec_from_file_location('agent', Path(__file__).parents[2] / 'tools/prospection/agent.py')
 agent = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(agent)
