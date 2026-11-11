@@ -97,3 +97,55 @@ Tests sans connexion réseau, sans envoi ni coût API : éligibilité/consenteme
 preuves et dates, format des messages, arrêt sur échec IMAP, conservation des
 états incertains. Compléter par les contrôles RLS sur le projet et le test réel
 décrit ci-dessus une fois les secrets connectés.
+
+
+## Extension agent commercial : publications, supports et suggestions
+
+La recherche couvre les trois pôles et les clubs, associations, professionnels
+et particuliers. Une activité récente pertinente peut justifier une prise de
+contact B2B ; ne pas présenter cette hypothèse comme une demande explicite.
+
+Le mode `creative` prépare, au maximum une fois par jour, deux textes adaptés
+à Facebook/Instagram et une suggestion de développement. Les trois pôles sont
+alternés. Les supports graphiques sont composés automatiquement en bleu nuit
+et or, au format JPEG 1080 × 1350, à partir des textes courts. Le titre et les
+points sont modifiables. Un texte trop long est refusé, pas coupé silencieusement.
+Aucun témoignage ni chiffre de performance inventé ; pas de tarif collectif supposé.
+
+Le studio /prospection/ affiche la légende exacte, la destination et le visuel.
+La validation conserve une copie exacte du contenu (`approved_snapshot`). Toute
+modification du texte, du visuel ou du réseau annule la validation. Le visuel est
+stocké dans le bucket public dédié `akprime-promotion` uniquement lors de la
+validation ; aucun prospect ni document client ne doit être déposé dans ce bucket.
+Les suggestions retenues ne sont jamais exécutées automatiquement et n’autorisent
+ni dépense ni campagne publicitaire.
+
+### Publication : connexion encore nécessaire
+
+À la vérification du 11 novembre 2026, seules GA4 et Search Console sont connectées
+à Windsor. Le workflow GitHub prépare les contenus et les e-mails ; **il ne publie
+pas lui-même les contenus sociaux**. La validation dans le studio signifie
+« contenu approuvé », pas « publication effectuée ».
+
+Facebook Pages et Instagram disposent d’actions de publication via Windsor.ai.
+Une fois les comptes AK PRIME connectés et vérifiés, le relais de publication
+pourra lire la file approuvée et utiliser ces actions. Ce relais n’est pas encore
+planifié tant que ces connexions manquent. L’envoi de messages privés arbitraires
+Instagram/Messenger n’est pas disponible dans les actions actuellement découvertes.
+Ne jamais simuler la publication ou marquer un élément publié sans résultat réel.
+
+Contrat du relais de publication après connexion :
+1. Vérifier le compte connecté correspondant exactement à la destination AK PRIME.
+2. Lire le contenu approuvé et comparer chaque champ à `approved_snapshot`.
+3. Réserver une seule fois avec `prospection_claim_publication(p_id)` ; si la file
+   est en pause, si le contenu a changé ou s’il est déjà réservé, ne rien envoyer.
+4. Lire le schéma de l’action Windsor avant utilisation. Pour Facebook, utiliser
+   `facebook_organic/create_photo_post` avec `caption` et `image_url`. Pour
+   Instagram, utiliser `instagram/create_image_post` avec `caption` et `image_url`.
+5. Appeler l’action une fois avec le texte et le JPEG approuvés, sans modification.
+6. Enregistrer `published` et l’URL réelle retournée seulement en cas de succès.
+   En cas d’incertitude, enregistrer `uncertain` et ne pas réessayer automatiquement.
+   Si une authentification ou une confirmation est demandée, arrêter avant l’action.
+
+La connexion des réseaux ne remplace pas les trois secrets GitHub nécessaires
+au traitement e-mail et à la génération IA. L’agent reste en pause à l’installation.

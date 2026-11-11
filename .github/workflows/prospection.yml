@@ -8,7 +8,7 @@ on:
         required: true
         default: check
         type: choice
-        options: [check, research, run]
+        options: [check, research, creative, run]
   schedule:
     - cron: '23 * * * *'
 
