@@ -70,4 +70,5 @@
  ids('closeCampaign').onclick=()=>ids('campaignEditor').close();ids('refreshDrafts').onclick=refresh;
  window.addEventListener('akprime-owner-ready',refresh);
  window.addEventListener('akprime-owner-logout',()=>{ids('campaignEditor').close();ids('campaignDrafts').replaceChildren();ids('commercialSuggestions').replaceChildren();current=null});
+ if(!ids('workspace').hidden)refresh();
 })();
