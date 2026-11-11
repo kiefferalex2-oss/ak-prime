@@ -16,18 +16,18 @@ async function load(){
  const [settings,leads]=await Promise.all([db.from('prospection_settings').select('*').eq('singleton',true).single(),db.from('prospection_leads').select('*').order('created_at',{ascending:false}).limit(500)]);
  if(settings.error||leads.error){say('Le module de prospection n’est pas encore disponible. Vérifiez son installation dans Supabase.',true);return}
  $('workspace').hidden=false;const s=settings.data;rows=leads.data;
- $('enabled').checked=s.enabled;$('researchEnabled').checked=s.research_enabled;$('sendingEnabled').checked=s.sending_enabled;$('dailyLimit').value=s.daily_limit;
+ $('enabled').checked=s.enabled;$('researchEnabled').checked=s.research_enabled;$('creativeEnabled').checked=s.creative_enabled;$('sendingEnabled').checked=s.sending_enabled;$('dailyLimit').value=s.daily_limit;
  $('agentBadge').textContent=s.enabled?'Agent activé':'Agent en pause';$('agentBadge').classList.toggle('active',s.enabled);
  $('heartbeat').textContent=s.last_run_at?new Date(s.last_run_at).toLocaleString('fr-FR')+' — '+s.last_status:'Aucun passage enregistré. Connectez les accès, puis lancez une vérification GitHub.';
  for(const [id,statuses] of [['newCount',['new']],['readyCount',['ready']],['sentCount',['sent','replied','opted_out']],['replyCount',['replied']]])$(id).textContent=rows.filter(r=>statuses.includes(r.stage)).length;
- say(rows.length===500?'Les 500 prospects les plus récents sont affichés.':'Suivi synchronisé.');render();
+ window.dispatchEvent(new Event('akprime-owner-ready'));say(rows.length===500?'Les 500 prospects les plus récents sont affichés.':'Suivi synchronisé.');render();
 }
 function render(){
  const target=$('leads');target.replaceChildren();const filtered=rows.filter(r=>$('filter').value==='all'||r.stage===$('filter').value);
  if(!filtered.length){const box=node('div',undefined,'empty');box.append(node('h3','Aucun prospect à afficher'),node('p','Les recherches connectées alimenteront cette liste avec des besoins récents et leurs sources. Vous pouvez aussi ajouter un contact dont vous avez déjà vérifié le besoin.'));target.append(box);return}
  for(const lead of filtered){
   const card=node('article',undefined,'lead'),details=node('div'),actions=node('div',undefined,'actions');
-  details.append(node('h3',lead.name),node('div',(lead.kind==='club'?'Club / structure':'Sportif / particulier')+' · '+(labels[lead.stage]||lead.stage)+' · '+(lead.email||'E-mail à compléter'),'meta'),node('blockquote',lead.evidence),link(lead.source_url,'Voir le besoin publié ↗'));
+  details.append(node('h3',lead.name),node('div',(({club:'Club',association:'Association',professional:'Professionnel',individual:'Sportif / particulier'}[lead.kind]||lead.kind))+' · '+(labels[lead.stage]||lead.stage)+' · '+(lead.email||'E-mail à compléter'),'meta'),node('blockquote',lead.evidence),link(lead.source_url,'Voir le besoin publié ↗'));
   const edit=node('button','Examiner le message','secondary');edit.onclick=()=>editLead(lead);actions.append(edit);
   if(!['opted_out'].includes(lead.stage)){const stop=node('button','Ne plus contacter','secondary');stop.onclick=async()=>{const {error}=await db.from('prospection_leads').update({stage:'opted_out',approved:false}).eq('id',lead.id);if(error)say('Impossible d’enregistrer l’opposition.',true);else await load()};actions.append(stop)}
   if(['sending','uncertain'].includes(lead.stage))details.append(node('p','Vérifier la boîte mail avant toute intervention. Cet envoi ne sera pas retenté automatiquement.','small error'));
@@ -51,7 +51,7 @@ $('leadForm').onsubmit=async event=>{
   const days=(Date.now()-new Date(data.opportunity_date+'T00:00:00Z'))/86400000;
   if(!data.email||!data.source_verified||days<0||days>=31){$('editorError').textContent='Vérifiez l’e-mail, la source et une publication datant de moins de 31 jours.';return}
   if(data.kind==='individual'&&(!data.consent||data.consent_note.length<10)){$('editorError').textContent='L’accord du particulier et sa preuve sont nécessaires avant l’envoi.';return}
-  if(data.kind==='club'&&data.professional_relevance.length<10){$('editorError').textContent='Précisez le lien entre le message et l’activité du club.';return}
+  if(['club','association','professional'].includes(data.kind)&&data.professional_relevance.length<10){$('editorError').textContent='Précisez le lien entre le message et l’activité du club.';return}
  }
  data.stage=data.approved?'ready':'new';
  let result;
@@ -60,9 +60,9 @@ $('leadForm').onsubmit=async event=>{
  if(result.error||!result.data?.length){$('editorError').textContent='Enregistrement impossible : contact déjà présent, déjà traité ou données incomplètes.';return}
  $('editor').close();await load();
 };
-$('settingsForm').onsubmit=async event=>{event.preventDefault();const {error}=await db.from('prospection_settings').update({enabled:$('enabled').checked,research_enabled:$('researchEnabled').checked,sending_enabled:$('sendingEnabled').checked,daily_limit:Number($('dailyLimit').value)}).eq('singleton',true);if(error)say('Impossible d’enregistrer les réglages.',true);else await load()};
+$('settingsForm').onsubmit=async event=>{event.preventDefault();const {error}=await db.from('prospection_settings').update({enabled:$('enabled').checked,research_enabled:$('researchEnabled').checked,creative_enabled:$('creativeEnabled').checked,sending_enabled:$('sendingEnabled').checked,daily_limit:Number($('dailyLimit').value)}).eq('singleton',true);if(error)say('Impossible d’enregistrer les réglages.',true);else await load()};
 $('pause').onclick=async()=>{const {error}=await db.from('prospection_settings').update({enabled:false,sending_enabled:false}).eq('singleton',true);if(error)say('La mise en pause a échoué. Réessayez.',true);else await load()};
 $('loginForm').onsubmit=async event=>{event.preventDefault();const form=event.currentTarget;const button=form.querySelector('button');button.disabled=true;try{const {error}=await db.auth.signInWithPassword({email:form.elements.email.value,password:form.elements.password.value});form.elements.password.value='';if(error){say('Connexion impossible. Vérifiez vos identifiants.',true);return}await load()}finally{button.disabled=false}};
 $('close').onclick=()=>$('editor').close();$('add').onclick=()=>editLead();$('refresh').onclick=()=>load().catch(()=>say('Connexion indisponible.',true));$('filter').onchange=render;
-db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){$('workspace').hidden=true;$('login').hidden=false;rows=[];$('leads').replaceChildren();$('editor').close();say('Session terminée.')}});
+db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){window.dispatchEvent(new Event('akprime-owner-logout'));$('workspace').hidden=true;$('login').hidden=false;rows=[];$('leads').replaceChildren();$('editor').close();say('Session terminée.')}});
 load().catch(()=>say('Connexion indisponible. Réessayez dans un instant.',true));
