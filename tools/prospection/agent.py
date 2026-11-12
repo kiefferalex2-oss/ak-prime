@@ -170,7 +170,7 @@ def validate_candidate(c, citation_urls, at=None):
                 "evidence", "email", "subject", "body", "professional_relevance")
     if not isinstance(c, dict) or any(not isinstance(c.get(k), str) for k in required):
         return False
-    if c["kind"] not in ("club", "association", "professional", "individual") or not c["name"].strip():
+    if c["kind"] not in ("club", "association", "professional") or not c["name"].strip():
         return False
     if not recent(c["opportunity_date"], at) or c["source_url"] not in citation_urls:
         return False
@@ -220,7 +220,7 @@ def discover(db, settings):
         "input": f"Date {today}. Recherche au maximum 5 opportunités en France publiées dans les 30 derniers jours : "
         "clubs, associations et professionnels du sport ou du bien-être exprimant un besoin pertinent "
         "pour la préparation physique, la forme et santé ou la préparation mentale à distance AK PRIME, "
-        "et sportifs adultes recherchant explicitement un tel accompagnement à distance. "
+        "Ne recherche aucun particulier ni profil personnel : uniquement des coordonnées officielles de structures. "
         "Pour les structures, accepte un signal récent et pertinent (reprise, nouvelle équipe, stage, atelier), en distinguant un intérêt potentiel d’un besoin déclaré. Un annuaire seul ne suffit pas. Exige une publication datée et une citation exacte du signal. "
         "Pour chaque cas, donne nom, type club/particulier, date, URL de la publication, citation exacte, "
         "éventuelle adresse de contact réellement publiée et URL de sa page. Ne devine pas les emails. "
