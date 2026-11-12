@@ -179,3 +179,41 @@ recherche vide ne doit pas être présentée comme une liste de prospects obtenu
 Les messages privés Instagram/Messenger restent indisponibles. L’exclusion des
 profils personnels évite de solliciter une liste d’amis ; aucune comparaison avec
 la liste d’amis privée de l’utilisateur n’est effectuée ou revendiquée.
+
+
+## Passages réguliers et budget de recherche (12 novembre 2026)
+
+Le workflow est programmé toutes les 15 minutes (GitHub peut retarder un passage).
+Chaque passage lit les réponses, traite les seuls mails autorisés et vérifie les
+sources des contacts en attente sans appel IA. Ces opérations sont effectuées
+avant la recherche payante et ne sont pas bloquées par une panne de l’API IA.
+Les envois conservent leurs horaires de semaine et leur plafond configuré.
+
+Le plafond choisi par le propriétaire est 10 USD par mois pour les nouvelles
+recherches de cet agent. Chaque réservation atomique consomme une enveloppe
+prudente de 0,10 USD, conservée même si le passage échoue. Le compteur est une
+provision conservatrice, pas la facture réelle OpenAI. Il n’inclut pas l’usage
+antérieur à son installation ni d’autres applications utilisant la même clé.
+Le modèle est limité à GPT-4.1 mini, les requêtes à 25 000 octets JSON, les sorties
+à 3 000 puis 4 500 tokens et l’outil web à trois appels maximum par réservation.
+Toute nouvelle tarification nécessite une réévaluation de cette enveloppe.
+
+Les recherches sont espacées d’au moins une heure et le budget est réparti sur
+les jours du mois. Avec 10 USD et une réservation de 0,10 USD, cela permet trois
+lots IA par jour sur un mois de 30 ou 31 jours, au plus cinq candidats par lot.
+Il ne s’agit donc pas d’une recherche IA payante sans interruption. Les passages
+intermédiaires continuent la vérification des sources et les envois approuvés.
+Une recherche ne garantit ni cinq contacts ni un client : les résultats et refus
+de vérification sont affichés honnêtement.
+
+L’espace propriétaire affiche le travail en cours et les quinze derniers passages,
+avec candidats, nouveaux contacts, vérifications et envois. Actualisation toutes
+les 30 secondes. Les liens qui redirigent sont suivis seulement après validation
+HTTPS et résolution vers des adresses publiques, avec IP épinglée et trois
+redirections maximum. Un site inaccessible ou un extrait non confirmé ne valide
+jamais automatiquement une adresse. Trois vérifications gratuites au maximum
+sont tentées avant de laisser le contact à examiner.
+
+Le bouton de création automatique n’entraîne plus d’appel IA : les visuels sont
+fournis par le propriétaire et les textes doivent toujours être validés. Aucun
+profil personnel n’est recherché et aucune liste d’amis privée n’est consultée.

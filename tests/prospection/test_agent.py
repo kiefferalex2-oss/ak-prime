@@ -98,14 +98,15 @@ class MailTests(unittest.TestCase):
                 self.assertEqual(agent.send_pending(db,'fake'),0)
                 smtp.assert_not_called()
 
-    def test_inbox_failure_prevents_research_and_sending(self):
-        db=MagicMock();db.settings.return_value={'enabled':True,'research_enabled':True}
+    def test_inbox_failure_blocks_sending_but_not_independent_research(self):
+        db=MagicMock();db.settings.return_value={'enabled':True,'research_enabled':True};db.metrics=dict(checked=0,candidates=0,added=0,verified=0,sent=0);db.call.return_value=[]
         with patch.object(agent,'Database',return_value=db),patch.object(sys,'argv',['agent','--mode','run']),\
              patch.dict(os.environ,{'PROSPECTION_OVH_PASSWORD':'fake'}),\
              patch.object(agent,'sync_replies',side_effect=OSError('offline')),\
              patch.object(agent,'discover') as research,patch.object(agent,'send_pending') as send:
+            research.return_value=0
             with self.assertRaises(SystemExit):agent.main()
-            research.assert_not_called();send.assert_not_called()
+            research.assert_called_once();send.assert_not_called()
 
     def test_independent_stop_stops_contact(self):
         db=MagicMock();db.call.return_value=[lead(stage='sent')]
