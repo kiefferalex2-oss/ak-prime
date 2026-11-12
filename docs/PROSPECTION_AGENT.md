@@ -169,7 +169,7 @@ La réception d’un jeton valide ne garantit pas que Meta autorisera chaque act
 un test réel n’est possible qu’avec un premier contenu autorisé par le propriétaire.
 
 Les e-mails autorisés sont traités par le workflow GitHub pendant ses passages
-planifiés. Le plafond actuel est cinq réservations par jour, du lundi au vendredi
+planifiés. Le plafond est réglable de 1 à 10 réservations par jour dans l’interface, du lundi au vendredi
 9 h–18 h Paris. Le bouton de pause bloque la recherche, les envois et le relais
 social lors de leur prochain contrôle. Un mail ou post déjà transmis ne peut pas
 être rappelé par ce bouton.
