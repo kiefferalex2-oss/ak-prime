@@ -416,7 +416,7 @@ def main():
         db.heartbeat(f"Terminé : {added} prospect(s), {drafts} proposition(s) à valider, {sent} mail(s) envoyé(s).")
         print(f"Terminé : {added} prospect(s), {drafts} proposition(s), {sent} envoi(s).")
     except Exception as exc:
-        safe = str(exc) if isinstance(exc, RuntimeError) and re.fullmatch(r"(?:OpenAI|Supabase) HTTP [0-9]{3}(?: \\([a-zA-Z0-9_-]+\\))?", str(exc)) else type(exc).__name__
+        safe = str(exc) if isinstance(exc, RuntimeError) and re.fullmatch(r"(OpenAI|Supabase) HTTP [0-9]{3}( [(][a-zA-Z0-9_-]+[)])?", str(exc)) else type(exc).__name__
         db.heartbeat("Échec : " + safe + ". Aucun nouvel envoi pour ce passage.")
         print("Diagnostic : " + safe, file=sys.stderr)
         print("Échec du passage. Vérifier les secrets et les connexions. Aucune donnée privée affichée.", file=sys.stderr)
