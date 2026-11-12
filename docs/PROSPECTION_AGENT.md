@@ -149,3 +149,33 @@ Contrat du relais de publication après connexion :
 
 La connexion des réseaux ne remplace pas les trois secrets GitHub nécessaires
 au traitement e-mail et à la génération IA. L’agent reste en pause à l’installation.
+
+
+## Fonctionnement final : visuels du propriétaire, validation, diffusion
+
+La création automatique est désactivée. Le bouton « Préparer une publication »
+permet au propriétaire d’ajouter le texte convenu, choisir Facebook AK PRIME ou
+Instagram akprime.fr et charger son propre visuel. Le navigateur prépare un JPEG
+et en montre l’aperçu exact. La validation conserve le texte et l’URL du média ;
+les modifications annulent cette validation. Les anciennes publications de
+présentation non validées ont été archivées, pas publiées.
+
+Un relais ChatGPT planifié vérifie la file une fois par heure. Il publie au plus
+une version validée par passage, sur les comptes AK PRIME explicitement reliés,
+après réservation atomique. Il n’invente pas de contenu, n’achète pas de publicité
+et ne contacte pas les profils personnels. Il n’utilise pas l’API OpenAI payante.
+Les publications en état incertain sont bloquées et signalées, sans nouvel essai.
+La réception d’un jeton valide ne garantit pas que Meta autorisera chaque action :
+un test réel n’est possible qu’avec un premier contenu autorisé par le propriétaire.
+
+Les e-mails autorisés sont traités par le workflow GitHub pendant ses passages
+planifiés. Le plafond actuel est cinq réservations par jour, du lundi au vendredi
+9 h–18 h Paris. Le bouton de pause bloque la recherche, les envois et le relais
+social lors de leur prochain contrôle. Un mail ou post déjà transmis ne peut pas
+être rappelé par ce bouton.
+
+Les actions de recherche restent limitées à une réservation quotidienne ; une
+recherche vide ne doit pas être présentée comme une liste de prospects obtenus.
+Les messages privés Instagram/Messenger restent indisponibles. L’exclusion des
+profils personnels évite de solliciter une liste d’amis ; aucune comparaison avec
+la liste d’amis privée de l’utilisateur n’est effectuée ou revendiquée.
