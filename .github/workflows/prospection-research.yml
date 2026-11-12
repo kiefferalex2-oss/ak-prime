@@ -1,0 +1,23 @@
+name: AK PRIME - Recherche de prospects sans envoi
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prospection-research.yml']
+permissions:
+  contents: read
+concurrency:
+  group: akprime-prospection
+  cancel-in-progress: false
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PROSPECTION_SUPABASE_SERVICE_KEY: ${{ secrets.PROSPECTION_SUPABASE_SERVICE_KEY }}
+      PROSPECTION_OPENAI_API_KEY: ${{ secrets.PROSPECTION_OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 tools/prospection/agent.py --mode research
