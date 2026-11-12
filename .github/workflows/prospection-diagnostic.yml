@@ -1,6 +1,9 @@
-name: AK PRIME - Diagnostic IA sans envoi
+name: AK PRIME - Test OVH sans envoi
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prospection-diagnostic.yml']
 permissions:
   contents: read
 concurrency:
@@ -9,27 +12,36 @@ concurrency:
 jobs:
   diagnostic:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     env:
       PROSPECTION_SUPABASE_SERVICE_KEY: ${{ secrets.PROSPECTION_SUPABASE_SERVICE_KEY }}
-      PROSPECTION_OPENAI_API_KEY: ${{ secrets.PROSPECTION_OPENAI_API_KEY }}
+      PROSPECTION_OVH_PASSWORD: ${{ secrets.PROSPECTION_OVH_PASSWORD }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Test IA minimal - un seul appel sans recherche
+      - name: Verifier les connexions SMTP et IMAP sans envoyer de message
         run: |
           python3 - <<'PY'
-          import sys
+          import os, ssl, smtplib, imaplib, sys
           sys.path.insert(0, 'tools/prospection')
-          from agent import ask_model, output_text, Database
-          r = ask_model({'input': 'Réponds uniquement OK', 'max_output_tokens': 16})
-          if output_text(r).strip() != 'OK':
-              raise RuntimeError('Réponse du test inattendue; aucune nouvelle tentative automatique.')
-          usage = r.get('usage', {})
-          Database().heartbeat('Test IA minimal réussi. Agent en pause, aucun envoi ni publication.')
-          print('Test IA réussi. Un seul appel, sans recherche web.')
-          print('Tokens entrée:', usage.get('input_tokens'), 'sortie:', usage.get('output_tokens'))
+          from agent import Database
+          db = Database()
+          phase = 'SMTP'
+          try:
+              password = os.environ['PROSPECTION_OVH_PASSWORD']
+              with smtplib.SMTP_SSL('smtp.mail.ovh.net',465,context=ssl.create_default_context(),timeout=30) as smtp:
+                  smtp.login('contact@akprime.fr',password)
+                  smtp.noop()
+              phase = 'IMAP'
+              with imaplib.IMAP4_SSL('imap.mail.ovh.net',993,ssl_context=ssl.create_default_context(),timeout=30) as inbox:
+                  inbox.login('contact@akprime.fr',password)
+                  if inbox.select('INBOX',readonly=True)[0] != 'OK':
+                      raise RuntimeError('Inbox inaccessible')
+              db.heartbeat('Connexions OVH SMTP et IMAP vérifiées. Aucun mail envoyé ; agent en pause.')
+              print('SMTP et IMAP vérifiés. Aucun message envoyé ou modifié. Aucun appel IA.')
+          except Exception as exc:
+              db.heartbeat('Test OVH échoué : '+phase+' / '+type(exc).__name__+'. Aucun mail envoyé.')
+              print('Échec connexion '+phase+' : '+type(exc).__name__,file=sys.stderr)
+              raise SystemExit(1)
           PY
-
-# Diagnostic provider status codes, without message contents or secrets.
