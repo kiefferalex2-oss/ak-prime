@@ -33,6 +33,11 @@ class AutonomousTests(unittest.TestCase):
         row['body']+=' Changed after authorization.'
         self.assertFalse(agent.eligible(row))
 
+    def test_campaign_exclusions(self):
+        for name in ['Sainte-Maure Troyes Handball','AS Ste Maure Troyes','Palente Besançon Handball','Vesoul Handball','Club de football Seconde Ligue']:
+            self.assertFalse(agent.approved_handball_target(buyer(name=name,evidence='Notre club sportif.')))
+        self.assertTrue(agent.approved_handball_target(buyer()))
+
     def test_pause_or_manual_mode_never_authorizes(self):
         for field in ('enabled','sending_enabled','autonomous_email_enabled'):
             db=MagicMock();db.settings.return_value={k:k!=field for k in ('enabled','sending_enabled','autonomous_email_enabled')}
@@ -46,7 +51,7 @@ class AutonomousTests(unittest.TestCase):
     def test_templates_have_no_prices_or_unverified_results(self):
         for role in ('sports_club','employer_cse'):
             subject,body=agent.autonomous_message(buyer(buyer_role=role))
-            self.assertIn('Club de handball exemple',body);self.assertIn('distance',body)
+            self.assertEqual(body,agent.APPROVED_CLUB_BODY);self.assertEqual(subject,agent.APPROVED_CLUB_SUBJECT)
             self.assertLessEqual(len(subject),160);self.assertLessEqual(len(body),1800)
             self.assertNotIn('€',body);self.assertNotIn('garanti',body)
 
