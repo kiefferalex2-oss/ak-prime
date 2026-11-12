@@ -1,6 +1,9 @@
 name: AK PRIME - Diagnostic IA sans envoi
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prospection-diagnostic.yml']
 permissions:
   contents: read
 concurrency:
@@ -17,7 +20,19 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Tester la generation uniquement
-        run: python3 tools/prospection/agent.py --mode creative
+      - name: Test IA minimal - un seul appel sans recherche
+        run: |
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0, 'tools/prospection')
+          from agent import ask_model, output_text, Database
+          r = ask_model({'input': 'Réponds uniquement OK', 'max_output_tokens': 16})
+          if output_text(r).strip() != 'OK':
+              raise RuntimeError('Réponse du test inattendue; aucune nouvelle tentative automatique.')
+          usage = r.get('usage', {})
+          Database().heartbeat('Test IA minimal réussi. Agent en pause, aucun envoi ni publication.')
+          print('Test IA réussi. Un seul appel, sans recherche web.')
+          print('Tokens entrée:', usage.get('input_tokens'), 'sortie:', usage.get('output_tokens'))
+          PY
 
 # Diagnostic provider status codes, without message contents or secrets.
