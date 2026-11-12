@@ -22,3 +22,5 @@ jobs:
           persist-credentials: false
       - name: Tester la generation uniquement
         run: python3 tools/prospection/agent.py --mode creative
+
+# Diagnostic provider status codes, without message contents or secrets.
