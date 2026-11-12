@@ -78,7 +78,7 @@ class MailTests(unittest.TestCase):
     def test_smtp_ambiguity_does_not_retry(self):
         db=MagicMock()
         db.settings.return_value={'enabled':True,'sending_enabled':True}
-        db.rpc.side_effect=[[lead(stage='sending')],[]]
+        db.rpc.side_effect=[[lead(stage='sending',opportunity_date='2026-11-11')],[]]
         conn=MagicMock()
         conn.__enter__.return_value=conn
         conn.send_message.side_effect=smtplib.SMTPServerDisconnected('uncertain')
