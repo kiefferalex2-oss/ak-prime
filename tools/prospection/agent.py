@@ -1,4 +1,4 @@
-"""AK PRIME: discovery, owner-reviewed outreach and reply tracking.
+"""AK PRIME: discovery, policy-authorized B2B outreach and reply tracking.
 
 Python 3.12 standard library only. Credentials come exclusively from environment.
 No message bodies, addresses, credentials or model responses are printed in CI.
