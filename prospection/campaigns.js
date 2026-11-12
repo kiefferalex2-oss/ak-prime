@@ -1,74 +1,98 @@
 'use strict';
 (()=>{
- const ids=id=>document.getElementById(id);
- const api=db;
- const names={performance:'Performance sportive',forme_sante:'Forme & santé',mental:'Préparation mentale'};
- const statuses={draft:'À valider',approved:'Version validée · publication non effectuée',rejected:'Refusé',publishing:'Publication en cours',published:'Publié',uncertain:'Résultat à vérifier'};
- let current=null,previewURLs=[],dirty=false;
+ const $=id=>document.getElementById(id),api=db;
+ const labels={draft:'À valider',approved:'Validé · en attente du prochain passage',rejected:'Refusé',publishing:'Publication en cours',published:'Publié',uncertain:'À vérifier, aucune relance automatique'};
+ let current=null,blob=null,previewURL=null,dirty=false,busy=false;
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n};
- function preview(d){const url=URL.createObjectURL(new Blob([window.AKPrimeStudio.svg(d)],{type:'image/svg+xml'}));previewURLs.push(url);return url}
+ const assetAllowed=url=>typeof url==='string'&&url.startsWith('https://gptvgldboqarfklorjip.supabase.co/storage/v1/object/public/akprime-promotion/');
+ function status(text){$('campaignStatus').textContent=text}
+ function preview(url){$('campaignVisual').hidden=!url;if(url)$('campaignVisual').src=url;else $('campaignVisual').removeAttribute('src')}
+ function clearBlob(){if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;blob=null}
  async function refresh(){
   const {data,error}=await api.from('prospection_drafts').select('*').order('created_at',{ascending:false}).limit(100);
-  for(const url of previewURLs)URL.revokeObjectURL(url);previewURLs=[];
-  for(const id of ['campaignDrafts','commercialSuggestions'])ids(id).replaceChildren();
-  if(error){ids('campaignDrafts').textContent='Le studio commercial est en cours de connexion.';return}
+  for(const id of ['campaignDrafts','commercialSuggestions'])$(id).replaceChildren();
+  if(error){$('campaignDrafts').textContent='Impossible de charger les propositions.';return}
   for(const d of data){
-   const card=el('article',undefined,'campaignCard');const description=el('div');
-   if(d.kind==='publication'){const image=el('img');image.alt='Visuel proposé : '+d.title;try{image.src=preview(d)}catch{image.alt='Texte du visuel à raccourcir'}card.append(image)}
-   description.append(el('h3',d.title),el('p',(d.kind==='publication'?d.channel+' · ':'')+names[d.pole]+' · '+statuses[d.status],'small muted'),el('pre',d.body));
-   const button=el('button','Examiner la proposition','secondary');button.onclick=()=>open(d);description.append(button);card.append(description);
-   ids(d.kind==='publication'?'campaignDrafts':'commercialSuggestions').append(card);
+   if(d.status==='rejected')continue;
+   const card=el('article',undefined,'campaignCard'),description=el('div');
+   if(d.kind==='publication'&&assetAllowed(d.asset_url)){const image=el('img');image.src=d.asset_url;image.alt='Visuel de '+d.title;card.append(image)}
+   description.append(el('h3',d.title),el('p',(d.kind==='publication'?d.channel+' · ':'')+labels[d.status],'small muted'),el('pre',d.body));
+   const button=el('button','Examiner','secondary');button.onclick=()=>open(d);description.append(button);
+   if(d.published_url){try{const u=new URL(d.published_url);if(u.protocol==='https:'){const a=el('a','Voir la publication');a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';description.append(a)}}catch{}}
+   card.append(description);$(d.kind==='publication'?'campaignDrafts':'commercialSuggestions').append(card);
   }
-  if(current?.kind==='publication'&&ids('campaignEditor').open)ids('campaignVisual').src=preview(current);
-  if(!ids('campaignDrafts').children.length)ids('campaignDrafts').textContent='Aucune publication préparée. Activez la préparation de contenus une fois la clé IA connectée.';
-  if(!ids('commercialSuggestions').children.length)ids('commercialSuggestions').textContent='Les suggestions de développement apparaîtront ici.';
+  if(!$('campaignDrafts').children.length)$('campaignDrafts').textContent='Aucune publication en attente. Ajoutez votre visuel et le texte validé ensemble.';
+  if(!$('commercialSuggestions').children.length)$('commercialSuggestions').textContent='Aucune suggestion en attente.';
  }
- function open(d){
-  current={...d};dirty=false;ids('campaignBody').value=d.body;ids('campaignVisualTitle').value=d.visual_title;ids('campaignVisualPoints').value=d.visual_points;
-  ids('campaignDestination').textContent=(d.kind==='publication'?d.channel+' · compte '+d.target_label:'Suggestion, sans exécution automatique')+' · '+names[d.pole];
-  ids('campaignReason').textContent=d.rationale;ids('campaignVisual').hidden=d.kind!=='publication';
-  ids('downloadCampaign').hidden=d.kind!=='publication';
-  const locked=['publishing','published','uncertain'].includes(d.status);
-  for(const id of ['campaignBody','campaignVisualTitle','campaignVisualPoints','saveCampaign','rejectCampaign','approveCampaign'])ids(id).disabled=locked;
-  ids('campaignStatus').textContent=statuses[d.status];
-  if(d.kind==='publication')try{ids('campaignVisual').src=preview(d)}catch(e){ids('campaignStatus').textContent=e.message;ids('approveCampaign').disabled=true}
-  ids('campaignEditor').showModal();
+ function open(d=null){
+  clearBlob();current=d?{...d}:null;dirty=false;
+  $('campaignTitle').value=d?.title||'';$('campaignBody').value=d?.body||'';$('campaignFile').value='';
+  $('campaignChannel').value=d?.channel==='instagram'?'instagram':'facebook';$('campaignPole').value=d?.pole||'performance';
+  const suggestion=d?.kind==='suggestion',locked=d&&['publishing','published','uncertain'].includes(d.status);
+  $('campaignDestination').textContent=suggestion?'Suggestion : aucune action ni dépense automatique.':'Facebook : AK PRIME · Instagram : akprime.fr. Rien ne part avant votre validation.';
+  $('campaignReason').textContent=d?.rationale||'';
+  for(const id of ['campaignTitle','campaignBody','campaignFile','campaignChannel','campaignPole','saveCampaign','rejectCampaign','approveCampaign'])$(id).disabled=!!locked;
+  $('campaignChannel').disabled=!!locked||suggestion;$('campaignPole').disabled=!!d;
+  $('campaignFile').hidden=suggestion;$('downloadCampaign').hidden=suggestion||!assetAllowed(d?.asset_url);
+  preview(assetAllowed(d?.asset_url)?d.asset_url:null);status(d?labels[d.status]:'Ajoutez un texte et un visuel. Enregistrez puis validez cette version.');
+  $('campaignEditor').showModal();
  }
- function edited(){return {...current,body:ids('campaignBody').value.trim(),visual_title:ids('campaignVisualTitle').value.trim(),visual_points:ids('campaignVisualPoints').value.trim()}}
  async function update(changes){
   const {data,error}=await api.from('prospection_drafts').update(changes).eq('id',current.id).eq('updated_at',current.updated_at).select('*');
-  if(error||!data?.length)throw Error('La proposition a changé ou n’a pas pu être enregistrée. Actualisez avant de valider.');
+  if(error||!data?.length)throw Error('Cette proposition a changé ou n’a pas pu être enregistrée. Actualisez avant de poursuivre.');
   current=data[0];return current;
  }
- for(const id of ['campaignBody','campaignVisualTitle','campaignVisualPoints'])ids(id).oninput=()=>{
-  dirty=true;ids('approveCampaign').disabled=true;ids('campaignStatus').textContent='Modifications non enregistrées. Enregistrez avant de valider.';
-  if(current?.kind==='publication')try{ids('campaignVisual').src=preview(edited())}catch(e){ids('campaignStatus').textContent=e.message}
- };
- ids('saveCampaign').onclick=async()=>{
-  try{const d=edited();if(d.kind==='publication')window.AKPrimeStudio.svg(d);
-   if(d.body.length<40)throw Error('Le message est trop court.');
-   await update({body:d.body,visual_title:d.visual_title,visual_points:d.visual_points,status:'draft',asset_url:null});dirty=false;ids('approveCampaign').disabled=false;ids('campaignStatus').textContent='Modifications enregistrées. Relisez puis validez cette version.';
-  }catch(e){ids('campaignStatus').textContent=e.message}
- };
- ids('approveCampaign').onclick=async()=>{
-  if(dirty||!current)return;ids('approveCampaign').disabled=true;
+ async function save(){
+  const title=$('campaignTitle').value.trim(),body=$('campaignBody').value.trim();
+  if(title.length<4||body.length<40)throw Error('Indiquez un titre (4 caractères minimum) et le texte complet (40 caractères minimum).');
+  const channel=current?.kind==='suggestion'?'strategy':$('campaignChannel').value;
+  if(current)await update({title,body,channel,status:'draft'});
+  else{
+   const row={batch_key:'manual-'+crypto.randomUUID(),kind:'publication',channel,pole:$('campaignPole').value,target_label:'AK PRIME',title,body,visual_title:'',visual_points:'',rationale:'Texte et visuel fournis puis validés par le propriétaire.'};
+   const {data,error}=await api.from('prospection_drafts').insert(row).select('*').single();
+   if(error)throw Error('Impossible de créer la publication.');current=data;
+  }
+  dirty=false;await refresh();status('Enregistré. Relisez le texte et l’aperçu avant de valider.');
+ }
+ for(const id of ['campaignTitle','campaignBody','campaignChannel'])$(id).oninput=()=>{dirty=true;status('Modifications non enregistrées : la validation précédente sera annulée à l’enregistrement.');$('approveCampaign').disabled=false};
+ $('campaignFile').onchange=async()=>{
+  const file=$('campaignFile').files[0];if(!file)return;
+  if(busy)return;busy=true;$('approveCampaign').disabled=true;
   try{
-   if(current.kind==='publication'&&!current.asset_url){
-    const image=await window.AKPrimeStudio.jpeg(current);const path=current.id+'/'+crypto.randomUUID()+'.jpg';
-    const {error}=await api.storage.from('akprime-promotion').upload(path,image,{contentType:'image/jpeg',upsert:false});
-    if(error)throw Error('Impossible d’enregistrer le visuel. Rien n’est publié sur les réseaux.');
-    const {data}=api.storage.from('akprime-promotion').getPublicUrl(path);
-    await update({asset_url:data.publicUrl});
-   }
-   await update({status:'approved'});
-   ids('campaignStatus').textContent=current.kind==='suggestion'?'Piste retenue. Aucune action ni dépense n’a été engagée.':'Version exacte validée. Le visuel est prêt ; aucune publication sociale n’a encore été effectuée.';
-   await refresh();
-  }catch(e){ids('campaignStatus').textContent=e.message}finally{ids('approveCampaign').disabled=false}
+   if(current)await update({status:'draft',asset_url:null});
+   if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>15000000)throw Error('Choisissez une image JPEG, PNG ou WebP de moins de 15 Mo.');
+   const bitmap=await createImageBitmap(file),ratio=bitmap.width/bitmap.height;
+   if(ratio<.8||ratio>1.91){bitmap.close();throw Error('Le visuel doit être entre le format 4:5 et le format paysage 1,91:1 pour une publication Instagram.');}
+   const scale=Math.min(1,1440/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');
+   canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);
+   const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+   const jpeg=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.94));
+   if(!jpeg||jpeg.size>3000000)throw Error('Le fichier préparé est trop lourd. Réduisez la taille de votre image.');
+   // Revoke any previous approval immediately, even before uploading a replacement.
+   clearBlob();blob=jpeg;previewURL=URL.createObjectURL(jpeg);preview(previewURL);$('approveCampaign').disabled=false;
+   status('Votre visuel est chargé. L’aperçu est le JPEG exact prévu pour la publication.');
+  }catch(e){status(e.message);$('campaignFile').value=''}finally{busy=false;$('approveCampaign').disabled=false}
  };
- ids('rejectCampaign').onclick=async()=>{try{await update({status:'rejected'});ids('campaignEditor').close();await refresh()}catch(e){ids('campaignStatus').textContent=e.message}};
- ids('downloadCampaign').onclick=async()=>{try{const blob=await window.AKPrimeStudio.jpeg(edited());const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='AK_PRIME_'+current.pole+'.jpg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){ids('campaignStatus').textContent=e.message}};
- ids('closeCampaign').onclick=()=>ids('campaignEditor').close();ids('refreshDrafts').onclick=refresh;
+ $('saveCampaign').onclick=async()=>{if(busy)return;busy=true;try{await save()}catch(e){status(e.message)}finally{busy=false}};
+ $('approveCampaign').onclick=async()=>{
+  if(busy)return;busy=true;$('approveCampaign').disabled=true;
+  try{
+   if(dirty||!current)await save();
+   if(current.kind==='publication'){
+    if(blob){const path=current.id+'/'+crypto.randomUUID()+'.jpg';const {error}=await api.storage.from('akprime-promotion').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+     if(error)throw Error('Enregistrement du visuel impossible. Rien n’a été publié.');
+     const {data}=api.storage.from('akprime-promotion').getPublicUrl(path);await update({asset_url:data.publicUrl});clearBlob();preview(data.publicUrl);
+    }
+    if(!assetAllowed(current.asset_url))throw Error('Ajoutez votre visuel avant de valider.');
+   }
+   await update({status:'approved'});await refresh();
+   status(current.kind==='suggestion'?'Suggestion retenue, sans exécution automatique.':'Version validée. Publication prévue au prochain passage automatique, dans un délai indicatif d’une heure.');
+  }catch(e){status(e.message)}finally{busy=false;$('approveCampaign').disabled=false}
+ };
+ $('rejectCampaign').onclick=async()=>{try{if(current)await update({status:'rejected'});$('campaignEditor').close();clearBlob();await refresh()}catch(e){status(e.message)}};
+ $('downloadCampaign').onclick=()=>{if(!assetAllowed(current?.asset_url))return;const a=el('a');a.href=current.asset_url;a.target='_blank';a.rel='noopener noreferrer';a.click()};
+ $('closeCampaign').onclick=()=>{$('campaignEditor').close();clearBlob()};$('newCampaign').onclick=()=>open();$('refreshDrafts').onclick=refresh;
  window.addEventListener('akprime-owner-ready',refresh);
- window.addEventListener('akprime-owner-logout',()=>{ids('campaignEditor').close();ids('campaignDrafts').replaceChildren();ids('commercialSuggestions').replaceChildren();current=null});
- if(!ids('workspace').hidden)refresh();
+ window.addEventListener('akprime-owner-logout',()=>{$('campaignEditor').close();clearBlob();current=null;$('campaignDrafts').replaceChildren();$('commercialSuggestions').replaceChildren()});
+ if(!$('workspace').hidden)refresh();
 })();
