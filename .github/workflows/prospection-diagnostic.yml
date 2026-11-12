@@ -1,0 +1,24 @@
+name: AK PRIME - Diagnostic IA sans envoi
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prospection-diagnostic.yml']
+permissions:
+  contents: read
+concurrency:
+  group: akprime-prospection
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PROSPECTION_SUPABASE_SERVICE_KEY: ${{ secrets.PROSPECTION_SUPABASE_SERVICE_KEY }}
+      PROSPECTION_OPENAI_API_KEY: ${{ secrets.PROSPECTION_OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Tester la generation uniquement
+        run: python3 tools/prospection/agent.py --mode creative
