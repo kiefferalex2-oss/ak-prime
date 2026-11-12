@@ -14,7 +14,7 @@ spec.loader.exec_module(agent)
 
 
 def lead(**changes):
-    value = dict(id='test-id', name='Club exemple', kind='club', source_verified=True,
+    value = dict(id='test-id', name='Club de handball exemple', buyer_role='sports_club', kind='club', source_verified=True,
                  source_url='https://example.org/besoin', contact_url='https://example.org/contact',
                  opportunity_date=agent.now().date().isoformat(), evidence='Nous recherchons un préparateur physique à distance.',
                  email='test@example.org', subject='Votre recherche de préparation physique',
@@ -50,6 +50,15 @@ class EligibilityTests(unittest.TestCase):
         self.assertFalse(agent.validate_candidate({**candidate,'evidence':'trop court'},citations))
         self.assertFalse(agent.validate_candidate({**candidate,'subject':'Hello\nBcc: foo'},citations))
         self.assertFalse(agent.validate_candidate({**candidate,'opportunity_date':'2020-01-01'},citations))
+
+    def test_competitors_are_not_buyers(self):
+        for name in ['My Day Sport Santé', 'SPORACTIO Maison Sport Santé', 'Coaching Performance', 'Fitness Club']:
+            with self.subTest(name=name):
+                self.assertFalse(agent.is_target_buyer(lead(name=name)))
+        self.assertFalse(agent.is_target_buyer(lead(buyer_role='provider')))
+        self.assertFalse(agent.is_target_buyer(lead(name='Entreprise exemple', buyer_role='employer_cse', evidence='Votre bien-être est notre priorité.')))
+        self.assertTrue(agent.is_target_buyer(lead()))
+        self.assertTrue(agent.is_target_buyer(lead(name='CSE Entreprise exemple', buyer_role='employer_cse', evidence='Notre CSE accompagne les salariés de notre entreprise.')))
 
     def test_recency_boundaries(self):
         at=dt.datetime(2026,11,11,tzinfo=agent.UTC)
