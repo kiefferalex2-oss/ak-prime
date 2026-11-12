@@ -13,7 +13,7 @@
    const cfg=s.data;
    $('livePhase').textContent=(cfg.enabled?(names[cfg.current_phase]||cfg.current_phase):'Agent en pause')+' — '+cfg.last_status;
    $('researchBudget').textContent=((cfg.month_reserved_cents||0)/100).toFixed(2)+' $ réservés sur '+((cfg.research_monthly_budget_cents||0)/100).toFixed(2)+' $ ce mois-ci. '+(cfg.research_note||'');
-   $('researchNext').textContent='Prochaine recherche IA possible : '+time(cfg.next_research_at)+'. Les vérifications et messages autorisés continuent entre les recherches.';
+   $('researchNext').textContent='Prochaine recherche IA possible : '+time(cfg.next_research_at)+'. '+(cfg.sending_enabled?(cfg.autonomous_email_enabled?'Emails professionnels : qualification et envois automatiques actifs.':'Emails : validation individuelle requise.'):'Emails : envois suspendus.')+' Passages programmés environ toutes les 15 minutes.';
    const target=$('agentHistory');target.replaceChildren();
    if(!r.data.length){target.textContent='Le prochain passage apparaîtra ici.';return}
    for(const run of r.data){
