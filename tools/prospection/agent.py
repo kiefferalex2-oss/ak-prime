@@ -51,7 +51,17 @@ def request_json(url, *, method="GET", data=None, headers=None):
             return json.loads(raw) if raw else None
     except urllib.error.HTTPError as exc:
         # Do not leak provider responses, which may echo personal data or keys.
-        raise RuntimeError(f"Erreur API HTTP {exc.code}") from None
+        provider = "OpenAI" if urllib.parse.urlparse(url).hostname == "api.openai.com" else "Supabase"
+        code = ""
+        if provider == "OpenAI":
+            try:
+                detail = json.loads(exc.read(16384)).get("error", {})
+                candidate = detail.get("code") or detail.get("type") or ""
+                if re.fullmatch(r"[a-zA-Z0-9_\-]{1,80}", str(candidate)):
+                    code = " (" + str(candidate) + ")"
+            except Exception:
+                pass
+        raise RuntimeError(f"{provider} HTTP {exc.code}{code}") from None
 
 
 class Database:
@@ -405,8 +415,10 @@ def main():
         sent = send_pending(db, password) if args.mode == "run" else 0
         db.heartbeat(f"Terminé : {added} prospect(s), {drafts} proposition(s) à valider, {sent} mail(s) envoyé(s).")
         print(f"Terminé : {added} prospect(s), {drafts} proposition(s), {sent} envoi(s).")
-    except Exception:
-        db.heartbeat("Erreur de connexion ou de traitement. Consulter la configuration ; envois suspendus pour ce passage.")
+    except Exception as exc:
+        safe = str(exc) if isinstance(exc, RuntimeError) and re.fullmatch(r"(?:OpenAI|Supabase) HTTP [0-9]{3}(?: \\([a-zA-Z0-9_-]+\\))?", str(exc)) else type(exc).__name__
+        db.heartbeat("Échec : " + safe + ". Aucun nouvel envoi pour ce passage.")
+        print("Diagnostic : " + safe, file=sys.stderr)
         print("Échec du passage. Vérifier les secrets et les connexions. Aucune donnée privée affichée.", file=sys.stderr)
         raise SystemExit(1)
 
