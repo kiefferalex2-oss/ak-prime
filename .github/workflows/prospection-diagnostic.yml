@@ -1,9 +1,6 @@
 name: AK PRIME - Test OVH sans envoi
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/prospection-diagnostic.yml']
 permissions:
   contents: read
 concurrency:
