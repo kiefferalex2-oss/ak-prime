@@ -9,8 +9,11 @@ on:
         default: check
         type: choice
         options: [check, research, creative, run]
+  push:
+    branches: [main]
+    paths: ['tools/prospection/agent.py', '.github/workflows/prospection.yml']
   schedule:
-    - cron: '23 * * * *'
+    - cron: '8,23,38,53 * * * *'
 
 permissions:
   contents: read
