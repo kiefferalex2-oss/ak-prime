@@ -59,6 +59,20 @@
       type==='decouverte'?'Visiteur du site (non vérifié)':'Retour libre (non vérifié)';
   }
 
+  // Les étoiles déjà saisies dans le commentaire ne doivent pas doubler la note affichée au-dessus.
+  // On retire uniquement une première ligne constituée exclusivement d'étoiles, sans modifier l'avis enregistré.
+  function reviewDisplayText(value,rating){
+    const lines=String(value||'').replace(/\r\n?/g,'\n').trim().split('\n');
+    const first=(lines[0]||'').trim();
+    const starPattern=/(?:⭐\uFE0F?|🌟|★|☆)/gu;
+    const stars=first.match(starPattern)||[];
+    if(stars.length===rating && first.replace(starPattern,'').trim()===''){
+      lines.shift();
+      while(lines.length&&!lines[0].trim())lines.shift();
+    }
+    return lines.join('\n').trim();
+  }
+
   akpLoadPublishedReviews=async function(){
     const box=document.getElementById('akpReviewsPublicList');
     if(!box)return;
@@ -90,7 +104,7 @@
       const extra=x.verified?[x.pole_label,x.offer_label].filter(Boolean).join(' · '):'';
       return '<article class="akpReviewCard"><div class="akpReviewStars" aria-label="'+rating+' étoiles sur 5">'+
         '★'.repeat(rating)+'☆'.repeat(5-rating)+'</div>'+
-        '<blockquote>'+esc(x.review_text)+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+
+        '<blockquote>'+esc(reviewDisplayText(x.review_text,rating))+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+
         '</strong><span>'+esc(source)+'</span>'+(extra?'<small>'+esc(extra)+'</small>':'')+
         '<small>Publié le '+esc(stamp)+'</small></div></article>';
     }).join('')+'</div>';
