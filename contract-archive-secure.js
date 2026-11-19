@@ -119,7 +119,9 @@ document.addEventListener('click', async function(event) {
     const script=document.createElement('script');
     // En phase de construction, charger la version actuelle du module à chaque ouverture.
     // Évite de réutiliser un script ancien malgré des mises à jour publiées sur GitHub.
-    script.src='./'+file+'?rev='+Date.now();
+    // Cloudflare Pages revalide chaque fichier (ETag) : pas besoin de forcer un
+    // nouveau téléchargement à chaque visite, le navigateur reçoit la dernière version.
+    script.src='./'+file;
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
@@ -132,7 +134,15 @@ document.addEventListener('click', async function(event) {
     event.preventDefault();event.stopImmediatePropagation();
     alert('Le nouveau formulaire n’est pas disponible : '+window.AKP_MODULE_FAILURE);
   },true);
-  next(0);
+  // Les modules ne servent qu'aux comptes connectés (coach ou client) :
+  // un simple visiteur du site ne les télécharge plus.
+  let started=false;
+  function startWhenSignedIn(){
+    if(started)return;
+    if(authUser){started=true;next(0);return;}
+    setTimeout(startWhenSignedIn,250);
+  }
+  startWhenSignedIn();
 })();
 
 
