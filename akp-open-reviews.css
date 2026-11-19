@@ -42,7 +42,7 @@
 .public-site .akpReviewsCompact .off{color:rgba(255,255,255,.18)}
 .public-site .akpReviewSummaryCount{font-size:12px;color:#b9c9d8}
 
-.public-site .akpReviewsCompact .akpReviewsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:18px;max-width:1040px;margin:0 auto 26px}
+.public-site .akpReviewsCompact .akpReviewsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:18px;max-width:1040px;margin:0 auto 26px;align-items:start}
 .public-site .akpReviewsCompact .akpReviewCard{position:relative;display:flex;flex-direction:column;gap:14px;padding:26px 24px 22px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid rgba(214,172,105,.22);box-shadow:0 18px 40px rgba(0,0,0,.18);transition:border-color .2s,transform .2s}
 .public-site .akpReviewsCompact .akpReviewCard:hover{border-color:rgba(214,172,105,.5);transform:translateY(-2px)}
 .public-site .akpReviewsCompact .akpReviewCard::before{content:"“";position:absolute;top:6px;right:20px;font:700 76px/1 Georgia,serif;color:rgba(214,172,105,.16);pointer-events:none}
