@@ -1,0 +1,73 @@
+/* AK PRIME — pages sport (handball, sports de combat) : compléments visuels. */
+
+/* Héros : média encadré */
+.sp-hero-media{position:relative;align-self:center;display:flex;justify-content:center;padding:40px 0}
+.sp-hero-media:before{content:"";position:absolute;inset:8% 6% auto auto;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(211,171,98,.22),transparent 65%);filter:blur(6px);z-index:0}
+.sp-frame{position:relative;z-index:1;width:min(100%,390px);aspect-ratio:4/5;border-radius:26px;overflow:hidden;border:1px solid rgba(235,205,146,.55);box-shadow:0 30px 70px rgba(0,0,0,.45),0 0 0 8px rgba(211,171,98,.07);transform:rotate(1.5deg)}
+.sp-frame img,.sp-frame video{display:block;width:100%;height:100%;object-fit:cover}
+.sp-frame:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(8,17,29,.55));pointer-events:none}
+.sp-float{position:absolute;z-index:2;left:0;bottom:62px;max-width:235px;border:1px solid rgba(211,171,98,.45);border-radius:15px;background:rgba(11,28,47,.9);backdrop-filter:blur(12px);padding:14px 18px;box-shadow:0 18px 45px rgba(0,0,0,.4)}
+.sp-float .tag{color:var(--ak-gold);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.sp-float strong{display:block;color:#fff;font-size:15px;line-height:1.38;margin-top:5px}
+
+/* Chiffres clés */
+.sp-stats{background:linear-gradient(90deg,#0b1727,#10263e 50%,#0b1727);border-top:1px solid #22384f;border-bottom:1px solid #22384f}
+.sp-stats-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.sp-stat{padding:30px 22px;text-align:center;border-left:1px solid rgba(211,171,98,.18)}
+.sp-stat:first-child{border-left:0}
+.sp-stat strong{display:block;font-size:clamp(28px,3.2vw,40px);line-height:1;color:var(--ak-gold-light);letter-spacing:-.03em}
+.sp-stat span{display:block;margin-top:9px;color:#b5c4d3;font-size:12.5px;line-height:1.45}
+
+/* Qualités travaillées */
+.sp-quals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px}
+.sp-qual{position:relative;padding:26px 24px 24px;border-radius:18px;border:1px solid #243a51;background:linear-gradient(160deg,#112238,#0c1828);overflow:hidden;transition:border-color .2s,transform .2s}
+.sp-qual:hover{border-color:rgba(211,171,98,.6);transform:translateY(-3px)}
+.sp-qual:after{content:"";position:absolute;right:-40px;top:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(211,171,98,.12),transparent 70%)}
+.sp-qual-icon{display:grid;place-items:center;width:50px;height:50px;border-radius:14px;color:#0e1d30;background:linear-gradient(140deg,#f0d08f,#c99a52);box-shadow:0 8px 22px rgba(211,171,98,.25)}
+.sp-qual h3{margin:18px 0 8px;font-size:18px;color:#fff}
+.sp-qual p{margin:0;color:#b2c2d2;font-size:13.5px;line-height:1.65}
+
+/* Semaine type */
+.sp-week{list-style:none;padding:0;margin:34px 0 0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.sp-day{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 8px 16px;border-radius:16px;background:#fff;border:1px solid #dfe6ee;text-align:center;box-shadow:0 10px 26px rgba(16,32,53,.05)}
+.sp-day-name{font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#6b7b8e}
+.sp-day-chip{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;border-radius:12px;font-weight:850;font-size:14px;line-height:1.2;padding:6px}
+.sp-day small{font-size:11.5px;line-height:1.4;color:#5a6b7e}
+.sp-day.club .sp-day-chip{background:#e8eef5;color:#1c3048}
+.sp-day.prep .sp-day-chip{background:linear-gradient(140deg,#f0d08f,#c99a52);color:#0e1d30;box-shadow:0 8px 20px rgba(201,154,82,.3)}
+.sp-day.prep{border-color:#d9b674}
+.sp-day.key .sp-day-chip{background:#0e1d30;color:#f0d08f}
+.sp-day.rest .sp-day-chip{background:repeating-linear-gradient(135deg,#f3f6f9,#f3f6f9 6px,#e9eef4 6px,#e9eef4 12px);color:#7a8a9c}
+.sp-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:18px 0 0;font-size:12.5px;color:#4d5e71}
+.sp-legend span{display:inline-flex;align-items:center;gap:7px}
+.sp-legend span:before{content:"";width:14px;height:14px;border-radius:4px}
+.sp-legend .club:before{background:#e8eef5;border:1px solid #cdd8e4}
+.sp-legend .prep:before{background:linear-gradient(140deg,#f0d08f,#c99a52)}
+.sp-legend .key:before{background:#0e1d30}
+.sp-legend .rest:before{background:repeating-linear-gradient(135deg,#f3f6f9,#f3f6f9 3px,#e1e7ef 3px,#e1e7ef 6px);border:1px solid #d6dee8}
+
+/* Galerie de séances */
+.sp-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:32px}
+.sp-gallery figure{margin:0;position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;border:1px solid #2a4057;background:#0c1828}
+.sp-gallery img,.sp-gallery video{display:block;width:100%;height:100%;object-fit:cover}
+.sp-gallery figcaption{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 13px;border-radius:12px;background:rgba(8,17,29,.78);backdrop-filter:blur(8px);color:#fff;font-size:13px;font-weight:750;border:1px solid rgba(211,171,98,.3)}
+
+@media(max-width:900px){
+ .sp-hero-media{padding:10px 0 50px}
+ .sp-stats-inner{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sp-stat:nth-child(3){border-left:0}
+ .sp-stat{border-top:1px solid rgba(211,171,98,.12)}
+ .sp-quals{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sp-week{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:640px){
+ .sp-frame{width:min(86%,340px);transform:none}
+ .sp-float{left:4%;bottom:30px}
+ .sp-quals{grid-template-columns:1fr}
+ .sp-week{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin-left:-20px;margin-right:-20px;padding:4px 20px 12px;scrollbar-width:none}
+ .sp-week::-webkit-scrollbar{display:none}
+ .sp-day{flex:0 0 31%;scroll-snap-align:start}
+ .sp-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:32px -20px 0;padding:0 20px 8px;scrollbar-width:none}
+ .sp-gallery figure{flex:0 0 72%;scroll-snap-align:center}
+}
+@media(prefers-reduced-motion:reduce){.sp-qual,.sp-frame{transition:none;transform:none}}
