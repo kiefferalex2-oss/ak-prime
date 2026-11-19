@@ -124,7 +124,7 @@ def build(cfg):
       <p class="hero-note">{cfg['hero_note']}</p>
     </div>
     <div class="sp-hero-media">
-      <div class="sp-frame">{cfg['hero_media']}</div>
+      <div class="sp-frame {cfg.get('frame_class','')}">{cfg['hero_media']}</div>
       <div class="sp-float"><span class="tag">{cfg['art_tag']}</span><strong>{cfg['art_text']}</strong></div>
     </div>
   </div>
@@ -136,7 +136,7 @@ def build(cfg):
         f'<div class="trust-item"><strong>{s}</strong><span>{t}</span></div>' for s, t in cfg["trust"]) + "\n</div></div>\n"
     html = replace_between(html, '<div class="trust-strip"', '<section class="section section-light" id="pour-qui">', trust)
     html = html.replace('<section class="section section-light" id="pour-qui">', rich_sections(cfg) + '<section class="section section-light" id="pour-qui">', 1)
-    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=1">', 1)
+    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=2">', 1)
 
     pour_qui = f'''<section class="section section-light" id="pour-qui">
   <div class="shell">
@@ -205,7 +205,8 @@ HANDBALL = {
     "h1_span": "Plus explosif, plus solide, toute la saison.",
     "lede": "Duels, appuis, sprints répétés, tirs en suspension : le handball sollicite énormément le corps. AK PRIME construit votre préparation autour de vos entraînements de club, de vos matchs et de votre poste, pour progresser sans vous cramer.",
     "hero_note": "Expérience en handball à Palente Besançon (niveau national) · Master STAPS · 100 % à distance",
-    "hero_media": '<img src="../assets/media/alex-terrain.webp" alt="Alex Kieffer, préparateur physique, sur le terrain pendant une séance" width="420" height="525" fetchpriority="high" decoding="async">',
+    "hero_media": '<img src="../assets/media/palente-victoire.webp" alt="L’équipe de Palente Besançon Handball réunie après une victoire à Besançon" width="840" height="660" fetchpriority="high" decoding="async">',
+    "frame_class": "wide",
     "stats": [("Master 2", "STAPS · entraînement et performance"), ("N2", "montée invaincue avec Palente"), ("100 %", "à distance, partout en France"), ("20 min", "bilan découverte offert")],
     "qual_h2": "Les qualités qui font la différence sur un terrain de hand.",
     "qual_p": "Chaque programme part de votre poste et de vos besoins : on travaille ce qui vous fera gagner des duels, pas des kilos sur une machine.",
@@ -229,8 +230,8 @@ HANDBALL = {
         ("Sam", "Match", "key", "Le jour J"),
         ("Dim", "Repos", "rest", "Repos complet"),
     ],
-    "art_tag": "HANDBALL",
-    "art_text": "Votre poste. Votre calendrier. Votre progression.",
+    "art_tag": "VICTOIRE · PALENTE",
+    "art_text": "Palente Besançon Handball : montée en N2 sans perdre un match.",
     "trust": [
         ("Palente Besançon Handball", "Prépa physique et mentale · montée en N2 sans perdre un match"),
         ("Championnes de France UNSS 2026", "Section handball Stendhal"),
