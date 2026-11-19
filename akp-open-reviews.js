@@ -108,17 +108,17 @@
     box.innerHTML=summary+'<div class="akpReviewsGrid">'+rows.map((x,i)=>{
       const rating=ratings[i];
       const stamp=dateLabel(x.published_at);
-      const source=x.verified?'Client vérifié':relationshipLabel(x.experience_type).replace(/\s*\(non vérifié\)/,'');
+      const source=x.verified?'Client AK PRIME':(x.experience_type==='accompagnement'?'Accompagnement déclaré':x.experience_type==='decouverte'?'Visiteur du site':'');
       const extra=x.verified?[x.pole_label,x.offer_label].filter(Boolean).join(' · '):'';
       const name=String(x.public_name||'').trim();
       const initial=(name.match(/\p{L}/u)||['A'])[0].toUpperCase();
       return '<article class="akpReviewCard'+(x.verified?' is-verified':'')+'">'+
         '<div class="akpReviewTop"><span class="akpReviewStars" role="img" aria-label="'+rating+' étoiles sur 5">'+starRow(rating)+'</span>'+
-        '<span class="akpReviewBadge'+(x.verified?' verified':'')+'">'+(x.verified?'✓ Vérifié':'Non vérifié')+'</span></div>'+
+        '<span class="akpReviewBadge'+(x.verified?' verified':'')+'" title="'+(x.verified?'Avis déposé depuis un espace client après au moins 14 jours de suivi':'Avis déposé sans compte client : non vérifié par AK PRIME')+'">'+(x.verified?'✓ Vérifié':'Avis libre')+'</span></div>'+
         '<blockquote class="akpReviewText">'+esc(reviewDisplayText(x.review_text,rating))+'</blockquote>'+
         '<button type="button" class="akpReviewMore" hidden aria-expanded="false">Lire la suite</button>'+
         '<footer class="akpReviewMeta"><span class="akpReviewAvatar" aria-hidden="true">'+esc(initial)+'</span>'+
-        '<span class="akpReviewWho"><strong>'+esc(name)+'</strong><small>'+esc(source)+(extra?' · '+esc(extra):'')+' · '+esc(stamp)+'</small></span></footer>'+
+        '<span class="akpReviewWho"><strong>'+esc(name)+'</strong><small>'+[source,extra,stamp].filter(Boolean).map(esc).join(' · ')+'</small></span></footer>'+
         '</article>';
     }).join('')+'</div>';
     // « Lire la suite » uniquement pour les avis réellement coupés.
