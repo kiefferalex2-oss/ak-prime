@@ -162,7 +162,7 @@ HANDBALL = {
     "art_tag": "HANDBALL",
     "art_text": "Votre poste. Votre calendrier. Votre progression.",
     "trust": [
-        ("Palente Besançon", "Montée en N2 sans perdre un match"),
+        ("Palente Besançon Handball", "Prépa physique et mentale · montée en N2 sans perdre un match"),
         ("Championnes de France UNSS 2026", "Section handball Stendhal"),
         ("Master STAPS", "Entraînement et optimisation de la performance"),
     ],
@@ -212,7 +212,7 @@ COMBAT = {
     "art_tag": "BOXE · COMBAT",
     "art_text": "Votre style. Votre prochain combat. Votre progression.",
     "trust": [
-        ("Corona Boxe", "Préparation physique de boxeurs jusqu’au niveau pro"),
+        ("Corona Boxe", "Prépa physique · boxeurs jusqu’au niveau pro"),
         ("Encadrement technique", "Boxe et haltérophilie"),
         ("Master STAPS", "Entraînement et optimisation de la performance"),
     ],
