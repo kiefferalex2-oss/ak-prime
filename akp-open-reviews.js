@@ -41,7 +41,8 @@
       '<div class="akpReviewsCompactHead"><h2>Avis clients</h2><p>Des retours vérifiés de personnes réellement accompagnées par AK PRIME.</p></div>',
       '<div class="akpReviewsCompactHead"><h2>Avis & retours d’expérience</h2><p>Découvrez les retours des clients et visiteurs, puis partagez le vôtre.</p></div>'
     );
-    html=html.replace('<div id="akpReviewsPublicList"',formMarkup()+'<div id="akpReviewsPublicList"');
+    // Les avis d'abord, le formulaire ensuite : le visiteur lit avant d'écrire.
+    html=html.replace('<details class="akpReviewInfo">',formMarkup()+'<details class="akpReviewInfo">');
     html=html.replace(
       /<details class="akpReviewInfo">[\s\S]*?<\/details>/,
       '<details class="akpReviewInfo"><summary>Comment fonctionnent les avis ?</summary><p>Tout visiteur peut déposer librement un avis, sans compte client. Ces avis sont clairement identifiés comme non vérifiés. Les témoignages de clients ayant suivi AK PRIME restent distingués. Les avis positifs et négatifs sont acceptés. Les contenus injurieux, publicitaires, illicites ou hors sujet peuvent être retirés avec un motif, sans sélection selon la note. Pour signaler un avis ou demander son retrait : <a href="mailto:contact@akprime.fr">contact@akprime.fr</a>.</p></details>'
@@ -97,18 +98,44 @@
     if(!rows.length){
       box.innerHTML='<p class="akpReviewEmpty">Aucun avis publié pour le moment. Soyez la première personne à partager votre retour.</p>';return;
     }
-    box.innerHTML='<div class="akpReviewsGrid">'+rows.map(x=>{
-      const rating=Math.min(5,Math.max(1,Number(x.rating)||1));
+    const ratings=rows.map(x=>Math.min(5,Math.max(1,Number(x.rating)||1)));
+    const average=ratings.reduce((s,r)=>s+r,0)/ratings.length;
+    const averageLabel=average.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+    const summary='<div class="akpReviewSummary" aria-label="Note moyenne '+averageLabel+' sur 5, '+rows.length+' avis affichés">'+
+      '<span class="akpReviewSummaryScore">'+averageLabel+'</span>'+
+      '<span class="akpReviewSummaryStars" aria-hidden="true">'+starRow(Math.round(average))+'</span>'+
+      '<span class="akpReviewSummaryCount">'+rows.length+' avis affiché'+(rows.length>1?'s':'')+'</span></div>';
+    box.innerHTML=summary+'<div class="akpReviewsGrid">'+rows.map((x,i)=>{
+      const rating=ratings[i];
       const stamp=dateLabel(x.published_at);
-      const source=x.verified?'Client AK PRIME vérifié':relationshipLabel(x.experience_type);
+      const source=x.verified?'Client vérifié':relationshipLabel(x.experience_type).replace(/\s*\(non vérifié\)/,'');
       const extra=x.verified?[x.pole_label,x.offer_label].filter(Boolean).join(' · '):'';
-      return '<article class="akpReviewCard"><div class="akpReviewStars" aria-label="'+rating+' étoiles sur 5">'+
-        '★'.repeat(rating)+'☆'.repeat(5-rating)+'</div>'+
-        '<blockquote>'+esc(reviewDisplayText(x.review_text,rating))+'</blockquote><div class="akpReviewMeta"><strong>'+esc(x.public_name)+
-        '</strong><span>'+esc(source)+'</span>'+(extra?'<small>'+esc(extra)+'</small>':'')+
-        '<small>Publié le '+esc(stamp)+'</small></div></article>';
+      const name=String(x.public_name||'').trim();
+      const initial=(name.match(/\p{L}/u)||['A'])[0].toUpperCase();
+      return '<article class="akpReviewCard'+(x.verified?' is-verified':'')+'">'+
+        '<div class="akpReviewTop"><span class="akpReviewStars" role="img" aria-label="'+rating+' étoiles sur 5">'+starRow(rating)+'</span>'+
+        '<span class="akpReviewBadge'+(x.verified?' verified':'')+'">'+(x.verified?'✓ Vérifié':'Non vérifié')+'</span></div>'+
+        '<blockquote class="akpReviewText">'+esc(reviewDisplayText(x.review_text,rating))+'</blockquote>'+
+        '<button type="button" class="akpReviewMore" hidden aria-expanded="false">Lire la suite</button>'+
+        '<footer class="akpReviewMeta"><span class="akpReviewAvatar" aria-hidden="true">'+esc(initial)+'</span>'+
+        '<span class="akpReviewWho"><strong>'+esc(name)+'</strong><small>'+esc(source)+(extra?' · '+esc(extra):'')+' · '+esc(stamp)+'</small></span></footer>'+
+        '</article>';
     }).join('')+'</div>';
+    // « Lire la suite » uniquement pour les avis réellement coupés.
+    box.querySelectorAll('.akpReviewCard').forEach(card=>{
+      const text=card.querySelector('.akpReviewText'),more=card.querySelector('.akpReviewMore');
+      if(!text||!more)return;
+      if(text.scrollHeight>text.clientHeight+4)more.hidden=false;
+      more.onclick=()=>{
+        const open=card.classList.toggle('is-open');
+        more.setAttribute('aria-expanded',String(open));
+        more.textContent=open?'Réduire':'Lire la suite';
+      };
+    });
   };
+  function starRow(n){
+    return '<span class="on">'+'★'.repeat(n)+'</span><span class="off">'+'★'.repeat(5-n)+'</span>';
+  }
 
   function ownerOpenMarkup(){
     if(authProfile?.role!=='owner')return '';
