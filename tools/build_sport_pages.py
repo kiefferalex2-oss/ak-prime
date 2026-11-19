@@ -137,8 +137,6 @@ def build(cfg):
     html = replace_between(html, '<div class="trust-strip"', '<section class="section section-light" id="pour-qui">', trust)
     html = html.replace('<section class="section section-light" id="pour-qui">', rich_sections(cfg) + '<section class="section section-light" id="pour-qui">', 1)
     html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=1">', 1)
-    if cfg.get('gallery'):
-        html = html.replace('<section class="section section-muted" id="coach">', cfg['gallery'] + '<section class="section section-muted" id="coach">', 1)
 
     pour_qui = f'''<section class="section section-light" id="pour-qui">
   <div class="shell">
@@ -166,6 +164,9 @@ def build(cfg):
         '<p class="offer-note">',
         f'<p class="offer-note"><strong style="color:#fff">Vous hésitez entre deux formules ?</strong> Le <a href="{BILAN}">bilan découverte offert de 20 min</a> sert justement à choisir ensemble, sans engagement. ',
         1)
+
+    if cfg.get('gallery'):
+        html = html.replace('<section class="section section-muted" id="coach">', cfg['gallery'] + '<section class="section section-muted" id="coach">', 1)
 
     faq_block = f'''<section class="section section-light" id="faq" style="padding-top:12px">
   <div class="shell">
