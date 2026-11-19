@@ -18,7 +18,10 @@
 
 .public-site .akp-sticky-bilan{display:none}
 @media(max-width:760px){
- .public-site .akp-hero-refs li{flex:1 1 100%}
+ .public-site .akp-hero-refs{gap:6px}
+ .public-site .akp-hero-refs li{flex:1 1 100%;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:8px 12px}
+ .public-site .akp-hero-refs strong{font-size:12.5px}
+ .public-site .akp-hero-refs span{font-size:11px}
  .public-site .akp-cta-band{padding:18px}
  .public-site .akp-cta-band a{width:100%}
  .public-site .akp-sticky-bilan{display:flex;position:fixed;z-index:900;left:14px;right:14px;bottom:14px;justify-content:center;align-items:center;padding:14px 18px;border-radius:14px;background:#d6ac69;color:#10223a;font-weight:900;font-size:15px;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35)}
