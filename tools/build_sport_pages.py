@@ -136,7 +136,7 @@ def build(cfg):
         f'<div class="trust-item"><strong>{s}</strong><span>{t}</span></div>' for s, t in cfg["trust"]) + "\n</div></div>\n"
     html = replace_between(html, '<div class="trust-strip"', '<section class="section section-light" id="pour-qui">', trust)
     html = html.replace('<section class="section section-light" id="pour-qui">', rich_sections(cfg) + '<section class="section section-light" id="pour-qui">', 1)
-    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=3">', 1)
+    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=4">', 1)
 
     pour_qui = f'''<section class="section section-light" id="pour-qui">
   <div class="shell">
@@ -280,7 +280,7 @@ COMBAT = {
     "h1_span": "Frapper plus fort, tenir plus longtemps.",
     "lede": "Puissance, vitesse de bras, jeu de jambes, cardio sur les rounds, récupération entre les combats : AK PRIME construit votre préparation physique autour de vos séances de club et de votre calendrier de combats, en complément de votre coach.",
     "hero_note": "Boxeurs accompagnés jusqu’au niveau pro au Corona Boxe · Master STAPS · 100 % à distance",
-    "hero_media": '<video src="../assets/media/boxe-gainage.mp4" poster="../assets/media/boxe-gainage.webp" autoplay muted loop playsinline preload="metadata" aria-label="Alex Kieffer pendant une séance de préparation physique en salle de boxe"></video>',
+    "hero_media": '<video src="../assets/media/boxe-battle-ropes.mp4" poster="../assets/media/boxe-battle-ropes.webp" autoplay muted loop playsinline preload="metadata" aria-label="Boxeur pendant un exercice de battle ropes en préparation physique"></video>',
     "stats": [("Pro", "boxeurs accompagnés jusqu’au niveau pro"), ("Master 2", "STAPS · entraînement et performance"), ("100 %", "à distance, partout en France"), ("20 min", "bilan découverte offert")],
     "qual_h2": "Le physique qui fait la différence dans le ring.",
     "qual_p": "La préparation sert votre boxe : plus de puissance, plus de cardio, sans vous alourdir ni vous fatiguer avant vos séances techniques.",
@@ -308,9 +308,12 @@ COMBAT = {
   <div class="shell">
     <div class="section-heading"><span class="kicker">EN SÉANCE</span><h2>Sur le terrain, avec des boxeurs.</h2><p>Extraits de séances de préparation physique en salle de boxe.</p></div>
     <div class="sp-gallery">
-      <figure><video src="../assets/media/boxe-medecine-ball.mp4" poster="../assets/media/boxe-medecine-ball.webp" autoplay muted loop playsinline preload="none" aria-label="Lancer de médecine-ball contre le mur"></video><figcaption>Puissance : lancers de médecine-ball</figcaption></figure>
-      <figure><img src="../assets/media/alex-chrono-boxe.webp" alt="Alex Kieffer chronomètre en main dans une salle de boxe" width="369" height="682" loading="lazy" decoding="async"><figcaption>Chaque série est mesurée</figcaption></figure>
+      <figure><video src="../assets/media/boxe-coaching-echelle.mp4" poster="../assets/media/boxe-coaching-echelle.webp" autoplay muted loop playsinline preload="none" aria-label="Alex Kieffer coache un boxeur sur une échelle de rythme"></video><figcaption>Jeu de jambes : échelle de rythme</figcaption></figure>
+      <figure><video src="../assets/media/boxe-medecine-ball-genoux.mp4" poster="../assets/media/boxe-medecine-ball-genoux.webp" autoplay muted loop playsinline preload="none" aria-label="Lancer de médecine-ball à genoux"></video><figcaption>Puissance : médecine-ball à genoux</figcaption></figure>
+      <figure><img src="../assets/media/alex-chrono-boxe.webp" alt="Alex Kieffer chronomètre en main dans une salle de boxe" loading="lazy" decoding="async" style="object-position:50% 8%"><figcaption>Chaque série est mesurée</figcaption></figure>
+      <figure><video src="../assets/media/boxe-medecine-ball.mp4" poster="../assets/media/boxe-medecine-ball.webp" autoplay muted loop playsinline preload="none" aria-label="Lancer de médecine-ball contre le mur"></video><figcaption>Explosivité : lancers contre le mur</figcaption></figure>
       <figure><video src="../assets/media/boxe-gainage.mp4" poster="../assets/media/boxe-gainage.webp" autoplay muted loop playsinline preload="none" aria-label="Exercice de gainage dynamique"></video><figcaption>Gainage et solidité</figcaption></figure>
+      <figure><video src="../assets/media/boxe-battle-ropes.mp4" poster="../assets/media/boxe-battle-ropes.webp" autoplay muted loop playsinline preload="none" aria-label="Exercice de battle ropes"></video><figcaption>Cardio : battle ropes</figcaption></figure>
     </div>
   </div>
 </section>
