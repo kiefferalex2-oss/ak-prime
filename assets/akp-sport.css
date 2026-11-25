@@ -49,7 +49,9 @@
 .sp-legend .rest:before{background:repeating-linear-gradient(135deg,#f3f6f9,#f3f6f9 3px,#e1e7ef 3px,#e1e7ef 6px);border:1px solid #d6dee8}
 
 /* Galerie de séances */
-.sp-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:32px}
+.sp-gallery{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:32px}
+.sp-gallery>figure{flex:0 0 calc((100% - 32px)/3)}
+.sp-gallery.two>figure{flex-basis:calc((100% - 16px)/2)}
 .sp-gallery.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .sp-gallery.two figure{aspect-ratio:27/22}
 .sp-gallery figure{margin:0;position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;border:1px solid #2a4057;background:#0c1828}
