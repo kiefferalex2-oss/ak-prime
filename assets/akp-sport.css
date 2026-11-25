@@ -74,7 +74,7 @@
  .sp-week{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin-left:-20px;margin-right:-20px;padding:4px 20px 12px;scrollbar-width:none}
  .sp-week::-webkit-scrollbar{display:none}
  .sp-day{flex:0 0 31%;scroll-snap-align:start}
- .sp-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:32px -20px 0;padding:0 20px 8px;scrollbar-width:none}
+ .sp-gallery{display:flex;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;margin:32px -20px 0;padding:0 20px 8px;scrollbar-width:none}
  .sp-gallery figure{flex:0 0 72%;scroll-snap-align:center}
  .sp-gallery.two figure{flex-basis:88%;aspect-ratio:27/22}
 }
