@@ -50,6 +50,8 @@
 
 /* Galerie de séances */
 .sp-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:32px}
+.sp-gallery.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sp-gallery.two figure{aspect-ratio:27/22}
 .sp-gallery figure{margin:0;position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;border:1px solid #2a4057;background:#0c1828}
 .sp-gallery img,.sp-gallery video{display:block;width:100%;height:100%;object-fit:cover}
 .sp-gallery figcaption{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 13px;border-radius:12px;background:rgba(8,17,29,.78);backdrop-filter:blur(8px);color:#fff;font-size:13px;font-weight:750;border:1px solid rgba(211,171,98,.3)}
@@ -72,5 +74,6 @@
  .sp-day{flex:0 0 31%;scroll-snap-align:start}
  .sp-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:32px -20px 0;padding:0 20px 8px;scrollbar-width:none}
  .sp-gallery figure{flex:0 0 72%;scroll-snap-align:center}
+ .sp-gallery.two figure{flex-basis:88%;aspect-ratio:27/22}
 }
 @media(prefers-reduced-motion:reduce){.sp-qual,.sp-frame{transition:none;transform:none}}

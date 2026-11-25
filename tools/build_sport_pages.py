@@ -136,7 +136,7 @@ def build(cfg):
         f'<div class="trust-item"><strong>{s}</strong><span>{t}</span></div>' for s, t in cfg["trust"]) + "\n</div></div>\n"
     html = replace_between(html, '<div class="trust-strip"', '<section class="section section-light" id="pour-qui">', trust)
     html = html.replace('<section class="section section-light" id="pour-qui">', rich_sections(cfg) + '<section class="section section-light" id="pour-qui">', 1)
-    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=4">', 1)
+    html = html.replace('<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">', '<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">\n<link rel="stylesheet" href="../assets/akp-sport.css?v=5">', 1)
 
     pour_qui = f'''<section class="section section-light" id="pour-qui">
   <div class="shell">
@@ -205,7 +205,17 @@ HANDBALL = {
     "h1_span": "Plus explosif, plus solide, toute la saison.",
     "lede": "Duels, appuis, sprints répétés, tirs en suspension : le handball sollicite énormément le corps. AK PRIME construit votre préparation autour de vos entraînements de club, de vos matchs et de votre poste, pour progresser sans vous cramer.",
     "hero_note": "Expérience en handball à Palente Besançon (niveau national) · Master STAPS · 100 % à distance",
-    "hero_media": '<img src="../assets/media/palente-victoire.webp" alt="L’équipe de Palente Besançon Handball réunie après une victoire à Besançon" width="840" height="660" fetchpriority="high" decoding="async">',
+    "hero_media": '<img src="../assets/media/palente-victoire-salle.webp" alt="Les joueuses et le staff de Palente Besançon Handball célèbrent une victoire devant la banderole Besançon terre de handball" width="1180" height="1000" fetchpriority="high" decoding="async">',
+    "gallery": '''<section class="section section-dark sp-gallery-section" id="victoires">
+  <div class="shell">
+    <div class="section-heading"><span class="kicker">NOS VICTOIRES</span><h2>Une saison invaincue, puis la N2.</h2><p>Avec Palente Besançon Handball, en préparation physique puis aussi en préparation mentale.</p></div>
+    <div class="sp-gallery two">
+      <figure><img src="../assets/media/palente-victoire-25-23.webp" alt="Les joueuses de Palente Besançon Handball célèbrent une victoire 25-23 devant le but" width="1080" height="880" loading="lazy" decoding="async"><figcaption>Victoire 25-23</figcaption></figure>
+      <figure><img src="../assets/media/palente-victoire.webp" alt="L’équipe de Palente Besançon Handball réunie après un match" width="840" height="660" loading="lazy" decoding="async"><figcaption>Le groupe après le match</figcaption></figure>
+    </div>
+  </div>
+</section>
+''',
     "frame_class": "wide",
     "stats": [("Master 2", "STAPS · entraînement et performance"), ("N2", "montée invaincue avec Palente"), ("100 %", "à distance, partout en France"), ("20 min", "bilan découverte offert")],
     "qual_h2": "Les qualités qui font la différence sur un terrain de hand.",
