@@ -81,6 +81,7 @@ html{scroll-behavior:smooth}
 @media(max-width:560px){.akp-discovery-section{padding:43px 14px 53px}.akp-discovery-formbox{padding:18px}.akp-discovery-fields{grid-template-columns:1fr}.akp-discovery-hero{padding:16px}.akp-discovery-hero a{width:100%}.akp-discovery-choice{min-width:63px;padding:9px 10px}}
 
 </style>
+<link rel="stylesheet" href="../akp-ga4-consent.css?v=1">
 </head>
 <body>
 <header class="akp-booking-nav"><div class="akp-booking-nav-inner">
@@ -132,7 +133,7 @@ html{scroll-behavior:smooth}
   </div>
  </div>
 </section></main>
-<footer class="akp-booking-foot">AK PRIME · Coaching sportif, préparation physique et mentale à distance · <a href="https://akprime.fr/?confidentialite=1">Confidentialité</a> · <a href="mailto:contact@akprime.fr">Nous contacter</a></footer>
+<footer class="akp-booking-foot">AK PRIME · Coaching sportif, préparation physique et mentale à distance · <a href="https://akprime.fr/?confidentialite=1">Confidentialité</a> · <button type="button" class="akpCookieSettings" style="background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0">Gérer mes cookies</button> · <a href="mailto:contact@akprime.fr">Nous contacter</a></footer>
 <script>
 const SUPABASE_URL="https://gptvgldboqarfklorjip.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_wvFEmkJCeJxDw8HhTmipaw_z2J9a8sx";
@@ -212,6 +213,7 @@ function akpInitDiscoveryPublic(){
    });
    const result=await response.json();
    if(!response.ok)throw Error(result.error||"Impossible de réserver ce créneau.");
+   try{if(window.akprimeAnalytics)window.akprimeAnalytics.track("generate_lead");}catch(e){}
    const pretty=akpDiscoveryDateLabel(data.startsAt)+" à "+fmtTime(data.startsAt);
    const box=document.querySelector(".akp-discovery-formbox");
    if(box){
@@ -229,5 +231,7 @@ function akpInitDiscoveryPublic(){
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',akpInitDiscoveryPublic,{once:true});else akpInitDiscoveryPublic();
 </script>
+<script src="../akp-ga4-consent.js?v=7"></script>
+<script>if(window.akprimeAnalytics)window.akprimeAnalytics.start();</script>
 </body>
 </html>

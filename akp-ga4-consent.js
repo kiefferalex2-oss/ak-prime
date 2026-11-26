@@ -154,7 +154,7 @@
   function track(event,params){
     // Les simulations Stripe TEST ne doivent jamais biaiser les statistiques publiques.
     if(!publicActive||choice!=='accepted'||window.AKP_PUBLIC_TEST_MODE===true)return;
-    if(!/^(view_offer_list|view_offer_details|view_service_details|begin_checkout|checkout_redirect)$/.test(event))return;
+    if(!/^(view_offer_list|view_offer_details|view_service_details|begin_checkout|checkout_redirect|generate_lead|discovery_slot_selected)$/.test(event))return;
     // Paramètres strictement bornés : aucun nom, e-mail, paiement, URL de retour ou contenu client.
     const safe={};
     const allowedCodes=['forme_standard','forme_renforce','performance_p1','performance_p2','performance_p3','mental_particulier','mental_sportif'];
