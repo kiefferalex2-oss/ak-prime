@@ -80,6 +80,13 @@ html{scroll-behavior:smooth}
 @media(max-width:820px){.akp-discovery-layout{grid-template-columns:1fr}.akp-discovery-info{padding:21px}}
 @media(max-width:560px){.akp-discovery-section{padding:43px 14px 53px}.akp-discovery-formbox{padding:18px}.akp-discovery-fields{grid-template-columns:1fr}.akp-discovery-hero{padding:16px}.akp-discovery-hero a{width:100%}.akp-discovery-choice{min-width:63px;padding:9px 10px}}
 
+.akp-trust-coach{display:flex;align-items:center;gap:12px;margin:18px 0 0;padding:16px 0 0;border-top:1px solid #35516c}
+.akp-trust-coach img{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:2px solid #d6ac69;background:#0d1b30}
+.akp-trust-coach strong{display:block;color:#fff;font-size:14.5px}
+.akp-trust-coach span{display:block;color:#b8c7d6;font-size:12px;line-height:1.45;margin-top:2px}
+.akp-trust-insta{display:inline-block;margin:16px 0 0;color:#e7bd76;font-size:13px;font-weight:800;text-decoration:none}
+.akp-trust-insta:hover{text-decoration:underline}
+.akp-minor-note{margin:4px 0 12px;color:#53647b;font-size:12.5px}
 </style>
 <link rel="stylesheet" href="../akp-ga4-consent.css?v=1">
 </head>
@@ -107,7 +114,12 @@ html{scroll-behavior:smooth}
      <li>Échangez avec un coach diplômé sur vos besoins.</li>
      <li>Découvrez les accompagnements réellement adaptés à votre profil.</li>
     </ul>
-    <div class="akp-discovery-free">✓ Offert · En visio · Sans engagement · Partout en France</div>
+    <div class="akp-discovery-free">✓ Offert · En visio · Sans engagement · Aucune carte bancaire</div>
+    <div class="akp-trust-coach">
+     <img src="../assets/portrait-ak-prime.webp" alt="Alex Kieffer" width="56" height="56" loading="lazy" decoding="async">
+     <div><strong>Avec Alex Kieffer</strong><span>Master 2 STAPS · Palente Besançon Handball, Corona Boxe, Thonon Évian</span></div>
+    </div>
+    <a class="akp-trust-insta" href="https://www.instagram.com/akprime.fr/" target="_blank" rel="noopener noreferrer">Une question avant ? Écris-moi sur Instagram →</a>
    </div>
    <div class="akp-discovery-formbox">
     <h3>Choisissez votre créneau</h3>
@@ -121,11 +133,12 @@ html{scroll-behavior:smooth}
      <div class="akp-discovery-fields">
       <div class="akp-discovery-field"><label for="akpDiscoveryName">Nom et prénom *</label><input id="akpDiscoveryName" name="full_name" type="text" maxlength="120" autocomplete="name" required placeholder="Votre nom complet"></div>
       <div class="akp-discovery-field"><label for="akpDiscoveryEmail">Adresse e-mail *</label><input id="akpDiscoveryEmail" name="email" type="email" maxlength="254" autocomplete="email" required placeholder="vous@exemple.fr"></div>
-      <div class="akp-discovery-field akp-discovery-field-wide"><label for="akpDiscoveryPhone">Numéro de téléphone *</label><input id="akpDiscoveryPhone" name="phone" type="tel" inputmode="tel" maxlength="26" autocomplete="tel" required minlength="9" placeholder="Ex. 06 12 34 56 78" aria-describedby="akpDiscoveryPhoneHint"><small id="akpDiscoveryPhoneHint" style="color:#6b7b91;font-size:11px">Pour organiser votre rendez-vous et vous joindre si nécessaire.</small></div>
+      <div class="akp-discovery-field akp-discovery-field-wide"><label for="akpDiscoveryPhone">Numéro de téléphone *</label><input id="akpDiscoveryPhone" name="phone" type="tel" inputmode="tel" maxlength="26" autocomplete="tel" required minlength="9" placeholder="Ex. 06 12 34 56 78" aria-describedby="akpDiscoveryPhoneHint"><small id="akpDiscoveryPhoneHint" style="color:#6b7b91;font-size:11px">Uniquement pour vous joindre si la visio ne se lance pas. Jamais de démarchage téléphonique.</small></div>
       <div class="akp-discovery-field akp-discovery-field-wide"><label for="akpDiscoveryGoal">Votre objectif (facultatif)</label><textarea id="akpDiscoveryGoal" name="goal" maxlength="600" rows="2" placeholder="Remise en forme, prise de masse, performance, préparation mentale…"></textarea></div>
      </div>
      <div class="akp-discovery-bot" aria-hidden="true"><label for="akpDiscoveryWebsite">Site internet</label><input id="akpDiscoveryWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
      <label class="akp-discovery-privacy"><input id="akpDiscoveryPrivacy" type="checkbox" required><span>J’accepte que mes coordonnées soient utilisées par AK PRIME uniquement pour organiser ce bilan et me recontacter à son sujet. <a href="https://akprime.fr/?confidentialite=1" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>.</span></label>
+     <p class="akp-minor-note">Moins de 18 ans ? Le bilan se fait avec un parent présent.</p>
      <button id="akpDiscoverySubmit" class="akp-discovery-submit" type="submit" disabled>Choisissez votre créneau pour réserver</button>
      <div id="akpDiscoveryStatus" class="akp-discovery-status" role="status" aria-live="polite"></div>
     </form>
