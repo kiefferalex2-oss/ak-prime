@@ -3531,11 +3531,11 @@ function calendarPage(){
  }).join('');
 
  const weekly=days.map(([label,n])=>{
-   const rows=windows.filter(w=>w.weekday===n).map(w=>'<div class="item" style="padding:9px"><div class="row between"><div><strong>'+esc(String(w.start_time).slice(0,5))+'–'+esc(String(w.end_time).slice(0,5))+'</strong><div class="tiny muted">Chaque '+label.toLowerCase()+'</div></div><button class="link deleteAvailability" data-id="'+w.id+'">Retirer</button></div></div>').join('');
+   const rows=windows.filter(w=>w.weekday===n).map(w=>'<div class="item" style="padding:9px"><div class="row between"><div><strong>'+esc(String(w.start_time).slice(0,5))+'–'+esc(String(w.end_time).slice(0,5))+'</strong><div class="tiny muted">Chaque '+label.toLowerCase()+'</div></div><span><button class="link editAvailability" data-id="'+w.id+'">Modifier</button> · <button class="link deleteAvailability" data-id="'+w.id+'">Retirer</button></span></div></div>').join('');
    return '<div class="card panel" style="min-width:180px"><div class="row between"><h3 style="margin:0">'+label+'</h3><button class="btn ghost small addAvailability" data-day="'+n+'">+</button></div><div class="list" style="margin-top:10px">'+(rows||'<div class="muted tiny">Aucune disponibilité habituelle</div>')+'</div></div>';
  }).join('');
 
- const exRows=exceptions.map(e=>{const end=String(e.end_date||e.exception_date).slice(0,10),range=end!==String(e.exception_date).slice(0,10)?fmtDate(e.exception_date)+' → '+fmtDate(end):fmtDate(e.exception_date);return '<div class="item row between"><div><strong>'+range+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée(s) entière(s)')+(e.note?' • '+esc(e.note):'')+'</div></div><button class="link deleteException" data-id="'+e.id+'">Retirer</button></div>'}).join('');
+ const exRows=exceptions.map(e=>{const end=String(e.end_date||e.exception_date).slice(0,10),range=end!==String(e.exception_date).slice(0,10)?fmtDate(e.exception_date)+' → '+fmtDate(end):fmtDate(e.exception_date);return '<div class="item row between"><div><strong>'+range+'</strong><div class="muted tiny">'+(e.start_time?esc(String(e.start_time).slice(0,5))+'–'+esc(String(e.end_time).slice(0,5)):'Journée(s) entière(s)')+(e.note?' • '+esc(e.note):'')+'</div></div><span><button class="link editException" data-id="'+e.id+'">Modifier</button> · <button class="link deleteException" data-id="'+e.id+'">Retirer</button></span></div>'}).join('');
  const discoveryNext=discovery.filter(b=>b.status==='scheduled'&&new Date(b.starts_at)>=new Date());
  const discoveryOverdue=discovery.filter(b=>b.status==='scheduled'&&new Date(b.starts_at)<new Date());
  const discoveryHistory=discovery.filter(b=>b.status!=='scheduled').slice().reverse().slice(0,15);
@@ -3939,7 +3939,7 @@ function bind(){
  document.querySelectorAll('.deleteDateAvailability').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_date_windows').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Disponibilité précise retirée');render()});
  document.querySelectorAll('.addAvailability').forEach(b=>b.onclick=()=>openAvailabilityModal(Number(b.dataset.day)));
  document.querySelectorAll('.deleteAvailability').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_windows').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Disponibilité retirée');render()});
- document.getElementById('addException')?.addEventListener('click',openExceptionModal);
+ document.getElementById('addException')?.addEventListener('click',()=>openExceptionModal());  document.querySelectorAll('.editException').forEach(b=>b.onclick=()=>{const e=akpFindAvailabilityRow('exception',b.dataset.id);if(e)openExceptionModal(e)});  document.querySelectorAll('.editAvailability').forEach(b=>b.onclick=()=>{const w=akpFindAvailabilityRow('window',b.dataset.id);if(w)openAvailabilityModal(w.weekday,w)});
  document.querySelectorAll('.deleteException').forEach(b=>b.onclick=async()=>{const {error}=await supa.from('availability_exceptions').delete().eq('id',b.dataset.id);if(error)return toast('Erreur : '+error.message);await loadSupabaseData();toast('Indisponibilité retirée');render()});
 
  document.querySelectorAll('.akpDiscoveryCoachAction').forEach(button=>button.onclick=async()=>{
@@ -4023,27 +4023,52 @@ function openDateAvailabilityModal(date){
  document.getElementById('saveM').onclick=async()=>{const start=document.getElementById('davStart').value,end=document.getElementById('davEnd').value;if(!start||!end||end<=start)return toast('Horaires invalides');const {error}=await supa.from('availability_date_windows').insert({coach_user_id:authUser.id,availability_date:date,start_time:start,end_time:end});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Disponibilité précise ajoutée');render()};
 }
 
-function openAvailabilityModal(day){
- const names={1:'Lundi',2:'Mardi',3:'Mercredi',4:'Jeudi',5:'Vendredi',6:'Samedi',7:'Dimanche'};
- modal('Ajouter une disponibilité — '+names[day],
- '<div class="grid2"><div class="field"><label>Début</label><input id="avStart" type="time" class="input" value="18:00"></div><div class="field"><label>Fin</label><input id="avEnd" type="time" class="input" value="20:00"></div></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Ajouter</button>');
- document.getElementById('cancelM').onclick=closeModal;
- document.getElementById('saveM').onclick=async()=>{const start=document.getElementById('avStart').value,end=document.getElementById('avEnd').value;if(!start||!end||end<=start)return toast('Horaires invalides');const {error}=await supa.from('availability_windows').insert({coach_user_id:authUser.id,weekday:day,start_time:start,end_time:end});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Disponibilité ajoutée');render()};
+function akpFindAvailabilityRow(kind,id){
+ const list=kind==='window'?(db.availabilityWindows||[]):(db.availabilityExceptions||[]);
+ return list.find(x=>String(x.id)===String(id))||null;
 }
-function openExceptionModal(){
- modal('Bloquer une période / un créneau',
- '<div class="grid2"><div class="field"><label>Date de début</label><input id="exDate" type="date" class="input"></div><div class="field"><label>Date de fin</label><input id="exEndDate" type="date" class="input"></div></div>'+
- '<div class="grid2"><div class="field"><label>Heure de début (facultatif)</label><input id="exStart" type="time" class="input"></div><div class="field"><label>Heure de fin (facultatif)</label><input id="exEnd" type="time" class="input"></div></div>'+
- '<div class="muted tiny">Sans horaires : toute la journée est bloquée pour chaque date de la période. Avec horaires : la même plage horaire est bloquée chaque jour de la période.</div>'+
- '<div class="field"><label>Note facultative</label><input id="exNote" class="input" placeholder="Ex. congés, déplacement, formation…"></div>',
- '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Bloquer la période</button>');
+function akpAddDaysISO(iso,n){const d=new Date(iso+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function openAvailabilityModal(day,existing){
+ const names={1:'Lundi',2:'Mardi',3:'Mercredi',4:'Jeudi',5:'Vendredi',6:'Samedi',7:'Dimanche'};
+ const editing=!!existing;
+ const v=t=>esc(String(t||'').slice(0,5));
+ modal((editing?'Modifier la disponibilité — ':'Ajouter une disponibilité — ')+names[day],
+ '<div class="grid2"><div class="field"><label>Début</label><input id="avStart" type="time" class="input" value="'+(editing?v(existing.start_time):'18:00')+'"></div><div class="field"><label>Fin</label><input id="avEnd" type="time" class="input" value="'+(editing?v(existing.end_time):'20:00')+'"></div></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">'+(editing?'Enregistrer':'Ajouter')+'</button>');
+ document.getElementById('cancelM').onclick=closeModal;
+ document.getElementById('saveM').onclick=async()=>{const start=document.getElementById('avStart').value,end=document.getElementById('avEnd').value;if(!start||!end||end<=start)return toast('Horaires invalides');
+  const {error}=await supa.from('availability_windows').insert({coach_user_id:authUser.id,weekday:day,start_time:start,end_time:end});if(error)return toast('Erreur : '+error.message);
+  if(editing){const del=await supa.from('availability_windows').delete().eq('id',existing.id);if(del.error)toast('Erreur : '+del.error.message)}
+  closeModal();await loadSupabaseData();toast(editing?'Disponibilité modifiée':'Disponibilité ajoutée');render()};
+}
+function openExceptionModal(existing){
+ const editing=!!(existing&&existing.id);
+ const v=t=>esc(String(t||'').slice(0,5)),d=t=>esc(String(t||'').slice(0,10));
+ modal(editing?'Modifier le blocage':'Bloquer une période / un créneau',
+ '<div class="grid2"><div class="field"><label>Date de début</label><input id="exDate" type="date" class="input" value="'+(editing?d(existing.exception_date):'')+'"></div><div class="field"><label>Date de fin</label><input id="exEndDate" type="date" class="input" value="'+(editing?d(existing.end_date||existing.exception_date):'')+'"></div></div>'+
+ '<div class="grid2"><div class="field"><label>Heure de début (facultatif)</label><input id="exStart" type="time" class="input" value="'+(editing?v(existing.start_time):'')+'"></div><div class="field"><label>Heure de fin (facultatif)</label><input id="exEnd" type="time" class="input" value="'+(editing?v(existing.end_time):'')+'"></div></div>'+
+ '<div class="muted tiny">Sans horaires : toute la journée est bloquée pour chaque date de la période. Avec horaires sur un seul jour : seule cette plage est bloquée. Avec horaires sur plusieurs jours : tout est bloqué en continu, de l’heure de début le premier jour jusqu’à l’heure de fin le dernier jour.</div>'+
+ '<div class="field"><label>Note facultative</label><input id="exNote" class="input" placeholder="Ex. congés, déplacement, formation…" value="'+(editing?esc(existing.note||''):'')+'"></div>',
+ '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">'+(editing?'Enregistrer':'Bloquer la période')+'</button>');
  document.getElementById('cancelM').onclick=closeModal;
  const startDate=document.getElementById('exDate'),endDate=document.getElementById('exEndDate');
  startDate.onchange=()=>{if(!endDate.value||endDate.value<startDate.value)endDate.value=startDate.value};
- document.getElementById('saveM').onclick=async()=>{const date=startDate.value,last=endDate.value||date,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim();if(!date)return toast('Date de début requise');if(last<date)return toast('La date de fin doit être après le début');if((start&&!end)||(!start&&end)||(start&&end&&end<=start))return toast('Créneau invalide');const {error}=await supa.from('availability_exceptions').insert({coach_user_id:authUser.id,exception_date:date,end_date:last,start_time:start||null,end_time:end||null,note:note||null});if(error)return toast('Erreur : '+error.message);closeModal();await loadSupabaseData();toast('Période indisponible ajoutée');render()};
+ document.getElementById('saveM').onclick=async()=>{const date=startDate.value,last=endDate.value||date,start=document.getElementById('exStart').value,end=document.getElementById('exEnd').value,note=document.getElementById('exNote').value.trim()||null;
+  if(!date)return toast('Date de début requise');if(last<date)return toast('La date de fin doit être après le début');
+  if((start&&!end)||(!start&&end))return toast('Indique les deux horaires, ou aucun');
+  const base={coach_user_id:authUser.id,note};const rows=[];
+  if(!start)rows.push({...base,exception_date:date,end_date:last,start_time:null,end_time:null});
+  else if(date===last){if(end<=start)return toast('Sur une seule journée, l’heure de fin doit être après l’heure de début');rows.push({...base,exception_date:date,end_date:date,start_time:start,end_time:end})}
+  else{
+   rows.push({...base,exception_date:date,end_date:date,start_time:start,end_time:'23:59'});
+   const firstFull=akpAddDaysISO(date,1),lastFull=akpAddDaysISO(last,-1);
+   if(firstFull<=lastFull)rows.push({...base,exception_date:firstFull,end_date:lastFull,start_time:null,end_time:null});
+   rows.push({...base,exception_date:last,end_date:last,start_time:'00:00',end_time:end});
+  }
+  const {error}=await supa.from('availability_exceptions').insert(rows);if(error)return toast('Erreur : '+error.message);
+  if(editing){const del=await supa.from('availability_exceptions').delete().eq('id',existing.id);if(del.error)toast('Erreur : '+del.error.message)}
+  closeModal();await loadSupabaseData();toast(editing?'Blocage modifié':'Période indisponible ajoutée');render()};
 }
-
 function openRenewalModal(cl){
  if(!cl?.end)return toast('Ajoute une date de fin d’engagement');
  modal('Renouvellement — '+esc(cl.name),
