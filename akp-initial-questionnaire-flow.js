@@ -347,11 +347,10 @@ function standalone(s){
  }
  document.querySelectorAll('[data-ak-legal]').forEach(b=>b.onclick=()=>openPublicLegal(b.dataset.akLegal));
 }
-const oldEnter=enterClientPortal;
-enterClientPortal=async function(...args){
- await oldEnter.apply(this,args);
- const s=clientPortalState;
- if(!s?.client||!s?.template||authProfile?.role!=='client')return;
+async function prepareInitial(s){
+ if(!s?.client||!s?.template||authProfile?.role!=='client'||s.akInitialReady||s.akInitialLoading)return;
+ s.akInitialLoading=true;
+ try{
  const code=offerCode(s.client);
  if(!EXTRA[code])return;
  const base=s.template;
@@ -384,9 +383,11 @@ enterClientPortal=async function(...args){
  // Une connexion ouvre toujours l'accueil : le questionnaire reste
  // accessible depuis l'onglet Questionnaire et le rappel « À faire ».
  // L'onboarding n'empêche pas de consulter les autres rubriques.
- clientPortalView='home';
- renderClientPortal();
-};
+ if(clientPortalState===s&&['home','onboarding'].includes(clientPortalView))renderClientPortal();
+ }finally{s.akInitialLoading=false;}
+}
+const oldEnter=enterClientPortal;
+enterClientPortal=async function(...args){await oldEnter.apply(this,args);await prepareInitial(clientPortalState);};
 const oldRender=renderClientPortal;
 renderClientPortal=function(...args){
  const s=clientPortalState;
@@ -433,4 +434,5 @@ document.addEventListener('click',event=>{
  renderClientPortal();
 },true);
 window[KEY]=true;
+if(clientPortalState?.client)void prepareInitial(clientPortalState).catch(e=>console.error('Questionnaire initial :',e));
 })();
