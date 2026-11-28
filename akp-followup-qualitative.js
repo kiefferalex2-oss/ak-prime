@@ -54,11 +54,11 @@
  }
  function hasContent(r){return !!(r.coach||r.feeling||r.pain||r.problem||r.constraints||r.missed||r.other);}
  function tag(label,kind){return '<span class="akQFollowTag '+(kind||'')+'">'+esc(label)+'</span>';}
- function entry(r){
-  const details=[['Gêne ou douleur',r.pain],['Difficulté rencontrée',r.problem],
-   ['Contraintes à venir',r.constraints],['Séances manquées',r.missed],['Autres remarques',r.other]].filter(x=>x[1]);
+ function entry(r,m){
+  const details=(m?[['Situations difficiles',r.problem],['Outils mentaux utilisés',r.missed],['Progrès et changements',r.other],['Échéances et besoins',r.constraints],['Gêne (ancien bilan)',r.pain]]:[['Gêne ou douleur',r.pain],['Difficulté rencontrée',r.problem],
+   ['Contraintes à venir',r.constraints],['Séances manquées',r.missed],['Autres remarques',r.other]]).filter(x=>x[1]);
   const status=tag(r.coach?'Retour du coach':r.reviewed?'Bilan traité':'Bilan transmis',r.coach?'':'neutral');
-  const alerts=(r.pain?tag('Gêne signalée','warning'):'')+(r.problem?tag('Difficulté signalée','problem'):'');
+  const alerts=(!m&&r.pain?tag('Gêne signalée','warning'):'')+(r.problem?tag('Difficulté signalée','problem'):'');
   const text=r.coach||r.feeling||'Bilan enregistré';
   return '<article class="akQFollowEntry">'+
     '<div class="akQFollowDate">'+(r.date?fmtDate(r.date):'Date inconnue')+'</div>'+
@@ -71,6 +71,7 @@
     '</div></article>';
  }
  passportFollowupPage=function(m){
+  const mental=m.pole==='Mental'||/^M[12]$/i.test(String(m.offer||''));
   const all=(m.checkins||[]).map(fromCheckin).sort((a,b)=>b.date.localeCompare(a.date));
   const recent=all.filter(hasContent).slice(0,3),older=all.filter(x=>!recent.includes(x));
   const coaches=all.filter(x=>x.coach).length;
@@ -81,11 +82,11 @@
     '<small>Les derniers retours importants sont affichés en priorité.</small></div>'+
     '<span class="akQFollowCount">'+all.length+' bilan'+(all.length>1?'s':'')+
       (coaches?' · '+coaches+' retour'+(coaches>1?'s':'')+' du coach':'')+'</span></div>'+
-    (recent.length?recent.map(entry).join(''):'<div class="akQFollowEmpty">'+
+    (recent.length?recent.map(r=>entry(r,mental)).join(''):'<div class="akQFollowEmpty">'+
      (all.length?'Aucun retour détaillé à afficher pour le moment.':'Aucun bilan hebdomadaire pour le moment.')+'</div>')+
     (older.length?'<details class="akQFollowMore"><summary>Afficher '+older.length+
       ' autre'+(older.length>1?'s':'')+' bilan'+(older.length>1?'s':'')+' ↓</summary>'+
-      older.map(entry).join('')+'</details>':'')+
+      older.map(r=>entry(r,mental)).join('')+'</details>':'')+
    '</section></div>';
  };
  window.AKP_QUALITATIVE_FOLLOWUP_READY=true;
