@@ -123,7 +123,7 @@ document.addEventListener('click', async function(event) {
     // Évite de réutiliser un script ancien malgré des mises à jour publiées sur GitHub.
     // Cloudflare Pages revalide chaque fichier (ETag) : pas besoin de forcer un
     // nouveau téléchargement à chaque visite, le navigateur reçoit la dernière version.
-    script.src='./'+file+'?v=20261128-navigation-fix';
+    script.src='./'+file+'?v=20261128-questionnaire-fix-v2';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
