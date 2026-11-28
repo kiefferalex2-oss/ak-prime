@@ -4321,7 +4321,7 @@ async function enterClientPortal(user,profile){
 
  // Les rappels AK PRIME conduisent directement au bon onglet après connexion.
  const requestedSection=new URL(location.href).searchParams.get('client_section');
- clientPortalView=['suivi','checkin','billing','passport','visios','avis','home'].includes(requestedSection)?requestedSection:clientPortalView;
+ clientPortalView=['suivi','checkin','billing','passport','visios','avis','home','onboarding'].includes(requestedSection)?requestedSection:clientPortalView;
  
  clientVisioWeek=0;
  clientVisioDay='';
@@ -7059,6 +7059,6 @@ clientNotifications=function(s){const n=oldNotif(s);if(!mental(s?.client))return
 initAuth();
 </script>
   <script src="./akp-public-test-flow.js?v=akp-confirmation-20261030-v4"></script>
-  <script src="./contract-archive-secure.js?v=akprime-navigation-20261128-v4"></script>
+  <script src="./contract-archive-secure.js?v=akprime-questionnaire-20261128-v5"></script>
 </body>
 </html>
