@@ -754,7 +754,7 @@
      '<div class="muted tiny" style="margin:8px 0">Les recommandations saisies ci-dessus apparaissent directement dans l’espace client une fois publiées. Une version imprimable peut également être enregistrée en PDF depuis le dossier coach, sans pièce jointe obligatoire.</div>'+
      '<div class="field" style="margin-top:12px"><label>PDF externe de recommandations (facultatif, 5 Mo maximum)</label><input id="offerMacroPdfFile" class="input" type="file" accept=".pdf,application/pdf"></div>'+
      '<label class="check"><input id="offerMacroPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Publier les objectifs de calories et macronutriments dans l’espace client</label>'+
-     (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Les valeurs peuvent être publiées seules. Le PDF sert uniquement de recommandations complémentaires.</div>'):''),
+     (details.pdf_path?'<div class="muted tiny">PDF déjà enregistré : tu peux le conserver ou le remplacer.</div>':'<div class="muted tiny">Les valeurs peuvent être publiées seules. Le PDF sert uniquement de recommandations complémentaires.</div>'):type.startsWith('mental_')?'<label class="check"><input id="offerMentalPublish" type="checkbox" '+(row?.client_visible?'checked':'')+'> Publier les exercices et consignes dans l’espace client (observations internes exclues)</label>':''),
 
     '<button class="btn ghost" id="cancelM">Annuler</button><button class="btn primary" id="saveM">Enregistrer</button>');
    document.getElementById('cancelM').onclick=closeModal;
@@ -784,7 +784,7 @@
      if(type==='sleep_entry'&&(!out.hours||!out.quality))return alert('Renseigne la durée et la qualité du sommeil.');
      const macro=type==='macro_budget';
      const pdf=macro?document.getElementById('offerMacroPdfFile')?.files?.[0]:null;
-     const publish=macro&&!!document.getElementById('offerMacroPublish')?.checked;
+     const publish=macro?!!document.getElementById('offerMacroPublish')?.checked:type.startsWith('mental_')&&!!document.getElementById('offerMentalPublish')?.checked;
      if(pdf&&(pdf.size>5242880||pdf.size===0||!(/\.pdf$/i.test(pdf.name)&&pdf.type==='application/pdf')))
        return alert('Sélectionne un PDF valide de 5 Mo maximum.');
      const save=document.getElementById('saveM');save.disabled=true;
