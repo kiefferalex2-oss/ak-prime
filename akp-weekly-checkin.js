@@ -1,6 +1,8 @@
 /* AK PRIME — bilans qualitatifs hebdomadaires (séparés d'Optitrainer). */
 (function(){
  'use strict';
+ if(window.AKP_WEEKLY_CHECKIN_READY)return;
+ const mental=c=>c?.current_pole==='Mental'||c?.pole==='Mental'||/^M[12]$/i.test(String(c?.current_offer||c?.offer||''));
  const css=document.createElement('style');
  css.textContent=[
   '.akWeekDetails{border:1px solid #dfe6ef;border-radius:11px;padding:11px 13px;margin:9px 0;background:#fcfdff}',
@@ -43,14 +45,14 @@
   const active=s?.client?.status==='active';
   const due=active&&from&&w.due>=from&&w.due<=w.now;
   const answer=(s?.checkins||[]).find(x=>iso(x.week_date)===w.due);
-  return {...w,due,answer};
+  return {...w,eligible:!!due,answer};
  }
  function clientBlock(s){
-  const w=current(s),active=s?.client?.status==='active';
+  const w=current(s),active=s?.client?.status==='active',m=mental(s.client);
   if(!active)return '<div class="client-section-card"><h3>Bilan hebdomadaire AK PRIME</h3><p class="muted tiny">Disponible lorsque ton accompagnement est actif.</p></div>';
   if(w.answer){
    const a=w.answer;
-   const fields=[['Semaine',a.overall_week],['Difficultés',a.exercise_problem],
+   const fields=m?[['État mental',a.overall_week],['Situations difficiles',a.exercise_problem],['Outils mentaux utilisés',a.missed_sessions],['Progrès et changements',a.other_info],['Échéances et besoins',a.next_week_constraints],['Gêne (ancien bilan)',a.pain_or_discomfort]]:[['Semaine',a.overall_week],['Difficultés',a.exercise_problem],
      ['Séances manquées',a.missed_sessions],['Gênes',a.pain_or_discomfort],
      ['Changements souhaités',a.other_info],['Contraintes',a.next_week_constraints]];
    return '<div class="client-section-card"><div class="row between"><div><h3>Bilan hebdomadaire AK PRIME</h3>'+
@@ -64,14 +66,21 @@
      '<p class="muted tiny">Ton bilan est bien enregistré et consultable par ton coach.</p>')+
     '</div>';
   }
-  if(!w.due)return '<div class="client-section-card"><div class="row between"><div>'+
+  if(!w.eligible)return '<div class="client-section-card"><div class="row between"><div>'+
     '<h3>Bilan hebdomadaire AK PRIME</h3><p class="muted tiny">Prochain questionnaire disponible vendredi '+
     fmtDate(w.next)+' à 18 h.</p></div><span class="status blue">À venir</span></div>'+
-    '<p class="muted tiny">Le suivi quotidien autour des séances reste sur Optitrainer.</p></div>';
+    (m?'':'<p class="muted tiny">Le suivi quotidien autour des séances reste sur Optitrainer.</p>')+'</div>';
   return '<div class="client-section-card akWeekInput"><div class="row between"><div>'+
-    '<h3>Bilan hebdomadaire AK PRIME</h3>'+
-    '<p class="muted tiny">Semaine du '+fmtDate(w.due)+' · 2 minutes, distinct du suivi quotidien Optitrainer.</p></div>'+
+    '<h3>'+(m?'Bilan hebdomadaire – Préparation mentale':'Bilan hebdomadaire AK PRIME')+'</h3>'+
+    '<p class="muted tiny">Semaine du '+fmtDate(w.due)+(m?' · 2 minutes, fais le point sur ton évolution mentale.':' · 2 minutes, distinct du suivi quotidien Optitrainer.')+'</p></div>'+
     '<span class="status amber">À remplir</span></div>'+
+    (m?[
+      ['ciOverall','Comment t’es-tu senti mentalement cette semaine ? *','État d’esprit, motivation, confiance, stress, émotions…'],
+      ['ciProblem','As-tu rencontré des situations mentalement difficiles ?','Pression, frustration, confiance, concentration…'],
+      ['ciMissed','As-tu utilisé les outils et exercices mentaux travaillés ensemble ?','Dans quelles situations ? Avec quels effets ?'],
+      ['ciOther','As-tu constaté des progrès ou des changements dans ton fonctionnement mental ?','Réactions, pensées, comportements, gestion des émotions…'],
+      ['ciConstraint','As-tu une échéance, une appréhension ou un besoin particulier pour la semaine prochaine ?','Compétition, situation stressante, aspect mental à travailler…']
+    ].map(([id,label,hint])=>'<div class="field"><label>'+label+'</label><textarea id="'+id+'" class="textarea" maxlength="1500" placeholder="'+hint+'"></textarea></div>').join(''):
     '<div class="field"><label>Comment s’est passée ta semaine ? *</label>'+
     '<textarea id="ciOverall" class="textarea" maxlength="1500" placeholder="Bien, mitigée, difficile… pourquoi ?"></textarea></div>'+
     '<div class="field"><label>Des difficultés avec les séances ou la programmation ?</label>'+
@@ -81,7 +90,7 @@
     '<div class="field"><label>Quelque chose qui te gêne dans l’accompagnement ou que tu voudrais changer ?</label>'+
     '<textarea id="ciOther" class="textarea" maxlength="1500" placeholder="Non, ou ce que tu aimerais améliorer"></textarea></div>'+
     '<div class="field"><label>Des contraintes la semaine prochaine ?</label>'+
-    '<textarea id="ciConstraint" class="textarea" maxlength="1500" placeholder="Non, ou précise"></textarea></div>'+
+    '<textarea id="ciConstraint" class="textarea" maxlength="1500" placeholder="Non, ou précise"></textarea></div>')+
     '<button class="btn primary" id="submitWeeklyCheckin">Envoyer mon bilan au coach</button>'+
     '<p class="muted tiny">Tes réponses sont consultées dans ton dossier AK PRIME.</p></div>';
  }
@@ -94,7 +103,7 @@
   if(!page)return wrapper.innerHTML;
   const card='<div class="client-section-card"><div class="row between" style="gap:10px;flex-wrap:wrap"><div>'+
    '<h3 style="margin:0">Bilan hebdomadaire AK PRIME</h3>'+
-   '<p class="muted tiny" style="margin:6px 0 0">Ressenti de la semaine, difficultés, gênes et ajustements souhaités, une fois par semaine.</p></div>'+
+   '<p class="muted tiny" style="margin:6px 0 0">'+(mental(s.client)?'État mental, difficultés, outils et progrès, une fois par semaine.':'Ressenti de la semaine, difficultés, gênes et ajustements souhaités, une fois par semaine.')+'</p></div>'+
    '<button class="btn primary small clientGoCheckin">Ouvrir le bilan hebdo</button></div></div>';
   const head=page.querySelector('.client-page-head');
   (head||page).insertAdjacentHTML(head?'afterend':'afterbegin',card);
@@ -103,7 +112,7 @@
  const origHome=renderClientHome;
  renderClientHome=function(s){
   const html=origHome(s);if(s?.client?.status!=='active')return html;
-  const w=current(s),pending=w.due&&!w.answer;
+  const w=current(s),pending=w.eligible&&!w.answer;
   const card='<div class="client-action-card '+(pending?'urgent':'')+'" style="margin:12px 0"><strong>'+
     (pending?'Ton bilan hebdomadaire est disponible':'Prochain bilan hebdomadaire AK PRIME')+'</strong>'+
     '<div class="muted tiny" style="margin:6px 0">'+
@@ -122,7 +131,7 @@
  clientNotifications=function(s){
   const prev=origClientNotif(s).filter(x=>!String(x.key||'').startsWith('client:checkin:'));
   if(s?.client?.status!=='active')return prev;
-  const w=current(s);if(!w.due||w.answer)return prev;
+  const w=current(s);if(!w.eligible||w.answer)return prev;
   const key='client:checkin:'+w.due,reads=new Set((s.notificationReads||[]).map(x=>x.notification_key));
   return [{key,title:'Bilan hebdomadaire AK PRIME à compléter',
     detail:'Ton court questionnaire de fin de semaine est disponible dans Mon suivi.',
@@ -155,17 +164,17 @@
    '<span class="status amber">'+todo.length+'</span></h3>'+
    '<div class="list">'+todo.slice(0,6).map(({c,w})=>
     '<div class="item row between"><div><strong>'+esc(c.name)+'</strong><div class="muted tiny">'+fmtDate(w.date)+
-    (akpPainReported(w.pain)?' · Gêne signalée':'')+'</div></div>'+
+    (!mental(c)&&akpPainReported(w.pain)?' · Gêne signalée':'')+'</div></div>'+
     '<button class="btn ghost small openClient" data-id="'+esc(c.id)+'" data-tab-target="follow">Consulter</button></div>').join('')+
    '</div></div>'+html;
  };
- function rowsMarkup(rows){
+ function rowsMarkup(rows,m){
   return rows.map(w=>{
-   const answers=[['Ressenti général',w.feeling],['Séances non réalisées',w.missed],['Difficultés',w.problem],
+   const answers=(m?[['État mental',w.feeling],['Situations difficiles',w.problem],['Outils mentaux utilisés',w.missed],['Progrès et changements',w.other],['Échéances et besoins',w.nextConstraint],['Gêne (ancien bilan)',w.pain]]:[['Ressenti général',w.feeling],['Séances non réalisées',w.missed],['Difficultés',w.problem],
     ['Gêne ou douleur',w.pain],['Ce qui gêne / à améliorer',w.other],
-    ['Contraintes prochaines',w.nextConstraint]].filter(([,value])=>present(value));
+    ['Contraintes prochaines',w.nextConstraint]]).filter(([,value])=>present(value));
    return '<details class="akWeekDetails"><summary><span>Semaine du '+fmtDate(w.date)+'</span> '+
-    (akpPainReported(w.pain)?'<span class="status amber">Gêne signalée</span> ':'')+
+    (!m&&akpPainReported(w.pain)?'<span class="status amber">Gêne signalée</span> ':'')+
     '<span class="status '+(pending(w)?'amber':'green')+'">'+(pending(w)?'À traiter':'Traité')+'</span></summary>'+
     '<div style="margin-top:12px">'+(answers.length?answers.map(([label,val])=>
      '<div class="akWeekFact"><span>'+esc(label)+'</span><div>'+esc(val)+'</div></div>').join(''):
@@ -180,17 +189,17 @@
   const all=(c.checkins||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   const todo=all.filter(pending),done=all.filter(w=>!pending(w));
   return '<div class="page-title"><div><h1>Bilans hebdomadaires AK PRIME</h1>'+
-   '<p>Retours qualitatifs du client chaque semaine, sans recopier la charge ni l’état de forme quotidien d’Optitrainer.</p></div>'+
+   '<p>'+(mental(c)?'Suivi qualitatif de la préparation mentale, semaine après semaine.':'Retours qualitatifs du client chaque semaine, sans recopier la charge ni l’état de forme quotidien d’Optitrainer.')+'</p></div>'+
    '<button class="btn ghost small akRefreshWeek">Actualiser</button></div>'+
    '<div class="akWeekColumns"><div>'+
    '<div class="card panel"><div class="row between"><h3>À traiter</h3><span class="status '+(todo.length?'amber':'green')+'">'+todo.length+'</span></div>'+
-   (todo.length?rowsMarkup(todo):'<p class="muted tiny">Aucun bilan en attente.</p>')+'</div>'+
+   (todo.length?rowsMarkup(todo,mental(c)):'<p class="muted tiny">Aucun bilan en attente.</p>')+'</div>'+
    '<details class="card panel" style="margin-top:13px"><summary style="cursor:pointer"><strong>Historique des bilans traités</strong> '+
     '<span class="status blue">'+done.length+'</span></summary>'+
-   '<div style="margin-top:10px">'+(done.length?rowsMarkup(done):'<p class="muted tiny">Aucun ancien bilan.</p>')+'</div></details></div>'+
+   '<div style="margin-top:10px">'+(done.length?rowsMarkup(done,mental(c)):'<p class="muted tiny">Aucun ancien bilan.</p>')+'</div></details></div>'+
    '<div><div class="card panel"><h3>Comment fonctionne le suivi ?</h3>'+
    '<p><strong>Vendredi à 18 h :</strong> questionnaire disponible dans l’espace client, avec rappel interne.</p>'+
-   '<p><strong>Client :</strong> ressenti, problèmes, gênes, besoins d’ajustement et contraintes.</p>'+
+   '<p><strong>Client :</strong> '+(mental(c)?'état mental, difficultés, outils, progrès et échéances.':'ressenti, problèmes, gênes, besoins d’ajustement et contraintes.')+'</p>'+
    '<p><strong>Coach :</strong> lecture ici, retour / décision conservé dans l’historique.</p>'+
    '<p class="muted tiny">Aucun e-mail automatique configuré pour le moment.</p></div>'+
    (c.pole!=='Mental'?'<div class="card panel" style="margin-top:13px"><h3>Suivi quotidien Optitrainer</h3>'+
