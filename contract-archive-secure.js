@@ -110,8 +110,10 @@ document.addEventListener('click', async function(event) {
         loadSupabaseData().then(()=>render()).catch(e=>fail('actualisation Supabase',e.message));
       }else if(authUser&&authProfile?.role==='client'){
         // Réinitialise l’espace client si le module a été chargé après la session.
-        enterClientPortal(authUser,authProfile).catch(e=>
-          console.error('AK PRIME : affichage des outils client',e));
+        if(clientPortalState?.client){
+          // Ne pas relancer la connexion ni réinitialiser l'onglet actif.
+          // Le prochain clic affichera naturellement les modules chargés.
+        }
       }
       return;
     }
@@ -121,7 +123,7 @@ document.addEventListener('click', async function(event) {
     // Évite de réutiliser un script ancien malgré des mises à jour publiées sur GitHub.
     // Cloudflare Pages revalide chaque fichier (ETag) : pas besoin de forcer un
     // nouveau téléchargement à chaque visite, le navigateur reçoit la dernière version.
-    script.src='./'+file;
+    script.src='./'+file+'?v=20261128-navigation-fix';
     script.onload=()=>{
       if(window[flag]!==true){fail(file,'le module n’a pas terminé son initialisation');return;}
       next(i+1);
